@@ -1,0 +1,14 @@
+{
+  "name": "quinntyne-brown",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "typings": "^1.3.1"
+  }
+}

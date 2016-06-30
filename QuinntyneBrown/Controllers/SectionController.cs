@@ -41,8 +41,6 @@ namespace QuinntyneBrown.Controllers
         [ResponseType(typeof(int))]
         public IHttpActionResult Remove(int id) { return Ok(_sectionService.Remove(id)); }
 
-        protected readonly ISectionService _sectionService;
-
-
+        protected readonly ISectionService _sectionService;        
     }
 }
