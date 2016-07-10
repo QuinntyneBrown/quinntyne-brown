@@ -141,6 +141,10 @@
       <HintPath>..\packages\SerilogMetrics.AddProperties.Fork.1.0.36\lib\net45\SerilogMetrics.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SerilogWeb.Classic, Version=2.0.0.0, Culture=neutral, PublicKeyToken=9462ddd55fbc0e7f, processorArchitecture=MSIL">
+      <HintPath>..\packages\SerilogWeb.Classic.2.0.9\lib\net45\SerilogWeb.Classic.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
       <HintPath>..\packages\Swashbuckle.Core.5.3.2\lib\net40\Swashbuckle.Core.dll</HintPath>
       <Private>True</Private>
@@ -179,6 +183,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Cors, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.3\lib\net45\System.Web.Cors.dll</HintPath>
@@ -231,29 +236,56 @@
     <Compile Include="ApiConfiguration.cs" />
     <Compile Include="App_Start\AppActivator.cs" />
     <Compile Include="Common\FailedRequestException.cs" />
+    <Compile Include="Configuration\ITraceConfiguration.cs" />
+    <Compile Include="Configuration\TraceConfiguration.cs" />
     <Compile Include="Controllers\ArticleController.cs" />
     <Compile Include="Controllers\ClientErrorController.cs" />
+    <Compile Include="Controllers\RssFeedController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Dtos\CurrentUserResponseDto.cs" />
     <Compile Include="Dtos\PhotoUploadResponseDto.cs" />
+    <Compile Include="Dtos\UserAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\UserAddOrUpdateResponseDto.cs" />
+    <Compile Include="Dtos\UserDto.cs" />
+    <Compile Include="Helpers\StartupHelper.cs" />
     <Compile Include="Models\App.cs" />
     <Compile Include="Models\AppProperty.cs" />
+    <Compile Include="Models\ArticlePhoto.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\Customer.cs" />
+    <Compile Include="Models\CustomerGallery.cs" />
+    <Compile Include="Models\CustomerPhoto.cs" />
     <Compile Include="Models\Gallery.cs" />
     <Compile Include="Models\GalleryPhoto.cs" />
+    <Compile Include="Models\Person.cs" />
     <Compile Include="Models\Photo.cs" />
+    <Compile Include="Models\Photographer.cs" />
+    <Compile Include="Models\PhotographerGallery.cs" />
+    <Compile Include="Models\PhotographerPhoto.cs" />
     <Compile Include="Models\PropertyType.cs" />
+    <Compile Include="Models\Role.cs" />
     <Compile Include="Models\Section.cs" />
     <Compile Include="Models\Property.cs" />
     <Compile Include="Models\SectionProperty.cs" />
+    <Compile Include="Models\Tag.cs" />
     <Compile Include="Models\UI.cs" />
     <Compile Include="Models\UIProperty.cs" />
     <Compile Include="Models\UISection.cs" />
+    <Compile Include="Models\User.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="SelfHostOptions.cs" />
+    <Compile Include="Services\IRssFeedService.cs" />
+    <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\PropertyHelper.cs" />
+    <Compile Include="Services\RssFeedService.cs" />
+    <Compile Include="Services\UserService.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="Trace\SearchTrace.cs" />
+    <Compile Include="Trace\EventIdEnricher.cs" />
+    <Compile Include="Trace\ITraceService.cs" />
+    <Compile Include="Trace\LoggerExtensions.cs" />
     <Compile Include="Trace\TraceEvent.cs" />
+    <Compile Include="Trace\TraceService.cs" />
     <Compile Include="Trace\TracingEvents.cs" />
     <Compile Include="UploadHandlers\FileMultipartFormDataStreamProvider.cs" />
     <Compile Include="UploadHandlers\InMemoryMultipartFormDataStreamProvider.cs" />
@@ -340,6 +372,27 @@
     <Compile Include="Dtos\GalleryAddOrUpdateResponseDto.cs" />
     <Compile Include="Controllers\GalleryController.cs" />
     <Compile Include="Controllers\PhotoController.cs" />
+    <Compile Include="Dtos\CustomerDto.cs" />
+    <Compile Include="Dtos\CustomerAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\CustomerAddOrUpdateResponseDto.cs" />
+    <Compile Include="Dtos\PhotographerDto.cs" />
+    <Compile Include="Dtos\PhotographerAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\PhotographerAddOrUpdateResponseDto.cs" />
+    <Compile Include="Services\CustomerService.cs" />
+    <Compile Include="Services\ICustomerService.cs" />
+    <Compile Include="Services\PhotographerService.cs" />
+    <Compile Include="Services\IPhotographerService.cs" />
+    <Compile Include="Controllers\CustomerController.cs" />
+    <Compile Include="Controllers\PhotographerController.cs" />
+    <Compile Include="Dtos\AuthorDto.cs" />
+    <Compile Include="Dtos\AuthorAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\AuthorAddOrUpdateResponseDto.cs" />
+    <Compile Include="Dtos\CategoryDto.cs" />
+    <Compile Include="Dtos\CategoryAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\CategoryAddOrUpdateResponseDto.cs" />
+    <Compile Include="Dtos\TagDto.cs" />
+    <Compile Include="Dtos\TagAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\TagAddOrUpdateResponseDto.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

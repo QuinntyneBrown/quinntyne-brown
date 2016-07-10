@@ -6,6 +6,4 @@ import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/s
     selector: "article-editor-container",
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ArticleEditorContainerComponent {
-    constructor() { }
-}
+export class ArticleEditorContainerComponent { }

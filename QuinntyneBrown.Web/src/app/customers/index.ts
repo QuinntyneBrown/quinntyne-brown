@@ -14,3 +14,5 @@ bootstrap(customersModule, {
     reducers: reducers,
     actions: actions
 });
+
+export * from "./customers.routes";

@@ -4,11 +4,12 @@ require("./app/galleries");
 require("./app/login");
 require("./app/photos");
 
-import { ArticlesRoutes, ArticleEditorContainerComponent, ArticlesContainerComponent, ArticleContainerComponent } from "./app/articles";
-import {  } from "./app/customers";
-import {  } from "./app/galleries";
+import { ArticlesRoutes } from "./app/articles";
+import { CustomersRoutes } from "./app/customers";
+import { GalleriesRoutes } from "./app/galleries";
 import { LoginRoutes, LoginContainerComponent } from "./app/login";
-import {  } from "./app/photos";
+import { PhotosRoutes } from "./app/photos";
+import { PhotographersRoutes } from "./app/photographers";
 
 import { provide, provideRoutePromise, bootstrap } from "angular-rx-ui/src/components/core";
 import { authorizationGuard } from "angular-rx-ui/src/components/routing/authorization-guard";
@@ -20,7 +21,8 @@ const quinntynebrownAppModule = angular.module("quinntynebrownApp", [
     "quinntynebrown.customers",
     "quinntynebrown.galleries",
     "quinntynebrown.login",
-    "quinntynebrown.photos"    
+    "quinntynebrown.photos",
+    "quinntynebrown.photographers"    
 ]);
 
 bootstrap(quinntynebrownAppModule, {
@@ -31,6 +33,10 @@ bootstrap(quinntynebrownAppModule, {
     run:[routeChangeSuccessIsAdminReducer],
     routes: [
         ...ArticlesRoutes,
-        ...LoginRoutes
+        ...CustomersRoutes,
+        ...GalleriesRoutes,
+        ...LoginRoutes,
+        ...PhotosRoutes,
+        ...PhotographersRoutes
     ]
 });

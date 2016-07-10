@@ -14,3 +14,5 @@ bootstrap(photosModule, {
     actions: actions
 });
 
+export * from "./photos.routes";
+

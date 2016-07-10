@@ -13,9 +13,9 @@ namespace QuinntyneBrown.Services
     {
         public AppService(IUow uow, ICacheProvider cacheProvider)
         {
-            this.uow = uow;
-            this._repository = uow.Apps;
-            this.cache = cacheProvider.GetCache();
+            _uow = uow;
+            _repository = uow.Apps;
+            _cache = cacheProvider.GetCache();
         }
 
         public AppAddOrUpdateResponseDto AddOrUpdate(AppAddOrUpdateRequestDto request)
@@ -24,7 +24,7 @@ namespace QuinntyneBrown.Services
                 .FirstOrDefault(x => x.Id == request.Id && x.IsDeleted == false);
             if (entity == null) _repository.Add(entity = new App());
             entity.Name = request.Name;
-            uow.SaveChanges();
+            _uow.SaveChanges();
             return new AppAddOrUpdateResponseDto(entity);
         }
 
@@ -32,7 +32,7 @@ namespace QuinntyneBrown.Services
         {
             var entity = _repository.GetById(id);
             entity.IsDeleted = true;
-            uow.SaveChanges();
+            _uow.SaveChanges();
             return id;
         }
 
@@ -53,8 +53,8 @@ namespace QuinntyneBrown.Services
         public IQueryable<App> GetAll() => _repository.GetAll()
             .Include(x=>x.UIs);
 
-        protected readonly IUow uow;
+        protected readonly IUow _uow;
         protected readonly IRepository<App> _repository;
-        protected readonly ICache cache;
+        protected readonly ICache _cache;
     }
 }

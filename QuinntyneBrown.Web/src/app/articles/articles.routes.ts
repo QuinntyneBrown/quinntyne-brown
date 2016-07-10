@@ -6,7 +6,7 @@ import { IRouteConfig } from "angular-rx-ui/src/components/core";
 
 export const ArticlesRoutes: Array<IRouteConfig> = [
     {
-        path: "/",
+        path: "/blog",
         component: ArticlesContainerComponent
     },
     {
@@ -14,7 +14,7 @@ export const ArticlesRoutes: Array<IRouteConfig> = [
         component: ArticleContainerComponent
     },
     {
-        path: "/admin",
+        path: "/admin/articles",
         component: ArticleEditorContainerComponent,
         authorizationRequired: true
     },
@@ -23,4 +23,4 @@ export const ArticlesRoutes: Array<IRouteConfig> = [
         component: ArticleEditorContainerComponent,
         authorizationRequired: true
     }
-]
+];

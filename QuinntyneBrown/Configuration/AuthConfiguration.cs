@@ -56,10 +56,7 @@ namespace QuinntyneBrown.Configuration
         {
             var section = ConfigurationManager.GetSection("authConfiguration") as IAuthConfiguration;
             if (section == null)
-            {
                 throw new ConfigurationErrorsException("authConfiguration");
-            }
-
             return section;
         }, true);
     }

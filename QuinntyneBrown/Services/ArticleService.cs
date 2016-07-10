@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using QuinntyneBrown.Dtos;
 using QuinntyneBrown.Data;
 using System.Linq;
+using QuinntyneBrown.Models;
 
 namespace QuinntyneBrown.Services
 {
@@ -45,6 +46,8 @@ namespace QuinntyneBrown.Services
             _uow.SaveChanges();
             return id;
         }
+
+        public IQueryable<Article> GetAll() => _repository.GetAll();
 
         protected readonly IUow _uow;
         protected readonly IRepository<Models.Article> _repository;

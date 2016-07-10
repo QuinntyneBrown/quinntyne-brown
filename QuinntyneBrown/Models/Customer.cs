@@ -1,0 +1,11 @@
+﻿using System.Collections.Generic;
+
+namespace QuinntyneBrown.Models
+{
+    public class Customer: Person
+    {
+
+        public ICollection<CustomerGallery> CustomerGalleries { get; set; } = new HashSet<CustomerGallery>();
+        public ICollection<CustomerPhoto> CustomerPhotos { get; set; } = new HashSet<CustomerPhoto>();
+    }
+}

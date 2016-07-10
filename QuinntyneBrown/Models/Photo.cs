@@ -18,5 +18,7 @@ namespace QuinntyneBrown.Models
         public Guid? UniqueId { get; set; } = Guid.NewGuid();
         public bool IsDeleted { get; set; }
         public ICollection<GalleryPhoto> GalleryPhotos { get; set; } = new HashSet<GalleryPhoto>();
+        public ICollection<ArticlePhoto> ArticlePhotos { get; set; } = new HashSet<ArticlePhoto>();
+        public ICollection<PhotographerPhoto> PhotographerPhotos { get; set; } = new HashSet<PhotographerPhoto>();
     }
 }

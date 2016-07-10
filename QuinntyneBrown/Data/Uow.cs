@@ -33,6 +33,10 @@ namespace QuinntyneBrown.Data
         public IRepository<Article> Articles { get { return GetStandardRepo<Article>(); } }
         public IRepository<Photo> Photos { get { return GetStandardRepo<Photo>(); } }
         public IRepository<Gallery> Galleries { get { return GetStandardRepo<Gallery>(); } }
+        public IRepository<User> Users { get { return GetStandardRepo<User>(); } }
+        public IRepository<Role> Roles { get { return GetStandardRepo<Role>(); } }
+        public IRepository<Photographer> Photographers { get { return GetStandardRepo<Photographer>(); } }
+        public IRepository<Customer> Customers { get { return GetStandardRepo<Customer>(); } }
 
         protected void ConfigureDbContext(IDbContext dbContext)
         {

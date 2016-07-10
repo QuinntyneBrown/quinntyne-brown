@@ -20,6 +20,12 @@ namespace QuinntyneBrown.Data
         public DbSet<Property> Properties { get; set; }
         public DbSet<Photo> Photos { get; set; }
         public DbSet<Gallery> Galleries { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Photographer> Photographers { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Tag> Tags { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

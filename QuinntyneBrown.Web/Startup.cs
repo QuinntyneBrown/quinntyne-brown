@@ -2,6 +2,7 @@ using Owin;
 using System.Web.Http;
 using Microsoft.Owin;
 using Unity.WebApi;
+using static QuinntyneBrown.Helpers.StartupHelper;
 
 [assembly: OwinStartup(typeof(QuinntyneBrown.Web.Startup))]
 
@@ -13,7 +14,9 @@ namespace QuinntyneBrown.Web
         {            
             GlobalConfiguration.Configure(config =>
             {
-                config.DependencyResolver = new UnityDependencyResolver(UnityConfiguration.GetContainer());
+                var container = UnityConfiguration.GetContainer();
+                InitLogging(container);
+                config.DependencyResolver = new UnityDependencyResolver(container);
                 QuinntyneBrown.ApiConfiguration.Install(config, app);
             });
         }

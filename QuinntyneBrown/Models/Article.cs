@@ -10,6 +10,7 @@ namespace QuinntyneBrown.Models
         public string ArticleBody { get; set; }
         public string Excerpt { get; set; }
         public string Headline { get; set; }
+        public string Url { get; set; }
         public string AlternativeHeadline { get; set; }
         public DateTime? DatePublished { get; set; }
         public DateTime? DateModified { get; set; }
@@ -21,6 +22,6 @@ namespace QuinntyneBrown.Models
         public int? AuthorId { get; set; }
         public Author Author { get; set; }
         public ICollection<Category> Categories { get; set; } = new HashSet<Category>();
-        public ICollection<Photo> Photos { get; set; } = new HashSet<Photo>();
+        public ICollection<ArticlePhoto> ArticlePhotos { get; set; } = new HashSet<ArticlePhoto>();
     }
 }

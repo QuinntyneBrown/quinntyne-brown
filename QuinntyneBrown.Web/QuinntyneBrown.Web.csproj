@@ -134,6 +134,26 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Serilog.Sinks.MSSqlServer, Version=3.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.Sinks.MSSqlServer.3.0.98\lib\net45\Serilog.Sinks.MSSqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SerilogMetrics, Version=1.0.0.0, Culture=neutral, PublicKeyToken=d4b150f150627b06, processorArchitecture=MSIL">
+      <HintPath>..\packages\SerilogMetrics.AddProperties.Fork.1.0.36\lib\net45\SerilogMetrics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SerilogWeb.Classic, Version=2.0.0.0, Culture=neutral, PublicKeyToken=9462ddd55fbc0e7f, processorArchitecture=MSIL">
+      <HintPath>..\packages\SerilogWeb.Classic.2.0.9\lib\net45\SerilogWeb.Classic.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
       <HintPath>..\packages\Swashbuckle.Core.5.3.2\lib\net40\Swashbuckle.Core.dll</HintPath>
       <Private>True</Private>
@@ -228,6 +248,18 @@
     <Content Include="src\app\customers\customer.component.scss">
       <DependentUpon>customer.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\galleries\galleries-container.component.html">
+      <DependentUpon>galleries-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\galleries\galleries-container.component.scss">
+      <DependentUpon>galleries-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\galleries\gallery-container.component.html">
+      <DependentUpon>gallery-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\galleries\gallery-container.component.scss">
+      <DependentUpon>gallery-container.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\galleries\gallery-editor-container.component.html">
       <DependentUpon>gallery-editor-container.component.ts</DependentUpon>
     </Content>
@@ -246,6 +278,12 @@
     <Content Include="src\app\login\login-container.component.scss">
       <DependentUpon>login-container.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\photographers\photographer.component.html">
+      <DependentUpon>photographer.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photographers\photographer.component.scss">
+      <DependentUpon>photographer.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\photos\photo-editor-container.component.html">
       <DependentUpon>photo-editor-container.component.ts</DependentUpon>
     </Content>
@@ -257,6 +295,18 @@
     </Content>
     <Content Include="src\app\photos\photo.component.scss">
       <DependentUpon>photo.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\shared\app-footer\app-footer.component.html">
+      <DependentUpon>app-footer.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\shared\app-footer\app-footer.component.scss">
+      <DependentUpon>app-footer.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\shared\app-header\app-header.component.html">
+      <DependentUpon>app-header.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\shared\app-header\app-header.component.scss">
+      <DependentUpon>app-header.component.ts</DependentUpon>
     </Content>
     <Content Include="tsconfig.json" />
     <Content Include="typings.json" />
@@ -273,6 +323,8 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+    <Content Include="src\app\shared\admin-header\admin-header.component.scss" />
+    <Content Include="src\app\shared\admin-header\admin-header.component.html" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="index.html" />
@@ -289,7 +341,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\app\shared\" />
     <Folder Include="src\assets\images\" />
     <Folder Include="src\assets\scss\" />
   </ItemGroup>
@@ -299,10 +350,12 @@
     <TypeScriptCompile Include="src\app\articles\articles-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\articles.routes.ts" />
     <TypeScriptCompile Include="src\app\articles\index.ts" />
+    <TypeScriptCompile Include="src\app\customers\customers.routes.ts" />
     <TypeScriptCompile Include="src\app\galleries\galleries.routes.ts" />
     <TypeScriptCompile Include="src\app\login\index.ts" />
     <TypeScriptCompile Include="src\app\login\login-container.component.ts" />
     <TypeScriptCompile Include="src\app\login\login.routes.ts" />
+    <TypeScriptCompile Include="src\app\photographers\photographers.routes.ts" />
     <TypeScriptCompile Include="src\app\photos\photos.routes.ts" />
     <TypeScriptCompile Include="src\main.ts" />
     <TypeScriptCompile Include="typings\globals\angular-mocks\index.d.ts" />
@@ -334,6 +387,17 @@
     <TypeScriptCompile Include="src\app\customers\customer.component.ts" />
     <TypeScriptCompile Include="src\app\galleries\gallery-editor-container.component.ts" />
     <TypeScriptCompile Include="src\app\photos\photo-editor-container.component.ts" />
+    <TypeScriptCompile Include="src\app\shared\admin-header\admin-header.component.ts" />
+    <TypeScriptCompile Include="src\app\shared\app-header\app-header.component.ts" />
+    <TypeScriptCompile Include="src\app\shared\app-footer\app-footer.component.ts" />
+    <TypeScriptCompile Include="src\app\galleries\galleries-container.component.ts" />
+    <TypeScriptCompile Include="src\app\galleries\gallery-container.component.ts" />
+    <TypeScriptCompile Include="src\app\photographers\photographer.model.ts" />
+    <TypeScriptCompile Include="src\app\photographers\index.ts" />
+    <TypeScriptCompile Include="src\app\photographers\photographer.actions.ts" />
+    <TypeScriptCompile Include="src\app\photographers\photographer.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\photographers\photographer.reducers.ts" />
+    <TypeScriptCompile Include="src\app\photographers\photographer.component.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
