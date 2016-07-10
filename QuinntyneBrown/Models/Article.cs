@@ -21,7 +21,7 @@ namespace QuinntyneBrown.Models
         public bool IsDeleted { get; set; }
         public int? AuthorId { get; set; }
         public Author Author { get; set; }
-        public ICollection<Category> Categories { get; set; } = new HashSet<Category>();
+        public ICollection<ArticleCategory> ArticleCategories { get; set; } = new HashSet<ArticleCategory>();
         public ICollection<ArticlePhoto> ArticlePhotos { get; set; } = new HashSet<ArticlePhoto>();
     }
 }

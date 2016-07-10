@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using QuinntyneBrown.Data;
 using QuinntyneBrown.Dtos;
-using System.Data.Entity;
 using System.Linq;
 using QuinntyneBrown.Models;
 
@@ -12,9 +10,9 @@ namespace QuinntyneBrown.Services
     {
         public PropertyService(IUow uow, ICacheProvider cacheProvider)
         {
-            this.uow = uow;
-            this._repository = uow.Properties;
-            this.cache = cacheProvider.GetCache();
+            _uow = uow;
+            _repository = uow.Properties;
+            _cache = cacheProvider.GetCache();
         }
 
         public PropertyAddOrUpdateResponseDto AddOrUpdate(PropertyAddOrUpdateRequestDto request)
@@ -23,7 +21,7 @@ namespace QuinntyneBrown.Services
                 .FirstOrDefault(x => x.Id == request.Id && x.IsDeleted == false);
             if (entity == null) _repository.Add(entity = new Property());
             entity.Name = request.Name;
-            uow.SaveChanges();
+            _uow.SaveChanges();
             return new PropertyAddOrUpdateResponseDto(entity);
         }
 
@@ -31,7 +29,7 @@ namespace QuinntyneBrown.Services
         {
             var entity = _repository.GetById(id);
             entity.IsDeleted = true;
-            uow.SaveChanges();
+            _uow.SaveChanges();
             return id;
         }
 
@@ -42,15 +40,14 @@ namespace QuinntyneBrown.Services
             foreach(var entity in entities) { response.Add(new PropertyDto(entity)); }    
             return response;
         }
-
-
+        
         public PropertyDto GetById(int id)
         {
             return new PropertyDto(_repository.GetAll().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault());
         }
 
-        protected readonly IUow uow;
+        protected readonly IUow _uow;
         protected readonly IRepository<Property> _repository;
-        protected readonly ICache cache;
+        protected readonly ICache _cache;
     }
 }

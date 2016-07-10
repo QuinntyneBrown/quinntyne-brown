@@ -14,6 +14,7 @@ namespace QuinntyneBrown
             host = string.IsNullOrEmpty(options.Host) ? host : options.Host;
             string baseAddress = $"http://{host}/";
             Start<Startup>(url: baseAddress);
+            AppActivator.PostStart();
             WriteLine($"Api Hosted at: {baseAddress}");
             ReadLine();
         }

@@ -250,6 +250,7 @@
     <Compile Include="Helpers\StartupHelper.cs" />
     <Compile Include="Models\App.cs" />
     <Compile Include="Models\AppProperty.cs" />
+    <Compile Include="Models\ArticleCategory.cs" />
     <Compile Include="Models\ArticlePhoto.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Category.cs" />
@@ -257,9 +258,11 @@
     <Compile Include="Models\CustomerGallery.cs" />
     <Compile Include="Models\CustomerPhoto.cs" />
     <Compile Include="Models\Gallery.cs" />
+    <Compile Include="Models\GalleryCategory.cs" />
     <Compile Include="Models\GalleryPhoto.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\Photo.cs" />
+    <Compile Include="Models\PhotoCategory.cs" />
     <Compile Include="Models\Photographer.cs" />
     <Compile Include="Models\PhotographerGallery.cs" />
     <Compile Include="Models\PhotographerPhoto.cs" />
