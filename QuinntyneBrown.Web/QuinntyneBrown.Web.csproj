@@ -228,6 +228,12 @@
     <Content Include="src\app\customers\customer.component.scss">
       <DependentUpon>customer.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\galleries\gallery-editor-container.component.html">
+      <DependentUpon>gallery-editor-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\galleries\gallery-editor-container.component.scss">
+      <DependentUpon>gallery-editor-container.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\galleries\gallery.component.html">
       <DependentUpon>gallery.component.ts</DependentUpon>
     </Content>
@@ -239,6 +245,12 @@
     </Content>
     <Content Include="src\app\login\login-container.component.scss">
       <DependentUpon>login-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo-editor-container.component.html">
+      <DependentUpon>photo-editor-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo-editor-container.component.scss">
+      <DependentUpon>photo-editor-container.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\photos\photo.component.html">
       <DependentUpon>photo.component.ts</DependentUpon>
@@ -320,6 +332,8 @@
     <TypeScriptCompile Include="src\app\customers\customer.action-creator.ts" />
     <TypeScriptCompile Include="src\app\customers\customer.reducers.ts" />
     <TypeScriptCompile Include="src\app\customers\customer.component.ts" />
+    <TypeScriptCompile Include="src\app\galleries\gallery-editor-container.component.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo-editor-container.component.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

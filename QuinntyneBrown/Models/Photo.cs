@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace QuinntyneBrown.Models
 {
@@ -16,5 +17,6 @@ namespace QuinntyneBrown.Models
         public Byte[] Bytes { get; set; } = new byte[0];
         public Guid? UniqueId { get; set; } = Guid.NewGuid();
         public bool IsDeleted { get; set; }
+        public ICollection<GalleryPhoto> GalleryPhotos { get; set; } = new HashSet<GalleryPhoto>();
     }
 }
