@@ -198,7 +198,45 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="config\gulpfile.config.js" />
+    <Content Include="config\karma.conf.js" />
+    <Content Include="config\webpack.config.js" />
+    <Content Include="gulpfile.js" />
     <Content Include="packages.config" />
+    <Content Include="bower.json" />
+    <Content Include="src\app\articles\article.component.html">
+      <DependentUpon>article.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\articles\article.component.scss">
+      <DependentUpon>article.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\customer\customer.component.html">
+      <DependentUpon>customer.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\customer\customer.component.scss">
+      <DependentUpon>customer.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\galleries\gallery.component.html">
+      <DependentUpon>gallery.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\galleries\gallery.component.scss">
+      <DependentUpon>gallery.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo.component.html">
+      <DependentUpon>photo.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo.component.scss">
+      <DependentUpon>photo.component.ts</DependentUpon>
+    </Content>
+    <Content Include="tsconfig.json" />
+    <Content Include="typings.json" />
+    <Content Include="typings\globals\angular-mocks\typings.json" />
+    <Content Include="typings\globals\angular-route\typings.json" />
+    <Content Include="typings\globals\angular\typings.json" />
+    <Content Include="typings\globals\fastclick\typings.json" />
+    <Content Include="typings\globals\jasmine\typings.json" />
+    <Content Include="typings\globals\jquery\typings.json" />
+    <Content Include="typings\globals\require\typings.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -221,11 +259,45 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\app\home\" />
-    <Folder Include="ts\" />
+    <Folder Include="src\app\shared\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\app\galleries\galleries.routes.ts" />
+    <TypeScriptCompile Include="src\app\photos\photos.routes.ts" />
     <TypeScriptCompile Include="src\main.ts" />
+    <TypeScriptCompile Include="typings\globals\angular-mocks\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\angular-route\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\angular\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\fastclick\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\jasmine\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\jquery\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\require\index.d.ts" />
+    <TypeScriptCompile Include="typings\globals\rx\rx.all.d.ts" />
+    <TypeScriptCompile Include="typings\index.d.ts" />
+    <TypeScriptCompile Include="src\app\galleries\gallery.model.ts" />
+    <TypeScriptCompile Include="src\app\galleries\index.ts" />
+    <TypeScriptCompile Include="src\app\galleries\gallery.actions.ts" />
+    <TypeScriptCompile Include="src\app\galleries\gallery.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\galleries\gallery.reducers.ts" />
+    <TypeScriptCompile Include="src\app\galleries\gallery.component.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo.model.ts" />
+    <TypeScriptCompile Include="src\app\photos\index.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo.actions.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo.reducers.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo.component.ts" />
+    <TypeScriptCompile Include="src\app\articles\article.model.ts" />
+    <TypeScriptCompile Include="src\app\articles\index.ts" />
+    <TypeScriptCompile Include="src\app\articles\article.actions.ts" />
+    <TypeScriptCompile Include="src\app\articles\article.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\articles\article.reducers.ts" />
+    <TypeScriptCompile Include="src\app\articles\article.component.ts" />
+    <TypeScriptCompile Include="src\app\customer\customer.model.ts" />
+    <TypeScriptCompile Include="src\app\customer\index.ts" />
+    <TypeScriptCompile Include="src\app\customer\customer.actions.ts" />
+    <TypeScriptCompile Include="src\app\customer\customer.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\customer\customer.reducers.ts" />
+    <TypeScriptCompile Include="src\app\customer\customer.component.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

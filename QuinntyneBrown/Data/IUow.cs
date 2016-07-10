@@ -9,6 +9,8 @@ namespace QuinntyneBrown.Data
         IRepository<Section> Sections { get; }
         IRepository<Property> Properties { get; }
         IRepository<Article> Articles { get; }
+        IRepository<Photo> Photos { get; }
+        IRepository<Gallery> Galleries { get; }
 
         void SaveChanges();
     }

@@ -150,6 +150,7 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=4.0.20622.1351, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.4.0.2.206221351\lib\net45\System.IdentityModel.Tokens.Jwt.dll</HintPath>
@@ -213,6 +214,10 @@
       <HintPath>..\packages\Unity.WebAPI.5.2.3\lib\net45\Unity.WebApi.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="WebActivatorEx, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebActivatorEx.2.1.0\lib\net40\WebActivatorEx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="WebApi.OutputCache.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Strathweb.CacheOutput.WebApi2.0.9.0\lib\net45\WebApi.OutputCache.Core.dll</HintPath>
       <Private>True</Private>
@@ -224,9 +229,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiConfiguration.cs" />
+    <Compile Include="App_Start\AppActivator.cs" />
     <Compile Include="Common\FailedRequestException.cs" />
     <Compile Include="Controllers\ArticleController.cs" />
+    <Compile Include="Dtos\PhotoUploadResponseDto.cs" />
     <Compile Include="Models\App.cs" />
+    <Compile Include="Models\AppProperty.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Category.cs" />
     <Compile Include="Models\Gallery.cs" />
@@ -234,13 +242,20 @@
     <Compile Include="Models\PropertyType.cs" />
     <Compile Include="Models\Section.cs" />
     <Compile Include="Models\Property.cs" />
+    <Compile Include="Models\SectionProperty.cs" />
     <Compile Include="Models\UI.cs" />
+    <Compile Include="Models\UIProperty.cs" />
+    <Compile Include="Models\UISection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="SelfHostOptions.cs" />
+    <Compile Include="Services\PropertyHelper.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Trace\SearchTrace.cs" />
     <Compile Include="Trace\TraceEvent.cs" />
     <Compile Include="Trace\TracingEvents.cs" />
+    <Compile Include="UploadHandlers\FileMultipartFormDataStreamProvider.cs" />
+    <Compile Include="UploadHandlers\InMemoryMultipartFormDataStreamProvider.cs" />
+    <Compile Include="UploadHandlers\StreamHelper.cs" />
     <Compile Include="WebApiUnityActionFilterProvider.cs" />
     <Compile Include="Authentication\JwtOptions.cs" />
     <Compile Include="Authentication\JwtWriterFormat.cs" />
@@ -311,6 +326,18 @@
     <Compile Include="Controllers\UIController.cs" />
     <Compile Include="Controllers\SectionController.cs" />
     <Compile Include="Controllers\PropertyController.cs" />
+    <Compile Include="Dtos\PhotoDto.cs" />
+    <Compile Include="Dtos\PhotoAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\PhotoAddOrUpdateResponseDto.cs" />
+    <Compile Include="Services\PhotoService.cs" />
+    <Compile Include="Services\IPhotoService.cs" />
+    <Compile Include="Services\GalleryService.cs" />
+    <Compile Include="Services\IGalleryService.cs" />
+    <Compile Include="Dtos\GalleryDto.cs" />
+    <Compile Include="Dtos\GalleryAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\GalleryAddOrUpdateResponseDto.cs" />
+    <Compile Include="Controllers\GalleryController.cs" />
+    <Compile Include="Controllers\PhotoController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

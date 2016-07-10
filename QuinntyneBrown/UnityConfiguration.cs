@@ -26,6 +26,8 @@ namespace QuinntyneBrown
             container.RegisterType<ISectionService, SectionService>();
             container.RegisterType<IPropertyService, PropertyService>();
             container.RegisterType<IArticleService, ArticleService>();
+            container.RegisterType<IPhotoService, PhotoService>();
+            container.RegisterType<IGalleryService, GalleryService>();
 
             container.RegisterInstance(AuthConfiguration.LazyConfig);            
             return container;

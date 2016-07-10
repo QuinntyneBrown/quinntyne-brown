@@ -18,6 +18,8 @@ namespace QuinntyneBrown.Data
         public DbSet<UI> UIs { get; set; }
         public DbSet<Section> Sections { get; set; }
         public DbSet<Property> Properties { get; set; }
+        public DbSet<Photo> Photos { get; set; }
+        public DbSet<Gallery> Galleries { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

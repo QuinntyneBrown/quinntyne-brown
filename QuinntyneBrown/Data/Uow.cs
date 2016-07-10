@@ -31,7 +31,9 @@ namespace QuinntyneBrown.Data
         public IRepository<Section> Sections { get { return GetStandardRepo<Section>(); } }
         public IRepository<Property> Properties { get { return GetStandardRepo<Property>(); } }
         public IRepository<Article> Articles { get { return GetStandardRepo<Article>(); } }
-        
+        public IRepository<Photo> Photos { get { return GetStandardRepo<Photo>(); } }
+        public IRepository<Gallery> Galleries { get { return GetStandardRepo<Gallery>(); } }
+
         protected void ConfigureDbContext(IDbContext dbContext)
         {
             dbContext.Configuration.ProxyCreationEnabled = false;

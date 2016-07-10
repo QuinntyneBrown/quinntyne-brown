@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuinntyneBrown.Models
 {
@@ -6,7 +7,11 @@ namespace QuinntyneBrown.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<Section> Sections { get; set; } = new HashSet<Section>();
+        [ForeignKey("App")]
+        public int? AppId { get; set; }
+        public ICollection<UISection> Sections { get; set; } = new HashSet<UISection>();
+        public ICollection<UIProperty> Properties { get; set; } = new HashSet<UIProperty>();
+        public App App { get; set; }
         public bool IsDeleted { get; set; }
     }
 }
