@@ -232,6 +232,7 @@
     <Compile Include="App_Start\AppActivator.cs" />
     <Compile Include="Common\FailedRequestException.cs" />
     <Compile Include="Controllers\ArticleController.cs" />
+    <Compile Include="Controllers\ClientErrorController.cs" />
     <Compile Include="Dtos\PhotoUploadResponseDto.cs" />
     <Compile Include="Models\App.cs" />
     <Compile Include="Models\AppProperty.cs" />

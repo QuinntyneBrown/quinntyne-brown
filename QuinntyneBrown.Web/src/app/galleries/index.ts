@@ -1,21 +1,14 @@
-require("../core");
-
-import { provide, provideAction } from "../core";
+import { bootstrap, provide, provideAction } from "angular-rx-ui/src/components/core";
 import { GalleryComponent } from "./gallery.component";
 import { GalleryActionCreator } from "./gallery.action-creator";
-import *  as reducers from "./gallery.reducers";
-import *  as actions from "./gallery.actions";
+import * as reducers from "./gallery.reducers";
+import * as actions from "./gallery.actions";
 
-var app = (<any>angular.module("app.gallery", [
-    "app.core"    
-]));
+let galleriesModule = (<any>angular.module("quinntynebrown.gallery", []));
 
-provide(app,GalleryActionCreator);
-
-app.component(GalleryComponent);
-
-app.config(["reducersProvider", reducersProvider => {	
-    for (var reducer in reducers) { reducersProvider.configure(reducers[reducer]); }
-}]);
-
-for (var action in actions) { provideAction(app, actions[action]); }
+bootstrap(galleriesModule, {
+    components: [GalleryComponent],
+    providers: [GalleryActionCreator],
+    reducers: reducers,
+    actions: actions
+});

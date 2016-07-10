@@ -204,16 +204,28 @@
     <Content Include="gulpfile.js" />
     <Content Include="packages.config" />
     <Content Include="bower.json" />
-    <Content Include="src\app\articles\article.component.html">
-      <DependentUpon>article.component.ts</DependentUpon>
+    <Content Include="src\app\articles\article-container.component.html">
+      <DependentUpon>article-container.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\articles\article.component.scss">
-      <DependentUpon>article.component.ts</DependentUpon>
+    <Content Include="src\app\articles\article-container.component.scss">
+      <DependentUpon>article-container.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\customer\customer.component.html">
+    <Content Include="src\app\articles\article-editor-container.component.html">
+      <DependentUpon>article-editor-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\articles\article-editor-container.component.scss">
+      <DependentUpon>article-editor-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\articles\articles-container.component.html">
+      <DependentUpon>articles-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\articles\articles-container.component.scss">
+      <DependentUpon>articles-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\customers\customer.component.html">
       <DependentUpon>customer.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\customer\customer.component.scss">
+    <Content Include="src\app\customers\customer.component.scss">
       <DependentUpon>customer.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\galleries\gallery.component.html">
@@ -221,6 +233,12 @@
     </Content>
     <Content Include="src\app\galleries\gallery.component.scss">
       <DependentUpon>gallery.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\login\login-container.component.html">
+      <DependentUpon>login-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\login\login-container.component.scss">
+      <DependentUpon>login-container.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\photos\photo.component.html">
       <DependentUpon>photo.component.ts</DependentUpon>
@@ -260,9 +278,19 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\app\shared\" />
+    <Folder Include="src\assets\images\" />
+    <Folder Include="src\assets\scss\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\app\articles\article-container.component.ts" />
+    <TypeScriptCompile Include="src\app\articles\article-editor-container.component.ts" />
+    <TypeScriptCompile Include="src\app\articles\articles-container.component.ts" />
+    <TypeScriptCompile Include="src\app\articles\articles.routes.ts" />
+    <TypeScriptCompile Include="src\app\articles\index.ts" />
     <TypeScriptCompile Include="src\app\galleries\galleries.routes.ts" />
+    <TypeScriptCompile Include="src\app\login\index.ts" />
+    <TypeScriptCompile Include="src\app\login\login-container.component.ts" />
+    <TypeScriptCompile Include="src\app\login\login.routes.ts" />
     <TypeScriptCompile Include="src\app\photos\photos.routes.ts" />
     <TypeScriptCompile Include="src\main.ts" />
     <TypeScriptCompile Include="typings\globals\angular-mocks\index.d.ts" />
@@ -286,18 +314,12 @@
     <TypeScriptCompile Include="src\app\photos\photo.action-creator.ts" />
     <TypeScriptCompile Include="src\app\photos\photo.reducers.ts" />
     <TypeScriptCompile Include="src\app\photos\photo.component.ts" />
-    <TypeScriptCompile Include="src\app\articles\article.model.ts" />
-    <TypeScriptCompile Include="src\app\articles\index.ts" />
-    <TypeScriptCompile Include="src\app\articles\article.actions.ts" />
-    <TypeScriptCompile Include="src\app\articles\article.action-creator.ts" />
-    <TypeScriptCompile Include="src\app\articles\article.reducers.ts" />
-    <TypeScriptCompile Include="src\app\articles\article.component.ts" />
-    <TypeScriptCompile Include="src\app\customer\customer.model.ts" />
-    <TypeScriptCompile Include="src\app\customer\index.ts" />
-    <TypeScriptCompile Include="src\app\customer\customer.actions.ts" />
-    <TypeScriptCompile Include="src\app\customer\customer.action-creator.ts" />
-    <TypeScriptCompile Include="src\app\customer\customer.reducers.ts" />
-    <TypeScriptCompile Include="src\app\customer\customer.component.ts" />
+    <TypeScriptCompile Include="src\app\customers\customer.model.ts" />
+    <TypeScriptCompile Include="src\app\customers\index.ts" />
+    <TypeScriptCompile Include="src\app\customers\customer.actions.ts" />
+    <TypeScriptCompile Include="src\app\customers\customer.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\customers\customer.reducers.ts" />
+    <TypeScriptCompile Include="src\app\customers\customer.component.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
