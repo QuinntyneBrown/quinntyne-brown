@@ -1,12 +1,13 @@
 ﻿import { GalleryEditorContainerComponent  } from "./gallery-editor-container.component";
 import { GalleriesContainerComponent  } from "./galleries-container.component";
 import { GalleryContainerComponent  } from "./gallery-container.component";
+import { FeaturedGalleryContainerComponent } from "./featured-gallery-container.component";
 import { IRouteConfig } from "angular-rx-ui/src/components/core";
 
 export const GalleriesRoutes: Array<IRouteConfig> = [
     {
         path: "/",
-        component: GalleriesContainerComponent,
+        component: FeaturedGalleryContainerComponent,
     },
     {
         path: "/gallery/:slug",

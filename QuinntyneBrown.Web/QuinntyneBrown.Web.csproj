@@ -381,11 +381,23 @@
     <Content Include="src\app\articles\articles-container.component.scss">
       <DependentUpon>articles-container.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\contacts\contact-container.component.html">
+      <DependentUpon>contact-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\contacts\contact-container.component.scss">
+      <DependentUpon>contact-container.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\customers\customer.component.html">
       <DependentUpon>customer.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\customers\customer.component.scss">
       <DependentUpon>customer.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\galleries\featured-gallery-container.component.html">
+      <DependentUpon>featured-gallery-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\galleries\featured-gallery-container.component.scss">
+      <DependentUpon>featured-gallery-container.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\galleries\galleries-container.component.html">
       <DependentUpon>galleries-container.component.ts</DependentUpon>
@@ -447,6 +459,9 @@
     <Content Include="src\app\shared\app-header\app-header.component.scss">
       <DependentUpon>app-header.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\assets\images\Squad.jpg" />
+    <Content Include="src\assets\scss\_breakpoints.scss" />
+    <None Include="src\assets\scss\_varibles.scss" />
     <Content Include="tsconfig.json" />
     <Content Include="typings.json" />
     <Content Include="typings\globals\angular-mocks\typings.json" />
@@ -501,16 +516,15 @@
       <Name>QuinntyneBrown</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="src\assets\images\" />
-    <Folder Include="src\assets\scss\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <TypeScriptCompile Include="src\app\articles\article-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\article-editor-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\articles-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\articles.routes.ts" />
     <TypeScriptCompile Include="src\app\articles\index.ts" />
+    <TypeScriptCompile Include="src\app\contacts\contacts.routes.ts" />
+    <TypeScriptCompile Include="src\app\contacts\index.ts" />
     <TypeScriptCompile Include="src\app\customers\customers.routes.ts" />
     <TypeScriptCompile Include="src\app\galleries\galleries.routes.ts" />
     <TypeScriptCompile Include="src\app\login\index.ts" />
@@ -560,6 +574,8 @@
     <TypeScriptCompile Include="src\app\photographers\photographer.action-creator.ts" />
     <TypeScriptCompile Include="src\app\photographers\photographer.reducers.ts" />
     <TypeScriptCompile Include="src\app\photographers\photographer.component.ts" />
+    <TypeScriptCompile Include="src\app\galleries\featured-gallery-container.component.ts" />
+    <TypeScriptCompile Include="src\app\contacts\contact-container.component.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

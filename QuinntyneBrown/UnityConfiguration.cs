@@ -32,6 +32,7 @@ namespace QuinntyneBrown
             container.RegisterType<ICustomerService, CustomerService>();
             container.RegisterType<IRssFeedService, RssFeedService>();
             container.RegisterType<IUserService, UserService>();
+            container.RegisterType<IContactService, ContactService>();
 
             container.RegisterInstance(AuthConfiguration.LazyConfig);
             container.RegisterInstance(TraceConfiguration.LazyConfig);

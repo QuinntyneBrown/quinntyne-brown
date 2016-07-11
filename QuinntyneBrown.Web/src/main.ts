@@ -1,4 +1,5 @@
 ﻿require("./app/articles");
+require("./app/contacts");
 require("./app/customers");
 require("./app/galleries");
 require("./app/login");
@@ -19,6 +20,7 @@ import { routeChangeSuccessIsAdminReducer } from "angular-rx-ui/src/components/r
 const quinntynebrownAppModule = angular.module("quinntynebrownApp", [
     "components",
     "quinntynebrown.articles",
+    "quinntynebrown.contacts",
     "quinntynebrown.customers",
     "quinntynebrown.galleries",
     "quinntynebrown.login",

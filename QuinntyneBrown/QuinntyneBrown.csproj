@@ -254,6 +254,7 @@
     <Compile Include="Models\ArticlePhoto.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\CustomerGallery.cs" />
     <Compile Include="Models\CustomerPhoto.cs" />
@@ -396,6 +397,12 @@
     <Compile Include="Dtos\TagDto.cs" />
     <Compile Include="Dtos\TagAddOrUpdateRequestDto.cs" />
     <Compile Include="Dtos\TagAddOrUpdateResponseDto.cs" />
+    <Compile Include="Dtos\ContactDto.cs" />
+    <Compile Include="Dtos\ContactAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\ContactAddOrUpdateResponseDto.cs" />
+    <Compile Include="Services\ContactService.cs" />
+    <Compile Include="Services\IContactService.cs" />
+    <Compile Include="Controllers\ContactController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

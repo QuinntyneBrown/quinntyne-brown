@@ -38,6 +38,8 @@ namespace QuinntyneBrown.Data
         public IRepository<Photographer> Photographers { get { return GetStandardRepo<Photographer>(); } }
         public IRepository<Customer> Customers { get { return GetStandardRepo<Customer>(); } }
         public IRepository<Category> Categories { get { return GetStandardRepo<Category>(); } }
+        public IRepository<Contact> Contacts { get { return GetStandardRepo<Contact>(); } }
+
         protected void ConfigureDbContext(IDbContext dbContext)
         {
             dbContext.Configuration.ProxyCreationEnabled = false;

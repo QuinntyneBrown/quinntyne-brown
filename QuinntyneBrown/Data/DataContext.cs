@@ -26,6 +26,7 @@ namespace QuinntyneBrown.Data
         public DbSet<Photographer> Photographers { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
