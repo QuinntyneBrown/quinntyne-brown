@@ -12,33 +12,37 @@ namespace QuinntyneBrown.Services
     {
         public ContactService(IUow uow, ICacheProvider cacheProvider)
         {
-            this.uow = uow;
-            this.repository = uow.Contacts;
-            this.cache = cacheProvider.GetCache();
+            _uow = uow;
+            _repository = uow.Contacts;
+            _cache = cacheProvider.GetCache();
         }
 
         public ContactAddOrUpdateResponseDto AddOrUpdate(ContactAddOrUpdateRequestDto request)
         {
-            var entity = repository.GetAll()
+            var entity = _repository.GetAll()
                 .FirstOrDefault(x => x.Id == request.Id && x.IsDeleted == false);
-            if (entity == null) repository.Add(entity = new Contact());
+            if (entity == null) _repository.Add(entity = new Contact());
             entity.Name = request.Name;
-            uow.SaveChanges();
+            entity.Firstname = request.Firstname;
+            entity.Lastname = request.Lastname;
+            entity.PhoneNumber = request.PhoneNumber;
+            entity.Email = request.Email;
+            _uow.SaveChanges();
             return new ContactAddOrUpdateResponseDto(entity);
         }
 
         public dynamic Remove(int id)
         {
-            var entity = repository.GetById(id);
+            var entity = _repository.GetById(id);
             entity.IsDeleted = true;
-            uow.SaveChanges();
+            _uow.SaveChanges();
             return id;
         }
 
         public ICollection<ContactDto> Get()
         {
             ICollection<ContactDto> response = new HashSet<ContactDto>();
-            var entities = repository.GetAll().Where(x => x.IsDeleted == false).ToList();
+            var entities = _repository.GetAll().Where(x => x.IsDeleted == false).ToList();
             foreach(var entity in entities) { response.Add(new ContactDto(entity)); }    
             return response;
         }
@@ -46,11 +50,13 @@ namespace QuinntyneBrown.Services
 
         public ContactDto GetById(int id)
         {
-            return new ContactDto(repository.GetAll().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault());
+            return new ContactDto(_repository.GetAll().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault());
         }
 
-        protected readonly IUow uow;
-        protected readonly IRepository<Contact> repository;
-        protected readonly ICache cache;
+        public IQueryable<Contact> GetAll() => _repository.GetAll().Where(x => x.IsDeleted == false);
+
+        protected readonly IUow _uow;
+        protected readonly IRepository<Contact> _repository;
+        protected readonly ICache _cache;
     }
 }

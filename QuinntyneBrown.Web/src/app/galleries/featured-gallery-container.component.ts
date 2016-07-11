@@ -6,6 +6,4 @@ import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/s
     selector: "featured-gallery-container",
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FeaturedGalleryContainerComponent {
-    constructor() { }
-}
+export class FeaturedGalleryContainerComponent { }

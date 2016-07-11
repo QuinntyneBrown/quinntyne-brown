@@ -7,8 +7,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>
-    </ProductVersion>
+    <ProductVersion></ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{658DA84D-AD6C-414A-9333-B89232911187}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -23,8 +22,7 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <UseGlobalApplicationHostFile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <NuGetPackageImportStamp></NuGetPackageImportStamp>
     <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
     <TypeScriptEmitDecoratorMetadata>true</TypeScriptEmitDecoratorMetadata>
     <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
@@ -387,6 +385,12 @@
     <Content Include="src\app\contacts\contact-container.component.scss">
       <DependentUpon>contact-container.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\contacts\contact-editor.component.html">
+      <DependentUpon>contact-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\contacts\contact-editor.component.scss">
+      <DependentUpon>contact-editor.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\customers\customer.component.html">
       <DependentUpon>customer.component.ts</DependentUpon>
     </Content>
@@ -576,6 +580,11 @@
     <TypeScriptCompile Include="src\app\photographers\photographer.component.ts" />
     <TypeScriptCompile Include="src\app\galleries\featured-gallery-container.component.ts" />
     <TypeScriptCompile Include="src\app\contacts\contact-container.component.ts" />
+    <TypeScriptCompile Include="src\app\contacts\contact-editor.component.ts" />
+    <TypeScriptCompile Include="src\app\contacts\contact.service.ts" />
+    <TypeScriptCompile Include="src\app\contacts\contact.actions.ts" />
+    <TypeScriptCompile Include="src\app\contacts\contact.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\contacts\contact.reducers.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
@@ -592,15 +601,14 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>56622</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:56622/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <CustomServerUrl></CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
