@@ -3057,7 +3057,7 @@
 /* 87 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"galleries-container\">\r\n    <h1>Galleries</h1>\r\n</div>\r\n"
+	module.exports = "<div class=\"galleries-container\">\r\n\r\n</div>\r\n"
 
 /***/ },
 /* 88 */
