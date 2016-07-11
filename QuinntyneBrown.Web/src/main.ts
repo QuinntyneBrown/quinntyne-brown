@@ -3,11 +3,12 @@ require("./app/customers");
 require("./app/galleries");
 require("./app/login");
 require("./app/photos");
+require("./app/shared");
 
 import { ArticlesRoutes } from "./app/articles";
 import { CustomersRoutes } from "./app/customers";
 import { GalleriesRoutes } from "./app/galleries";
-import { LoginRoutes, LoginContainerComponent } from "./app/login";
+import { LoginRoutes } from "./app/login";
 import { PhotosRoutes } from "./app/photos";
 import { PhotographersRoutes } from "./app/photographers";
 
@@ -22,7 +23,8 @@ const quinntynebrownAppModule = angular.module("quinntynebrownApp", [
     "quinntynebrown.galleries",
     "quinntynebrown.login",
     "quinntynebrown.photos",
-    "quinntynebrown.photographers"    
+    "quinntynebrown.photographers",
+    "quinntynebrown.shared"    
 ]);
 
 bootstrap(quinntynebrownAppModule, {

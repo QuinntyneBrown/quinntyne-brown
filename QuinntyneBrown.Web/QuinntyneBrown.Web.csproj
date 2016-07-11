@@ -126,8 +126,8 @@
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
@@ -357,6 +357,7 @@
     <TypeScriptCompile Include="src\app\login\login.routes.ts" />
     <TypeScriptCompile Include="src\app\photographers\photographers.routes.ts" />
     <TypeScriptCompile Include="src\app\photos\photos.routes.ts" />
+    <TypeScriptCompile Include="src\app\shared\index.ts" />
     <TypeScriptCompile Include="src\main.ts" />
     <TypeScriptCompile Include="typings\globals\angular-mocks\index.d.ts" />
     <TypeScriptCompile Include="typings\globals\angular-route\index.d.ts" />

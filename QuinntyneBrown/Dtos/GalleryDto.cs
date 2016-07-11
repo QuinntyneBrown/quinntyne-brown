@@ -12,17 +12,21 @@ namespace QuinntyneBrown.Dtos
             Description = entity.Description;
             Photographers = entity.PhotographerGalleries.Select(x => new PhotographerDto(x.Photographer)).ToList();
             Photos = entity.GalleryPhotos.Select(x => new PhotoDto(x.Photo)).ToList();
+            Categories = entity.GalleryCategories.Select(x => new CategoryDto(x.Category)).ToList();
         }
 
         public GalleryDto()
         {
-            
+
         }
 
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Headline { get; set; }
+        public string AlternateHeadline { get; set; }
         public string Description { get; set; }
         public ICollection<PhotographerDto> Photographers { get; set; }
         public ICollection<PhotoDto> Photos { get; set; }
+        public ICollection<CategoryDto> Categories {get;set;}
     }
 }

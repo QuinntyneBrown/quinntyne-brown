@@ -50,13 +50,16 @@
 	__webpack_require__(81);
 	__webpack_require__(102);
 	__webpack_require__(108);
+	__webpack_require__(121);
 	var articles_1 = __webpack_require__(1);
+	var customers_1 = __webpack_require__(70);
 	var galleries_1 = __webpack_require__(81);
 	var login_1 = __webpack_require__(102);
 	var photos_1 = __webpack_require__(108);
+	var photographers_1 = __webpack_require__(134);
 	var core_1 = __webpack_require__(3);
-	var authorization_guard_1 = __webpack_require__(121);
-	var route_change_success_is_admin_reducer_1 = __webpack_require__(122);
+	var authorization_guard_1 = __webpack_require__(143);
+	var route_change_success_is_admin_reducer_1 = __webpack_require__(144);
 	var quinntynebrownAppModule = angular.module("quinntynebrownApp", [
 	    "components",
 	    "quinntynebrown.articles",
@@ -64,7 +67,8 @@
 	    "quinntynebrown.galleries",
 	    "quinntynebrown.login",
 	    "quinntynebrown.photos",
-	    "quinntynebrown.photographers"
+	    "quinntynebrown.photographers",
+	    "quinntynebrown.shared"
 	]);
 	core_1.bootstrap(quinntynebrownAppModule, {
 	    api: "api",
@@ -72,7 +76,7 @@
 	    html5Mode: true,
 	    guards: [authorization_guard_1.authorizationGuard],
 	    run: [route_change_success_is_admin_reducer_1.routeChangeSuccessIsAdminReducer],
-	    routes: articles_1.ArticlesRoutes.concat(galleries_1.GalleriesRoutes, login_1.LoginRoutes, photos_1.PhotosRoutes)
+	    routes: articles_1.ArticlesRoutes.concat(customers_1.CustomersRoutes, galleries_1.GalleriesRoutes, login_1.LoginRoutes, photos_1.PhotosRoutes, photographers_1.PhotographersRoutes)
 	});
 
 
@@ -237,7 +241,7 @@
 	    "translateXAsync",
 	    "template"
 	]);
-
+	//# sourceMappingURL=index.js.map
 
 /***/ },
 /* 4 */
@@ -286,17 +290,19 @@
 	            core_1.provide(app, options.providers[i]);
 	        }
 	    }
-	    app.config(["$routeProvider", function ($routeProvider) {
-	            for (var i_1 = 0; i_1 < options.routes.length; i_1++) {
-	                var path = options.routes[i_1].component.constructor.config.path;
-	                var selector = options.routes[i_1].component.constructor.config.selector;
-	                var template = "<" + selector + "></" + selector + ">";
-	                var authorizationRequired = options.routes[i_1].component.constructor.config.authorizationRequired;
-	                $routeProvider.when(path, { template: template, authorizationRequired: authorizationRequired });
-	            }
-	        }]);
+	    if (options.routes) {
+	        app.config(["$routeProvider", function ($routeProvider) {
+	                for (var i_1 = 0; i_1 < options.routes.length; i_1++) {
+	                    var path = options.routes[i_1].path;
+	                    var selector = options.routes[i_1].component.prototype.constructor.config.selector;
+	                    var template = "<" + selector + "></" + selector + ">";
+	                    var authorizationRequired = options.routes[i_1].authorizationRequired;
+	                    $routeProvider.when(path, { template: template, authorizationRequired: authorizationRequired });
+	                }
+	            }]);
+	    }
 	};
-
+	//# sourceMappingURL=bootstrap.js.map
 
 /***/ },
 /* 5 */
@@ -355,7 +361,7 @@
 	    return BaseService;
 	}());
 	exports.BaseService = BaseService;
-
+	//# sourceMappingURL=service.js.map
 
 /***/ },
 /* 6 */
@@ -368,7 +374,7 @@
 	    };
 	}
 	exports.Injectable = Injectable;
-
+	//# sourceMappingURL=injectable.js.map
 
 /***/ },
 /* 7 */
@@ -380,7 +386,7 @@
 	    };
 	}
 	exports.Inject = Inject;
-
+	//# sourceMappingURL=inject.js.map
 
 /***/ },
 /* 8 */
@@ -481,7 +487,7 @@
 	    .provider("initialState", InitialStateProvider)
 	    .value("guid", guid)
 	    .run(["store", function (store) { }]);
-
+	//# sourceMappingURL=store.js.map
 
 /***/ },
 /* 9 */
@@ -547,7 +553,7 @@
 	}());
 	exports.LocalStorageManagerProvider = LocalStorageManagerProvider;
 	angular.module("localStorageManager", []).provider("localStorageManager", LocalStorageManagerProvider);
-
+	//# sourceMappingURL=local-storage-manager-provider.js.map
 
 /***/ },
 /* 10 */
@@ -561,7 +567,7 @@
 	    };
 	}
 	exports.Action = Action;
-
+	//# sourceMappingURL=action-decorator.js.map
 
 /***/ },
 /* 11 */
@@ -576,7 +582,7 @@
 	    }
 	    return options.items;
 	};
-
+	//# sourceMappingURL=pluck-out.js.map
 
 /***/ },
 /* 12 */
@@ -618,7 +624,7 @@
 	    ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 5] = "Default";
 	})(exports.ChangeDetectionStrategy || (exports.ChangeDetectionStrategy = {}));
 	var ChangeDetectionStrategy = exports.ChangeDetectionStrategy;
-
+	//# sourceMappingURL=change-detection-strategy.js.map
 
 /***/ },
 /* 13 */
@@ -635,7 +641,7 @@
 	exports.CanActivate = function (fnDefinition) {
 	    return function (cls) { cls.prototype.canActivate = function () { return fnDefinition; }; };
 	};
-
+	//# sourceMappingURL=component.decorators.js.map
 
 /***/ },
 /* 14 */
@@ -644,7 +650,7 @@
 	"use strict";
 	exports.convertUnixTimestampToDate = function (timestamp) { return new Date(timestamp * 1000); };
 	angular.module("convertUnixTimestampToDate", []).value("convertUnixTimestampToDate", exports.convertUnixTimestampToDate);
-
+	//# sourceMappingURL=convert-unix-timestamp-to-date.js.map
 
 /***/ },
 /* 15 */
@@ -659,7 +665,7 @@
 	    };
 	}
 	exports.Service = Service;
-
+	//# sourceMappingURL=service.decorator.js.map
 
 /***/ },
 /* 16 */
@@ -760,7 +766,7 @@
 	    }
 	    return key;
 	}
-
+	//# sourceMappingURL=cache.decorator.js.map
 
 /***/ },
 /* 17 */
@@ -770,7 +776,7 @@
 	exports.endsWith = function (value1, value2) {
 	    return value1.toLowerCase().indexOf(value2.toLowerCase()) === value1.length - value2.length;
 	};
-
+	//# sourceMappingURL=ends-with.js.map
 
 /***/ },
 /* 18 */
@@ -791,7 +797,7 @@
 	    }
 	};
 	angular.module("addOrUpdate", []).value("addOrUpdate", exports.addOrUpdate);
-
+	//# sourceMappingURL=add-or-update.js.map
 
 /***/ },
 /* 19 */
@@ -848,7 +854,7 @@
 	    return BaseActionCreator;
 	}());
 	exports.BaseActionCreator = BaseActionCreator;
-
+	//# sourceMappingURL=action-creator.js.map
 
 /***/ },
 /* 20 */
@@ -864,7 +870,7 @@
 	    }
 	    return item;
 	};
-
+	//# sourceMappingURL=pluck.js.map
 
 /***/ },
 /* 21 */
@@ -899,7 +905,7 @@
 	    ViewEncapsulation[ViewEncapsulation["None"] = 2] = "None";
 	})(exports.ViewEncapsulation || (exports.ViewEncapsulation = {}));
 	var ViewEncapsulation = exports.ViewEncapsulation;
-
+	//# sourceMappingURL=view-encapsulation.js.map
 
 /***/ },
 /* 22 */
@@ -950,7 +956,7 @@
 	}());
 	exports.Fetch = Fetch;
 	angular.module("fetch", ["localStorageManager"]).service("fetch", ["$http", "$q", "localStorageManager", Fetch]);
-
+	//# sourceMappingURL=fetch.js.map
 
 /***/ },
 /* 23 */
@@ -995,7 +1001,7 @@
 	exports.LoginRedirectProvider = LoginRedirectProvider;
 	angular.module("loginRedirect", []).provider("loginRedirect", [LoginRedirectProvider])
 	    .config(["$httpProvider", function ($httpProvider) { return $httpProvider.interceptors.push("loginRedirect"); }]);
-
+	//# sourceMappingURL=login-redirect-provider.js.map
 
 /***/ },
 /* 24 */
@@ -1010,7 +1016,7 @@
 	        app.service(service.serviceName, [service]);
 	    }
 	};
-
+	//# sourceMappingURL=provide.js.map
 
 /***/ },
 /* 25 */
@@ -1020,7 +1026,7 @@
 	exports.provideAction = function (app, value) {
 	    app.value(value.type, value);
 	};
-
+	//# sourceMappingURL=provide-action.js.map
 
 /***/ },
 /* 26 */
@@ -1037,7 +1043,7 @@
 	            });
 	        }]);
 	};
-
+	//# sourceMappingURL=provide-route-promise.js.map
 
 /***/ },
 /* 27 */
@@ -1052,7 +1058,7 @@
 	    return JSON.parse(transform.replace(/^\w+\(/, "[").replace(/\)$/, "]"))[4];
 	};
 	angular.module("getX", []).value("getX", exports.getX);
-
+	//# sourceMappingURL=get-x.js.map
 
 /***/ },
 /* 28 */
@@ -1063,7 +1069,7 @@
 	    if (upperLimit === void 0) { upperLimit = null; }
 	    return false;
 	};
-
+	//# sourceMappingURL=is-between.js.map
 
 /***/ },
 /* 29 */
@@ -1080,7 +1086,7 @@
 	    return element;
 	};
 	angular.module("translateX", []).value("translateX", exports.translateX);
-
+	//# sourceMappingURL=translate-x.js.map
 
 /***/ },
 /* 30 */
@@ -1097,7 +1103,7 @@
 	    return element;
 	};
 	angular.module("translateXY", []).value("translateXY", exports.translateXY);
-
+	//# sourceMappingURL=translate-x-y.js.map
 
 /***/ },
 /* 31 */
@@ -1118,7 +1124,7 @@
 	    return txt;
 	};
 	angular.module("getHtml", []).value("getHtml", exports.getHtml);
-
+	//# sourceMappingURL=get-html.js.map
 
 /***/ },
 /* 32 */
@@ -1183,7 +1189,7 @@
 	exports.Renderer = Renderer;
 	var app = angular.module("renderer", ["getHtml"]);
 	provide_1.provide(app, Renderer);
-
+	//# sourceMappingURL=renderer.service.js.map
 
 /***/ },
 /* 33 */
@@ -1196,7 +1202,7 @@
 	};
 	angular.module("setElementBackgroundImage", [])
 	    .value("setElementBackgroundImage", exports.setElementBackgroundImage);
-
+	//# sourceMappingURL=set-element-background-image.js.map
 
 /***/ },
 /* 34 */
@@ -1213,7 +1219,7 @@
 	};
 	angular.module("setElementDimension", [])
 	    .value("setElementDimension", exports.setElementDimension);
-
+	//# sourceMappingURL=set-element-dimension.js.map
 
 /***/ },
 /* 35 */
@@ -1227,7 +1233,7 @@
 	};
 	angular.module("setElementDimensions", [])
 	    .value("setElementDimensions", exports.setElementDimensions);
-
+	//# sourceMappingURL=set-element-dimensions.js.map
 
 /***/ },
 /* 36 */
@@ -1415,7 +1421,7 @@
 	    });
 	    return deferred.promise;
 	});
-
+	//# sourceMappingURL=invoke-async.js.map
 
 /***/ },
 /* 43 */
@@ -1647,7 +1653,7 @@
 	    "translateXY"
 	]);
 	core_1.provide(app, Position);
-
+	//# sourceMappingURL=position.service.js.map
 
 /***/ },
 /* 45 */
@@ -1775,7 +1781,7 @@
 	}());
 	angular.module("routeResolver", [])
 	    .provider("routeResolverService", [RouteResolverServiceProvider]);
-
+	//# sourceMappingURL=route-resolver.js.map
 
 /***/ },
 /* 47 */
@@ -1906,7 +1912,7 @@
 	exports.Rectangle = Rectangle;
 	var app = angular.module("rectangle", []);
 	core_1.provide(app, Rectangle);
-
+	//# sourceMappingURL=rectangle.service.js.map
 
 /***/ },
 /* 49 */
@@ -1966,7 +1972,7 @@
 	    "rectangle",
 	]);
 	core_1.provide(app, Ruler);
-
+	//# sourceMappingURL=ruler.service.js.map
 
 /***/ },
 /* 50 */
@@ -2040,7 +2046,7 @@
 	exports.Space = Space;
 	var app = angular.module("space", []);
 	core_1.provide(app, Space);
-
+	//# sourceMappingURL=space.service.js.map
 
 /***/ },
 /* 53 */
@@ -2114,7 +2120,7 @@
 	exports.Template = Template;
 	var app = angular.module("template", []);
 	core_1.provide(app, Template);
-
+	//# sourceMappingURL=template.service.js.map
 
 /***/ },
 /* 55 */
@@ -2677,13 +2683,12 @@
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
-	__webpack_require__(3);
 	var core_1 = __webpack_require__(3);
 	var customer_component_1 = __webpack_require__(71);
 	var customer_action_creator_1 = __webpack_require__(75);
 	var reducers = __webpack_require__(78);
 	var actions = __webpack_require__(79);
-	var customersModule = angular.module("app.customer", []);
+	var customersModule = angular.module("quinntynebrown.customers", []);
 	core_1.bootstrap(customersModule, {
 	    components: [customer_component_1.CustomerComponent],
 	    providers: [customer_action_creator_1.CustomerActionCreator],
@@ -2841,7 +2846,7 @@
 	    return ModalActionCreator;
 	}());
 	exports.ModalActionCreator = ModalActionCreator;
-
+	//# sourceMappingURL=modal.action-creator.js.map
 
 /***/ },
 /* 77 */
@@ -2883,7 +2888,7 @@
 	    return CloseModalAction;
 	}());
 	exports.CloseModalAction = CloseModalAction;
-
+	//# sourceMappingURL=modal.actions.js.map
 
 /***/ },
 /* 78 */
@@ -3052,7 +3057,7 @@
 /* 87 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"galleries-container\">\r\n\r\n</div>\r\n"
+	module.exports = "<div class=\"galleries-container\">\r\n    <h1>Galleries</h1>\r\n</div>\r\n"
 
 /***/ },
 /* 88 */
@@ -3130,7 +3135,7 @@
 /* 91 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"gallery-editor-container\">\r\n\r\n</div>\r\n"
+	module.exports = "<div class=\"gallery-editor-container\">\r\n    <h1>Gallery Editor Container</h1>\r\n</div>\r\n"
 
 /***/ },
 /* 92 */
@@ -3245,7 +3250,7 @@
 	        component: gallery_container_component_1.GalleryContainerComponent
 	    },
 	    {
-	        path: "/admin/galleries",
+	        path: "/admin",
 	        component: gallery_editor_container_component_1.GalleryEditorContainerComponent,
 	        authorizationRequired: true
 	    },
@@ -3343,7 +3348,12 @@
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
-	__export(__webpack_require__(103));
+	var core_1 = __webpack_require__(3);
+	var login_container_component_1 = __webpack_require__(103);
+	var loginModule = angular.module("quinntynebrown.login", []);
+	core_1.bootstrap(loginModule, {
+	    components: [login_container_component_1.LoginContainerComponent]
+	});
 	__export(__webpack_require__(107));
 
 
@@ -3684,6 +3694,419 @@
 
 /***/ },
 /* 121 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var core_1 = __webpack_require__(3);
+	var app_footer_component_1 = __webpack_require__(122);
+	var app_header_component_1 = __webpack_require__(126);
+	var admin_header_component_1 = __webpack_require__(130);
+	var sharedModule = angular.module("quinntynebrown.shared", []);
+	core_1.bootstrap(sharedModule, {
+	    components: [app_footer_component_1.AppFooterComponent, app_header_component_1.AppHeaderComponent, admin_header_component_1.AdminHeaderComponent],
+	});
+
+
+/***/ },
+/* 122 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var AppFooterComponent = (function () {
+	    function AppFooterComponent() {
+	    }
+	    AppFooterComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(123),
+	            styles: [__webpack_require__(124)],
+	            selector: "app-footer",
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], AppFooterComponent);
+	    return AppFooterComponent;
+	}());
+	exports.AppFooterComponent = AppFooterComponent;
+
+
+/***/ },
+/* 123 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"app-footer\">\r\n\r\n</div>\r\n"
+
+/***/ },
+/* 124 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(125);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./app-footer.component.scss", function() {
+				var newContent = require("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./app-footer.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 125 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 126 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var AppHeaderComponent = (function () {
+	    function AppHeaderComponent() {
+	    }
+	    AppHeaderComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(127),
+	            styles: [__webpack_require__(128)],
+	            selector: "app-header",
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], AppHeaderComponent);
+	    return AppHeaderComponent;
+	}());
+	exports.AppHeaderComponent = AppHeaderComponent;
+
+
+/***/ },
+/* 127 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"app-header\">\r\n    <h1>\r\n        QB\r\n    </h1>\r\n</div>\r\n"
+
+/***/ },
+/* 128 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(129);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./app-header.component.scss", function() {
+				var newContent = require("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./app-header.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 129 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 130 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var AdminHeaderComponent = (function () {
+	    function AdminHeaderComponent() {
+	    }
+	    AdminHeaderComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(131),
+	            styles: [__webpack_require__(132)],
+	            selector: "admin-header",
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], AdminHeaderComponent);
+	    return AdminHeaderComponent;
+	}());
+	exports.AdminHeaderComponent = AdminHeaderComponent;
+
+
+/***/ },
+/* 131 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"admin-header\">\r\n    <h1>\r\n        QB: Admin\r\n    </h1>\r\n</div>\r\n"
+
+/***/ },
+/* 132 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(133);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./admin-header.component.scss", function() {
+				var newContent = require("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./admin-header.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 133 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 134 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
+	var core_1 = __webpack_require__(3);
+	var photographer_component_1 = __webpack_require__(135);
+	var photographer_action_creator_1 = __webpack_require__(139);
+	var reducers = __webpack_require__(140);
+	var actions = __webpack_require__(141);
+	var photographersModule = angular.module("quinntynebrown.photographers", []);
+	core_1.bootstrap(photographersModule, {
+	    components: [photographer_component_1.PhotographerComponent],
+	    providers: [photographer_action_creator_1.PhotographerActionCreator],
+	    reducers: reducers,
+	    actions: actions
+	});
+	__export(__webpack_require__(142));
+
+
+/***/ },
+/* 135 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var PhotographerComponent = (function () {
+	    function PhotographerComponent() {
+	    }
+	    PhotographerComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(136),
+	            styles: [__webpack_require__(137)],
+	            selector: "photographer",
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], PhotographerComponent);
+	    return PhotographerComponent;
+	}());
+	exports.PhotographerComponent = PhotographerComponent;
+
+
+/***/ },
+/* 136 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"photographer\">\r\n\r\n</div>\r\n"
+
+/***/ },
+/* 137 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(138);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./photographer.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./photographer.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 138 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 139 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var modal_action_creator_1 = __webpack_require__(76);
+	var PhotographerActionCreator = (function () {
+	    function PhotographerActionCreator(dispatcher, guid, invokeAsync, modalActionCreator) {
+	        this.dispatcher = dispatcher;
+	        this.guid = guid;
+	        this.invokeAsync = invokeAsync;
+	        this.modalActionCreator = modalActionCreator;
+	    }
+	    PhotographerActionCreator = __decorate([
+	        core_1.Service({
+	            serviceName: "photographerActionCreator",
+	            viewProviders: ["dispatcher", "guid", "invokeAsync", "modalActionCreator"]
+	        }), 
+	        __metadata('design:paramtypes', [Object, Object, Object, modal_action_creator_1.ModalActionCreator])
+	    ], PhotographerActionCreator);
+	    return PhotographerActionCreator;
+	}());
+	exports.PhotographerActionCreator = PhotographerActionCreator;
+
+
+/***/ },
+/* 140 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+
+/***/ },
+/* 141 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var Default = (function () {
+	    function Default() {
+	    }
+	    return Default;
+	}());
+	exports.Default = Default;
+
+
+/***/ },
+/* 142 */
+/***/ function(module, exports) {
+
+	"use strict";
+	exports.PhotographersRoutes = [];
+
+
+/***/ },
+/* 143 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3704,10 +4127,10 @@
 	        }],
 	    priority: -999
 	};
-
+	//# sourceMappingURL=authorization-guard.js.map
 
 /***/ },
-/* 122 */
+/* 144 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3722,7 +4145,7 @@
 	            }
 	        });
 	    }];
-
+	//# sourceMappingURL=route-change-success-is-admin.reducer.js.map
 
 /***/ }
 /******/ ]);

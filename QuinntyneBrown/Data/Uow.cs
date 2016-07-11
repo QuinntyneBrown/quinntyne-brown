@@ -37,7 +37,7 @@ namespace QuinntyneBrown.Data
         public IRepository<Role> Roles { get { return GetStandardRepo<Role>(); } }
         public IRepository<Photographer> Photographers { get { return GetStandardRepo<Photographer>(); } }
         public IRepository<Customer> Customers { get { return GetStandardRepo<Customer>(); } }
-
+        public IRepository<Category> Categories { get { return GetStandardRepo<Category>(); } }
         protected void ConfigureDbContext(IDbContext dbContext)
         {
             dbContext.Configuration.ProxyCreationEnabled = false;

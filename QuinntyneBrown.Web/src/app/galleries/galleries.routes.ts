@@ -13,7 +13,7 @@ export const GalleriesRoutes: Array<IRouteConfig> = [
         component: GalleryContainerComponent
     },
     {
-        path: "/admin/galleries",
+        path: "/admin",
         component: GalleryEditorContainerComponent,
         authorizationRequired: true
     },

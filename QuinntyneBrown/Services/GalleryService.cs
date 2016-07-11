@@ -23,6 +23,38 @@ namespace QuinntyneBrown.Services
                 .FirstOrDefault(x => x.Id == request.Id && x.IsDeleted == false);
             if (entity == null) _repository.Add(entity = new Gallery());
             entity.Name = request.Name;
+            entity.Description = request.Description;
+            entity.Headline = request.Headline;
+            entity.AlternateHeadline = request.AlternateHeadline;
+
+            entity.GalleryCategories.Clear();
+            entity.PhotographerGalleries.Clear();
+            entity.GalleryPhotos.Clear();
+
+            foreach (var category in request.Categories)
+            {
+                entity.GalleryCategories.Add(new GalleryCategory()
+                {
+                    Category= _uow.Categories.GetById(category.Id)
+                });
+            }
+
+            foreach (var photo in request.Photos)
+            {
+                entity.GalleryPhotos.Add(new GalleryPhoto()
+                {
+                    Photo = _uow.Photos.GetById(photo.Id)
+                });
+            }
+
+            foreach (var photographer in request.Photographers)
+            {
+                entity.PhotographerGalleries.Add(new PhotographerGallery()
+                {
+                    Photographer = _uow.Photographers.GetById(photographer.Id)
+                });
+            }
+
             _uow.SaveChanges();
             return new GalleryAddOrUpdateResponseDto(entity);
         }
