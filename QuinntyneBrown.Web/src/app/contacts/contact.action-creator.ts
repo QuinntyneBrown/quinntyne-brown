@@ -1,6 +1,14 @@
 import { IDispatcher, BaseActionCreator, Service } from "angular-rx-ui/src/components/core";
 import { ModalActionCreator } from "angular-rx-ui/src/components/modal/modal.action-creator";
-import { AllContactsAction, RemoveContactAction, ContactsFilterAction, SetCurrentContactAction, AddOrUpdateContactSuccessAction, CurrentContactRemovedAction } from "./contact.actions";
+import {
+    AllContactsAction,
+    RemoveContactAction,
+    ContactsFilterAction,
+    SetCurrentContactAction,
+    AddOrUpdateContactSuccessAction,
+    CurrentContactRemovedAction,
+    AddOrUpdateContactAction
+} from "./contact.actions";
 
 @Service({
     serviceName: "contactActionCreator",
@@ -8,7 +16,7 @@ import { AllContactsAction, RemoveContactAction, ContactsFilterAction, SetCurren
 })
 export class ContactActionCreator extends BaseActionCreator {
     constructor($location: angular.ILocationService, dispatcher: IDispatcher, contactService, guid, private invokeAsync, private modalActionCreator: ModalActionCreator) {
-        super($location,contactService,dispatcher,guid,AddOrUpdateContactSuccessAction,AllContactsAction,RemoveContactAction,SetCurrentContactAction)
+        super($location, contactService, dispatcher, guid, AddOrUpdateContactAction,AllContactsAction,RemoveContactAction,SetCurrentContactAction)
     }    
 
 	addOrUpdateSuccess = options => this.dispatcher.dispatch(new AddOrUpdateContactSuccessAction(options.entity));
