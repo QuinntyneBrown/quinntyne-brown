@@ -1,7 +1,7 @@
 import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/src/components/core";
-import * as actions from "./property.actions";
+import * as actions from "../actions/property.actions";
 import { pluck } from "angular-rx-ui/src/components/core/pluck";
-import { Property } from "./property.model";
+import { Property } from "../models/property.model";
 
 @Component({
     routes: ["/admin/properties","/admin/property/edit/:propertyId"],
@@ -17,7 +17,7 @@ import { Property } from "./property.model";
     if (propertyId) { promises.push(invokeAsync({ action: propertyActionCreator.getById, params: { id: propertyId } })) };
     return $q.all(promises);
 }])
-export class PropertysContainerComponent { 
+export class PropertiesContainerComponent { 
     constructor(private $location: angular.ILocationService, private $routeParams: angular.route.IRouteParamsService, private propertyActionCreator: actions.PropertyActionCreator, private _invokeAsync) { }
     storeOnChange = state => {        
         this.entities = state.propertys;

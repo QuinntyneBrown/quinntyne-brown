@@ -1,6 +1,14 @@
 import { IDispatcher, BaseActionCreator, Service } from "angular-rx-ui/src/components/core";
 import { ModalActionCreator } from "angular-rx-ui/src/components/modal/modal.action-creator";
-import { AllPropertysAction, RemovePropertyAction, PropertysFilterAction, SetCurrentPropertyAction,AddOrUpdatePropertyAction, AddOrUpdatePropertySuccessAction, CurrentPropertyRemovedAction } from "../property/property.actions";
+import {
+    AllPropertysAction,
+    RemovePropertyAction,
+    PropertysFilterAction,
+    SetCurrentPropertyAction,
+    AddOrUpdatePropertyAction,
+    AddOrUpdatePropertySuccessAction,
+    CurrentPropertyRemovedAction
+} from "../actions/property.actions";
 
 @Service({
     serviceName: "propertyActionCreator",

@@ -1,5 +1,5 @@
-import * as actions from "./property.actions";
-import { addOrUpdate, pluckOut } from "../core";
+import * as actions from "../actions/property.actions";
+import { addOrUpdate, pluckOut } from "angular-rx-ui/src/components/core";
 
 export const removePropertyReducer = (state, action) => {
     if (action instanceof actions.RemovePropertyAction)

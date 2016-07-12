@@ -452,6 +452,12 @@
     <Content Include="src\app\photos\photo.component.scss">
       <DependentUpon>photo.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\properties\containers\apps-container.component.html">
+      <DependentUpon>apps-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\properties\containers\apps-container.component.scss">
+      <DependentUpon>apps-container.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\properties\containers\properties-container.component.html">
       <DependentUpon>properties-container.component.ts</DependentUpon>
     </Content>
@@ -466,6 +472,18 @@
     </Content>
     <Content Include="src\app\properties\components\property.component.scss">
       <DependentUpon>property.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\properties\containers\sections-container.component.html">
+      <DependentUpon>sections-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\properties\containers\sections-container.component.scss">
+      <DependentUpon>sections-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\properties\containers\uis-container.component.html">
+      <DependentUpon>uis-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\properties\containers\uis-container.component.scss">
+      <DependentUpon>uis-container.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\shared\app-footer\app-footer.component.html">
       <DependentUpon>app-footer.component.ts</DependentUpon>
@@ -564,11 +582,18 @@
     <TypeScriptCompile Include="src\app\login\login.routes.ts" />
     <TypeScriptCompile Include="src\app\photographers\photographers.routes.ts" />
     <TypeScriptCompile Include="src\app\photos\photos.routes.ts" />
+    <TypeScriptCompile Include="src\app\properties\action-creators\index.ts" />
+    <TypeScriptCompile Include="src\app\properties\actions\index.ts" />
+    <TypeScriptCompile Include="src\app\properties\components\index.ts" />
+    <TypeScriptCompile Include="src\app\properties\containers\index.ts" />
     <TypeScriptCompile Include="src\app\properties\models\app.model.ts" />
+    <TypeScriptCompile Include="src\app\properties\models\index.ts" />
     <TypeScriptCompile Include="src\app\properties\models\property.model.ts" />
     <TypeScriptCompile Include="src\app\properties\models\section.model.ts" />
     <TypeScriptCompile Include="src\app\properties\models\ui.model.ts" />
     <TypeScriptCompile Include="src\app\properties\properties.routes.ts" />
+    <TypeScriptCompile Include="src\app\properties\reducers\index.ts" />
+    <TypeScriptCompile Include="src\app\properties\services\index.ts" />
     <TypeScriptCompile Include="src\app\shared\index.ts" />
     <TypeScriptCompile Include="src\main.ts" />
     <TypeScriptCompile Include="typings\globals\angular-mocks\index.d.ts" />
@@ -627,6 +652,21 @@
     <TypeScriptCompile Include="src\app\properties\services\property.service.ts" />
     <TypeScriptCompile Include="src\app\properties\components\property-list.component.ts" />
     <TypeScriptCompile Include="src\app\properties\components\property-editor.component.ts" />
+    <TypeScriptCompile Include="src\app\properties\containers\apps-container.component.ts" />
+    <TypeScriptCompile Include="src\app\properties\containers\uis-container.component.ts" />
+    <TypeScriptCompile Include="src\app\properties\containers\sections-container.component.ts" />
+    <TypeScriptCompile Include="src\app\properties\actions\app.actions.ts" />
+    <TypeScriptCompile Include="src\app\properties\action-creators\app.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\properties\reducers\app.reducers.ts" />
+    <TypeScriptCompile Include="src\app\properties\actions\section.actions.ts" />
+    <TypeScriptCompile Include="src\app\properties\action-creators\section.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\properties\reducers\section.reducers.ts" />
+    <TypeScriptCompile Include="src\app\properties\actions\ui.actions.ts" />
+    <TypeScriptCompile Include="src\app\properties\action-creators\ui.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\properties\reducers\ui.reducers.ts" />
+    <TypeScriptCompile Include="src\app\properties\services\app.service.ts" />
+    <TypeScriptCompile Include="src\app\properties\services\section.service.ts" />
+    <TypeScriptCompile Include="src\app\properties\services\ui.service.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

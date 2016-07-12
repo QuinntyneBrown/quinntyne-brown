@@ -1,4 +1,4 @@
-import { BaseService, Injectable, Service } from "../core";
+import { BaseService, Injectable, Service } from "angular-rx-ui/src/components/core";
 
 @Injectable()
 @Service({
@@ -10,6 +10,6 @@ export class PropertyService extends BaseService {
         super($q, apiEndpoint, fetch)
     }
 
-    get baseUri() { return this.apiEndpoint.getBaseUrl() + "/v1/property"; }
+    get baseUri() { return this.apiEndpoint.getBaseUrl() + "/property"; }
 
 }
