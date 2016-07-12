@@ -9,5 +9,6 @@ namespace QuinntyneBrown.Services
         ICollection<UIDto> Get();
         UIDto GetById(int id);
         dynamic Remove(int id);
+        UIDto GetByName(string name);
     }
 }

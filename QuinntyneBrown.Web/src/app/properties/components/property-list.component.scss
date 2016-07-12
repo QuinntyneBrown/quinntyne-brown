@@ -1,0 +1,22 @@
+.propertyList-name,
+.propertyList-actions {
+    position:relative;
+    float:left;
+}
+
+.propertyList-name {
+    min-width:200px;
+}
+
+.propertyList-item {
+    height:50px;
+}
+
+.propertyList-actions span {
+    cursor:pointer;
+}
+
+.propertyList-actions {
+    text-transform: uppercase;
+}
+   

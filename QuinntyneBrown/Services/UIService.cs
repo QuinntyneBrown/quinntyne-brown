@@ -46,14 +46,22 @@ namespace QuinntyneBrown.Services
 
         public UIDto GetById(int id)
         {
-            return new UIDto(_repository.GetAll().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault());
+            return new UIDto(GetAll().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault());
         }
-        
+
+        public UIDto GetByName(string name)
+        {
+            return new UIDto(GetAll().Where(x => x.Name == name).FirstOrDefault());
+        }
+
         public IQueryable<UI> GetAll() => GetAll()
             .Include(x => x.Sections)
             .Include(x => x.Properties)
             .Include("UIProperties.Property")
-            .Include("Sections.Section");
+            .Include("Sections.Section")
+            .Include("Sections.Section.SectionProperties")
+            .Include("Sections.Section.SectionProperties.Property")
+            .Where(x => x.IsDeleted == false);
 
         protected readonly IUow _uow;
         protected readonly IRepository<UI> _repository;

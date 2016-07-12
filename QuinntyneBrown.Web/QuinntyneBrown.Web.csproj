@@ -349,7 +349,6 @@
     <Content Include="config\gulpfile.config.js" />
     <Content Include="config\karma.conf.js" />
     <Content Include="config\webpack.config.js" />
-    <Content Include="dist\app.js" />
     <Content Include="gulpfile.js" />
     <Content Include="lib\angular-route.js" />
     <Content Include="lib\angular-rx-ui.js" />
@@ -453,6 +452,21 @@
     <Content Include="src\app\photos\photo.component.scss">
       <DependentUpon>photo.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\properties\containers\properties-container.component.html">
+      <DependentUpon>properties-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\properties\components\property-editor.component.html">
+      <DependentUpon>property-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\properties\components\property-list.component.html">
+      <DependentUpon>property-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\properties\components\property.component.html">
+      <DependentUpon>property.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\properties\components\property.component.scss">
+      <DependentUpon>property.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\shared\app-footer\app-footer.component.html">
       <DependentUpon>app-footer.component.ts</DependentUpon>
     </Content>
@@ -467,6 +481,15 @@
     </Content>
     <Content Include="src\assets\images\Squad.jpg" />
     <Content Include="src\assets\scss\_breakpoints.scss" />
+    <Content Include="src\app\properties\components\property-editor.component.scss">
+      <DependentUpon>property-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\properties\components\property-list.component.scss">
+      <DependentUpon>property-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\properties\containers\properties-container.component.scss">
+      <DependentUpon>properties-container.component.ts</DependentUpon>
+    </Content>
     <None Include="src\assets\scss\_varibles.scss" />
     <Content Include="tsconfig.json" />
     <Content Include="typings.json" />
@@ -522,7 +545,9 @@
       <Name>QuinntyneBrown</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="dist\" />
+  </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\app\articles\article-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\article-editor-container.component.ts" />
@@ -539,6 +564,11 @@
     <TypeScriptCompile Include="src\app\login\login.routes.ts" />
     <TypeScriptCompile Include="src\app\photographers\photographers.routes.ts" />
     <TypeScriptCompile Include="src\app\photos\photos.routes.ts" />
+    <TypeScriptCompile Include="src\app\properties\models\app.model.ts" />
+    <TypeScriptCompile Include="src\app\properties\models\property.model.ts" />
+    <TypeScriptCompile Include="src\app\properties\models\section.model.ts" />
+    <TypeScriptCompile Include="src\app\properties\models\ui.model.ts" />
+    <TypeScriptCompile Include="src\app\properties\properties.routes.ts" />
     <TypeScriptCompile Include="src\app\shared\index.ts" />
     <TypeScriptCompile Include="src\main.ts" />
     <TypeScriptCompile Include="typings\globals\angular-mocks\index.d.ts" />
@@ -588,6 +618,15 @@
     <TypeScriptCompile Include="src\app\contacts\contact.actions.ts" />
     <TypeScriptCompile Include="src\app\contacts\contact.action-creator.ts" />
     <TypeScriptCompile Include="src\app\contacts\contact.reducers.ts" />
+    <TypeScriptCompile Include="src\app\properties\index.ts" />
+    <TypeScriptCompile Include="src\app\properties\containers\properties-container.component.ts" />
+    <TypeScriptCompile Include="src\app\properties\actions\property.actions.ts" />
+    <TypeScriptCompile Include="src\app\properties\action-creators\property.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\properties\reducers\property.reducers.ts" />
+    <TypeScriptCompile Include="src\app\properties\components\property.component.ts" />
+    <TypeScriptCompile Include="src\app\properties\services\property.service.ts" />
+    <TypeScriptCompile Include="src\app\properties\components\property-list.component.ts" />
+    <TypeScriptCompile Include="src\app\properties\components\property-editor.component.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

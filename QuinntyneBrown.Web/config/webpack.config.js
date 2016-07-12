@@ -23,7 +23,7 @@ var WebpackConfig = (function () {
                         loaders: ["style", "css", "sass"]
                     }
                 ]
-            }
+            },
         };
     }
 
