@@ -1,14 +1,13 @@
-require("../core/core.module");
 
-import { provide, provideAction } from "../core";
-import { PropertyEditorComponent } from "./property-editor.component";
-import { PropertyListComponent } from "./property-list.component";
-import { PropertyComponent } from "./property.component";
-import { PropertysContainerComponent } from "./propertys-container.component";
-import { PropertyActionCreator } from "./property.action-creator";
-import { PropertyService } from "./property.service";
-import *  as reducers from "./property.reducers";
-import *  as actions from "./property.actions";
+import { provide, provideAction } from "angular-rx-ui/src/components/core";
+import { PropertyEditorComponent } from "./components/property-editor.component";
+import { PropertyListComponent } from "./components/property-list.component";
+import { PropertyComponent } from "./components/property.component";
+import { PropertiesContainerComponent } from "./containers/properties-container.component";
+import { PropertyActionCreator } from "./action-creators/property.action-creator";
+import { PropertyService } from "./services/property.service";
+import *  as reducers from "./reducers/property.reducers";
+import *  as actions from "./actions/property.actions";
 
 var app = (<any>angular.module("app.property", [
     "app.core"    
@@ -19,7 +18,7 @@ provide(app,PropertyService);
 app.component(PropertyEditorComponent);
 app.component(PropertyListComponent);
 app.component(PropertyComponent);
-app.component(PropertysContainerComponent);
+app.component(PropertiesContainerComponent);
 
 app.config(["reducersProvider", reducersProvider => {	
     for (var reducer in reducers) { reducersProvider.configure(reducers[reducer]); }

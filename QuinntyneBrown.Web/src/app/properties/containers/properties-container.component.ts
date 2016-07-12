@@ -1,5 +1,6 @@
 import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/src/components/core";
 import * as actions from "../actions/property.actions";
+import { PropertyActionCreator } from "../action-creators/property.action-creator";
 import { pluck } from "angular-rx-ui/src/components/core/pluck";
 import { Property } from "../models/property.model";
 
@@ -11,14 +12,14 @@ import { Property } from "../models/property.model";
     viewProviders: ["$location","$routeParams","propertyActionCreator","invokeAsync"],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-@CanActivate(["$q", "$route", "invokeAsync", "propertyActionCreator", ($q: angular.IQService, $route: angular.route.IRouteService, invokeAsync, propertyActionCreator: actions.PropertyActionCreator) => {
+@CanActivate(["$q", "$route", "invokeAsync", "propertyActionCreator", ($q: angular.IQService, $route: angular.route.IRouteService, invokeAsync, propertyActionCreator: PropertyActionCreator) => {
     var propertyId = $route.current.params.propertyId;
     var promises = [invokeAsync(propertyActionCreator.all)];
     if (propertyId) { promises.push(invokeAsync({ action: propertyActionCreator.getById, params: { id: propertyId } })) };
     return $q.all(promises);
 }])
 export class PropertiesContainerComponent { 
-    constructor(private $location: angular.ILocationService, private $routeParams: angular.route.IRouteParamsService, private propertyActionCreator: actions.PropertyActionCreator, private _invokeAsync) { }
+    constructor(private $location: angular.ILocationService, private $routeParams: angular.route.IRouteParamsService, private propertyActionCreator: PropertyActionCreator, private _invokeAsync) { }
     storeOnChange = state => {        
         this.entities = state.propertys;
 

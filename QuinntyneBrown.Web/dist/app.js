@@ -244,7 +244,7 @@
 	    "translateXAsync",
 	    "template"
 	]);
-	//# sourceMappingURL=index.js.map
+
 
 /***/ },
 /* 4 */
@@ -305,7 +305,7 @@
 	            }]);
 	    }
 	};
-	//# sourceMappingURL=bootstrap.js.map
+
 
 /***/ },
 /* 5 */
@@ -364,7 +364,7 @@
 	    return BaseService;
 	}());
 	exports.BaseService = BaseService;
-	//# sourceMappingURL=service.js.map
+
 
 /***/ },
 /* 6 */
@@ -377,7 +377,7 @@
 	    };
 	}
 	exports.Injectable = Injectable;
-	//# sourceMappingURL=injectable.js.map
+
 
 /***/ },
 /* 7 */
@@ -389,7 +389,7 @@
 	    };
 	}
 	exports.Inject = Inject;
-	//# sourceMappingURL=inject.js.map
+
 
 /***/ },
 /* 8 */
@@ -490,7 +490,7 @@
 	    .provider("initialState", InitialStateProvider)
 	    .value("guid", guid)
 	    .run(["store", function (store) { }]);
-	//# sourceMappingURL=store.js.map
+
 
 /***/ },
 /* 9 */
@@ -556,7 +556,7 @@
 	}());
 	exports.LocalStorageManagerProvider = LocalStorageManagerProvider;
 	angular.module("localStorageManager", []).provider("localStorageManager", LocalStorageManagerProvider);
-	//# sourceMappingURL=local-storage-manager-provider.js.map
+
 
 /***/ },
 /* 10 */
@@ -570,7 +570,7 @@
 	    };
 	}
 	exports.Action = Action;
-	//# sourceMappingURL=action-decorator.js.map
+
 
 /***/ },
 /* 11 */
@@ -585,7 +585,7 @@
 	    }
 	    return options.items;
 	};
-	//# sourceMappingURL=pluck-out.js.map
+
 
 /***/ },
 /* 12 */
@@ -627,7 +627,7 @@
 	    ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 5] = "Default";
 	})(exports.ChangeDetectionStrategy || (exports.ChangeDetectionStrategy = {}));
 	var ChangeDetectionStrategy = exports.ChangeDetectionStrategy;
-	//# sourceMappingURL=change-detection-strategy.js.map
+
 
 /***/ },
 /* 13 */
@@ -644,7 +644,7 @@
 	exports.CanActivate = function (fnDefinition) {
 	    return function (cls) { cls.prototype.canActivate = function () { return fnDefinition; }; };
 	};
-	//# sourceMappingURL=component.decorators.js.map
+
 
 /***/ },
 /* 14 */
@@ -653,7 +653,7 @@
 	"use strict";
 	exports.convertUnixTimestampToDate = function (timestamp) { return new Date(timestamp * 1000); };
 	angular.module("convertUnixTimestampToDate", []).value("convertUnixTimestampToDate", exports.convertUnixTimestampToDate);
-	//# sourceMappingURL=convert-unix-timestamp-to-date.js.map
+
 
 /***/ },
 /* 15 */
@@ -668,7 +668,7 @@
 	    };
 	}
 	exports.Service = Service;
-	//# sourceMappingURL=service.decorator.js.map
+
 
 /***/ },
 /* 16 */
@@ -769,7 +769,7 @@
 	    }
 	    return key;
 	}
-	//# sourceMappingURL=cache.decorator.js.map
+
 
 /***/ },
 /* 17 */
@@ -779,7 +779,7 @@
 	exports.endsWith = function (value1, value2) {
 	    return value1.toLowerCase().indexOf(value2.toLowerCase()) === value1.length - value2.length;
 	};
-	//# sourceMappingURL=ends-with.js.map
+
 
 /***/ },
 /* 18 */
@@ -800,7 +800,7 @@
 	    }
 	};
 	angular.module("addOrUpdate", []).value("addOrUpdate", exports.addOrUpdate);
-	//# sourceMappingURL=add-or-update.js.map
+
 
 /***/ },
 /* 19 */
@@ -857,7 +857,7 @@
 	    return BaseActionCreator;
 	}());
 	exports.BaseActionCreator = BaseActionCreator;
-	//# sourceMappingURL=action-creator.js.map
+
 
 /***/ },
 /* 20 */
@@ -873,7 +873,7 @@
 	    }
 	    return item;
 	};
-	//# sourceMappingURL=pluck.js.map
+
 
 /***/ },
 /* 21 */
@@ -908,7 +908,7 @@
 	    ViewEncapsulation[ViewEncapsulation["None"] = 2] = "None";
 	})(exports.ViewEncapsulation || (exports.ViewEncapsulation = {}));
 	var ViewEncapsulation = exports.ViewEncapsulation;
-	//# sourceMappingURL=view-encapsulation.js.map
+
 
 /***/ },
 /* 22 */
@@ -959,7 +959,7 @@
 	}());
 	exports.Fetch = Fetch;
 	angular.module("fetch", ["localStorageManager"]).service("fetch", ["$http", "$q", "localStorageManager", Fetch]);
-	//# sourceMappingURL=fetch.js.map
+
 
 /***/ },
 /* 23 */
@@ -1004,7 +1004,7 @@
 	exports.LoginRedirectProvider = LoginRedirectProvider;
 	angular.module("loginRedirect", []).provider("loginRedirect", [LoginRedirectProvider])
 	    .config(["$httpProvider", function ($httpProvider) { return $httpProvider.interceptors.push("loginRedirect"); }]);
-	//# sourceMappingURL=login-redirect-provider.js.map
+
 
 /***/ },
 /* 24 */
@@ -1019,7 +1019,7 @@
 	        app.service(service.serviceName, [service]);
 	    }
 	};
-	//# sourceMappingURL=provide.js.map
+
 
 /***/ },
 /* 25 */
@@ -1029,7 +1029,7 @@
 	exports.provideAction = function (app, value) {
 	    app.value(value.type, value);
 	};
-	//# sourceMappingURL=provide-action.js.map
+
 
 /***/ },
 /* 26 */
@@ -1046,7 +1046,7 @@
 	            });
 	        }]);
 	};
-	//# sourceMappingURL=provide-route-promise.js.map
+
 
 /***/ },
 /* 27 */
@@ -1061,7 +1061,7 @@
 	    return JSON.parse(transform.replace(/^\w+\(/, "[").replace(/\)$/, "]"))[4];
 	};
 	angular.module("getX", []).value("getX", exports.getX);
-	//# sourceMappingURL=get-x.js.map
+
 
 /***/ },
 /* 28 */
@@ -1072,7 +1072,7 @@
 	    if (upperLimit === void 0) { upperLimit = null; }
 	    return false;
 	};
-	//# sourceMappingURL=is-between.js.map
+
 
 /***/ },
 /* 29 */
@@ -1089,7 +1089,7 @@
 	    return element;
 	};
 	angular.module("translateX", []).value("translateX", exports.translateX);
-	//# sourceMappingURL=translate-x.js.map
+
 
 /***/ },
 /* 30 */
@@ -1106,7 +1106,7 @@
 	    return element;
 	};
 	angular.module("translateXY", []).value("translateXY", exports.translateXY);
-	//# sourceMappingURL=translate-x-y.js.map
+
 
 /***/ },
 /* 31 */
@@ -1127,7 +1127,7 @@
 	    return txt;
 	};
 	angular.module("getHtml", []).value("getHtml", exports.getHtml);
-	//# sourceMappingURL=get-html.js.map
+
 
 /***/ },
 /* 32 */
@@ -1192,7 +1192,7 @@
 	exports.Renderer = Renderer;
 	var app = angular.module("renderer", ["getHtml"]);
 	provide_1.provide(app, Renderer);
-	//# sourceMappingURL=renderer.service.js.map
+
 
 /***/ },
 /* 33 */
@@ -1205,7 +1205,7 @@
 	};
 	angular.module("setElementBackgroundImage", [])
 	    .value("setElementBackgroundImage", exports.setElementBackgroundImage);
-	//# sourceMappingURL=set-element-background-image.js.map
+
 
 /***/ },
 /* 34 */
@@ -1222,7 +1222,7 @@
 	};
 	angular.module("setElementDimension", [])
 	    .value("setElementDimension", exports.setElementDimension);
-	//# sourceMappingURL=set-element-dimension.js.map
+
 
 /***/ },
 /* 35 */
@@ -1236,7 +1236,7 @@
 	};
 	angular.module("setElementDimensions", [])
 	    .value("setElementDimensions", exports.setElementDimensions);
-	//# sourceMappingURL=set-element-dimensions.js.map
+
 
 /***/ },
 /* 36 */
@@ -1424,7 +1424,7 @@
 	    });
 	    return deferred.promise;
 	});
-	//# sourceMappingURL=invoke-async.js.map
+
 
 /***/ },
 /* 43 */
@@ -1656,7 +1656,7 @@
 	    "translateXY"
 	]);
 	core_1.provide(app, Position);
-	//# sourceMappingURL=position.service.js.map
+
 
 /***/ },
 /* 45 */
@@ -1784,7 +1784,7 @@
 	}());
 	angular.module("routeResolver", [])
 	    .provider("routeResolverService", [RouteResolverServiceProvider]);
-	//# sourceMappingURL=route-resolver.js.map
+
 
 /***/ },
 /* 47 */
@@ -1915,7 +1915,7 @@
 	exports.Rectangle = Rectangle;
 	var app = angular.module("rectangle", []);
 	core_1.provide(app, Rectangle);
-	//# sourceMappingURL=rectangle.service.js.map
+
 
 /***/ },
 /* 49 */
@@ -1975,7 +1975,7 @@
 	    "rectangle",
 	]);
 	core_1.provide(app, Ruler);
-	//# sourceMappingURL=ruler.service.js.map
+
 
 /***/ },
 /* 50 */
@@ -2049,7 +2049,7 @@
 	exports.Space = Space;
 	var app = angular.module("space", []);
 	core_1.provide(app, Space);
-	//# sourceMappingURL=space.service.js.map
+
 
 /***/ },
 /* 53 */
@@ -2123,7 +2123,7 @@
 	exports.Template = Template;
 	var app = angular.module("template", []);
 	core_1.provide(app, Template);
-	//# sourceMappingURL=template.service.js.map
+
 
 /***/ },
 /* 55 */
@@ -2828,7 +2828,7 @@
 	    return ModalActionCreator;
 	}());
 	exports.ModalActionCreator = ModalActionCreator;
-	//# sourceMappingURL=modal.action-creator.js.map
+
 
 /***/ },
 /* 74 */
@@ -2870,7 +2870,7 @@
 	    return CloseModalAction;
 	}());
 	exports.CloseModalAction = CloseModalAction;
-	//# sourceMappingURL=modal.actions.js.map
+
 
 /***/ },
 /* 75 */
@@ -4626,7 +4626,7 @@
 	        }],
 	    priority: -999
 	};
-	//# sourceMappingURL=authorization-guard.js.map
+
 
 /***/ },
 /* 162 */
@@ -4644,7 +4644,7 @@
 	            }
 	        });
 	    }];
-	//# sourceMappingURL=route-change-success-is-admin.reducer.js.map
+
 
 /***/ }
 /******/ ]);

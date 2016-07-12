@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity.Migrations;
 using WebActivatorEx;
-
+using static System.IO.Path;
+using static System.IO.File;
 [assembly: PostApplicationStartMethod(typeof(QuinntyneBrown.AppActivator), "PostStart")]
 
 namespace QuinntyneBrown
@@ -10,7 +11,7 @@ namespace QuinntyneBrown
         public static void PostStart()
         {
             var dbMigrator = new DbMigrator(new Migrations.Configuration());
-            dbMigrator.Update();
+            dbMigrator.Update();            
         }
     }
 }
