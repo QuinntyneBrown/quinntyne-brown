@@ -1,6 +1,12 @@
 .app-header {
     width:100%;
     font-family: Lato;
+    color:#272727;
+
+    a {
+        text-decoration:none;
+        color:#272727;
+    }
 }
 
 .app-header-inner {
@@ -13,5 +19,7 @@
 .app-header-sub-nav {
     text-transform:uppercase;
     font-family:Roboto;
+    font-weight:100;
     cursor:pointer;
 }
+

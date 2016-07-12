@@ -4,7 +4,7 @@ import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/s
     template: require("./contact-editor.component.html"),
     styles: [require("./contact-editor.component.scss")],
     selector: "contact-editor",
-
+    inputs:["onTryToSaveContact","entity"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContactEditorComponent { }

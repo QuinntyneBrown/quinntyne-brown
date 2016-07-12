@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.ServiceModel.Syndication;
+using static QuinntyneBrown.Common.Constants;
 
 namespace QuinntyneBrown.Services
 {
@@ -14,7 +15,7 @@ namespace QuinntyneBrown.Services
 
         public SyndicationFeed Get()
         {
-            return new SyndicationFeed("Digital Architecture","A blog about Digital Architecture",new Uri("http://QuinntyneBrown.ca"))
+            return new SyndicationFeed(BlogTitle,BlogDescription,new Uri(BlogUrl))
             {
                 Items = _articleService.Get().Select(x => new SyndicationItem(
                     x.Headline,

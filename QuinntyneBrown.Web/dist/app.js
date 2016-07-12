@@ -47,20 +47,21 @@
 	"use strict";
 	__webpack_require__(1);
 	__webpack_require__(70);
-	__webpack_require__(76);
-	__webpack_require__(87);
-	__webpack_require__(112);
-	__webpack_require__(118);
-	__webpack_require__(131);
+	__webpack_require__(86);
+	__webpack_require__(95);
+	__webpack_require__(120);
+	__webpack_require__(126);
+	__webpack_require__(139);
 	var articles_1 = __webpack_require__(1);
-	var customers_1 = __webpack_require__(76);
-	var galleries_1 = __webpack_require__(87);
-	var login_1 = __webpack_require__(112);
-	var photos_1 = __webpack_require__(118);
-	var photographers_1 = __webpack_require__(144);
+	var contacts_1 = __webpack_require__(70);
+	var customers_1 = __webpack_require__(86);
+	var galleries_1 = __webpack_require__(95);
+	var login_1 = __webpack_require__(120);
+	var photos_1 = __webpack_require__(126);
+	var photographers_1 = __webpack_require__(152);
 	var core_1 = __webpack_require__(3);
-	var authorization_guard_1 = __webpack_require__(153);
-	var route_change_success_is_admin_reducer_1 = __webpack_require__(154);
+	var authorization_guard_1 = __webpack_require__(161);
+	var route_change_success_is_admin_reducer_1 = __webpack_require__(162);
 	var quinntynebrownAppModule = angular.module("quinntynebrownApp", [
 	    "components",
 	    "quinntynebrown.articles",
@@ -78,7 +79,7 @@
 	    html5Mode: true,
 	    guards: [authorization_guard_1.authorizationGuard],
 	    run: [route_change_success_is_admin_reducer_1.routeChangeSuccessIsAdminReducer],
-	    routes: articles_1.ArticlesRoutes.concat(customers_1.CustomersRoutes, galleries_1.GalleriesRoutes, login_1.LoginRoutes, photos_1.PhotosRoutes, photographers_1.PhotographersRoutes)
+	    routes: articles_1.ArticlesRoutes.concat(contacts_1.ContactsRoutes, customers_1.CustomersRoutes, galleries_1.GalleriesRoutes, login_1.LoginRoutes, photos_1.PhotosRoutes, photographers_1.PhotographersRoutes)
 	});
 
 
@@ -2687,11 +2688,15 @@
 	}
 	var core_1 = __webpack_require__(3);
 	var contact_container_component_1 = __webpack_require__(71);
+	var contact_editor_component_1 = __webpack_require__(80);
+	var contact_action_creator_1 = __webpack_require__(72);
+	var contact_service_1 = __webpack_require__(84);
 	var contactsModule = angular.module("quinntynebrown.contacts", []);
 	core_1.bootstrap(contactsModule, {
-	    components: [contact_container_component_1.ContactContainerComponent],
+	    components: [contact_container_component_1.ContactContainerComponent, contact_editor_component_1.ContactEditorComponent],
+	    providers: [contact_action_creator_1.ContactActionCreator, contact_service_1.ContactService]
 	});
-	__export(__webpack_require__(75));
+	__export(__webpack_require__(85));
 
 
 /***/ },
@@ -2709,17 +2714,30 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
+	var contact_action_creator_1 = __webpack_require__(72);
+	var contact_model_1 = __webpack_require__(76);
 	var ContactContainerComponent = (function () {
-	    function ContactContainerComponent() {
+	    function ContactContainerComponent(contactActionCreator) {
+	        var _this = this;
+	        this.contactActionCreator = contactActionCreator;
+	        this.storeOnChange = function () {
+	        };
+	        this.onTryToSaveContact = function (options) {
+	            _this.contactActionCreator.addOrUpdate({
+	                data: options.data
+	            });
+	        };
+	        this.entity = new contact_model_1.Contact();
 	    }
 	    ContactContainerComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(72),
-	            styles: [__webpack_require__(73)],
+	            template: __webpack_require__(77),
+	            styles: [__webpack_require__(78)],
 	            selector: "contact-container",
+	            viewProviders: ["contactActionCreator"],
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
-	        __metadata('design:paramtypes', [])
+	        __metadata('design:paramtypes', [contact_action_creator_1.ContactActionCreator])
 	    ], ContactContainerComponent);
 	    return ContactContainerComponent;
 	}());
@@ -2728,91 +2746,57 @@
 
 /***/ },
 /* 72 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	module.exports = "<div class=\"contact-container\">\r\n\r\n</div>\r\n"
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var modal_action_creator_1 = __webpack_require__(73);
+	var contact_actions_1 = __webpack_require__(75);
+	var ContactActionCreator = (function (_super) {
+	    __extends(ContactActionCreator, _super);
+	    function ContactActionCreator($location, dispatcher, contactService, guid, invokeAsync, modalActionCreator) {
+	        var _this = this;
+	        _super.call(this, $location, contactService, dispatcher, guid, contact_actions_1.AddOrUpdateContactAction, contact_actions_1.AllContactsAction, contact_actions_1.RemoveContactAction, contact_actions_1.SetCurrentContactAction);
+	        this.invokeAsync = invokeAsync;
+	        this.modalActionCreator = modalActionCreator;
+	        this.addOrUpdateSuccess = function (options) { return _this.dispatcher.dispatch(new contact_actions_1.AddOrUpdateContactSuccessAction(options.entity)); };
+	        this.currentContactRemoved = function () { return _this.dispatcher.dispatch(new contact_actions_1.CurrentContactRemovedAction()); };
+	        this.openAllContactsModal = function () {
+	            _this.invokeAsync(_this.all).then(function (results) {
+	                _this.modalActionCreator.open({ html: "<all-contact-modal></all-contact-modal>" });
+	            });
+	        };
+	    }
+	    ContactActionCreator = __decorate([
+	        core_1.Service({
+	            serviceName: "contactActionCreator",
+	            viewProviders: ["$location", "dispatcher", "contactService", "guid", "invokeAsync", "modalActionCreator"]
+	        }), 
+	        __metadata('design:paramtypes', [Object, Object, Object, Object, Object, modal_action_creator_1.ModalActionCreator])
+	    ], ContactActionCreator);
+	    return ContactActionCreator;
+	}(core_1.BaseActionCreator));
+	exports.ContactActionCreator = ContactActionCreator;
+
 
 /***/ },
 /* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(74);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(60)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./contact-container.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./contact-container.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 74 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(59)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "", ""]);
-
-	// exports
-
-
-/***/ },
-/* 75 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var contact_container_component_1 = __webpack_require__(71);
-	exports.PhotographersRoutes = [
-	    {
-	        path: "/contact",
-	        component: contact_container_component_1.ContactContainerComponent
-	    }
-	];
-
-
-/***/ },
-/* 76 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	function __export(m) {
-	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-	}
-	var core_1 = __webpack_require__(3);
-	var customer_component_1 = __webpack_require__(77);
-	var customer_action_creator_1 = __webpack_require__(81);
-	var reducers = __webpack_require__(84);
-	var actions = __webpack_require__(85);
-	var customersModule = angular.module("quinntynebrown.customers", []);
-	core_1.bootstrap(customersModule, {
-	    components: [customer_component_1.CustomerComponent],
-	    providers: [customer_action_creator_1.CustomerActionCreator],
-	    reducers: reducers,
-	    actions: actions
-	});
-	__export(__webpack_require__(86));
-
-
-/***/ },
-/* 77 */
-/***/ function(module, exports, __webpack_require__) {
-
 	"use strict";
 	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
 	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -2823,120 +2807,7 @@
 	var __metadata = (this && this.__metadata) || function (k, v) {
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
-	var core_1 = __webpack_require__(3);
-	var CustomerComponent = (function () {
-	    function CustomerComponent() {
-	    }
-	    CustomerComponent = __decorate([
-	        core_1.Component({
-	            template: __webpack_require__(78),
-	            styles: [__webpack_require__(79)],
-	            selector: "customer",
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], CustomerComponent);
-	    return CustomerComponent;
-	}());
-	exports.CustomerComponent = CustomerComponent;
-
-
-/***/ },
-/* 78 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"customer\">\r\n\r\n</div>\r\n"
-
-/***/ },
-/* 79 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(80);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(60)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./customer.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./customer.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 80 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(59)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "", ""]);
-
-	// exports
-
-
-/***/ },
-/* 81 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var modal_action_creator_1 = __webpack_require__(82);
-	var CustomerActionCreator = (function () {
-	    function CustomerActionCreator(dispatcher, guid, invokeAsync, modalActionCreator) {
-	        this.dispatcher = dispatcher;
-	        this.guid = guid;
-	        this.invokeAsync = invokeAsync;
-	        this.modalActionCreator = modalActionCreator;
-	    }
-	    CustomerActionCreator = __decorate([
-	        core_1.Service({
-	            serviceName: "customerActionCreator",
-	            viewProviders: ["dispatcher", "guid", "invokeAsync", "modalActionCreator"]
-	        }), 
-	        __metadata('design:paramtypes', [Object, Object, Object, modal_action_creator_1.ModalActionCreator])
-	    ], CustomerActionCreator);
-	    return CustomerActionCreator;
-	}());
-	exports.CustomerActionCreator = CustomerActionCreator;
-
-
-/***/ },
-/* 82 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var modal_actions_1 = __webpack_require__(83);
+	var modal_actions_1 = __webpack_require__(74);
 	var core_1 = __webpack_require__(3);
 	var ModalActionCreator = (function () {
 	    function ModalActionCreator($rootScope, dispatcher) {
@@ -2960,7 +2831,7 @@
 	//# sourceMappingURL=modal.action-creator.js.map
 
 /***/ },
-/* 83 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3002,14 +2873,452 @@
 	//# sourceMappingURL=modal.actions.js.map
 
 /***/ },
+/* 75 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var AddOrUpdateContactAction = (function () {
+	    function AddOrUpdateContactAction(id, entity) {
+	        this.id = id;
+	        this.entity = entity;
+	    }
+	    AddOrUpdateContactAction = __decorate([
+	        core_1.Action({
+	            type: "contact.addOrUpdatecontactAction"
+	        }), 
+	        __metadata('design:paramtypes', [Object, Object])
+	    ], AddOrUpdateContactAction);
+	    return AddOrUpdateContactAction;
+	}());
+	exports.AddOrUpdateContactAction = AddOrUpdateContactAction;
+	var AllContactsAction = (function () {
+	    function AllContactsAction(id, entities) {
+	        this.id = id;
+	        this.entities = entities;
+	    }
+	    AllContactsAction = __decorate([
+	        core_1.Action({
+	            type: "contact.allcontactsAction"
+	        }), 
+	        __metadata('design:paramtypes', [Object, Object])
+	    ], AllContactsAction);
+	    return AllContactsAction;
+	}());
+	exports.AllContactsAction = AllContactsAction;
+	var RemoveContactAction = (function () {
+	    function RemoveContactAction(id, entity) {
+	        this.id = id;
+	        this.entity = entity;
+	    }
+	    RemoveContactAction = __decorate([
+	        core_1.Action({
+	            type: "contact.removecontactAction"
+	        }), 
+	        __metadata('design:paramtypes', [Object, Object])
+	    ], RemoveContactAction);
+	    return RemoveContactAction;
+	}());
+	exports.RemoveContactAction = RemoveContactAction;
+	var ContactsFilterAction = (function () {
+	    function ContactsFilterAction(id, term) {
+	        this.id = id;
+	        this.term = term;
+	    }
+	    ContactsFilterAction = __decorate([
+	        core_1.Action({
+	            type: "contact.sFilterActioncontactsFilterAction"
+	        }), 
+	        __metadata('design:paramtypes', [Object, Object])
+	    ], ContactsFilterAction);
+	    return ContactsFilterAction;
+	}());
+	exports.ContactsFilterAction = ContactsFilterAction;
+	var SetCurrentContactAction = (function () {
+	    function SetCurrentContactAction(entity) {
+	        this.entity = entity;
+	    }
+	    SetCurrentContactAction = __decorate([
+	        core_1.Action({
+	            type: "contact.setCurrentcontactAction"
+	        }), 
+	        __metadata('design:paramtypes', [Object])
+	    ], SetCurrentContactAction);
+	    return SetCurrentContactAction;
+	}());
+	exports.SetCurrentContactAction = SetCurrentContactAction;
+	var AddOrUpdateContactSuccessAction = (function () {
+	    function AddOrUpdateContactSuccessAction(entity) {
+	        this.entity = entity;
+	    }
+	    AddOrUpdateContactSuccessAction = __decorate([
+	        core_1.Action({
+	            type: "contact.addOrUpdatecontactSuccessAction"
+	        }), 
+	        __metadata('design:paramtypes', [Object])
+	    ], AddOrUpdateContactSuccessAction);
+	    return AddOrUpdateContactSuccessAction;
+	}());
+	exports.AddOrUpdateContactSuccessAction = AddOrUpdateContactSuccessAction;
+	var CurrentContactRemovedAction = (function () {
+	    function CurrentContactRemovedAction() {
+	    }
+	    CurrentContactRemovedAction = __decorate([
+	        core_1.Action({
+	            type: "contact.currentcontactRemovedAction"
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], CurrentContactRemovedAction);
+	    return CurrentContactRemovedAction;
+	}());
+	exports.CurrentContactRemovedAction = CurrentContactRemovedAction;
+
+
+/***/ },
+/* 76 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var Contact = (function () {
+	    function Contact() {
+	    }
+	    return Contact;
+	}());
+	exports.Contact = Contact;
+
+
+/***/ },
+/* 77 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"contact-container\">\r\n    <contact-editor on-try-to-save-contact=\"vm.onTryToSaveContact\" entity=\"vm.entity\"></contact-editor>\r\n</div>\r\n"
+
+/***/ },
+/* 78 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(79);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./contact-container.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./contact-container.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 79 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var ContactEditorComponent = (function () {
+	    function ContactEditorComponent() {
+	    }
+	    ContactEditorComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(81),
+	            styles: [__webpack_require__(82)],
+	            selector: "contact-editor",
+	            inputs: ["onTryToSaveContact", "entity"],
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], ContactEditorComponent);
+	    return ContactEditorComponent;
+	}());
+	exports.ContactEditorComponent = ContactEditorComponent;
+
+
+/***/ },
+/* 81 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"contact-editor\">\r\n\r\n    <div class=\"contact-editor-inner\">\r\n\r\n        <div class=\"contact-editor-form\">\r\n            <h2>Contact</h2>\r\n\r\n            <div>\r\n                <input type=\"text\" class=\"contact-editor-form-input\" placeholder=\"Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n            <div>\r\n                <input type=\"text\" class=\"contact-editor-form-input\" placeholder=\"Email\" data-ng-model=\"vm.entity.email\" />\r\n            </div>\r\n            <div>\r\n                <input type=\"text\" class=\"contact-editor-form-input\" placeholder=\"Message\" data-ng-model=\"vm.entity.message\" />\r\n            </div>\r\n\r\n            <button on-click=\"vm.onTryToSaveContact({ data: vm.entity })\" caption=\"Send Message\"></button>\r\n\r\n        </div>\r\n\r\n    </div>\r\n\r\n</div>\r\n"
+
+/***/ },
+/* 82 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(83);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./contact-editor.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./contact-editor.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 83 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".contact-editor {\n  width: 100%; }\n\n.contact-editor-inner {\n  margin: 0 auto;\n  max-width: 1280px; }\n\n.contact-editor-form {\n  max-width: 500px;\n  margin: 0 auto; }\n\n.contact-editor-form-input {\n  margin-bottom: 15px;\n  max-width: 500px;\n  width: 100%;\n  padding: 10px; }\n", ""]);
+
+	// exports
+
+
+/***/ },
 /* 84 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var ContactService = (function () {
+	    function ContactService($q, apiEndpoint, fetch) {
+	        this.$q = $q;
+	        this.apiEndpoint = apiEndpoint;
+	        this.fetch = fetch;
+	    }
+	    Object.defineProperty(ContactService.prototype, "baseUri", {
+	        get: function () { return this.apiEndpoint.getBaseUrl() + "/contact"; },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    ContactService = __decorate([
+	        core_1.Injectable(),
+	        core_1.Service({
+	            serviceName: "contactService",
+	            viewProviders: ["$q", "apiEndpoint", "fetch"]
+	        }), 
+	        __metadata('design:paramtypes', [Function, Object, Object])
+	    ], ContactService);
+	    return ContactService;
+	}());
+	exports.ContactService = ContactService;
+
+
+/***/ },
+/* 85 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var contact_container_component_1 = __webpack_require__(71);
+	exports.ContactsRoutes = [
+	    {
+	        path: "/contact",
+	        component: contact_container_component_1.ContactContainerComponent
+	    }
+	];
+
+
+/***/ },
+/* 86 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
+	var core_1 = __webpack_require__(3);
+	var customer_component_1 = __webpack_require__(87);
+	var customer_action_creator_1 = __webpack_require__(91);
+	var reducers = __webpack_require__(92);
+	var actions = __webpack_require__(93);
+	var customersModule = angular.module("quinntynebrown.customers", []);
+	core_1.bootstrap(customersModule, {
+	    components: [customer_component_1.CustomerComponent],
+	    providers: [customer_action_creator_1.CustomerActionCreator],
+	    reducers: reducers,
+	    actions: actions
+	});
+	__export(__webpack_require__(94));
+
+
+/***/ },
+/* 87 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var CustomerComponent = (function () {
+	    function CustomerComponent() {
+	    }
+	    CustomerComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(88),
+	            styles: [__webpack_require__(89)],
+	            selector: "customer",
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], CustomerComponent);
+	    return CustomerComponent;
+	}());
+	exports.CustomerComponent = CustomerComponent;
+
+
+/***/ },
+/* 88 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"customer\">\r\n\r\n</div>\r\n"
+
+/***/ },
+/* 89 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(90);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./customer.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./customer.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 90 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 91 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var modal_action_creator_1 = __webpack_require__(73);
+	var CustomerActionCreator = (function () {
+	    function CustomerActionCreator(dispatcher, guid, invokeAsync, modalActionCreator) {
+	        this.dispatcher = dispatcher;
+	        this.guid = guid;
+	        this.invokeAsync = invokeAsync;
+	        this.modalActionCreator = modalActionCreator;
+	    }
+	    CustomerActionCreator = __decorate([
+	        core_1.Service({
+	            serviceName: "customerActionCreator",
+	            viewProviders: ["dispatcher", "guid", "invokeAsync", "modalActionCreator"]
+	        }), 
+	        __metadata('design:paramtypes', [Object, Object, Object, modal_action_creator_1.ModalActionCreator])
+	    ], CustomerActionCreator);
+	    return CustomerActionCreator;
+	}());
+	exports.CustomerActionCreator = CustomerActionCreator;
+
+
+/***/ },
+/* 92 */
 /***/ function(module, exports) {
 
 	"use strict";
 
 
 /***/ },
-/* 85 */
+/* 93 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3022,7 +3331,7 @@
 
 
 /***/ },
-/* 86 */
+/* 94 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3030,7 +3339,7 @@
 
 
 /***/ },
-/* 87 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3038,13 +3347,13 @@
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
 	var core_1 = __webpack_require__(3);
-	var gallery_component_1 = __webpack_require__(88);
-	var galleries_container_component_1 = __webpack_require__(92);
-	var featured_gallery_container_component_1 = __webpack_require__(96);
-	var gallery_editor_container_component_1 = __webpack_require__(100);
-	var gallery_action_creator_1 = __webpack_require__(104);
-	var reducers = __webpack_require__(105);
-	var actions = __webpack_require__(106);
+	var gallery_component_1 = __webpack_require__(96);
+	var galleries_container_component_1 = __webpack_require__(100);
+	var featured_gallery_container_component_1 = __webpack_require__(104);
+	var gallery_editor_container_component_1 = __webpack_require__(108);
+	var gallery_action_creator_1 = __webpack_require__(112);
+	var reducers = __webpack_require__(113);
+	var actions = __webpack_require__(114);
 	var galleriesModule = angular.module("quinntynebrown.galleries", []);
 	core_1.bootstrap(galleriesModule, {
 	    components: [gallery_component_1.GalleryComponent, gallery_editor_container_component_1.GalleryEditorContainerComponent, galleries_container_component_1.GalleriesContainerComponent, featured_gallery_container_component_1.FeaturedGalleryContainerComponent],
@@ -3052,11 +3361,11 @@
 	    reducers: reducers,
 	    actions: actions
 	});
-	__export(__webpack_require__(107));
+	__export(__webpack_require__(115));
 
 
 /***/ },
-/* 88 */
+/* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3075,8 +3384,8 @@
 	    }
 	    GalleryComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(89),
-	            styles: [__webpack_require__(90)],
+	            template: __webpack_require__(97),
+	            styles: [__webpack_require__(98)],
 	            selector: "gallery",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -3088,19 +3397,19 @@
 
 
 /***/ },
-/* 89 */
+/* 97 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"gallery\">\r\n\r\n</div>\r\n"
 
 /***/ },
-/* 90 */
+/* 98 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(91);
+	var content = __webpack_require__(99);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -3120,162 +3429,6 @@
 	}
 
 /***/ },
-/* 91 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(59)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "", ""]);
-
-	// exports
-
-
-/***/ },
-/* 92 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var GalleriesContainerComponent = (function () {
-	    function GalleriesContainerComponent() {
-	    }
-	    GalleriesContainerComponent = __decorate([
-	        core_1.Component({
-	            template: __webpack_require__(93),
-	            styles: [__webpack_require__(94)],
-	            selector: "galleries-container",
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], GalleriesContainerComponent);
-	    return GalleriesContainerComponent;
-	}());
-	exports.GalleriesContainerComponent = GalleriesContainerComponent;
-
-
-/***/ },
-/* 93 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"galleries-container\">\r\n\r\n</div>\r\n"
-
-/***/ },
-/* 94 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(95);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(60)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./galleries-container.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./galleries-container.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 95 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(59)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "", ""]);
-
-	// exports
-
-
-/***/ },
-/* 96 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var FeaturedGalleryContainerComponent = (function () {
-	    function FeaturedGalleryContainerComponent() {
-	    }
-	    FeaturedGalleryContainerComponent = __decorate([
-	        core_1.Component({
-	            template: __webpack_require__(97),
-	            styles: [__webpack_require__(98)],
-	            selector: "featured-gallery-container",
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], FeaturedGalleryContainerComponent);
-	    return FeaturedGalleryContainerComponent;
-	}());
-	exports.FeaturedGalleryContainerComponent = FeaturedGalleryContainerComponent;
-
-
-/***/ },
-/* 97 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"featured-gallery-container\">\r\n    <div class=\"featured-gallery-container-inner\">\r\n        <img class=\"featured-gallery-container-img\" src=\"src/assets/images/Squad.jpg\" />\r\n    </div>    \r\n</div>\r\n"
-
-/***/ },
-/* 98 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(99);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(60)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./featured-gallery-container.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./featured-gallery-container.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
 /* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -3284,7 +3437,7 @@
 
 
 	// module
-	exports.push([module.id, ".featured-gallery-container {\n  margin-top: 60px; }\n\n.featured-gallery-container-inner {\n  max-width: 1200px;\n  margin: 0 auto; }\n\n.featured-gallery-container-img {\n  width: 100%;\n  max-width: 1200px; }\n", ""]);
+	exports.push([module.id, "", ""]);
 
 	// exports
 
@@ -3304,28 +3457,28 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var GalleryEditorContainerComponent = (function () {
-	    function GalleryEditorContainerComponent() {
+	var GalleriesContainerComponent = (function () {
+	    function GalleriesContainerComponent() {
 	    }
-	    GalleryEditorContainerComponent = __decorate([
+	    GalleriesContainerComponent = __decorate([
 	        core_1.Component({
 	            template: __webpack_require__(101),
 	            styles: [__webpack_require__(102)],
-	            selector: "gallery-editor-container",
+	            selector: "galleries-container",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
 	        __metadata('design:paramtypes', [])
-	    ], GalleryEditorContainerComponent);
-	    return GalleryEditorContainerComponent;
+	    ], GalleriesContainerComponent);
+	    return GalleriesContainerComponent;
 	}());
-	exports.GalleryEditorContainerComponent = GalleryEditorContainerComponent;
+	exports.GalleriesContainerComponent = GalleriesContainerComponent;
 
 
 /***/ },
 /* 101 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"gallery-editor-container\">\r\n    <h1>Gallery Editor Container</h1>\r\n</div>\r\n"
+	module.exports = "<div class=\"galleries-container\">\r\n\r\n</div>\r\n"
 
 /***/ },
 /* 102 */
@@ -3343,8 +3496,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./gallery-editor-container.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./gallery-editor-container.component.scss");
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./galleries-container.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./galleries-container.component.scss");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -3382,74 +3535,67 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var modal_action_creator_1 = __webpack_require__(82);
-	var GalleryActionCreator = (function () {
-	    function GalleryActionCreator(dispatcher, guid, invokeAsync, modalActionCreator) {
-	        this.dispatcher = dispatcher;
-	        this.guid = guid;
-	        this.invokeAsync = invokeAsync;
-	        this.modalActionCreator = modalActionCreator;
+	var FeaturedGalleryContainerComponent = (function () {
+	    function FeaturedGalleryContainerComponent() {
 	    }
-	    GalleryActionCreator = __decorate([
-	        core_1.Service({
-	            serviceName: "galleryActionCreator",
-	            viewProviders: ["dispatcher", "guid", "invokeAsync", "modalActionCreator"]
+	    FeaturedGalleryContainerComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(105),
+	            styles: [__webpack_require__(106)],
+	            selector: "featured-gallery-container",
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
-	        __metadata('design:paramtypes', [Object, Object, Object, modal_action_creator_1.ModalActionCreator])
-	    ], GalleryActionCreator);
-	    return GalleryActionCreator;
+	        __metadata('design:paramtypes', [])
+	    ], FeaturedGalleryContainerComponent);
+	    return FeaturedGalleryContainerComponent;
 	}());
-	exports.GalleryActionCreator = GalleryActionCreator;
+	exports.FeaturedGalleryContainerComponent = FeaturedGalleryContainerComponent;
 
 
 /***/ },
 /* 105 */
 /***/ function(module, exports) {
 
-	"use strict";
-
+	module.exports = "<div class=\"featured-gallery-container\">\r\n    <div class=\"featured-gallery-container-inner\">\r\n        <img class=\"featured-gallery-container-img\" src=\"src/assets/images/Squad.jpg\" />\r\n    </div>    \r\n</div>\r\n"
 
 /***/ },
 /* 106 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
-	var Default = (function () {
-	    function Default() {
-	    }
-	    return Default;
-	}());
-	exports.Default = Default;
+	// style-loader: Adds some css to the DOM by adding a <style> tag
 
+	// load the styles
+	var content = __webpack_require__(107);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./featured-gallery-container.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./featured-gallery-container.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
 
 /***/ },
 /* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
-	var gallery_editor_container_component_1 = __webpack_require__(100);
-	var gallery_container_component_1 = __webpack_require__(108);
-	var featured_gallery_container_component_1 = __webpack_require__(96);
-	exports.GalleriesRoutes = [
-	    {
-	        path: "/",
-	        component: featured_gallery_container_component_1.FeaturedGalleryContainerComponent,
-	    },
-	    {
-	        path: "/gallery/:slug",
-	        component: gallery_container_component_1.GalleryContainerComponent
-	    },
-	    {
-	        path: "/admin",
-	        component: gallery_editor_container_component_1.GalleryEditorContainerComponent,
-	        authorizationRequired: true
-	    },
-	    {
-	        path: "/admin/gallery/:galleryid",
-	        component: gallery_editor_container_component_1.GalleryEditorContainerComponent,
-	        authorizationRequired: true
-	    }
-	];
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".featured-gallery-container {\n  margin-top: 60px; }\n\n.featured-gallery-container-inner {\n  max-width: 1280px;\n  margin: 0 auto; }\n\n.featured-gallery-container-img {\n  width: 100%;\n  max-width: 1280px; }\n", ""]);
+
+	// exports
 
 
 /***/ },
@@ -3467,28 +3613,28 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var GalleryContainerComponent = (function () {
-	    function GalleryContainerComponent() {
+	var GalleryEditorContainerComponent = (function () {
+	    function GalleryEditorContainerComponent() {
 	    }
-	    GalleryContainerComponent = __decorate([
+	    GalleryEditorContainerComponent = __decorate([
 	        core_1.Component({
 	            template: __webpack_require__(109),
 	            styles: [__webpack_require__(110)],
-	            selector: "gallery-container",
+	            selector: "gallery-editor-container",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
 	        __metadata('design:paramtypes', [])
-	    ], GalleryContainerComponent);
-	    return GalleryContainerComponent;
+	    ], GalleryEditorContainerComponent);
+	    return GalleryEditorContainerComponent;
 	}());
-	exports.GalleryContainerComponent = GalleryContainerComponent;
+	exports.GalleryEditorContainerComponent = GalleryEditorContainerComponent;
 
 
 /***/ },
 /* 109 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"gallery-container\">\r\n\r\n</div>\r\n"
+	module.exports = "<div class=\"gallery-editor-container\">\r\n    <h1>Gallery Editor Container</h1>\r\n</div>\r\n"
 
 /***/ },
 /* 110 */
@@ -3506,8 +3652,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./gallery-container.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./gallery-container.component.scss");
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./gallery-editor-container.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./gallery-editor-container.component.scss");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -3535,20 +3681,183 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	function __export(m) {
-	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-	}
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
 	var core_1 = __webpack_require__(3);
-	var login_container_component_1 = __webpack_require__(113);
-	var loginModule = angular.module("quinntynebrown.login", []);
-	core_1.bootstrap(loginModule, {
-	    components: [login_container_component_1.LoginContainerComponent]
-	});
-	__export(__webpack_require__(117));
+	var modal_action_creator_1 = __webpack_require__(73);
+	var GalleryActionCreator = (function () {
+	    function GalleryActionCreator(dispatcher, guid, invokeAsync, modalActionCreator) {
+	        this.dispatcher = dispatcher;
+	        this.guid = guid;
+	        this.invokeAsync = invokeAsync;
+	        this.modalActionCreator = modalActionCreator;
+	    }
+	    GalleryActionCreator = __decorate([
+	        core_1.Service({
+	            serviceName: "galleryActionCreator",
+	            viewProviders: ["dispatcher", "guid", "invokeAsync", "modalActionCreator"]
+	        }), 
+	        __metadata('design:paramtypes', [Object, Object, Object, modal_action_creator_1.ModalActionCreator])
+	    ], GalleryActionCreator);
+	    return GalleryActionCreator;
+	}());
+	exports.GalleryActionCreator = GalleryActionCreator;
 
 
 /***/ },
 /* 113 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+
+/***/ },
+/* 114 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var Default = (function () {
+	    function Default() {
+	    }
+	    return Default;
+	}());
+	exports.Default = Default;
+
+
+/***/ },
+/* 115 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var gallery_editor_container_component_1 = __webpack_require__(108);
+	var gallery_container_component_1 = __webpack_require__(116);
+	var featured_gallery_container_component_1 = __webpack_require__(104);
+	exports.GalleriesRoutes = [
+	    {
+	        path: "/",
+	        component: featured_gallery_container_component_1.FeaturedGalleryContainerComponent,
+	    },
+	    {
+	        path: "/gallery/:slug",
+	        component: gallery_container_component_1.GalleryContainerComponent
+	    },
+	    {
+	        path: "/admin",
+	        component: gallery_editor_container_component_1.GalleryEditorContainerComponent,
+	        authorizationRequired: true
+	    },
+	    {
+	        path: "/admin/gallery/:galleryid",
+	        component: gallery_editor_container_component_1.GalleryEditorContainerComponent,
+	        authorizationRequired: true
+	    }
+	];
+
+
+/***/ },
+/* 116 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var GalleryContainerComponent = (function () {
+	    function GalleryContainerComponent() {
+	    }
+	    GalleryContainerComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(117),
+	            styles: [__webpack_require__(118)],
+	            selector: "gallery-container",
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], GalleryContainerComponent);
+	    return GalleryContainerComponent;
+	}());
+	exports.GalleryContainerComponent = GalleryContainerComponent;
+
+
+/***/ },
+/* 117 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"gallery-container\">\r\n\r\n</div>\r\n"
+
+/***/ },
+/* 118 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(119);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./gallery-container.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./gallery-container.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 119 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 120 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
+	var core_1 = __webpack_require__(3);
+	var login_container_component_1 = __webpack_require__(121);
+	var loginModule = angular.module("quinntynebrown.login", []);
+	core_1.bootstrap(loginModule, {
+	    components: [login_container_component_1.LoginContainerComponent]
+	});
+	__export(__webpack_require__(125));
+
+
+/***/ },
+/* 121 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3567,8 +3876,8 @@
 	    }
 	    LoginContainerComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(114),
-	            styles: [__webpack_require__(115)],
+	            template: __webpack_require__(122),
+	            styles: [__webpack_require__(123)],
 	            selector: "da-login-container",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -3580,19 +3889,19 @@
 
 
 /***/ },
-/* 114 */
+/* 122 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"login-container\">\r\n    <login></login>\r\n</div>\r\n"
 
 /***/ },
-/* 115 */
+/* 123 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(116);
+	var content = __webpack_require__(124);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -3612,7 +3921,7 @@
 	}
 
 /***/ },
-/* 116 */
+/* 124 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -3626,11 +3935,11 @@
 
 
 /***/ },
-/* 117 */
+/* 125 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var login_container_component_1 = __webpack_require__(113);
+	var login_container_component_1 = __webpack_require__(121);
 	exports.LoginRoutes = [
 	    {
 	        path: "/login",
@@ -3640,7 +3949,7 @@
 
 
 /***/ },
-/* 118 */
+/* 126 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3648,11 +3957,11 @@
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
 	var core_1 = __webpack_require__(3);
-	var photo_component_1 = __webpack_require__(119);
-	var photo_editor_container_component_1 = __webpack_require__(123);
-	var photo_action_creator_1 = __webpack_require__(127);
-	var reducers = __webpack_require__(128);
-	var actions = __webpack_require__(129);
+	var photo_component_1 = __webpack_require__(127);
+	var photo_editor_container_component_1 = __webpack_require__(131);
+	var photo_action_creator_1 = __webpack_require__(135);
+	var reducers = __webpack_require__(136);
+	var actions = __webpack_require__(137);
 	var photosModule = angular.module("quinntynebrown.photos", []);
 	core_1.bootstrap(photosModule, {
 	    components: [photo_component_1.PhotoComponent, photo_editor_container_component_1.PhotoEditorContainerComponent],
@@ -3660,11 +3969,11 @@
 	    reducers: reducers,
 	    actions: actions
 	});
-	__export(__webpack_require__(130));
+	__export(__webpack_require__(138));
 
 
 /***/ },
-/* 119 */
+/* 127 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3683,8 +3992,8 @@
 	    }
 	    PhotoComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(120),
-	            styles: [__webpack_require__(121)],
+	            template: __webpack_require__(128),
+	            styles: [__webpack_require__(129)],
 	            selector: "photo",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -3696,19 +4005,19 @@
 
 
 /***/ },
-/* 120 */
+/* 128 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"photo\">\r\n\r\n</div>\r\n"
 
 /***/ },
-/* 121 */
+/* 129 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(122);
+	var content = __webpack_require__(130);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -3728,7 +4037,7 @@
 	}
 
 /***/ },
-/* 122 */
+/* 130 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -3742,7 +4051,7 @@
 
 
 /***/ },
-/* 123 */
+/* 131 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3761,8 +4070,8 @@
 	    }
 	    PhotoEditorContainerComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(124),
-	            styles: [__webpack_require__(125)],
+	            template: __webpack_require__(132),
+	            styles: [__webpack_require__(133)],
 	            selector: "photo-editor-container",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -3774,19 +4083,19 @@
 
 
 /***/ },
-/* 124 */
+/* 132 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"photo-editor-container\">\r\n\r\n</div>\r\n"
 
 /***/ },
-/* 125 */
+/* 133 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(126);
+	var content = __webpack_require__(134);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -3806,7 +4115,7 @@
 	}
 
 /***/ },
-/* 126 */
+/* 134 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -3820,7 +4129,7 @@
 
 
 /***/ },
-/* 127 */
+/* 135 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3834,7 +4143,7 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var modal_action_creator_1 = __webpack_require__(82);
+	var modal_action_creator_1 = __webpack_require__(73);
 	var PhotoActionCreator = (function () {
 	    function PhotoActionCreator(dispatcher, guid, invokeAsync, modalActionCreator) {
 	        this.dispatcher = dispatcher;
@@ -3855,14 +4164,14 @@
 
 
 /***/ },
-/* 128 */
+/* 136 */
 /***/ function(module, exports) {
 
 	"use strict";
 
 
 /***/ },
-/* 129 */
+/* 137 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3875,7 +4184,7 @@
 
 
 /***/ },
-/* 130 */
+/* 138 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3883,14 +4192,14 @@
 
 
 /***/ },
-/* 131 */
+/* 139 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var core_1 = __webpack_require__(3);
-	var app_footer_component_1 = __webpack_require__(132);
-	var app_header_component_1 = __webpack_require__(136);
-	var admin_header_component_1 = __webpack_require__(140);
+	var app_footer_component_1 = __webpack_require__(140);
+	var app_header_component_1 = __webpack_require__(144);
+	var admin_header_component_1 = __webpack_require__(148);
 	var sharedModule = angular.module("quinntynebrown.shared", []);
 	core_1.bootstrap(sharedModule, {
 	    components: [app_footer_component_1.AppFooterComponent, app_header_component_1.AppHeaderComponent, admin_header_component_1.AdminHeaderComponent],
@@ -3898,7 +4207,7 @@
 
 
 /***/ },
-/* 132 */
+/* 140 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3917,8 +4226,8 @@
 	    }
 	    AppFooterComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(133),
-	            styles: [__webpack_require__(134)],
+	            template: __webpack_require__(141),
+	            styles: [__webpack_require__(142)],
 	            selector: "app-footer",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -3930,166 +4239,10 @@
 
 
 /***/ },
-/* 133 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"app-footer\">\r\n\r\n</div>\r\n"
-
-/***/ },
-/* 134 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(135);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(60)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./app-footer.component.scss", function() {
-				var newContent = require("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./app-footer.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 135 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(59)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "", ""]);
-
-	// exports
-
-
-/***/ },
-/* 136 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var AppHeaderComponent = (function () {
-	    function AppHeaderComponent() {
-	    }
-	    AppHeaderComponent = __decorate([
-	        core_1.Component({
-	            template: __webpack_require__(137),
-	            styles: [__webpack_require__(138)],
-	            selector: "app-header",
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], AppHeaderComponent);
-	    return AppHeaderComponent;
-	}());
-	exports.AppHeaderComponent = AppHeaderComponent;
-
-
-/***/ },
-/* 137 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"app-header\">\r\n    <div class=\"app-header-inner\">\r\n        <h1>\r\n            Quinntyne Brown\r\n        </h1>\r\n        <div class=\"app-header-sub-nav\">\r\n            <span>Home</span>\r\n            &nbsp;&nbsp;|&nbsp;&nbsp;\r\n            <span>Blog</span>\r\n            &nbsp;&nbsp;|&nbsp;&nbsp;\r\n            <span>About</span>\r\n            &nbsp;&nbsp;|&nbsp;&nbsp;\r\n            <span>Contact</span>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
-
-/***/ },
-/* 138 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(139);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(60)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./app-header.component.scss", function() {
-				var newContent = require("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./app-header.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 139 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(59)();
-	// imports
-
-
-	// module
-	exports.push([module.id, ".app-header {\n  width: 100%;\n  font-family: Lato; }\n\n.app-header-inner {\n  max-width: 1280px;\n  margin: 0 auto;\n  text-align: center;\n  letter-spacing: -0.5px; }\n\n.app-header-sub-nav {\n  text-transform: uppercase;\n  font-family: Roboto;\n  cursor: pointer; }\n", ""]);
-
-	// exports
-
-
-/***/ },
-/* 140 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var AdminHeaderComponent = (function () {
-	    function AdminHeaderComponent() {
-	    }
-	    AdminHeaderComponent = __decorate([
-	        core_1.Component({
-	            template: __webpack_require__(141),
-	            styles: [__webpack_require__(142)],
-	            selector: "admin-header",
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], AdminHeaderComponent);
-	    return AdminHeaderComponent;
-	}());
-	exports.AdminHeaderComponent = AdminHeaderComponent;
-
-
-/***/ },
 /* 141 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"admin-header\">\r\n    <div class=\"admin-header-inner\">\r\n        <h1>\r\n            QB: Admin\r\n        </h1>\r\n    </div>\r\n</div>\r\n"
+	module.exports = "<div class=\"app-footer\">\r\n\r\n</div>\r\n"
 
 /***/ },
 /* 142 */
@@ -4107,8 +4260,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./admin-header.component.scss", function() {
-				var newContent = require("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./admin-header.component.scss");
+			module.hot.accept("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./app-footer.component.scss", function() {
+				var newContent = require("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./app-footer.component.scss");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -4136,14 +4289,170 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var AppHeaderComponent = (function () {
+	    function AppHeaderComponent() {
+	    }
+	    AppHeaderComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(145),
+	            styles: [__webpack_require__(146)],
+	            selector: "app-header",
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], AppHeaderComponent);
+	    return AppHeaderComponent;
+	}());
+	exports.AppHeaderComponent = AppHeaderComponent;
+
+
+/***/ },
+/* 145 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"app-header\">\r\n    <div class=\"app-header-inner\">\r\n        <h1>\r\n            Quinntyne Brown\r\n        </h1>\r\n        <div class=\"app-header-sub-nav\">\r\n            <a href=\"/\">Home</a>\r\n            &nbsp;&nbsp;|&nbsp;&nbsp;\r\n            <a>Blog</a>\r\n            &nbsp;&nbsp;|&nbsp;&nbsp;\r\n            <a>About</a>\r\n            &nbsp;&nbsp;|&nbsp;&nbsp;\r\n            <a href=\"/contact\">Contact</a>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
+
+/***/ },
+/* 146 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(147);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./app-header.component.scss", function() {
+				var newContent = require("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./app-header.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 147 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".app-header {\n  width: 100%;\n  font-family: Lato;\n  color: #272727; }\n  .app-header a {\n    text-decoration: none;\n    color: #272727; }\n\n.app-header-inner {\n  max-width: 1280px;\n  margin: 0 auto;\n  text-align: center;\n  letter-spacing: -0.5px; }\n\n.app-header-sub-nav {\n  text-transform: uppercase;\n  font-family: Roboto;\n  font-weight: 100;\n  cursor: pointer; }\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 148 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var AdminHeaderComponent = (function () {
+	    function AdminHeaderComponent() {
+	    }
+	    AdminHeaderComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(149),
+	            styles: [__webpack_require__(150)],
+	            selector: "admin-header",
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], AdminHeaderComponent);
+	    return AdminHeaderComponent;
+	}());
+	exports.AdminHeaderComponent = AdminHeaderComponent;
+
+
+/***/ },
+/* 149 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"admin-header\">\r\n    <div class=\"admin-header-inner\">\r\n        <h1>\r\n            QB: Admin\r\n        </h1>\r\n    </div>\r\n</div>\r\n"
+
+/***/ },
+/* 150 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(151);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./admin-header.component.scss", function() {
+				var newContent = require("!!./../../../../node_modules/css-loader/index.js!./../../../../node_modules/sass-loader/index.js!./admin-header.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 151 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 152 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
 	var core_1 = __webpack_require__(3);
-	var photographer_component_1 = __webpack_require__(145);
-	var photographer_action_creator_1 = __webpack_require__(149);
-	var reducers = __webpack_require__(150);
-	var actions = __webpack_require__(151);
+	var photographer_component_1 = __webpack_require__(153);
+	var photographer_action_creator_1 = __webpack_require__(157);
+	var reducers = __webpack_require__(158);
+	var actions = __webpack_require__(159);
 	var photographersModule = angular.module("quinntynebrown.photographers", []);
 	core_1.bootstrap(photographersModule, {
 	    components: [photographer_component_1.PhotographerComponent],
@@ -4151,11 +4460,11 @@
 	    reducers: reducers,
 	    actions: actions
 	});
-	__export(__webpack_require__(152));
+	__export(__webpack_require__(160));
 
 
 /***/ },
-/* 145 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4174,8 +4483,8 @@
 	    }
 	    PhotographerComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(146),
-	            styles: [__webpack_require__(147)],
+	            template: __webpack_require__(154),
+	            styles: [__webpack_require__(155)],
 	            selector: "photographer",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -4187,19 +4496,19 @@
 
 
 /***/ },
-/* 146 */
+/* 154 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"photographer\">\r\n\r\n</div>\r\n"
 
 /***/ },
-/* 147 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(148);
+	var content = __webpack_require__(156);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -4219,7 +4528,7 @@
 	}
 
 /***/ },
-/* 148 */
+/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -4233,7 +4542,7 @@
 
 
 /***/ },
-/* 149 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4247,7 +4556,7 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var modal_action_creator_1 = __webpack_require__(82);
+	var modal_action_creator_1 = __webpack_require__(73);
 	var PhotographerActionCreator = (function () {
 	    function PhotographerActionCreator(dispatcher, guid, invokeAsync, modalActionCreator) {
 	        this.dispatcher = dispatcher;
@@ -4268,14 +4577,14 @@
 
 
 /***/ },
-/* 150 */
+/* 158 */
 /***/ function(module, exports) {
 
 	"use strict";
 
 
 /***/ },
-/* 151 */
+/* 159 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4288,7 +4597,7 @@
 
 
 /***/ },
-/* 152 */
+/* 160 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4296,7 +4605,7 @@
 
 
 /***/ },
-/* 153 */
+/* 161 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4320,7 +4629,7 @@
 	//# sourceMappingURL=authorization-guard.js.map
 
 /***/ },
-/* 154 */
+/* 162 */
 /***/ function(module, exports) {
 
 	"use strict";

@@ -247,6 +247,7 @@
     <Compile Include="Dtos\UserAddOrUpdateRequestDto.cs" />
     <Compile Include="Dtos\UserAddOrUpdateResponseDto.cs" />
     <Compile Include="Dtos\UserDto.cs" />
+    <Compile Include="Extensions\HttpResponseMessageExtensions.cs" />
     <Compile Include="Helpers\StartupHelper.cs" />
     <Compile Include="Models\App.cs" />
     <Compile Include="Models\AppProperty.cs" />

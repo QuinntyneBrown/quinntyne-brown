@@ -7,6 +7,7 @@ require("./app/photos");
 require("./app/shared");
 
 import { ArticlesRoutes } from "./app/articles";
+import { ContactsRoutes } from "./app/contacts";
 import { CustomersRoutes } from "./app/customers";
 import { GalleriesRoutes } from "./app/galleries";
 import { LoginRoutes } from "./app/login";
@@ -37,6 +38,7 @@ bootstrap(quinntynebrownAppModule, {
     run:[routeChangeSuccessIsAdminReducer],
     routes: [
         ...ArticlesRoutes,
+        ...ContactsRoutes,
         ...CustomersRoutes,
         ...GalleriesRoutes,
         ...LoginRoutes,
