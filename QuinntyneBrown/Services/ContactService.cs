@@ -27,6 +27,7 @@ namespace QuinntyneBrown.Services
             entity.Lastname = request.Lastname;
             entity.PhoneNumber = request.PhoneNumber;
             entity.Email = request.Email;
+            entity.Message = request.Message;
             _uow.SaveChanges();
             return new ContactAddOrUpdateResponseDto(entity);
         }

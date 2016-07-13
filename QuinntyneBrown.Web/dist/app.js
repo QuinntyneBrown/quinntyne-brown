@@ -2716,16 +2716,15 @@
 	var core_1 = __webpack_require__(3);
 	var contact_action_creator_1 = __webpack_require__(72);
 	var contact_model_1 = __webpack_require__(76);
+	var contact_actions_1 = __webpack_require__(75);
 	var ContactContainerComponent = (function () {
 	    function ContactContainerComponent(contactActionCreator) {
 	        var _this = this;
 	        this.contactActionCreator = contactActionCreator;
-	        this.storeOnChange = function () {
-	        };
-	        this.onTryToSaveContact = function (options) {
-	            _this.contactActionCreator.addOrUpdate({
-	                data: options.data
-	            });
+	        this.storeOnChange = function (state) {
+	            if (state.lastTriggeredByAction instanceof contact_actions_1.AddOrUpdateContactAction) {
+	                _this.entity = new contact_model_1.Contact();
+	            }
 	        };
 	        this.entity = new contact_model_1.Contact();
 	    }
@@ -3057,18 +3056,27 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
+	var contact_action_creator_1 = __webpack_require__(72);
 	var ContactEditorComponent = (function () {
-	    function ContactEditorComponent() {
+	    function ContactEditorComponent(contactActionCreator) {
+	        var _this = this;
+	        this.contactActionCreator = contactActionCreator;
+	        this.onTryToSaveContact = function (options) {
+	            _this.contactActionCreator.addOrUpdate({
+	                data: options.data
+	            });
+	        };
 	    }
 	    ContactEditorComponent = __decorate([
 	        core_1.Component({
 	            template: __webpack_require__(81),
 	            styles: [__webpack_require__(82)],
 	            selector: "contact-editor",
-	            inputs: ["onTryToSaveContact", "entity"],
+	            inputs: ["entity"],
+	            viewProviders: ["contactActionCreator"],
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
-	        __metadata('design:paramtypes', [])
+	        __metadata('design:paramtypes', [contact_action_creator_1.ContactActionCreator])
 	    ], ContactEditorComponent);
 	    return ContactEditorComponent;
 	}());
@@ -3079,7 +3087,7 @@
 /* 81 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"contact-editor\">\r\n\r\n    <div class=\"contact-editor-inner\">\r\n\r\n        <div class=\"contact-editor-form\">\r\n            <h2>Contact</h2>\r\n\r\n            <div>\r\n                <input type=\"text\" class=\"contact-editor-form-input\" placeholder=\"Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n            <div>\r\n                <input type=\"text\" class=\"contact-editor-form-input\" placeholder=\"Email\" data-ng-model=\"vm.entity.email\" />\r\n            </div>\r\n            <div>\r\n                <input type=\"text\" class=\"contact-editor-form-input\" placeholder=\"Message\" data-ng-model=\"vm.entity.message\" />\r\n            </div>\r\n\r\n            <button on-click=\"vm.onTryToSaveContact({ data: vm.entity })\" caption=\"Send Message\"></button>\r\n\r\n        </div>\r\n\r\n    </div>\r\n\r\n</div>\r\n"
+	module.exports = "<div class=\"contact-editor\">\r\n\r\n    <div class=\"contact-editor-inner\">\r\n\r\n        <div class=\"contact-editor-form\">\r\n            <h2>Contact</h2>\r\n\r\n            <div>\r\n                <input type=\"text\" class=\"contact-editor-form-input\" placeholder=\"Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n            <div>\r\n                <input type=\"text\" class=\"contact-editor-form-input\" placeholder=\"Email\" data-ng-model=\"vm.entity.email\" />\r\n            </div>\r\n            <div>\r\n                <textarea rows=\"10\" class=\"contact-editor-form-input\" placeholder=\"Message\" data-ng-model=\"vm.entity.message\" />\r\n            </div>\r\n\r\n            <div class=\"submit-contact\" data-ng-click=\"vm.onTryToSaveContact({ data: vm.entity })\">Send Message</div>\r\n\r\n        </div>\r\n\r\n    </div>\r\n\r\n</div>\r\n"
 
 /***/ },
 /* 82 */
@@ -3116,7 +3124,7 @@
 
 
 	// module
-	exports.push([module.id, ".contact-editor {\n  width: 100%; }\n\n.contact-editor-inner {\n  margin: 0 auto;\n  max-width: 1280px; }\n\n.contact-editor-form {\n  max-width: 500px;\n  margin: 0 auto; }\n\n.contact-editor-form-input {\n  margin-bottom: 15px;\n  max-width: 500px;\n  width: 100%;\n  padding: 10px; }\n", ""]);
+	exports.push([module.id, ".contact-editor {\n  width: 100%;\n  padding-top: 60px; }\n\n.contact-editor-inner {\n  margin: 0 auto;\n  max-width: 1280px; }\n\n.contact-editor-form {\n  max-width: 500px;\n  margin: 0 auto; }\n\n.contact-editor-form-input {\n  margin-bottom: 15px;\n  max-width: 500px;\n  width: 100%;\n  padding: 10px; }\n\n.submit-contact {\n  cursor: pointer;\n  line-height: 4em;\n  border: solid 2px #EEE;\n  padding-right: 15px;\n  padding-left: 15px;\n  padding-top: 10px;\n  padding-bottom: 10px;\n  display: inline; }\n", ""]);
 
 	// exports
 
@@ -3126,6 +3134,11 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
 	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
 	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
 	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -3136,11 +3149,10 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var ContactService = (function () {
+	var ContactService = (function (_super) {
+	    __extends(ContactService, _super);
 	    function ContactService($q, apiEndpoint, fetch) {
-	        this.$q = $q;
-	        this.apiEndpoint = apiEndpoint;
-	        this.fetch = fetch;
+	        _super.call(this, $q, apiEndpoint, fetch);
 	    }
 	    Object.defineProperty(ContactService.prototype, "baseUri", {
 	        get: function () { return this.apiEndpoint.getBaseUrl() + "/contact"; },
@@ -3156,7 +3168,7 @@
 	        __metadata('design:paramtypes', [Function, Object, Object])
 	    ], ContactService);
 	    return ContactService;
-	}());
+	}(core_1.BaseService));
 	exports.ContactService = ContactService;
 
 

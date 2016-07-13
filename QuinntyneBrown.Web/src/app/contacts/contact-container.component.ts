@@ -1,6 +1,7 @@
 import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/src/components/core";
 import { ContactActionCreator } from "./contact.action-creator";
 import { Contact } from "./contact.model";
+import { AddOrUpdateContactAction } from "./contact.actions";
 
 @Component({
     template: require("./contact-container.component.html"),
@@ -12,15 +13,11 @@ import { Contact } from "./contact.model";
 export class ContactContainerComponent {
     constructor(private contactActionCreator: ContactActionCreator) { }
 
-    storeOnChange = () => {
-
+    storeOnChange = state => {
+        if (state.lastTriggeredByAction instanceof AddOrUpdateContactAction)
+        {
+            this.entity = new Contact();
+        }
     }
-
-    public onTryToSaveContact = options => {
-        this.contactActionCreator.addOrUpdate({
-            data: options.data
-        });
-    }
-
     public entity: Contact = new Contact();
 }

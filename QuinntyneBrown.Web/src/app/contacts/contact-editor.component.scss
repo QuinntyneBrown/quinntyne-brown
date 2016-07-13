@@ -1,5 +1,6 @@
 .contact-editor {
     width:100%;
+    padding-top:60px;
 }
 
 .contact-editor-inner {
@@ -17,4 +18,15 @@
     max-width:500px;
     width:100%;
     padding:10px;
+}
+
+.submit-contact {
+    cursor:pointer;
+    line-height:4em;
+    border: solid 2px #EEE;
+    padding-right:15px;
+    padding-left:15px;
+    padding-top:10px;
+    padding-bottom:10px;
+    display:inline;    
 }

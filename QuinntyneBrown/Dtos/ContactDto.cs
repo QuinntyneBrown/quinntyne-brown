@@ -10,6 +10,7 @@ namespace QuinntyneBrown.Dtos
             Lastname = entity.Lastname;
             PhoneNumber = entity.PhoneNumber;
             Email = entity.Email;
+            Message = entity.Message;
         }
 
         public ContactDto()
@@ -23,5 +24,6 @@ namespace QuinntyneBrown.Dtos
         public string Lastname { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
+        public string Message { get; set; }
     }
 }

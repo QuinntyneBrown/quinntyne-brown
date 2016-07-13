@@ -12,10 +12,10 @@
                 <input type="text" class="contact-editor-form-input" placeholder="Email" data-ng-model="vm.entity.email" />
             </div>
             <div>
-                <input type="text" class="contact-editor-form-input" placeholder="Message" data-ng-model="vm.entity.message" />
+                <textarea rows="10" class="contact-editor-form-input" placeholder="Message" data-ng-model="vm.entity.message" />
             </div>
 
-            <button on-click="vm.onTryToSaveContact({ data: vm.entity })" caption="Send Message"></button>
+            <div class="submit-contact" data-ng-click="vm.onTryToSaveContact({ data: vm.entity })">Send Message</div>
 
         </div>
 

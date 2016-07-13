@@ -17,6 +17,7 @@ namespace QuinntyneBrown.Controllers
 
         [Route("add")]
         [HttpPost]
+        [AllowAnonymous]
         [ResponseType(typeof(ContactAddOrUpdateResponseDto))]
         public IHttpActionResult Add(ContactAddOrUpdateRequestDto dto) { return Ok(_contactService.AddOrUpdate(dto)); }
 
