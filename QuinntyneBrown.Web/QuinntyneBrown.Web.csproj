@@ -349,6 +349,7 @@
     <Content Include="config\gulpfile.config.js" />
     <Content Include="config\karma.conf.js" />
     <Content Include="config\webpack.config.js" />
+    <Content Include="dist\app.js" />
     <Content Include="gulpfile.js" />
     <Content Include="lib\angular-route.js" />
     <Content Include="lib\angular-rx-ui.js" />
@@ -508,6 +509,7 @@
     <Content Include="src\app\properties\containers\properties-container.component.scss">
       <DependentUpon>properties-container.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\shared\shared.scss" />
     <None Include="src\assets\scss\_varibles.scss" />
     <Content Include="tsconfig.json" />
     <Content Include="typings.json" />
@@ -563,9 +565,7 @@
       <Name>QuinntyneBrown</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="dist\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <TypeScriptCompile Include="src\app\articles\article-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\article-editor-container.component.ts" />

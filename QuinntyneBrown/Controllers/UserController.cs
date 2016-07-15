@@ -1,8 +1,11 @@
+using QuinntyneBrown.Data;
 using QuinntyneBrown.Dtos;
 using QuinntyneBrown.Services;
 using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Http.Description;
+using System.Linq;
+using QuinntyneBrown.Models;
 
 namespace QuinntyneBrown.Controllers
 {
@@ -61,6 +64,7 @@ namespace QuinntyneBrown.Controllers
             return Ok(_userService.Current(User.Identity.Name));
         }
 
-        protected readonly IUserService _userService;        
+        protected readonly IUserService _userService;
+        protected readonly Uow uow;   
     }
 }

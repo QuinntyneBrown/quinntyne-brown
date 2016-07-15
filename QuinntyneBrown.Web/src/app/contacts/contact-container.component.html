@@ -1,3 +1,7 @@
 <div class="contact-container">
-    <contact-editor on-try-to-save-contact="vm.onTryToSaveContact" entity="vm.entity"></contact-editor>
+    <contact-editor on-try-to-save-contact="vm.onTryToSaveContact" entity="vm.entity" data-ng-if="!vm.contactReceived"></contact-editor>
+    <div class="contact-info-received" data-ng-if="vm.contactReceived">
+        <h2>Thank you!</h2>
+        <p>Your information has been received. Quinntyne Brown will be in contact with you as soon as possible.</p>
+    </div>
 </div>

@@ -6,4 +6,7 @@ import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/s
     selector: "app-header",
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppHeaderComponent { }
+export class AppHeaderComponent {
+    public _title: string = "Quinntyne Brown";    
+    public get title(): string { return this._title; }
+}

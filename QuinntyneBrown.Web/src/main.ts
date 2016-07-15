@@ -31,7 +31,7 @@ const quinntynebrownAppModule = angular.module("quinntynebrownApp", [
 ]);
 
 bootstrap(quinntynebrownAppModule, {
-    api: "api",
+    api: "http://www.quinntynebrown.com/api",
     loginRedirectUrl: "/",
     html5Mode: true,
     guards: [authorizationGuard],

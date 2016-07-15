@@ -16,8 +16,10 @@ export class ContactContainerComponent {
     storeOnChange = state => {
         if (state.lastTriggeredByAction instanceof AddOrUpdateContactAction)
         {
+            this.contactReceived = true;
             this.entity = new Contact();
         }
     }
     public entity: Contact = new Contact();
+    public contactReceived: boolean = false;
 }

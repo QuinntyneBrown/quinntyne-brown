@@ -1,0 +1,31 @@
+﻿.admin-content-container:after {
+    content: " ";
+    display:block;
+}
+
+.admin-side-nav {
+    position:relative;
+    float:left;
+    width:200px;
+}
+
+.admin-main-content {
+    position:relative;
+    float:left;
+}
+
+.admin-app {
+    padding-left:10px;
+    padding-right:10px;
+}
+
+.admin-side-nav ul {
+    list-style-type:none;
+}
+
+.admin-side-nav a {
+    cursor:pointer;
+    text-decoration:none;
+    color:#272727;
+    line-height:1.5em;
+}
