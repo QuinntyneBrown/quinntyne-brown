@@ -1,3 +1,18 @@
 <div class="admin-app">
-
+    <admin-header></admin-header>
+    <div class="admin-content-container">
+        <div class="admin-side-nav" data-ng-if="vm.currentUser">
+            <ul>
+                <li><a href="/admin/articles">Articles</a></li>
+                <li><a href="/admin/contacts">Contacts</a></li>
+                <li><a href="/admin">Galleries</a></li>
+                <li><a href="/admin/photos">Photos</a></li>
+                <li><a href="/admin/apps">Apps</a></li>
+                <li><a href="/admin/uis">UIs</a></li>
+                <li><a href="/admin/sections">Sections</a></li>
+                <li><a href="/admin/properties">Properties</a></li>
+            </ul>
+        </div>
+        <div class="admin-main-content" data-ng-view></div>
+    </div>
 </div>

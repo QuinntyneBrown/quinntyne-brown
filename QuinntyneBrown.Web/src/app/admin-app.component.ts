@@ -7,5 +7,6 @@ import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/s
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminAppComponent {
-    constructor() { }
+    currentUser;
+    storeOnChange = state => this.currentUser = state.currentUser;
 }
