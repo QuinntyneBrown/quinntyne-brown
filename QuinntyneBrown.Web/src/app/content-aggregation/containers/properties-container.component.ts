@@ -21,10 +21,10 @@ import { Property } from "../models/property.model";
 export class PropertiesContainerComponent { 
     constructor(private $location: angular.ILocationService, private $routeParams: angular.route.IRouteParamsService, private propertyActionCreator: PropertyActionCreator, private _invokeAsync) { }
     storeOnChange = state => {        
-        this.entities = state.propertys;
+        this.entities = state.properties;
 
 		if (state.lastTriggeredByAction instanceof actions.SetCurrentPropertyAction && !state.lastTriggeredByAction.entity) 
-            this.$location.path("/admin/propertys");
+            this.$location.path("/admin/properties");
 
         if (state.lastTriggeredByAction instanceof actions.SetCurrentPropertyAction && state.lastTriggeredByAction.entity) 
             this.$location.path("/admin/property/edit/" + state.lastTriggeredByAction.entity.id);
@@ -34,7 +34,7 @@ export class PropertiesContainerComponent {
 
         if (state.lastTriggeredByAction instanceof actions.RemovePropertyAction && this.entity && this.entity.id) {
             this.entity = pluck({ value: Number(this.$routeParams["propertyId"]), items: this.entities }) as Property;
-            if (Object.keys(this.entity).length === 0) { this.$location.path("/admin/propertys"); }
+            if (Object.keys(this.entity).length === 0) { this.$location.path("/admin/properties"); }
         }
     }
 
@@ -54,10 +54,10 @@ export class PropertiesContainerComponent {
             action: this.propertyActionCreator.addOrUpdate,
             params: { data: options.data }
         }).then(() => {
-            if (this.$location.path() === "/admin/propertys") {
+            if (this.$location.path() === "/admin/properties") {
                 this.entity = new Property();
             } else {
-                this.$location.path("/admin/propertys")
+                this.$location.path("/admin/properties")
             }
         });        
     };

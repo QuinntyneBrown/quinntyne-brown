@@ -1,3 +1,4 @@
+
 export class AddOrUpdatePropertyAction { constructor(public id, public entity) { } }
 
 export class AllPropertysAction { constructor(public id, public entities) { } }

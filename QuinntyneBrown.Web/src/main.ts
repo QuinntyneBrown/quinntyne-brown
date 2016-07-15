@@ -1,10 +1,12 @@
 ﻿require("./app/articles");
 require("./app/contacts");
+require("./app/content-aggreation");
 require("./app/customers");
 require("./app/galleries");
 require("./app/login");
 require("./app/photos");
 require("./app/shared");
+
 
 import { ArticlesRoutes } from "./app/articles";
 import { ContactsRoutes } from "./app/contacts";
@@ -13,6 +15,7 @@ import { GalleriesRoutes } from "./app/galleries";
 import { LoginRoutes } from "./app/login";
 import { PhotosRoutes } from "./app/photos";
 import { PhotographersRoutes } from "./app/photographers";
+import { ContentAggregationRoutes } from "./app/content-aggregation";
 
 import { provide, provideRoutePromise, bootstrap } from "angular-rx-ui/src/components/core";
 import { authorizationGuard } from "angular-rx-ui/src/components/routing/authorization-guard";
@@ -23,6 +26,7 @@ import { AdminAppComponent } from "./app/admin-app.component";
 
 const quinntynebrownAppModule = angular.module("quinntynebrownApp", [
     "components",
+    "app.contentAggregation",
     "quinntynebrown.articles",
     "quinntynebrown.contacts",
     "quinntynebrown.customers",

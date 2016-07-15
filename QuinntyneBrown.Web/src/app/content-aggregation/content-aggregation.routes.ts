@@ -7,7 +7,7 @@ import {
     UIsContainerComponent
 } from "./containers";
 
-export const CustomersRoutes: Array<IRouteConfig> = [
+export const ContentAggregationRoutes: Array<IRouteConfig> = [
     {
         path: "/admin/apps",
         component: AppsContainerComponent,

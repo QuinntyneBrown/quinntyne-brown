@@ -47,6 +47,7 @@
 	"use strict";
 	__webpack_require__(1);
 	__webpack_require__(70);
+	__webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./app/content-aggreation\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	__webpack_require__(86);
 	__webpack_require__(95);
 	__webpack_require__(120);
@@ -66,6 +67,7 @@
 	var admin_app_component_1 = __webpack_require__(169);
 	var quinntynebrownAppModule = angular.module("quinntynebrownApp", [
 	    "components",
+	    "app.contentAggregation",
 	    "quinntynebrown.articles",
 	    "quinntynebrown.contacts",
 	    "quinntynebrown.customers",

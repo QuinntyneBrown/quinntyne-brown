@@ -465,37 +465,37 @@
     <Content Include="src\app\photos\photo.component.scss">
       <DependentUpon>photo.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\containers\apps-container.component.html">
+    <Content Include="src\app\content-aggregation\containers\apps-container.component.html">
       <DependentUpon>apps-container.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\containers\apps-container.component.scss">
+    <Content Include="src\app\content-aggregation\containers\apps-container.component.scss">
       <DependentUpon>apps-container.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\containers\properties-container.component.html">
+    <Content Include="src\app\content-aggregation\containers\properties-container.component.html">
       <DependentUpon>properties-container.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\components\property-editor.component.html">
+    <Content Include="src\app\content-aggregation\components\property-editor.component.html">
       <DependentUpon>property-editor.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\components\property-list.component.html">
+    <Content Include="src\app\content-aggregation\components\property-list.component.html">
       <DependentUpon>property-list.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\components\property.component.html">
+    <Content Include="src\app\content-aggregation\components\property.component.html">
       <DependentUpon>property.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\components\property.component.scss">
+    <Content Include="src\app\content-aggregation\components\property.component.scss">
       <DependentUpon>property.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\containers\sections-container.component.html">
+    <Content Include="src\app\content-aggregation\containers\sections-container.component.html">
       <DependentUpon>sections-container.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\containers\sections-container.component.scss">
+    <Content Include="src\app\content-aggregation\containers\sections-container.component.scss">
       <DependentUpon>sections-container.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\containers\uis-container.component.html">
+    <Content Include="src\app\content-aggregation\containers\uis-container.component.html">
       <DependentUpon>uis-container.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\containers\uis-container.component.scss">
+    <Content Include="src\app\content-aggregation\containers\uis-container.component.scss">
       <DependentUpon>uis-container.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\shared\app-footer\app-footer.component.html">
@@ -512,13 +512,13 @@
     </Content>
     <Content Include="src\assets\images\Squad.jpg" />
     <Content Include="src\assets\scss\_breakpoints.scss" />
-    <Content Include="src\app\properties\components\property-editor.component.scss">
+    <Content Include="src\app\content-aggregation\components\property-editor.component.scss">
       <DependentUpon>property-editor.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\components\property-list.component.scss">
+    <Content Include="src\app\content-aggregation\components\property-list.component.scss">
       <DependentUpon>property-list.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\properties\containers\properties-container.component.scss">
+    <Content Include="src\app\content-aggregation\containers\properties-container.component.scss">
       <DependentUpon>properties-container.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\shared\shared.scss" />
@@ -594,18 +594,18 @@
     <TypeScriptCompile Include="src\app\login\login.routes.ts" />
     <TypeScriptCompile Include="src\app\photographers\photographers.routes.ts" />
     <TypeScriptCompile Include="src\app\photos\photos.routes.ts" />
-    <TypeScriptCompile Include="src\app\properties\action-creators\index.ts" />
-    <TypeScriptCompile Include="src\app\properties\actions\index.ts" />
-    <TypeScriptCompile Include="src\app\properties\components\index.ts" />
-    <TypeScriptCompile Include="src\app\properties\containers\index.ts" />
-    <TypeScriptCompile Include="src\app\properties\models\app.model.ts" />
-    <TypeScriptCompile Include="src\app\properties\models\index.ts" />
-    <TypeScriptCompile Include="src\app\properties\models\property.model.ts" />
-    <TypeScriptCompile Include="src\app\properties\models\section.model.ts" />
-    <TypeScriptCompile Include="src\app\properties\models\ui.model.ts" />
-    <TypeScriptCompile Include="src\app\properties\properties.routes.ts" />
-    <TypeScriptCompile Include="src\app\properties\reducers\index.ts" />
-    <TypeScriptCompile Include="src\app\properties\services\index.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\action-creators\index.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\actions\index.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\index.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\containers\index.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\models\app.model.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\models\index.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\models\property.model.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\models\section.model.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\models\ui.model.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\content-aggregation.routes.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\reducers\index.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\services\index.ts" />
     <TypeScriptCompile Include="src\app\shared\index.ts" />
     <TypeScriptCompile Include="src\main.ts" />
     <TypeScriptCompile Include="typings\globals\angular-mocks\index.d.ts" />
@@ -655,30 +655,30 @@
     <TypeScriptCompile Include="src\app\contacts\contact.actions.ts" />
     <TypeScriptCompile Include="src\app\contacts\contact.action-creator.ts" />
     <TypeScriptCompile Include="src\app\contacts\contact.reducers.ts" />
-    <TypeScriptCompile Include="src\app\properties\index.ts" />
-    <TypeScriptCompile Include="src\app\properties\containers\properties-container.component.ts" />
-    <TypeScriptCompile Include="src\app\properties\actions\property.actions.ts" />
-    <TypeScriptCompile Include="src\app\properties\action-creators\property.action-creator.ts" />
-    <TypeScriptCompile Include="src\app\properties\reducers\property.reducers.ts" />
-    <TypeScriptCompile Include="src\app\properties\components\property.component.ts" />
-    <TypeScriptCompile Include="src\app\properties\services\property.service.ts" />
-    <TypeScriptCompile Include="src\app\properties\components\property-list.component.ts" />
-    <TypeScriptCompile Include="src\app\properties\components\property-editor.component.ts" />
-    <TypeScriptCompile Include="src\app\properties\containers\apps-container.component.ts" />
-    <TypeScriptCompile Include="src\app\properties\containers\uis-container.component.ts" />
-    <TypeScriptCompile Include="src\app\properties\containers\sections-container.component.ts" />
-    <TypeScriptCompile Include="src\app\properties\actions\app.actions.ts" />
-    <TypeScriptCompile Include="src\app\properties\action-creators\app.action-creator.ts" />
-    <TypeScriptCompile Include="src\app\properties\reducers\app.reducers.ts" />
-    <TypeScriptCompile Include="src\app\properties\actions\section.actions.ts" />
-    <TypeScriptCompile Include="src\app\properties\action-creators\section.action-creator.ts" />
-    <TypeScriptCompile Include="src\app\properties\reducers\section.reducers.ts" />
-    <TypeScriptCompile Include="src\app\properties\actions\ui.actions.ts" />
-    <TypeScriptCompile Include="src\app\properties\action-creators\ui.action-creator.ts" />
-    <TypeScriptCompile Include="src\app\properties\reducers\ui.reducers.ts" />
-    <TypeScriptCompile Include="src\app\properties\services\app.service.ts" />
-    <TypeScriptCompile Include="src\app\properties\services\section.service.ts" />
-    <TypeScriptCompile Include="src\app\properties\services\ui.service.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\index.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\containers\properties-container.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\actions\property.actions.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\action-creators\property.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\reducers\property.reducers.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\property.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\services\property.service.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\property-list.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\property-editor.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\containers\apps-container.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\containers\uis-container.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\containers\sections-container.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\actions\app.actions.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\action-creators\app.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\reducers\app.reducers.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\actions\section.actions.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\action-creators\section.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\reducers\section.reducers.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\actions\ui.actions.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\action-creators\ui.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\reducers\ui.reducers.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\services\app.service.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\services\section.service.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\services\ui.service.ts" />
     <TypeScriptCompile Include="src\app\app.component.ts" />
     <TypeScriptCompile Include="src\app\admin-app.component.ts" />
   </ItemGroup>

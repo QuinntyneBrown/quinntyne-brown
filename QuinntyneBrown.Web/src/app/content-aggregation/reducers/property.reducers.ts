@@ -14,7 +14,7 @@ export const addPropertyReducer = (state, action) => {
     return state;
 }
 
-export const allPropertysReducer = (state, action) => {
+export const allPropertiesReducer = (state, action) => {
     if (action instanceof actions.AllPropertysAction) {
         state.propertys = action.entities;
     }
