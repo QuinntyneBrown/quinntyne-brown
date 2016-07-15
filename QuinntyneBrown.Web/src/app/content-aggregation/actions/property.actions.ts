@@ -1,7 +1,7 @@
 
 export class AddOrUpdatePropertyAction { constructor(public id, public entity) { } }
 
-export class AllPropertysAction { constructor(public id, public entities) { } }
+export class AllPropertiesAction { constructor(public id, public entities) { } }
 
 export class RemovePropertyAction { constructor(public id, public entity) { } }
 

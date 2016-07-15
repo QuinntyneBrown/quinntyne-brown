@@ -3,20 +3,20 @@ import { addOrUpdate, pluckOut } from "angular-rx-ui/src/components/core";
 
 export const removePropertyReducer = (state, action) => {
     if (action instanceof actions.RemovePropertyAction)
-        pluckOut({ items: state.propertys, value: action.entity.id });
+        pluckOut({ items: state.properties, value: action.entity.id });
     return state;
 }
 
 export const addPropertyReducer = (state, action) => {
     if (action instanceof actions.AddOrUpdatePropertyAction) {
-        addOrUpdate({ items: state.propertys, item: action.entity });
+        addOrUpdate({ items: state.properties, item: action.entity });
     }
     return state;
 }
 
 export const allPropertiesReducer = (state, action) => {
-    if (action instanceof actions.AllPropertysAction) {
-        state.propertys = action.entities;
+    if (action instanceof actions.AllPropertiesAction) {
+        state.properties = action.entities;
     }
     return state;
 }

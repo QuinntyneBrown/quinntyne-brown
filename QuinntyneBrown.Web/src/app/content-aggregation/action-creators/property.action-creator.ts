@@ -1,7 +1,7 @@
 import { IDispatcher, BaseActionCreator, Service } from "angular-rx-ui/src/components/core";
 import { ModalActionCreator } from "angular-rx-ui/src/components/modal/modal.action-creator";
 import {
-    AllPropertysAction,
+    AllPropertiesAction,
     RemovePropertyAction,
     PropertysFilterAction,
     SetCurrentPropertyAction,
@@ -16,7 +16,7 @@ import {
 })
 export class PropertyActionCreator extends BaseActionCreator {
     constructor($location: angular.ILocationService, dispatcher: IDispatcher, propertyService, guid, private invokeAsync, private modalActionCreator: ModalActionCreator) {
-        super($location,propertyService,dispatcher,guid,AddOrUpdatePropertyAction,AllPropertysAction,RemovePropertyAction,SetCurrentPropertyAction)
+        super($location,propertyService,dispatcher,guid,AddOrUpdatePropertyAction,AllPropertiesAction,RemovePropertyAction,SetCurrentPropertyAction)
     }    
 
 	addOrUpdateSuccess = options => this.dispatcher.dispatch(new AddOrUpdatePropertySuccessAction(options.entity));
