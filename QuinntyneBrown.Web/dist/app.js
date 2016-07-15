@@ -3886,16 +3886,23 @@
 	};
 	var core_1 = __webpack_require__(3);
 	var LoginContainerComponent = (function () {
-	    function LoginContainerComponent() {
+	    function LoginContainerComponent(loginRedirect) {
+	        var _this = this;
+	        this.loginRedirect = loginRedirect;
+	        this.storeOnChange = function (state) {
+	            if (state.lastTriggeredByActionType == "login.userLoggedInAction")
+	                _this.loginRedirect.redirectPreLogin();
+	        };
 	    }
 	    LoginContainerComponent = __decorate([
 	        core_1.Component({
 	            template: __webpack_require__(122),
 	            styles: [__webpack_require__(123)],
 	            selector: "da-login-container",
+	            viewProviders: ["loginRedirect"],
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
-	        __metadata('design:paramtypes', [])
+	        __metadata('design:paramtypes', [Object])
 	    ], LoginContainerComponent);
 	    return LoginContainerComponent;
 	}());
