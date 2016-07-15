@@ -11,7 +11,6 @@ var app = (<any>angular.module("app.contentAggregation", [
     "app.contentAggregation.actions",
     "app.contentAggregation.components",
     "app.contentAggregation.containers",
-    "app.contentAggregation.models",
     "app.contentAggregation.action-creators",
     "app.contentAggregation.reducers",
     "app.contentAggregation.services"    

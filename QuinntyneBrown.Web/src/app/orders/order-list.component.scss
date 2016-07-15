@@ -1,0 +1,22 @@
+.orderList-name,
+.orderList-actions {
+    position:relative;
+    float:left;
+}
+
+.orderList-name {
+    min-width:200px;
+}
+
+.orderList-item {
+    height:50px;
+}
+
+.orderList-actions span {
+    cursor:pointer;
+}
+
+.orderList-actions {
+    text-transform: uppercase;
+}
+   

@@ -19,6 +19,9 @@ namespace QuinntyneBrown.Data
         public DbSet<Section> Sections { get; set; }
         public DbSet<Property> Properties { get; set; }
         public DbSet<Photo> Photos { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Quote> Quotes { get; set; }
+        public DbSet<Order> Orders { get; set; }
         public DbSet<Gallery> Galleries { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }

@@ -5,7 +5,7 @@ import { BaseService, Injectable, Service } from "angular-rx-ui/src/components/c
 	serviceName: "uiService",
 	viewProviders: ["$q","apiEndpoint","fetch"]
 })
-export class UiService extends BaseService {
+export class UIService extends BaseService {
     constructor($q: angular.IQService, apiEndpoint, fetch) {
         super($q, apiEndpoint, fetch)
     }

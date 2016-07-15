@@ -17,6 +17,9 @@ namespace QuinntyneBrown.Data
         IRepository<Customer> Customers { get; }
         IRepository<Category> Categories { get; }
         IRepository<Contact> Contacts { get; }
+        IRepository<Product> Products { get; }
+        IRepository<Order> Orders { get; }
+        IRepository<Quote> Quotes { get; }
         void SaveChanges();
     }
 }

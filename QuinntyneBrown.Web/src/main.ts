@@ -1,12 +1,14 @@
 ﻿require("./app/articles");
 require("./app/contacts");
-require("./app/content-aggreation");
+require("./app/content-aggregation");
 require("./app/customers");
 require("./app/galleries");
 require("./app/login");
+require("./app/orders");
 require("./app/photos");
+require("./app/products");
+require("./app/quotes");
 require("./app/shared");
-
 
 import { ArticlesRoutes } from "./app/articles";
 import { ContactsRoutes } from "./app/contacts";
@@ -15,6 +17,9 @@ import { GalleriesRoutes } from "./app/galleries";
 import { LoginRoutes } from "./app/login";
 import { PhotosRoutes } from "./app/photos";
 import { PhotographersRoutes } from "./app/photographers";
+import { ProductsRoutes } from "./app/products";
+import { QuotesRoutes } from "./app/quotes";
+import { OrdersRoutes } from "./app/orders";
 import { ContentAggregationRoutes } from "./app/content-aggregation";
 
 import { provide, provideRoutePromise, bootstrap } from "angular-rx-ui/src/components/core";
@@ -32,8 +37,11 @@ const quinntynebrownAppModule = angular.module("quinntynebrownApp", [
     "quinntynebrown.customers",
     "quinntynebrown.galleries",
     "quinntynebrown.login",
+    "quinntynebrown.orders",
     "quinntynebrown.photos",
     "quinntynebrown.photographers",
+    "quinntynebrown.products",
+    "quinntynebrown.quotes",
     "quinntynebrown.shared"    
 ]);
 
@@ -50,7 +58,9 @@ bootstrap(quinntynebrownAppModule, {
         ...CustomersRoutes,
         ...GalleriesRoutes,
         ...LoginRoutes,
+        ...OrdersRoutes,
         ...PhotosRoutes,
-        ...PhotographersRoutes
+        ...PhotographersRoutes,
+        ...QuotesRoutes
     ]
 });

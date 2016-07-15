@@ -1,0 +1,22 @@
+.quoteList-name,
+.quoteList-actions {
+    position:relative;
+    float:left;
+}
+
+.quoteList-name {
+    min-width:200px;
+}
+
+.quoteList-item {
+    height:50px;
+}
+
+.quoteList-actions span {
+    cursor:pointer;
+}
+
+.quoteList-actions {
+    text-transform: uppercase;
+}
+   

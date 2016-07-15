@@ -447,6 +447,21 @@
     <Content Include="src\app\login\login-container.component.scss">
       <DependentUpon>login-container.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\orders\order-editor.component.html">
+      <DependentUpon>order-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\orders\order-list.component.html">
+      <DependentUpon>order-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\orders\order.component.html">
+      <DependentUpon>order.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\orders\order.component.scss">
+      <DependentUpon>order.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\orders\orders-container.component.html">
+      <DependentUpon>orders-container.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\photographers\photographer.component.html">
       <DependentUpon>photographer.component.ts</DependentUpon>
     </Content>
@@ -498,6 +513,36 @@
     <Content Include="src\app\content-aggregation\containers\uis-container.component.scss">
       <DependentUpon>uis-container.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\products\product-editor.component.html">
+      <DependentUpon>product-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\products\product-list.component.html">
+      <DependentUpon>product-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\products\product.component.html">
+      <DependentUpon>product.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\products\product.component.scss">
+      <DependentUpon>product.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\products\products-container.component.html">
+      <DependentUpon>products-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\quotes\quote-editor.component.html">
+      <DependentUpon>quote-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\quotes\quote-list.component.html">
+      <DependentUpon>quote-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\quotes\quote.component.html">
+      <DependentUpon>quote.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\quotes\quote.component.scss">
+      <DependentUpon>quote.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\quotes\quotes-container.component.html">
+      <DependentUpon>quotes-container.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\shared\app-footer\app-footer.component.html">
       <DependentUpon>app-footer.component.ts</DependentUpon>
     </Content>
@@ -522,6 +567,33 @@
       <DependentUpon>properties-container.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\shared\shared.scss" />
+    <Content Include="src\app\products\product-editor.component.scss">
+      <DependentUpon>product-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\products\product-list.component.scss">
+      <DependentUpon>product-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\orders\orders-container.component.scss">
+      <DependentUpon>orders-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\orders\order-list.component.scss">
+      <DependentUpon>order-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\orders\order-editor.component.scss">
+      <DependentUpon>order-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\products\products-container.component.scss">
+      <DependentUpon>products-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\quotes\quote-editor.component.scss">
+      <DependentUpon>quote-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\quotes\quote-list.component.scss">
+      <DependentUpon>quote-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\quotes\quotes-container.component.scss">
+      <DependentUpon>quotes-container.component.ts</DependentUpon>
+    </Content>
     <None Include="src\assets\scss\_varibles.scss" />
     <Content Include="tsconfig.json" />
     <Content Include="typings.json" />
@@ -592,6 +664,7 @@
     <TypeScriptCompile Include="src\app\login\index.ts" />
     <TypeScriptCompile Include="src\app\login\login-container.component.ts" />
     <TypeScriptCompile Include="src\app\login\login.routes.ts" />
+    <TypeScriptCompile Include="src\app\orders\orders.routes.ts" />
     <TypeScriptCompile Include="src\app\photographers\photographers.routes.ts" />
     <TypeScriptCompile Include="src\app\photos\photos.routes.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\action-creators\index.ts" />
@@ -606,6 +679,8 @@
     <TypeScriptCompile Include="src\app\content-aggregation\content-aggregation.routes.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\reducers\index.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\services\index.ts" />
+    <TypeScriptCompile Include="src\app\products\products.routes.ts" />
+    <TypeScriptCompile Include="src\app\quotes\quotes.routes.ts" />
     <TypeScriptCompile Include="src\app\shared\index.ts" />
     <TypeScriptCompile Include="src\main.ts" />
     <TypeScriptCompile Include="typings\globals\angular-mocks\index.d.ts" />
@@ -681,6 +756,36 @@
     <TypeScriptCompile Include="src\app\content-aggregation\services\ui.service.ts" />
     <TypeScriptCompile Include="src\app\app.component.ts" />
     <TypeScriptCompile Include="src\app\admin-app.component.ts" />
+    <TypeScriptCompile Include="src\app\products\product.model.ts" />
+    <TypeScriptCompile Include="src\app\products\index.ts" />
+    <TypeScriptCompile Include="src\app\products\products-container.component.ts" />
+    <TypeScriptCompile Include="src\app\products\product.actions.ts" />
+    <TypeScriptCompile Include="src\app\products\product.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\products\product.reducers.ts" />
+    <TypeScriptCompile Include="src\app\products\product.component.ts" />
+    <TypeScriptCompile Include="src\app\products\product.service.ts" />
+    <TypeScriptCompile Include="src\app\products\product-list.component.ts" />
+    <TypeScriptCompile Include="src\app\products\product-editor.component.ts" />
+    <TypeScriptCompile Include="src\app\orders\order.model.ts" />
+    <TypeScriptCompile Include="src\app\orders\index.ts" />
+    <TypeScriptCompile Include="src\app\orders\orders-container.component.ts" />
+    <TypeScriptCompile Include="src\app\orders\order.actions.ts" />
+    <TypeScriptCompile Include="src\app\orders\order.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\orders\order.reducers.ts" />
+    <TypeScriptCompile Include="src\app\orders\order.component.ts" />
+    <TypeScriptCompile Include="src\app\orders\order.service.ts" />
+    <TypeScriptCompile Include="src\app\orders\order-list.component.ts" />
+    <TypeScriptCompile Include="src\app\orders\order-editor.component.ts" />
+    <TypeScriptCompile Include="src\app\quotes\quote.model.ts" />
+    <TypeScriptCompile Include="src\app\quotes\index.ts" />
+    <TypeScriptCompile Include="src\app\quotes\quotes-container.component.ts" />
+    <TypeScriptCompile Include="src\app\quotes\quote.actions.ts" />
+    <TypeScriptCompile Include="src\app\quotes\quote.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\quotes\quote.reducers.ts" />
+    <TypeScriptCompile Include="src\app\quotes\quote.component.ts" />
+    <TypeScriptCompile Include="src\app\quotes\quote.service.ts" />
+    <TypeScriptCompile Include="src\app\quotes\quote-list.component.ts" />
+    <TypeScriptCompile Include="src\app\quotes\quote-editor.component.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
