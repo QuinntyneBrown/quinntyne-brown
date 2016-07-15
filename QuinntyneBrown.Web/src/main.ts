@@ -18,6 +18,9 @@ import { provide, provideRoutePromise, bootstrap } from "angular-rx-ui/src/compo
 import { authorizationGuard } from "angular-rx-ui/src/components/routing/authorization-guard";
 import { routeChangeSuccessIsAdminReducer } from "angular-rx-ui/src/components/routing/route-change-success-is-admin.reducer";
 
+import { AppComponent } from "./app/app.component";
+import { AdminAppComponent } from "./app/admin-app.component";
+
 const quinntynebrownAppModule = angular.module("quinntynebrownApp", [
     "components",
     "quinntynebrown.articles",
@@ -32,6 +35,7 @@ const quinntynebrownAppModule = angular.module("quinntynebrownApp", [
 
 bootstrap(quinntynebrownAppModule, {
     api: "http://www.quinntynebrown.com/api",
+    components:[AppComponent, AdminAppComponent],
     loginRedirectUrl: "/",
     html5Mode: true,
     guards: [authorizationGuard],
