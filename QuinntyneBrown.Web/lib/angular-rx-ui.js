@@ -586,28 +586,62 @@ var ngRxUI =
 
 /***/ },
 /* 7 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var core_1 = __webpack_require__(6);
 	exports.bootstrap = function (app, options) {
-	    app.config(["apiEndpointProvider", function (apiEndpointProvider) {
-	            apiEndpointProvider.configure(options.api);
-	        }]);
-	    app.config(["loginRedirectProvider", function (loginRedirectProvider) {
-	            loginRedirectProvider.setDefaultUrl(options.loginRedirectUrl);
-	        }]);
-	    app.config(["$locationProvider", function ($locationProvider) {
-	            $locationProvider.html5Mode(options.html5Mode);
-	        }]);
-	    app.config(["$routeProvider", function ($routeProvider) {
-	            for (var i = 0; i < options.routes.length; i++) {
-	                var path = options.routes[i].path;
-	                var selector = options.routes[i].component.prototype.constructor.config.selector;
-	                var template = "<" + selector + "></" + selector + ">";
-	                var authorizationRequired = options.routes[i].component.prototype.constructor.config.authorizationRequired;
-	                $routeProvider.when(path, { template: template, authorizationRequired: authorizationRequired });
-	            }
-	        }]);
+	    if (options.api)
+	        app.config(["apiEndpointProvider", function (apiEndpointProvider) {
+	                apiEndpointProvider.configure(options.api);
+	            }]);
+	    if (options.loginRedirectUrl)
+	        app.config(["loginRedirectProvider", function (loginRedirectProvider) {
+	                loginRedirectProvider.setDefaultUrl(options.loginRedirectUrl);
+	            }]);
+	    if (options.html5Mode)
+	        app.config(["$locationProvider", function ($locationProvider) {
+	                $locationProvider.html5Mode(options.html5Mode);
+	            }]);
+	    if (options.reducers)
+	        app.config(["reducersProvider", function (reducersProvider) {
+	                for (var reducer in options.reducers) {
+	                    reducersProvider.configure(options.reducers[reducer]);
+	                }
+	            }]);
+	    if (options.actions)
+	        for (var action in options.actions) {
+	            core_1.provideAction(app, options.actions[action]);
+	        }
+	    if (options.components) {
+	        for (var i = 0; i < options.components.length; i++) {
+	            app.component(options.components[i]);
+	        }
+	    }
+	    if (options.guards)
+	        for (var i = 0; i < options.guards.length; i++) {
+	            core_1.provideRoutePromise(app, options.guards[i]);
+	        }
+	    if (options.run)
+	        for (var i = 0; i < options.run.length; i++) {
+	            app.run(options.run[i]);
+	        }
+	    if (options.providers) {
+	        for (var i = 0; i < options.providers.length; i++) {
+	            core_1.provide(app, options.providers[i]);
+	        }
+	    }
+	    if (options.routes) {
+	        app.config(["$routeProvider", function ($routeProvider) {
+	                for (var i_1 = 0; i_1 < options.routes.length; i_1++) {
+	                    var path = options.routes[i_1].path;
+	                    var selector = options.routes[i_1].component.prototype.constructor.config.selector;
+	                    var template = "<" + selector + "></" + selector + ">";
+	                    var authorizationRequired = options.routes[i_1].authorizationRequired;
+	                    $routeProvider.when(path, { template: template, authorizationRequired: authorizationRequired });
+	                }
+	            }]);
+	    }
 	};
 
 
@@ -2685,6 +2719,9 @@ var ngRxUI =
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
 	__webpack_require__(6);
 	__webpack_require__(70);
 	__webpack_require__(91);
@@ -2728,6 +2765,12 @@ var ngRxUI =
 	for (var action in actions) {
 	    core_1.provideAction(app, actions[action]);
 	}
+	__export(__webpack_require__(139));
+	__export(__webpack_require__(143));
+	__export(__webpack_require__(147));
+	__export(__webpack_require__(151));
+	__export(__webpack_require__(155));
+	__export(__webpack_require__(162));
 
 
 /***/ },
@@ -5206,8 +5249,8 @@ var ngRxUI =
 	"use strict";
 	__webpack_require__(6);
 	var core_1 = __webpack_require__(6);
-	var button_component_1 = __webpack_require__(171);
-	var bold_button_component_1 = __webpack_require__(175);
+	var bold_button_component_1 = __webpack_require__(171);
+	var button_component_1 = __webpack_require__(175);
 	var button_action_creator_1 = __webpack_require__(179);
 	var reducers = __webpack_require__(180);
 	var actions = __webpack_require__(181);
@@ -5215,8 +5258,8 @@ var ngRxUI =
 	    "app.core"
 	]);
 	core_1.provide(app, button_action_creator_1.ButtonActionCreator);
-	app.component(button_component_1.ButtonComponent);
 	app.component(bold_button_component_1.BoldButtonComponent);
+	app.component(button_component_1.ButtonComponent);
 	app.config(["reducersProvider", function (reducersProvider) {
 	        for (var reducer in reducers) {
 	            reducersProvider.configure(reducers[reducer]);
@@ -5242,92 +5285,13 @@ var ngRxUI =
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(6);
-	var ButtonComponent = (function () {
-	    function ButtonComponent() {
-	    }
-	    ButtonComponent = __decorate([
-	        core_1.Component({
-	            template: __webpack_require__(172),
-	            styles: [__webpack_require__(173)],
-	            selector: "button",
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush,
-	            inputs: ["&onClick", "@caption"]
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], ButtonComponent);
-	    return ButtonComponent;
-	}());
-	exports.ButtonComponent = ButtonComponent;
-
-
-/***/ },
-/* 172 */
-/***/ function(module, exports) {
-
-	module.exports = "<input type=\"button\" class=\"button\" data-ng-click=\"vm.onClick()\" value=\"{{ ::vm.caption }}\"></input>"
-
-/***/ },
-/* 173 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(174);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(4)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./button.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./button.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 174 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(3)();
-	// imports
-
-
-	// module
-	exports.push([module.id, ".button {\n  min-width: 100px; }\n", ""]);
-
-	// exports
-
-
-/***/ },
-/* 175 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(6);
 	var BoldButtonComponent = (function () {
 	    function BoldButtonComponent() {
 	    }
 	    BoldButtonComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(176),
-	            styles: [__webpack_require__(177)],
+	            template: __webpack_require__(172),
+	            styles: [__webpack_require__(173)],
 	            selector: "bold-button",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush,
 	            inputs: ["&onClick", "@caption"]
@@ -5340,19 +5304,19 @@ var ngRxUI =
 
 
 /***/ },
-/* 176 */
+/* 172 */
 /***/ function(module, exports) {
 
 	module.exports = "<input type=\"button\" class=\"bold-button\" data-ng-click=\"vm.onClick()\" value=\"{{ ::vm.caption }}\"></input>"
 
 /***/ },
-/* 177 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(178);
+	var content = __webpack_require__(174);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(4)(content, {});
@@ -5372,6 +5336,85 @@ var ngRxUI =
 	}
 
 /***/ },
+/* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(3)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".bold-button {\n  font-weight: 600; }\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 175 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(6);
+	var ButtonComponent = (function () {
+	    function ButtonComponent() {
+	    }
+	    ButtonComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(176),
+	            styles: [__webpack_require__(177)],
+	            selector: "calypso-button",
+	            inputs: ['@caption', '&onClick'],
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], ButtonComponent);
+	    return ButtonComponent;
+	}());
+	exports.ButtonComponent = ButtonComponent;
+
+
+/***/ },
+/* 176 */
+/***/ function(module, exports) {
+
+	module.exports = "<button class=\"button\" data-ng-click=\"vm.onClick()\">{{ ::vm.caption }}</button>"
+
+/***/ },
+/* 177 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(178);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(4)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./button.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./button.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
 /* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -5380,7 +5423,7 @@ var ngRxUI =
 
 
 	// module
-	exports.push([module.id, ".button, .bold-button {\n  min-width: 100px; }\n\n.bold-button {\n  font-weight: 600; }\n", ""]);
+	exports.push([module.id, ".button {\n  margin-top: 15px;\n  margin-bottom: 30px;\n  line-height: 30px;\n  width: 75px;\n  background-color: #FFF;\n  border: solid 1px;\n  cursor: pointer; }\n", ""]);
 
 	// exports
 
@@ -6658,6 +6701,9 @@ var ngRxUI =
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
 	__webpack_require__(6);
 	var core_1 = __webpack_require__(6);
 	var login_component_1 = __webpack_require__(238);
@@ -6677,6 +6723,8 @@ var ngRxUI =
 	            reducersProvider.configure(reducers[reducer]);
 	        }
 	    }]);
+	__export(__webpack_require__(245));
+	__export(__webpack_require__(238));
 
 
 /***/ },
@@ -6897,7 +6945,7 @@ var ngRxUI =
 /* 242 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"login\">\r\n    <h1>Login</h1>\r\n    <div>\r\n        <input type=\"text\" class=\"inputField\" placeholder=\"username\" data-ng-model=\"vm.username\" />\r\n    </div>\r\n\r\n    <div>\r\n        <input type=\"password\" class=\"inputField\" placeholder=\"password\" data-ng-model=\"vm.password\" />\r\n    </div>\r\n\r\n    <button on-click=\"vm.tryToLogin()\" caption=\"Login\"></button>\r\n\r\n</div>"
+	module.exports = "<div class=\"login\">\r\n    <h1>Login</h1>\r\n    <div>\r\n        <input type=\"text\" class=\"inputField\" placeholder=\"username\" data-ng-model=\"vm.username\" />\r\n    </div>\r\n\r\n    <div>\r\n        <input type=\"password\" class=\"inputField\" placeholder=\"password\" data-ng-model=\"vm.password\" />\r\n    </div>\r\n\r\n    <calypso-button on-click=\"vm.tryToLogin()\" caption=\"Login\"></calypso-button>\r\n\r\n</div>"
 
 /***/ },
 /* 243 */
