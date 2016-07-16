@@ -375,6 +375,12 @@
     <Content Include="src\app\app.component.scss">
       <DependentUpon>app.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\contacts\contacts-container.component.html">
+      <DependentUpon>contacts-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\contacts\contacts-container.component.scss">
+      <DependentUpon>contacts-container.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\content-aggregation\components\app-editor.component.html">
       <DependentUpon>app-editor.component.ts</DependentUpon>
     </Content>
@@ -884,6 +890,7 @@
     <TypeScriptCompile Include="src\app\content-aggregation\components\ui.component.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\components\ui-list.component.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\components\ui-editor.component.ts" />
+    <TypeScriptCompile Include="src\app\contacts\contacts-container.component.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

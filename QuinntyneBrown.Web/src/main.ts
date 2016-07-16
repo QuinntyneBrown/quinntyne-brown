@@ -60,6 +60,7 @@ bootstrap(quinntynebrownAppModule, {
     routes: [
         ...ArticlesRoutes,
         ...ContactsRoutes,
+        ...ContentAggregationRoutes,
         ...CustomersRoutes,
         ...GalleriesRoutes,
         ...LoginRoutes,

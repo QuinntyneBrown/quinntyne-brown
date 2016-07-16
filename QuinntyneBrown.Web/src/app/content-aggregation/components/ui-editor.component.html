@@ -1,8 +1,8 @@
 <div class="uiEditor">
 
-    <h1  data-ng-if="!vm.entity.id">Create Ui <span data-ng-if="vm.entity.name.length > 0">: {{ vm.entity.name }}</span></h1>
+    <h1  data-ng-if="!vm.entity.id">Create UI <span data-ng-if="vm.entity.name.length > 0">: {{ vm.entity.name }}</span></h1>
 
-    <h1 data-ng-if="vm.entity.id">Edit Ui: {{ vm.entity.name }}</h1>
+    <h1 data-ng-if="vm.entity.id">Edit UI: {{ vm.entity.name }}</h1>
 
     <tabs tabs-name="ui-editor">
 
@@ -10,7 +10,7 @@
 
         <tab-content>
             <div>
-                <input class="inputField" type="text" placeholder="Ui Name" data-ng-model="vm.entity.name" />
+                <input class="inputField" type="text" placeholder="UI Name" data-ng-model="vm.entity.name" />
             </div>
         </tab-content>
 
