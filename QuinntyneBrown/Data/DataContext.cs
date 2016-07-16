@@ -30,6 +30,7 @@ namespace QuinntyneBrown.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<SocialShareItem> SocialShareItems { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

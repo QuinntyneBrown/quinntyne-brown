@@ -260,11 +260,13 @@
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\CustomerGallery.cs" />
+    <Compile Include="Models\CustomerOrder.cs" />
     <Compile Include="Models\CustomerPhoto.cs" />
     <Compile Include="Models\Gallery.cs" />
     <Compile Include="Models\GalleryCategory.cs" />
     <Compile Include="Models\GalleryPhoto.cs" />
     <Compile Include="Models\Order.cs" />
+    <Compile Include="Models\OrderProduct.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\Photo.cs" />
     <Compile Include="Models\PhotoCategory.cs" />
@@ -278,6 +280,7 @@
     <Compile Include="Models\Section.cs" />
     <Compile Include="Models\Property.cs" />
     <Compile Include="Models\SectionProperty.cs" />
+    <Compile Include="Models\SocialShareItem.cs" />
     <Compile Include="Models\Tag.cs" />
     <Compile Include="Models\UI.cs" />
     <Compile Include="Models\UIProperty.cs" />
@@ -427,6 +430,12 @@
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Controllers\OrderController.cs" />
     <Compile Include="Controllers\QuoteController.cs" />
+    <Compile Include="Services\SocialShareItemService.cs" />
+    <Compile Include="Services\ISocialShareItemService.cs" />
+    <Compile Include="Controllers\SocialShareItemController.cs" />
+    <Compile Include="Dtos\SocialShareItemDto.cs" />
+    <Compile Include="Dtos\SocialShareItemAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\SocialShareItemAddOrUpdateResponseDto.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

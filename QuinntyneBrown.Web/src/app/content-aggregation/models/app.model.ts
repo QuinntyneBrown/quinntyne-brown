@@ -1,3 +1,4 @@
-﻿export class App {
-
+export class App { 
+	id:number;
+	name:string;
 }

@@ -9,6 +9,7 @@ require("./app/photos");
 require("./app/products");
 require("./app/quotes");
 require("./app/shared");
+require("./app/social-share-items");
 
 import { ArticlesRoutes } from "./app/articles";
 import { ContactsRoutes } from "./app/contacts";
@@ -21,6 +22,7 @@ import { ProductsRoutes } from "./app/products";
 import { QuotesRoutes } from "./app/quotes";
 import { OrdersRoutes } from "./app/orders";
 import { ContentAggregationRoutes } from "./app/content-aggregation";
+import { SocialShareItemsRoutes } from "./app/social-share-items";
 
 import { provide, provideRoutePromise, bootstrap } from "angular-rx-ui/src/components/core";
 import { authorizationGuard } from "angular-rx-ui/src/components/routing/authorization-guard";
@@ -42,11 +44,14 @@ const quinntynebrownAppModule = angular.module("quinntynebrownApp", [
     "quinntynebrown.photographers",
     "quinntynebrown.products",
     "quinntynebrown.quotes",
-    "quinntynebrown.shared"    
+    "quinntynebrown.shared",
+    "quinntynebrown.socialShareItems"    
 ]);
 
+//http://www.quinntynebrown.com/
+
 bootstrap(quinntynebrownAppModule, {
-    api: "http://www.quinntynebrown.com/api",
+    api: "api",
     components:[AppComponent, AdminAppComponent],
     loginRedirectUrl: "/",
     html5Mode: true,
@@ -61,6 +66,7 @@ bootstrap(quinntynebrownAppModule, {
         ...OrdersRoutes,
         ...PhotosRoutes,
         ...PhotographersRoutes,
-        ...QuotesRoutes
+        ...QuotesRoutes,
+        ...SocialShareItemsRoutes
     ]
 });

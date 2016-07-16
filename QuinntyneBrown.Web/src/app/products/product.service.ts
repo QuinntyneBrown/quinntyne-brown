@@ -10,6 +10,6 @@ export class ProductService extends BaseService {
         super($q, apiEndpoint, fetch)
     }
 
-    get baseUri() { return this.apiEndpoint.getBaseUrl() + "/v1/product"; }
+    get baseUri() { return this.apiEndpoint.getBaseUrl() + "/product"; }
 
 }

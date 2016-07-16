@@ -1,0 +1,22 @@
+.uiList-name,
+.uiList-actions {
+    position:relative;
+    float:left;
+}
+
+.uiList-name {
+    min-width:200px;
+}
+
+.uiList-item {
+    height:50px;
+}
+
+.uiList-actions span {
+    cursor:pointer;
+}
+
+.uiList-actions {
+    text-transform: uppercase;
+}
+   

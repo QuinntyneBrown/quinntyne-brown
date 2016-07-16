@@ -20,6 +20,7 @@ namespace QuinntyneBrown.Data
         IRepository<Product> Products { get; }
         IRepository<Order> Orders { get; }
         IRepository<Quote> Quotes { get; }
+        IRepository<SocialShareItem> SocialShareItems { get; }
         void SaveChanges();
     }
 }

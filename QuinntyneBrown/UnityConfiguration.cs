@@ -37,6 +37,7 @@ namespace QuinntyneBrown
             container.RegisterType<IProductService, ProductService>();
             container.RegisterType<IOrderService, OrderService>();
             container.RegisterType<IQuoteService, QuoteService>();
+            container.RegisterType<ISocialShareItemService, SocialShareItemService>();
 
             container.RegisterInstance(AuthConfiguration.LazyConfig);
             container.RegisterInstance(TraceConfiguration.LazyConfig);

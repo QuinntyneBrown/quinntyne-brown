@@ -375,6 +375,21 @@
     <Content Include="src\app\app.component.scss">
       <DependentUpon>app.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\content-aggregation\components\app-editor.component.html">
+      <DependentUpon>app-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\app-list.component.html">
+      <DependentUpon>app-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\app.component.html">
+      <DependentUpon>app.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\app.component.scss">
+      <DependentUpon>app.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\containers\apps-container.component.html">
+      <DependentUpon>apps-container.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\articles\article-container.component.html">
       <DependentUpon>article-container.component.ts</DependentUpon>
     </Content>
@@ -404,6 +419,9 @@
     </Content>
     <Content Include="src\app\contacts\contact-editor.component.scss">
       <DependentUpon>contact-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\containers\sections-container.component.html">
+      <DependentUpon>sections-container.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\customers\customer.component.html">
       <DependentUpon>customer.component.ts</DependentUpon>
@@ -480,12 +498,6 @@
     <Content Include="src\app\photos\photo.component.scss">
       <DependentUpon>photo.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\content-aggregation\containers\apps-container.component.html">
-      <DependentUpon>apps-container.component.ts</DependentUpon>
-    </Content>
-    <Content Include="src\app\content-aggregation\containers\apps-container.component.scss">
-      <DependentUpon>apps-container.component.ts</DependentUpon>
-    </Content>
     <Content Include="src\app\content-aggregation\containers\properties-container.component.html">
       <DependentUpon>properties-container.component.ts</DependentUpon>
     </Content>
@@ -500,18 +512,6 @@
     </Content>
     <Content Include="src\app\content-aggregation\components\property.component.scss">
       <DependentUpon>property.component.ts</DependentUpon>
-    </Content>
-    <Content Include="src\app\content-aggregation\containers\sections-container.component.html">
-      <DependentUpon>sections-container.component.ts</DependentUpon>
-    </Content>
-    <Content Include="src\app\content-aggregation\containers\sections-container.component.scss">
-      <DependentUpon>sections-container.component.ts</DependentUpon>
-    </Content>
-    <Content Include="src\app\content-aggregation\containers\uis-container.component.html">
-      <DependentUpon>uis-container.component.ts</DependentUpon>
-    </Content>
-    <Content Include="src\app\content-aggregation\containers\uis-container.component.scss">
-      <DependentUpon>uis-container.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\products\product-editor.component.html">
       <DependentUpon>product-editor.component.ts</DependentUpon>
@@ -543,6 +543,18 @@
     <Content Include="src\app\quotes\quotes-container.component.html">
       <DependentUpon>quotes-container.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\content-aggregation\components\section-editor.component.html">
+      <DependentUpon>section-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\section-list.component.html">
+      <DependentUpon>section-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\section.component.html">
+      <DependentUpon>section.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\section.component.scss">
+      <DependentUpon>section.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\shared\app-footer\app-footer.component.html">
       <DependentUpon>app-footer.component.ts</DependentUpon>
     </Content>
@@ -554,6 +566,36 @@
     </Content>
     <Content Include="src\app\shared\app-header\app-header.component.scss">
       <DependentUpon>app-header.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\social-share-items\social-share-item-editor.component.html">
+      <DependentUpon>social-share-item-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\social-share-items\social-share-item-list.component.html">
+      <DependentUpon>social-share-item-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\social-share-items\social-share-item.component.html">
+      <DependentUpon>social-share-item.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\social-share-items\social-share-item.component.scss">
+      <DependentUpon>social-share-item.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\social-share-items\social-share-items-container.component.html">
+      <DependentUpon>social-share-items-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\containers\uis-container.component.html">
+      <DependentUpon>uis-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\ui-editor.component.html">
+      <DependentUpon>ui-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\ui-list.component.html">
+      <DependentUpon>ui-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\ui.component.html">
+      <DependentUpon>ui.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\ui.component.scss">
+      <DependentUpon>ui.component.ts</DependentUpon>
     </Content>
     <Content Include="src\assets\images\Squad.jpg" />
     <Content Include="src\assets\scss\_breakpoints.scss" />
@@ -593,6 +635,42 @@
     </Content>
     <Content Include="src\app\quotes\quotes-container.component.scss">
       <DependentUpon>quotes-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\social-share-items\social-share-item-editor.component.scss">
+      <DependentUpon>social-share-item-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\social-share-items\social-share-item-list.component.scss">
+      <DependentUpon>social-share-item-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\social-share-items\social-share-items-container.component.scss">
+      <DependentUpon>social-share-items-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\app-editor.component.scss">
+      <DependentUpon>app-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\app-list.component.scss">
+      <DependentUpon>app-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\containers\apps-container.component.scss">
+      <DependentUpon>apps-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\containers\uis-container.component.scss">
+      <DependentUpon>uis-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\ui-editor.component.scss">
+      <DependentUpon>ui-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\ui-list.component.scss">
+      <DependentUpon>ui-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\section-editor.component.scss">
+      <DependentUpon>section-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\section-list.component.scss">
+      <DependentUpon>section-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\containers\sections-container.component.scss">
+      <DependentUpon>sections-container.component.ts</DependentUpon>
     </Content>
     <None Include="src\assets\scss\_varibles.scss" />
     <Content Include="tsconfig.json" />
@@ -659,6 +737,7 @@
     <TypeScriptCompile Include="src\app\contacts\contact.model.ts" />
     <TypeScriptCompile Include="src\app\contacts\contacts.routes.ts" />
     <TypeScriptCompile Include="src\app\contacts\index.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\containers\sections-container.component.ts" />
     <TypeScriptCompile Include="src\app\customers\customers.routes.ts" />
     <TypeScriptCompile Include="src\app\galleries\galleries.routes.ts" />
     <TypeScriptCompile Include="src\app\login\index.ts" />
@@ -671,7 +750,6 @@
     <TypeScriptCompile Include="src\app\content-aggregation\actions\index.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\components\index.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\containers\index.ts" />
-    <TypeScriptCompile Include="src\app\content-aggregation\models\app.model.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\models\index.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\models\property.model.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\models\section.model.ts" />
@@ -682,6 +760,7 @@
     <TypeScriptCompile Include="src\app\products\products.routes.ts" />
     <TypeScriptCompile Include="src\app\quotes\quotes.routes.ts" />
     <TypeScriptCompile Include="src\app\shared\index.ts" />
+    <TypeScriptCompile Include="src\app\social-share-items\social-share-items.routes.ts" />
     <TypeScriptCompile Include="src\main.ts" />
     <TypeScriptCompile Include="typings\globals\angular-mocks\index.d.ts" />
     <TypeScriptCompile Include="typings\globals\angular-route\index.d.ts" />
@@ -739,9 +818,6 @@
     <TypeScriptCompile Include="src\app\content-aggregation\services\property.service.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\components\property-list.component.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\components\property-editor.component.ts" />
-    <TypeScriptCompile Include="src\app\content-aggregation\containers\apps-container.component.ts" />
-    <TypeScriptCompile Include="src\app\content-aggregation\containers\uis-container.component.ts" />
-    <TypeScriptCompile Include="src\app\content-aggregation\containers\sections-container.component.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\actions\app.actions.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\action-creators\app.action-creator.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\reducers\app.reducers.ts" />
@@ -786,6 +862,28 @@
     <TypeScriptCompile Include="src\app\quotes\quote.service.ts" />
     <TypeScriptCompile Include="src\app\quotes\quote-list.component.ts" />
     <TypeScriptCompile Include="src\app\quotes\quote-editor.component.ts" />
+    <TypeScriptCompile Include="src\app\social-share-items\social-share-item.model.ts" />
+    <TypeScriptCompile Include="src\app\social-share-items\index.ts" />
+    <TypeScriptCompile Include="src\app\social-share-items\social-share-items-container.component.ts" />
+    <TypeScriptCompile Include="src\app\social-share-items\social-share-item.actions.ts" />
+    <TypeScriptCompile Include="src\app\social-share-items\social-share-item.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\social-share-items\social-share-item.reducers.ts" />
+    <TypeScriptCompile Include="src\app\social-share-items\social-share-item.component.ts" />
+    <TypeScriptCompile Include="src\app\social-share-items\social-share-item.service.ts" />
+    <TypeScriptCompile Include="src\app\social-share-items\social-share-item-list.component.ts" />
+    <TypeScriptCompile Include="src\app\social-share-items\social-share-item-editor.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\section.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\section-list.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\section-editor.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\models\app.model.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\containers\apps-container.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\app.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\app-list.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\app-editor.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\containers\uis-container.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\ui.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\ui-list.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\ui-editor.component.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

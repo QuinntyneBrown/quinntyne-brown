@@ -1,0 +1,15 @@
+<div class="socialShareItemList">
+    <div class="socialShareItemList-header">
+        <h1>SocialShareItems</h1>
+    </div>
+    
+    <div data-ng-repeat="entity in vm.entities" class="socialShareItemList-item">
+        <div class="socialShareItemList-name">
+            {{ entity.name }}
+        </div>
+        <div class="socialShareItemList-actions">
+            <span data-ng-click="vm.edit({ entity: this.entity })">edit</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span data-ng-click="vm.remove({ entity: this.entity })">remove</span>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+</div>
