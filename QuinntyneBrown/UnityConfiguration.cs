@@ -27,8 +27,7 @@ namespace QuinntyneBrown
             container.RegisterType<IPropertyService, PropertyService>();
             container.RegisterType<IArticleService, ArticleService>();
             container.RegisterType<IPhotoService, PhotoService>();
-            container.RegisterType<IGalleryService, GalleryService>();
-            container.RegisterType<IPhotographerService, PhotographerService>();
+            container.RegisterType<IGalleryService, GalleryService>();            
             container.RegisterType<ICustomerService, CustomerService>();
             container.RegisterType<IRssFeedService, RssFeedService>();
             container.RegisterType<IUserService, UserService>();
@@ -38,6 +37,8 @@ namespace QuinntyneBrown
             container.RegisterType<IOrderService, OrderService>();
             container.RegisterType<IQuoteService, QuoteService>();
             container.RegisterType<ISocialShareItemService, SocialShareItemService>();
+            container.RegisterType<IServiceProviderService, ServiceProviderService>();
+            container.RegisterType<IProfessionalServiceService, ProfessionalServiceService>();
 
             container.RegisterInstance(AuthConfiguration.LazyConfig);
             container.RegisterInstance(TraceConfiguration.LazyConfig);

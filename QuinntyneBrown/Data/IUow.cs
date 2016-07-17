@@ -13,7 +13,7 @@ namespace QuinntyneBrown.Data
         IRepository<Gallery> Galleries { get; }
         IRepository<User> Users { get; }
         IRepository<Role> Roles { get; }
-        IRepository<Photographer> Photographers { get; }
+        IRepository<ServiceProvider> ServiceProviders { get; }
         IRepository<Customer> Customers { get; }
         IRepository<Category> Categories { get; }
         IRepository<Contact> Contacts { get; }
@@ -21,6 +21,7 @@ namespace QuinntyneBrown.Data
         IRepository<Order> Orders { get; }
         IRepository<Quote> Quotes { get; }
         IRepository<SocialShareItem> SocialShareItems { get; }
+        IRepository<ProfessionalService> ProfessionalServices { get; }
         void SaveChanges();
     }
 }

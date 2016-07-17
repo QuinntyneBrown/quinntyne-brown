@@ -51,7 +51,7 @@ namespace QuinntyneBrown.Services
 
         public IQueryable<Photo> GetAll() => _repository.GetAll()
             .Include(x=>x.GalleryPhotos)
-            .Include(x=>x.PhotographerPhotos)
+            .Include(x=>x.ServiceProviderPhotos)
             .Include(x=>x.ArticlePhotos)
             .Include("GalleryPhotos.Gallery")
             .Include("PhotographerPhotos.Photographer")

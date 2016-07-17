@@ -26,11 +26,12 @@ namespace QuinntyneBrown.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Customer> Customers { get; set; }
-        public DbSet<Photographer> Photographers { get; set; }
+        public DbSet<ServiceProvider> ServiceProviders { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<SocialShareItem> SocialShareItems { get; set; }
+        public DbSet<ProfessionalService> ProfessionalServices { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

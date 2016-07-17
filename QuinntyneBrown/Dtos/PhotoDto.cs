@@ -20,7 +20,7 @@ namespace QuinntyneBrown.Dtos
 
             Galleries = entity.GalleryPhotos.Select(x => new GalleryDto(x.Gallery)).ToList();
             Articles = entity.ArticlePhotos.Select(x => new ArticleDto(x.Article)).ToList();
-            Photographers = entity.PhotographerPhotos.Select(x => new PhotographerDto(x.Photographer)).ToList();
+            ServiceProviders = entity.ServiceProviderPhotos.Select(x => new ServiceProviderDto(x.ServiceProvider)).ToList();
         }
 
         public PhotoDto()
@@ -40,6 +40,6 @@ namespace QuinntyneBrown.Dtos
         public Guid? UniqueId { get; set; }
         public ICollection<GalleryDto> Galleries { get; set; }
         public ICollection<ArticleDto> Articles { get; set; }
-        public ICollection<PhotographerDto> Photographers { get; set; }
+        public ICollection<ServiceProviderDto> ServiceProviders { get; set; }
     }
 }

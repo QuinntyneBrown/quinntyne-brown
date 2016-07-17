@@ -2,14 +2,14 @@
 
 namespace QuinntyneBrown.Models
 {
-    public class PhotographerGallery
+    public class ServiceProviderGallery
     {
         public int Id { get; set; }
-        [ForeignKey("Photographer")]
-        public int? PhotographerId { get; set; }
+        [ForeignKey("ServiceProvider")]
+        public int? ServiceProviderId { get; set; }
         [ForeignKey("Gallery")]
         public int? GalleryId { get; set; }
-        public Photographer Photographer { get; set; }
+        public ServiceProvider ServiceProvider { get; set; }
         public Gallery Gallery { get; set; }
     }
 }

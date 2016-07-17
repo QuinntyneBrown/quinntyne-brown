@@ -375,6 +375,12 @@
     <Content Include="src\app\app.component.scss">
       <DependentUpon>app.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\biography-page\biography-page-container.component.html">
+      <DependentUpon>biography-page-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\biography-page\biography-page-container.component.scss">
+      <DependentUpon>biography-page-container.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\contacts\contacts-container.component.html">
       <DependentUpon>contacts-container.component.ts</DependentUpon>
     </Content>
@@ -392,6 +398,18 @@
     </Content>
     <Content Include="src\app\content-aggregation\components\app.component.scss">
       <DependentUpon>app.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\property-paged-list.component.html">
+      <DependentUpon>property-paged-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\property-paged-list.component.scss">
+      <DependentUpon>property-paged-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\property-picker-modal.component.html">
+      <DependentUpon>property-picker-modal.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\content-aggregation\components\property-picker-modal.component.scss">
+      <DependentUpon>property-picker-modal.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\content-aggregation\containers\apps-container.component.html">
       <DependentUpon>apps-container.component.ts</DependentUpon>
@@ -603,6 +621,12 @@
     <Content Include="src\app\content-aggregation\components\ui.component.scss">
       <DependentUpon>ui.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\thank-you-page\thank-you-page-container.component.html">
+      <DependentUpon>thank-you-page-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\thank-you-page\thank-you-page-container.component.scss">
+      <DependentUpon>thank-you-page-container.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\assets\images\Squad.jpg" />
     <Content Include="src\assets\scss\_breakpoints.scss" />
     <Content Include="src\app\content-aggregation\components\property-editor.component.scss">
@@ -733,16 +757,24 @@
       <Name>QuinntyneBrown</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="src\app\bookings\" />
+    <Folder Include="src\app\home-page\" />
+    <Folder Include="src\app\professional-services\" />
+  </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\app\articles\article-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\article-editor-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\articles-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\articles.routes.ts" />
     <TypeScriptCompile Include="src\app\articles\index.ts" />
+    <TypeScriptCompile Include="src\app\biography-page\biography-page.routes.ts" />
+    <TypeScriptCompile Include="src\app\biography-page\index.ts" />
     <TypeScriptCompile Include="src\app\contacts\contact.model.ts" />
     <TypeScriptCompile Include="src\app\contacts\contacts.routes.ts" />
     <TypeScriptCompile Include="src\app\contacts\index.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\property-paged-list.component.ts" />
+    <TypeScriptCompile Include="src\app\content-aggregation\components\property-picker-modal.component.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\containers\sections-container.component.ts" />
     <TypeScriptCompile Include="src\app\customers\customers.routes.ts" />
     <TypeScriptCompile Include="src\app\galleries\galleries.routes.ts" />
@@ -767,6 +799,8 @@
     <TypeScriptCompile Include="src\app\quotes\quotes.routes.ts" />
     <TypeScriptCompile Include="src\app\shared\index.ts" />
     <TypeScriptCompile Include="src\app\social-share-items\social-share-items.routes.ts" />
+    <TypeScriptCompile Include="src\app\thank-you-page\thank-you-page.routes.ts" />
+    <TypeScriptCompile Include="src\app\thank-you-page\index.ts" />
     <TypeScriptCompile Include="src\main.ts" />
     <TypeScriptCompile Include="typings\globals\angular-mocks\index.d.ts" />
     <TypeScriptCompile Include="typings\globals\angular-route\index.d.ts" />
@@ -891,6 +925,8 @@
     <TypeScriptCompile Include="src\app\content-aggregation\components\ui-list.component.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\components\ui-editor.component.ts" />
     <TypeScriptCompile Include="src\app\contacts\contacts-container.component.ts" />
+    <TypeScriptCompile Include="src\app\biography-page\biography-page-container.component.ts" />
+    <TypeScriptCompile Include="src\app\thank-you-page\thank-you-page-container.component.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

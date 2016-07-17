@@ -6,6 +6,8 @@ import { AppComponent } from "./app.component";
 import { PropertyEditorComponent } from "./property-editor.component";
 import { PropertyListComponent } from "./property-list.component";
 import { PropertyComponent } from "./property.component";
+import { PropertyPagedListComponent } from "./property-paged-list.component";
+import { PropertyPickerModalComponent } from "./property-picker-modal.component";
 import { SectionEditorComponent } from "./section-editor.component";
 import { SectionListComponent } from "./section-list.component";
 import { SectionComponent } from "./section.component";
@@ -23,6 +25,8 @@ bootstrap(contentAggregationComponentsModule, {
         PropertyComponent,
         PropertyEditorComponent,
         PropertyListComponent,
+        PropertyPagedListComponent,
+        PropertyPickerModalComponent,
         SectionEditorComponent,
         SectionListComponent,
         SectionComponent,

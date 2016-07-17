@@ -35,7 +35,7 @@ namespace QuinntyneBrown.Data
         public IRepository<Gallery> Galleries { get { return GetStandardRepo<Gallery>(); } }
         public IRepository<User> Users { get { return GetStandardRepo<User>(); } }
         public IRepository<Role> Roles { get { return GetStandardRepo<Role>(); } }
-        public IRepository<Photographer> Photographers { get { return GetStandardRepo<Photographer>(); } }
+        public IRepository<ServiceProvider> ServiceProviders { get { return GetStandardRepo<ServiceProvider>(); } }
         public IRepository<Customer> Customers { get { return GetStandardRepo<Customer>(); } }
         public IRepository<Category> Categories { get { return GetStandardRepo<Category>(); } }
         public IRepository<Contact> Contacts { get { return GetStandardRepo<Contact>(); } }
@@ -43,6 +43,7 @@ namespace QuinntyneBrown.Data
         public IRepository<Order> Orders { get { return GetStandardRepo<Order>(); } }
         public IRepository<Quote> Quotes { get { return GetStandardRepo<Quote>(); } }
         public IRepository<SocialShareItem> SocialShareItems { get { return GetStandardRepo<SocialShareItem>(); } }
+        public IRepository<ProfessionalService> ProfessionalServices { get { return GetStandardRepo<ProfessionalService>(); } }
 
         protected void ConfigureDbContext(IDbContext dbContext)
         {

@@ -1,14 +1,14 @@
 namespace QuinntyneBrown.Dtos
 {
-    public class PhotographerDto
+    public class ProfessionalServiceDto
     {
-        public PhotographerDto(QuinntyneBrown.Models.Photographer entity)
+        public ProfessionalServiceDto(QuinntyneBrown.Models.ProfessionalService entity)
         {
             this.Id = entity.Id;
             this.Name = entity.Name;
         }
 
-        public PhotographerDto()
+        public ProfessionalServiceDto()
         {
             
         }

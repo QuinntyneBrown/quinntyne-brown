@@ -270,10 +270,11 @@
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\Photo.cs" />
     <Compile Include="Models\PhotoCategory.cs" />
-    <Compile Include="Models\Photographer.cs" />
-    <Compile Include="Models\PhotographerGallery.cs" />
-    <Compile Include="Models\PhotographerPhoto.cs" />
+    <Compile Include="Models\ServiceProvider.cs" />
+    <Compile Include="Models\ServiceProviderGallery.cs" />
+    <Compile Include="Models\ServiceProviderPhoto.cs" />
     <Compile Include="Models\Product.cs" />
+    <Compile Include="Models\ProfessionalService.cs" />
     <Compile Include="Models\PropertyType.cs" />
     <Compile Include="Models\Quote.cs" />
     <Compile Include="Models\Role.cs" />
@@ -388,15 +389,9 @@
     <Compile Include="Dtos\CustomerDto.cs" />
     <Compile Include="Dtos\CustomerAddOrUpdateRequestDto.cs" />
     <Compile Include="Dtos\CustomerAddOrUpdateResponseDto.cs" />
-    <Compile Include="Dtos\PhotographerDto.cs" />
-    <Compile Include="Dtos\PhotographerAddOrUpdateRequestDto.cs" />
-    <Compile Include="Dtos\PhotographerAddOrUpdateResponseDto.cs" />
     <Compile Include="Services\CustomerService.cs" />
     <Compile Include="Services\ICustomerService.cs" />
-    <Compile Include="Services\PhotographerService.cs" />
-    <Compile Include="Services\IPhotographerService.cs" />
     <Compile Include="Controllers\CustomerController.cs" />
-    <Compile Include="Controllers\PhotographerController.cs" />
     <Compile Include="Dtos\AuthorDto.cs" />
     <Compile Include="Dtos\AuthorAddOrUpdateRequestDto.cs" />
     <Compile Include="Dtos\AuthorAddOrUpdateResponseDto.cs" />
@@ -436,6 +431,17 @@
     <Compile Include="Dtos\SocialShareItemDto.cs" />
     <Compile Include="Dtos\SocialShareItemAddOrUpdateRequestDto.cs" />
     <Compile Include="Dtos\SocialShareItemAddOrUpdateResponseDto.cs" />
+    <Compile Include="Dtos\ProfessionalServiceDto.cs" />
+    <Compile Include="Dtos\ProfessionalServiceAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\ProfessionalServiceAddOrUpdateResponseDto.cs" />
+    <Compile Include="Dtos\ServiceProviderDto.cs" />
+    <Compile Include="Dtos\ServiceProviderAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\ServiceProviderAddOrUpdateResponseDto.cs" />
+    <Compile Include="Services\ServiceProviderService.cs" />
+    <Compile Include="Services\IServiceProviderService.cs" />
+    <Compile Include="Controllers\ServiceProviderController.cs" />
+    <Compile Include="Services\ProfessionalServiceService.cs" />
+    <Compile Include="Services\IProfessionalServiceService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

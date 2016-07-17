@@ -19,6 +19,6 @@ namespace QuinntyneBrown.Models
         public bool IsDeleted { get; set; }
         public ICollection<GalleryPhoto> GalleryPhotos { get; set; } = new HashSet<GalleryPhoto>();
         public ICollection<ArticlePhoto> ArticlePhotos { get; set; } = new HashSet<ArticlePhoto>();
-        public ICollection<PhotographerPhoto> PhotographerPhotos { get; set; } = new HashSet<PhotographerPhoto>();
+        public ICollection<ServiceProviderPhoto> ServiceProviderPhotos { get; set; } = new HashSet<ServiceProviderPhoto>();
     }
 }
