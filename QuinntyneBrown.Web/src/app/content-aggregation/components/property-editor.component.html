@@ -10,7 +10,22 @@
 
         <tab-content>
             <div>
-                <input class="inputField" type="text" placeholder="Property Name" data-ng-model="vm.entity.name" />
+                <input class="inputField" type="text" placeholder="Name" data-ng-model="vm.entity.name" />
+            </div>
+            <div>
+                <input class="inputField" type="text" placeholder="Key" data-ng-model="vm.entity.key" />
+            </div>
+            <div>
+                <input class="inputField" type="text" placeholder="Value" data-ng-model="vm.entity.value" />
+            </div>
+            <div>
+                <input class="inputField" type="text" placeholder="Base Uri" data-ng-model="vm.entity.baseUri" />
+            </div>
+            <div>
+                <input class="inputField" type="text" placeholder="Uri" data-ng-model="vm.entity.uri" />
+            </div>
+            <div>
+                <textarea ui-tinymce ng-model="vm.entity.htmlBody"></textarea>
             </div>
         </tab-content>
 

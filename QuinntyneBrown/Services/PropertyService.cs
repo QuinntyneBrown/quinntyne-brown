@@ -3,6 +3,7 @@ using QuinntyneBrown.Data;
 using QuinntyneBrown.Dtos;
 using System.Linq;
 using QuinntyneBrown.Models;
+using System.Data.Entity;
 
 namespace QuinntyneBrown.Services
 {
@@ -17,10 +18,16 @@ namespace QuinntyneBrown.Services
 
         public PropertyAddOrUpdateResponseDto AddOrUpdate(PropertyAddOrUpdateRequestDto request)
         {
-            var entity = _repository.GetAll()
+            var entity = GetAll()
                 .FirstOrDefault(x => x.Id == request.Id && x.IsDeleted == false);
             if (entity == null) _repository.Add(entity = new Property());
             entity.Name = request.Name;
+            entity.IsDynamic = request.IsDynamic;
+            entity.Key = request.Key;
+            entity.Value = request.Value;
+            entity.BaseUri = request.BaseUri;
+            entity.Uri = request.Uri;
+            entity.HtmlBody = request.HtmlBody;
             _uow.SaveChanges();
             return new PropertyAddOrUpdateResponseDto(entity);
         }
@@ -36,15 +43,20 @@ namespace QuinntyneBrown.Services
         public ICollection<PropertyDto> Get()
         {
             ICollection<PropertyDto> response = new HashSet<PropertyDto>();
-            var entities = _repository.GetAll().Where(x => x.IsDeleted == false).ToList();
+            var entities = GetAll().Where(x => x.IsDeleted == false).ToList();
             foreach(var entity in entities) { response.Add(new PropertyDto(entity)); }    
             return response;
         }
         
         public PropertyDto GetById(int id)
         {
-            return new PropertyDto(_repository.GetAll().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault());
+            return new PropertyDto(GetAll().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault());
         }
+
+        public IQueryable<Property> GetAll() => _repository.GetAll()
+            .Include(x => x.AppProperties)
+            .Include(x => x.UIProperties)
+            .Include(x => x.SectionProperties);
 
         protected readonly IUow _uow;
         protected readonly IRepository<Property> _repository;

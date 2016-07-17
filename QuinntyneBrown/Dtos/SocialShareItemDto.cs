@@ -4,8 +4,10 @@ namespace QuinntyneBrown.Dtos
     {
         public SocialShareItemDto(QuinntyneBrown.Models.SocialShareItem entity)
         {
-            this.Id = entity.Id;
-            this.Name = entity.Name;
+            Id = entity.Id;
+            Name = entity.Name;
+            Src = entity.Src;
+            SrcHover = entity.SrcHover;
         }
 
         public SocialShareItemDto()
@@ -15,5 +17,8 @@ namespace QuinntyneBrown.Dtos
 
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Src { get; set; }
+        public string SrcHover { get; set; }
+        
     }
 }

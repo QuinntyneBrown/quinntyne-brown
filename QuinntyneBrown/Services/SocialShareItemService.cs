@@ -12,45 +12,46 @@ namespace QuinntyneBrown.Services
     {
         public SocialShareItemService(IUow uow, ICacheProvider cacheProvider)
         {
-            this.uow = uow;
-            this.repository = uow.SocialShareItems;
-            this.cache = cacheProvider.GetCache();
+            _uow = uow;
+            _repository = uow.SocialShareItems;
+            _cache = cacheProvider.GetCache();
         }
 
         public SocialShareItemAddOrUpdateResponseDto AddOrUpdate(SocialShareItemAddOrUpdateRequestDto request)
         {
-            var entity = repository.GetAll()
+            var entity = _repository.GetAll()
                 .FirstOrDefault(x => x.Id == request.Id && x.IsDeleted == false);
-            if (entity == null) repository.Add(entity = new SocialShareItem());
+            if (entity == null) _repository.Add(entity = new SocialShareItem());
             entity.Name = request.Name;
-            uow.SaveChanges();
+            entity.Src = request.Src;
+            entity.SrcHover = request.SrcHover;
+            _uow.SaveChanges();
             return new SocialShareItemAddOrUpdateResponseDto(entity);
         }
 
         public dynamic Remove(int id)
         {
-            var entity = repository.GetById(id);
+            var entity = _repository.GetById(id);
             entity.IsDeleted = true;
-            uow.SaveChanges();
+            _uow.SaveChanges();
             return id;
         }
 
         public ICollection<SocialShareItemDto> Get()
         {
             ICollection<SocialShareItemDto> response = new HashSet<SocialShareItemDto>();
-            var entities = repository.GetAll().Where(x => x.IsDeleted == false).ToList();
+            var entities = _repository.GetAll().Where(x => x.IsDeleted == false).ToList();
             foreach(var entity in entities) { response.Add(new SocialShareItemDto(entity)); }    
             return response;
         }
-
-
+        
         public SocialShareItemDto GetById(int id)
         {
-            return new SocialShareItemDto(repository.GetAll().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault());
+            return new SocialShareItemDto(_repository.GetAll().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault());
         }
 
-        protected readonly IUow uow;
-        protected readonly IRepository<SocialShareItem> repository;
-        protected readonly ICache cache;
+        protected readonly IUow _uow;
+        protected readonly IRepository<SocialShareItem> _repository;
+        protected readonly ICache _cache;
     }
 }

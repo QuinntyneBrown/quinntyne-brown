@@ -67,6 +67,7 @@ bootstrap(quinntynebrownAppModule, {
         ...OrdersRoutes,
         ...PhotosRoutes,
         ...PhotographersRoutes,
+        ...ProductsRoutes,
         ...QuotesRoutes,
         ...SocialShareItemsRoutes
     ]
