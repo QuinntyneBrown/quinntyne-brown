@@ -5,16 +5,13 @@ require("./app/customers");
 require("./app/galleries");
 require("./app/login");
 require("./app/orders");
+require("./app/pages");
 require("./app/photos");
 require("./app/products");
 require("./app/quotes");
 require("./app/shared");
 require("./app/social-share-items");
 
-
-//Pages
-require("./app/biography-page");
-require("./app/thank-you-page");
 
 import { ArticlesRoutes } from "./app/articles";
 import { ContactsRoutes } from "./app/contacts";
@@ -26,11 +23,10 @@ import { PhotographersRoutes } from "./app/photographers";
 import { ProductsRoutes } from "./app/products";
 import { QuotesRoutes } from "./app/quotes";
 import { OrdersRoutes } from "./app/orders";
+import { PagesRoutes } from "./app/pages";
 import { ContentAggregationRoutes } from "./app/content-aggregation";
 import { SocialShareItemsRoutes } from "./app/social-share-items";
 
-import { BiographyPageRoutes } from "./app/biography-page";
-import { ThankYouPageRoutes } from "./app/thank-you-page";
 
 import { provide, provideRoutePromise, bootstrap } from "angular-rx-ui/src/components/core";
 import { authorizationGuard } from "angular-rx-ui/src/components/routing/authorization-guard";
@@ -42,9 +38,6 @@ import { AdminAppComponent } from "./app/admin-app.component";
 const quinntynebrownAppModule = angular.module("quinntynebrownApp", [
     "components",
 
-    "quinntynebrown.biographyPage",
-    "quinntynebrown.thankYouPage",
-
     "app.contentAggregation",
     "quinntynebrown.articles",
     "quinntynebrown.contacts",
@@ -52,6 +45,7 @@ const quinntynebrownAppModule = angular.module("quinntynebrownApp", [
     "quinntynebrown.galleries",
     "quinntynebrown.login",
     "quinntynebrown.orders",
+    "quinntynebrown.pages",
     "quinntynebrown.photos",
     "quinntynebrown.photographers",
     "quinntynebrown.products",
@@ -67,10 +61,7 @@ bootstrap(quinntynebrownAppModule, {
     html5Mode: true,
     guards: [authorizationGuard],
     run:[routeChangeSuccessIsAdminReducer],
-    routes: [
-        ...BiographyPageRoutes,
-        ...ThankYouPageRoutes,
-
+    routes: [        
         ...ArticlesRoutes,
         ...ContactsRoutes,
         ...ContentAggregationRoutes,
@@ -78,6 +69,7 @@ bootstrap(quinntynebrownAppModule, {
         ...GalleriesRoutes,
         ...LoginRoutes,
         ...OrdersRoutes,
+        ...PagesRoutes,
         ...PhotosRoutes,
         ...PhotographersRoutes,
         ...ProductsRoutes,
