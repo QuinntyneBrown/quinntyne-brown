@@ -3489,6 +3489,16 @@
 	                _this.modalActionCreator.open({ html: "<all-property-modal></all-property-modal>" });
 	            });
 	        };
+	        this.openPropertyPickerModal = function () {
+	            _this.invokeAsync(_this.all).then(function (results) {
+	                _this.modalActionCreator.open({ html: "<property-picker-modal></property-picker-modal>" });
+	            });
+	        };
+	        this.pick = function (entity) { return _this.dispatcher.dispatch(new property_actions_1.PropertyPickedAction(entity)); };
+	        this.openEditPropertyModal = function (options) {
+	            if (options === void 0) { options = { property: null }; }
+	            _this.modalActionCreator.open({ html: "<edit-property-modal property='" + JSON.stringify(options.property) + "'></edit-property-modal>" });
+	        };
 	    }
 	    PropertyActionCreator = __decorate([
 	        core_1.Service({
@@ -3559,6 +3569,13 @@
 	    return CurrentPropertyRemovedAction;
 	}());
 	exports.CurrentPropertyRemovedAction = CurrentPropertyRemovedAction;
+	var PropertyPickedAction = (function () {
+	    function PropertyPickedAction(entity) {
+	        this.entity = entity;
+	    }
+	    return PropertyPickedAction;
+	}());
+	exports.PropertyPickedAction = PropertyPickedAction;
 
 
 /***/ },
@@ -4866,6 +4883,8 @@
 	                }
 	            });
 	        };
+	        this.addOrUpdateProperty = function () { return alert("add or update property"); };
+	        this.addOrUpdateUI = function () { return alert("add or update ui"); };
 	    }
 	    AppsContainerComponent = __decorate([
 	        core_1.Component({
@@ -4909,7 +4928,7 @@
 /* 153 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\r\n    <app-editor entity=\"vm.entity\" edit=\"vm.edit\" remove=\"vm.remove\" add-or-update=\"vm.addOrUpdate\" create=\"vm.create\"></app-editor>\r\n    <app-list entities=\"vm.entities\" edit=\"vm.edit\" remove=\"vm.remove\"></app-list>\r\n</div>\r\n"
+	module.exports = "<div>\r\n    <a class=\"apps-container-add-or-update-property\" data-ng-click=\"vm.addOrUpdateProperty()\">Add Or Update Property</a>\r\n    <a class=\"apps-container-add-or-update-ui\" data-ng-click=\"vm.addOrUpdateUI()\">Add Or Update UI</a>\r\n    <app-editor entity=\"vm.entity\" edit=\"vm.edit\" remove=\"vm.remove\" add-or-update=\"vm.addOrUpdate\" create=\"vm.create\"></app-editor>\r\n    <app-list entities=\"vm.entities\" edit=\"vm.edit\" remove=\"vm.remove\"></app-list>\r\n</div>\r\n"
 
 /***/ },
 /* 154 */
@@ -4946,7 +4965,7 @@
 
 
 	// module
-	exports.push([module.id, "", ""]);
+	exports.push([module.id, ".apps-container-add-or-update-property,\n.apps-container-add-or-update-ui {\n  cursor: pointer; }\n", ""]);
 
 	// exports
 
@@ -8873,16 +8892,20 @@
 	};
 	var core_1 = __webpack_require__(3);
 	var AdminHeaderComponent = (function () {
-	    function AdminHeaderComponent() {
+	    function AdminHeaderComponent($location) {
+	        var _this = this;
+	        this.$location = $location;
+	        this.onTitleClick = function () { return _this.$location.path("/"); };
 	    }
 	    AdminHeaderComponent = __decorate([
 	        core_1.Component({
 	            template: __webpack_require__(317),
 	            styles: [__webpack_require__(318)],
 	            selector: "admin-header",
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush,
+	            viewProviders: ["$location"]
 	        }), 
-	        __metadata('design:paramtypes', [])
+	        __metadata('design:paramtypes', [Object])
 	    ], AdminHeaderComponent);
 	    return AdminHeaderComponent;
 	}());
@@ -8893,7 +8916,7 @@
 /* 317 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"admin-header\">\r\n    <div class=\"admin-header-inner\">\r\n        <h1>\r\n            QB: Admin\r\n        </h1>\r\n    </div>\r\n</div>\r\n"
+	module.exports = "<div class=\"admin-header\">\r\n    <div class=\"admin-header-inner\">\r\n        <h1 class=\"admin-header-title\" data-ng-click=\"vm.onTitleClick()\">\r\n            Admin\r\n        </h1>\r\n    </div>\r\n</div>\r\n"
 
 /***/ },
 /* 318 */
@@ -8930,7 +8953,7 @@
 
 
 	// module
-	exports.push([module.id, "", ""]);
+	exports.push([module.id, ".admin-header-title {\n  cursor: pointer; }\n", ""]);
 
 	// exports
 

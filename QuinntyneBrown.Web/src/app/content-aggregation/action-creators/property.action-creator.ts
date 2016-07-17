@@ -7,7 +7,8 @@ import {
     SetCurrentPropertyAction,
     AddOrUpdatePropertyAction,
     AddOrUpdatePropertySuccessAction,
-    CurrentPropertyRemovedAction
+    CurrentPropertyRemovedAction,
+    PropertyPickedAction
 } from "../actions/property.actions";
 
 @Service({
@@ -27,6 +28,18 @@ export class PropertyActionCreator extends BaseActionCreator {
         this.invokeAsync(this.all).then(results => {
             this.modalActionCreator.open({ html: "<all-property-modal></all-property-modal>" });
         });
+    }
+
+    openPropertyPickerModal = () => {
+        this.invokeAsync(this.all).then(results => {
+            this.modalActionCreator.open({ html: "<property-picker-modal></property-picker-modal>" });
+        });
+    }
+
+    pick = entity => this.dispatcher.dispatch(new PropertyPickedAction(entity));
+
+    openEditPropertyModal = (options = { property: null }) => {
+        this.modalActionCreator.open({ html: `<edit-property-modal property='${JSON.stringify(options.property)}'></edit-property-modal>` });
     }
 }
 

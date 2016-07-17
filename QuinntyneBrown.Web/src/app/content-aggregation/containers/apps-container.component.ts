@@ -60,6 +60,8 @@ export class AppsContainerComponent {
             }
         });        
     };
+    addOrUpdateProperty = () => alert("add or update property");
+    addOrUpdateUI = () => alert("add or update ui");
     entity: App;
     entities: Array<App>;
 }

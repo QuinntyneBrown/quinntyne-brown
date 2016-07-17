@@ -12,3 +12,5 @@ export class SetCurrentPropertyAction { constructor(public entity) { } }
 export class AddOrUpdatePropertySuccessAction { constructor(public entity) { } }
 
 export class CurrentPropertyRemovedAction { constructor() { } }
+
+export class PropertyPickedAction { constructor(public entity) { } }
