@@ -8,7 +8,7 @@ import { MenuItemService } from "./menu-item.service";
 import * as reducers from "./menu-item.reducers";
 import * as actions from "./menu-item.actions";
 
-const appMenuItemsModule = angular.module("quinntynebrown.menu-items", []);
+const appMenuItemsModule = angular.module("quinntynebrown.menuItems", []);
 
 bootstrap(appMenuItemsModule, {
     components: [MenuItemComponent, MenuItemEditorComponent, MenuItemsContainerComponent, MenuItemListComponent],

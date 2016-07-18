@@ -8,4 +8,5 @@ import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/s
 })
 export class BiographyPageContainerComponent {
     constructor() { }
+    public biographyPageHtmlBody: string;
 }
