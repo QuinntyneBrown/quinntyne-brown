@@ -534,18 +534,6 @@
     <Content Include="src\app\photographers\photographer.component.scss">
       <DependentUpon>photographer.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\app\photos\photo-editor-container.component.html">
-      <DependentUpon>photo-editor-container.component.ts</DependentUpon>
-    </Content>
-    <Content Include="src\app\photos\photo-editor-container.component.scss">
-      <DependentUpon>photo-editor-container.component.ts</DependentUpon>
-    </Content>
-    <Content Include="src\app\photos\photo.component.html">
-      <DependentUpon>photo.component.ts</DependentUpon>
-    </Content>
-    <Content Include="src\app\photos\photo.component.scss">
-      <DependentUpon>photo.component.ts</DependentUpon>
-    </Content>
     <Content Include="src\app\content-aggregation\containers\properties-container.component.html">
       <DependentUpon>properties-container.component.ts</DependentUpon>
     </Content>
@@ -560,6 +548,39 @@
     </Content>
     <Content Include="src\app\content-aggregation\components\property.component.scss">
       <DependentUpon>property.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo-editor.component.html">
+      <DependentUpon>photo-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo-editor.component.scss">
+      <DependentUpon>photo-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo-list.component.html">
+      <DependentUpon>photo-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo-list.component.scss">
+      <DependentUpon>photo-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo-picker-modal.component.html">
+      <DependentUpon>photo-picker-modal.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo-upload-modal.component.html">
+      <DependentUpon>photo-upload-modal.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo-upload.component.html">
+      <DependentUpon>photo-upload.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo.component.html">
+      <DependentUpon>photo.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo.component.scss">
+      <DependentUpon>photo.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photos-container.component.html">
+      <DependentUpon>photos-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photos-container.component.scss">
+      <DependentUpon>photos-container.component.ts</DependentUpon>
     </Content>
     <Content Include="src\app\products\product-editor.component.html">
       <DependentUpon>product-editor.component.ts</DependentUpon>
@@ -751,6 +772,15 @@
     <Content Include="src\app\professional-service\professional-services-container.component.scss">
       <DependentUpon>professional-services-container.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\photos\photo-picker-modal.component.scss">
+      <DependentUpon>photo-picker-modal.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo-upload-modal.component.scss">
+      <DependentUpon>photo-upload-modal.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\photos\photo-upload.component.scss">
+      <DependentUpon>photo-upload.component.ts</DependentUpon>
+    </Content>
     <None Include="src\assets\scss\_varibles.scss" />
     <Content Include="tsconfig.json" />
     <Content Include="typings.json" />
@@ -828,7 +858,6 @@
     <TypeScriptCompile Include="src\app\login\login.routes.ts" />
     <TypeScriptCompile Include="src\app\orders\orders.routes.ts" />
     <TypeScriptCompile Include="src\app\photographers\photographers.routes.ts" />
-    <TypeScriptCompile Include="src\app\photos\photos.routes.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\action-creators\index.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\actions\index.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\components\index.ts" />
@@ -840,6 +869,20 @@
     <TypeScriptCompile Include="src\app\content-aggregation\content-aggregation.routes.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\reducers\index.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\services\index.ts" />
+    <TypeScriptCompile Include="src\app\photos\index.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo-editor.component.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo-list.component.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo-picker-modal.component.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo-upload-modal.component.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo-upload.component.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo.component.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo.model.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo.reducers.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo.service.ts" />
+    <TypeScriptCompile Include="src\app\photos\photo.actions.ts" />
+    <TypeScriptCompile Include="src\app\photos\photos-container.component.ts" />
+    <TypeScriptCompile Include="src\app\photos\photos.routes.ts" />
     <TypeScriptCompile Include="src\app\products\products.routes.ts" />
     <TypeScriptCompile Include="src\app\professional-service\professional-services.routes.ts" />
     <TypeScriptCompile Include="src\app\quotes\quotes.routes.ts" />
@@ -861,12 +904,6 @@
     <TypeScriptCompile Include="src\app\galleries\gallery.action-creator.ts" />
     <TypeScriptCompile Include="src\app\galleries\gallery.reducers.ts" />
     <TypeScriptCompile Include="src\app\galleries\gallery.component.ts" />
-    <TypeScriptCompile Include="src\app\photos\photo.model.ts" />
-    <TypeScriptCompile Include="src\app\photos\index.ts" />
-    <TypeScriptCompile Include="src\app\photos\photo.actions.ts" />
-    <TypeScriptCompile Include="src\app\photos\photo.action-creator.ts" />
-    <TypeScriptCompile Include="src\app\photos\photo.reducers.ts" />
-    <TypeScriptCompile Include="src\app\photos\photo.component.ts" />
     <TypeScriptCompile Include="src\app\customers\customer.model.ts" />
     <TypeScriptCompile Include="src\app\customers\index.ts" />
     <TypeScriptCompile Include="src\app\customers\customer.actions.ts" />
@@ -874,7 +911,6 @@
     <TypeScriptCompile Include="src\app\customers\customer.reducers.ts" />
     <TypeScriptCompile Include="src\app\customers\customer.component.ts" />
     <TypeScriptCompile Include="src\app\galleries\gallery-editor-container.component.ts" />
-    <TypeScriptCompile Include="src\app\photos\photo-editor-container.component.ts" />
     <TypeScriptCompile Include="src\app\shared\admin-header\admin-header.component.ts" />
     <TypeScriptCompile Include="src\app\shared\app-header\app-header.component.ts" />
     <TypeScriptCompile Include="src\app\shared\app-footer\app-footer.component.ts" />
