@@ -15,8 +15,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using WebApi.OutputCache.V2;
-using static System.Drawing.Image;
-using static System.Drawing.Imaging.ImageFormat;
 
 namespace QuinntyneBrown.Controllers
 {
@@ -24,9 +22,12 @@ namespace QuinntyneBrown.Controllers
     [RoutePrefix("api/photo")]
     public class PhotoController : ApiController
     {
-        public PhotoController(IPhotoService photoService)
+        public PhotoController(IPhotoService photoService, IUow uow, ICacheProvider cacheProvider)
         {
             _photoService = photoService;
+            _uow = uow;
+            _repository = uow.Photos;
+            _cache = cacheProvider.GetCache();
         }
 
         [Route("add")]
@@ -60,14 +61,11 @@ namespace QuinntyneBrown.Controllers
         [HttpPost]
         public async Task<HttpResponseMessage> Upload(HttpRequestMessage request)
         {
-
             var photos = new List<Photo>();
             try
             {
                 if (!Request.Content.IsMimeMultipartContent("form-data"))
-                {
                     throw new HttpResponseException(HttpStatusCode.BadRequest);
-                }
 
                 var provider = await Request.Content.ReadAsMultipartAsync(new InMemoryMultipartFormDataStreamProvider());
 
@@ -101,32 +99,21 @@ namespace QuinntyneBrown.Controllers
         [Route("serve")]
         [HttpGet]
         [AllowAnonymous]
-        [CacheOutput(ClientTimeSpan = 0, ServerTimeSpan = 0)]
+        [CacheOutput(ClientTimeSpan = 1000, ServerTimeSpan = 1000)]
         public HttpResponseMessage Serve([FromUri]Guid uniqueId, int? height = null)
         {
             Photo photo = _cache.FromCacheOrService(() => _repository.GetAll().FirstOrDefault(x => x.UniqueId == uniqueId), uniqueId.ToString());
             HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
             if (photo == null)
                 return result;
-            var memoryStream = new System.IO.MemoryStream(photo.Bytes);
-            System.Drawing.Image fullsizeImage = FromStream(memoryStream);
-            height = height.HasValue ? height : fullsizeImage.Height;
-            var ratio = (float)height.Value / (float)fullsizeImage.Height;
-            var width = fullsizeImage.Width * ratio;
-            System.Drawing.Image newImage = fullsizeImage.GetThumbnailImage((int)width, height.Value, null, IntPtr.Zero);
-            var myResult = new System.IO.MemoryStream();
-            newImage.Save(myResult, fullsizeImage.RawFormat);
-            result.Content = new ByteArrayContent(myResult.ToArray());
+            result.Content = new ByteArrayContent(photo.Bytes);
             result.Content.Headers.ContentType = new MediaTypeHeaderValue(photo.ContentType);
             return result;
         }
-
-
+        
         protected readonly IPhotoService _photoService;
         protected readonly IRepository<Photo> _repository;
         protected readonly IUow _uow;
-        protected readonly ICache _cache;
-
-
+        protected readonly ICache _cache;        
     }
 }

@@ -4,7 +4,7 @@ import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/s
     template: require("./photo-editor.component.html"),
     styles: [require("./photo-editor.component.scss")],
     selector: "photo-editor",
-    inputs: ['entity','addOrUpdate','remove','create'],
+    inputs: ['entity', 'addOrUpdate', 'remove', 'create', 'upload'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PhotoEditorComponent {}

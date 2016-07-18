@@ -54,28 +54,28 @@
 	__webpack_require__(241);
 	__webpack_require__(264);
 	__webpack_require__(290);
-	__webpack_require__(313);
-	__webpack_require__(336);
-	__webpack_require__(359);
-	__webpack_require__(374);
+	__webpack_require__(321);
+	__webpack_require__(344);
+	__webpack_require__(367);
+	__webpack_require__(382);
 	var articles_1 = __webpack_require__(1);
 	var contacts_1 = __webpack_require__(70);
 	var customers_1 = __webpack_require__(201);
 	var galleries_1 = __webpack_require__(210);
 	var login_1 = __webpack_require__(235);
 	var photos_1 = __webpack_require__(290);
-	var photographers_1 = __webpack_require__(397);
-	var products_1 = __webpack_require__(313);
-	var quotes_1 = __webpack_require__(336);
+	var photographers_1 = __webpack_require__(405);
+	var products_1 = __webpack_require__(321);
+	var quotes_1 = __webpack_require__(344);
 	var orders_1 = __webpack_require__(241);
 	var pages_1 = __webpack_require__(264);
 	var content_aggregation_1 = __webpack_require__(90);
-	var social_share_items_1 = __webpack_require__(374);
+	var social_share_items_1 = __webpack_require__(382);
 	var core_1 = __webpack_require__(3);
-	var authorization_guard_1 = __webpack_require__(406);
-	var route_change_success_is_admin_reducer_1 = __webpack_require__(407);
-	var app_component_1 = __webpack_require__(408);
-	var admin_app_component_1 = __webpack_require__(412);
+	var authorization_guard_1 = __webpack_require__(414);
+	var route_change_success_is_admin_reducer_1 = __webpack_require__(415);
+	var app_component_1 = __webpack_require__(416);
+	var admin_app_component_1 = __webpack_require__(420);
 	var quinntynebrownAppModule = angular.module("quinntynebrownApp", [
 	    "components",
 	    "app.contentAggregation",
@@ -5253,15 +5253,18 @@
 	};
 	var core_1 = __webpack_require__(3);
 	var actions = __webpack_require__(93);
+	var property_actions_1 = __webpack_require__(95);
 	var app_action_creator_1 = __webpack_require__(92);
 	var app_model_1 = __webpack_require__(170);
+	var property_action_creator_1 = __webpack_require__(94);
 	var AppsContainerComponent = (function () {
-	    function AppsContainerComponent($location, $routeParams, appActionCreator, _invokeAsync) {
+	    function AppsContainerComponent($location, $routeParams, appActionCreator, _invokeAsync, propertyActionCreator) {
 	        var _this = this;
 	        this.$location = $location;
 	        this.$routeParams = $routeParams;
 	        this.appActionCreator = appActionCreator;
 	        this._invokeAsync = _invokeAsync;
+	        this.propertyActionCreator = propertyActionCreator;
 	        this.storeOnChange = function (state) {
 	            _this.entities = state.apps;
 	            if (state.lastTriggeredByAction instanceof actions.SetCurrentAppAction && !state.lastTriggeredByAction.entity)
@@ -5275,6 +5278,9 @@
 	                if (Object.keys(_this.entity).length === 0) {
 	                    _this.$location.path("/admin/apps");
 	                }
+	            }
+	            if (state.lastTriggeredByAction instanceof property_actions_1.PropertyPickedAction && _this.entity && _this.entity.id) {
+	                _this.entity.properties.push(state.lastTriggeredByAction.entity);
 	            }
 	        };
 	        this.ngOnInit = function () {
@@ -5301,7 +5307,7 @@
 	                }
 	            });
 	        };
-	        this.addOrUpdateProperty = function () { return alert("add or update property"); };
+	        this.addOrUpdateProperty = function () { return _this.propertyActionCreator.openPropertyPickerModal(); };
 	        this.addOrUpdateUI = function () { return alert("add or update ui"); };
 	    }
 	    AppsContainerComponent = __decorate([
@@ -5310,7 +5316,7 @@
 	            template: __webpack_require__(171),
 	            styles: [__webpack_require__(172)],
 	            selector: "apps-container",
-	            viewProviders: ["$location", "$routeParams", "appActionCreator", "invokeAsync"],
+	            viewProviders: ["$location", "$routeParams", "appActionCreator", "invokeAsync", "propertyActionCreator"],
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }),
 	        core_1.CanActivate(["$q", "$route", "invokeAsync", "appActionCreator", function ($q, $route, invokeAsync, appActionCreator) {
@@ -5322,7 +5328,7 @@
 	                ;
 	                return $q.all(promises);
 	            }]), 
-	        __metadata('design:paramtypes', [Object, Object, app_action_creator_1.AppActionCreator, Object])
+	        __metadata('design:paramtypes', [Object, Object, app_action_creator_1.AppActionCreator, Object, property_action_creator_1.PropertyActionCreator])
 	    ], AppsContainerComponent);
 	    return AppsContainerComponent;
 	}());
@@ -5336,6 +5342,7 @@
 	"use strict";
 	var App = (function () {
 	    function App() {
+	        this.properties = [];
 	    }
 	    return App;
 	}());
@@ -6194,7 +6201,7 @@
 	        authorizationRequired: true
 	    },
 	    {
-	        path: "/admin/app/:appid",
+	        path: "/admin/app/edit/:appId",
 	        component: containers_1.AppsContainerComponent,
 	        authorizationRequired: true
 	    },
@@ -6204,7 +6211,7 @@
 	        authorizationRequired: true
 	    },
 	    {
-	        path: "/admin/properties/:propertyid",
+	        path: "/admin/property/edit/:propertyid",
 	        component: containers_1.PropertiesContainerComponent,
 	        authorizationRequired: true
 	    },
@@ -6214,7 +6221,7 @@
 	        authorizationRequired: true
 	    },
 	    {
-	        path: "/admin/sections/:sectionid",
+	        path: "/admin/section/edit/:sectionid",
 	        component: containers_1.SectionsContainerComponent,
 	        authorizationRequired: true
 	    },
@@ -6224,7 +6231,7 @@
 	        authorizationRequired: true
 	    },
 	    {
-	        path: "/admin/properties/:uiid",
+	        path: "/admin/ui/edit/:uiid",
 	        component: containers_1.UIsContainerComponent,
 	        authorizationRequired: true
 	    }
@@ -6613,7 +6620,7 @@
 /* 220 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"featured-gallery-container\">\r\n    <div class=\"featured-gallery-container-inner\">\r\n        <img class=\"featured-gallery-container-img\" src=\"src/assets/images/Squad.jpg\" />\r\n    </div>    \r\n</div>\r\n"
+	module.exports = "<div class=\"featured-gallery-container\">\r\n    <div class=\"featured-gallery-container-inner\">\r\n        <img class=\"featured-gallery-container-img\" src=\"http://www.quinntynebrown.com/api/photo/serve?uniqueid=1e6dce05-b78f-401d-991d-44a3920d80dd\" />\r\n    </div>    \r\n</div>\r\n"
 
 /***/ },
 /* 221 */
@@ -8144,18 +8151,20 @@
 	var photo_list_component_1 = __webpack_require__(295);
 	var photo_component_1 = __webpack_require__(299);
 	var photos_container_component_1 = __webpack_require__(303);
+	var photo_upload_modal_component_1 = __webpack_require__(310);
+	var photo_upload_component_1 = __webpack_require__(314);
 	var photo_action_creator_1 = __webpack_require__(305);
-	var photo_service_1 = __webpack_require__(310);
-	var reducers = __webpack_require__(311);
+	var photo_service_1 = __webpack_require__(318);
+	var reducers = __webpack_require__(319);
 	var actions = __webpack_require__(304);
-	var appPhotosModule = angular.module("app.photos", []);
+	var appPhotosModule = angular.module("quinntynebrown.photos", []);
 	core_1.bootstrap(appPhotosModule, {
-	    components: [photo_component_1.PhotoComponent, photo_editor_component_1.PhotoEditorComponent, photos_container_component_1.PhotosContainerComponent, photo_list_component_1.PhotoListComponent],
+	    components: [photo_component_1.PhotoComponent, photo_editor_component_1.PhotoEditorComponent, photos_container_component_1.PhotosContainerComponent, photo_list_component_1.PhotoListComponent, photo_upload_component_1.PhotoUploadComponent, photo_upload_modal_component_1.PhotoUploadModalComponent],
 	    providers: [photo_action_creator_1.PhotoActionCreator, photo_service_1.PhotoService],
 	    reducers: reducers,
 	    actions: actions
 	});
-	__export(__webpack_require__(312));
+	__export(__webpack_require__(320));
 
 
 /***/ },
@@ -8181,7 +8190,7 @@
 	            template: __webpack_require__(292),
 	            styles: [__webpack_require__(293)],
 	            selector: "photo-editor",
-	            inputs: ['entity', 'addOrUpdate', 'remove', 'create'],
+	            inputs: ['entity', 'addOrUpdate', 'remove', 'create', 'upload'],
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
 	        __metadata('design:paramtypes', [])
@@ -8195,7 +8204,7 @@
 /* 292 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"photoEditor\">\r\n\r\n    <h1  data-ng-if=\"!vm.entity.id\">Create Photo <span data-ng-if=\"vm.entity.name.length > 0\">: {{ vm.entity.name }}</span></h1>\r\n\r\n    <h1 data-ng-if=\"vm.entity.id\">Edit Photo: {{ vm.entity.name }}</h1>\r\n\r\n    <tabs tabs-name=\"photo-editor\">\r\n\r\n        <tab-title>General</tab-title>\r\n\r\n        <tab-content>\r\n            <div>\r\n                <input class=\"inputField\" type=\"text\" placeholder=\"Photo Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n        </tab-content>\r\n\r\n    </tabs>\r\n\r\n    <div>\r\n        <calypso-button on-click=\"vm.addOrUpdate({ data: vm.entity })\" caption=\"'Save'\"></calypso-button>\r\n\r\n        <calypso-button on-click=\"vm.create()\" caption=\"'Create'\"></calypso-button>\r\n    </div>\r\n</div>\r\n"
+	module.exports = "<div class=\"photoEditor\">\r\n\r\n    <h1  data-ng-if=\"!vm.entity.id\">Create Photo <span data-ng-if=\"vm.entity.name.length > 0\">: {{ vm.entity.name }}</span></h1>\r\n\r\n    <h1 data-ng-if=\"vm.entity.id\">Edit Photo: {{ vm.entity.name }}</h1>\r\n\r\n    <tabs tabs-name=\"photo-editor\">\r\n\r\n        <tab-title>General</tab-title>\r\n\r\n        <tab-content>\r\n            <div>\r\n                <a data-ng-click=\"vm.upload()\" style=\"line-height:3em;cursor:pointer;\">Upload</a>\r\n            </div>\r\n            <div>\r\n                <input class=\"inputField\" type=\"text\" placeholder=\"Photo Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n        </tab-content>\r\n\r\n    </tabs>\r\n\r\n    <div>\r\n        <calypso-button on-click=\"vm.addOrUpdate({ data: vm.entity })\" caption=\"Save\"></calypso-button>\r\n\r\n        <calypso-button on-click=\"vm.create()\" caption=\"Create\"></calypso-button>\r\n    </div>\r\n</div>\r\n"
 
 /***/ },
 /* 293 */
@@ -8442,6 +8451,7 @@
 	                _this.entity = new photo_model_1.Photo();
 	            }
 	        };
+	        this.upload = function () { return _this.photoActionCreator.openPhotoUploadModal(); };
 	        this.edit = function (entity) { return _this.photoActionCreator.edit(entity); };
 	        this.remove = function (entity) { return _this.photoActionCreator.remove(entity); };
 	        this.create = function (entity) { return _this.photoActionCreator.create(); };
@@ -8658,7 +8668,7 @@
 /* 307 */
 /***/ function(module, exports) {
 
-	module.exports = "<div>\r\n    <photo-editor entity=\"vm.entity\" edit=\"vm.edit\" remove=\"vm.remove\" add-or-update=\"vm.addOrUpdate\" create=\"vm.create\"></photo-editor>\r\n    <photo-list entities=\"vm.entities\" edit=\"vm.edit\" remove=\"vm.remove\"></photo-list>\r\n</div>\r\n"
+	module.exports = "<div>\r\n    <photo-editor entity=\"vm.entity\" \r\n                  edit=\"vm.edit\" \r\n                  remove=\"vm.remove\" \r\n                  add-or-update=\"vm.addOrUpdate\" \r\n                  create=\"vm.create\"\r\n                  upload=\"vm.upload\"></photo-editor>\r\n    <photo-list entities=\"vm.entities\" edit=\"vm.edit\" remove=\"vm.remove\"></photo-list>\r\n</div>\r\n"
 
 /***/ },
 /* 308 */
@@ -8702,6 +8712,193 @@
 
 /***/ },
 /* 310 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var photo_actions_1 = __webpack_require__(304);
+	var modal_action_creator_1 = __webpack_require__(73);
+	var PhotoUploadModalComponent = (function () {
+	    function PhotoUploadModalComponent(modalActionCreator) {
+	        var _this = this;
+	        this.modalActionCreator = modalActionCreator;
+	        this.storeOnChange = function (state) {
+	            if (state.lastTriggeredByAction instanceof photo_actions_1.PhotoUploadAction) {
+	                _this.close();
+	            }
+	        };
+	        this.close = function () { return _this.modalActionCreator.close(); };
+	    }
+	    PhotoUploadModalComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(311),
+	            styles: __webpack_require__(312),
+	            selector: "photo-upload-modal",
+	            viewProviders: ["modalActionCreator"],
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [modal_action_creator_1.ModalActionCreator])
+	    ], PhotoUploadModalComponent);
+	    return PhotoUploadModalComponent;
+	}());
+	exports.PhotoUploadModalComponent = PhotoUploadModalComponent;
+
+
+/***/ },
+/* 311 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"photo-upload-modal\">\r\n    \r\n    <modal>\r\n\r\n        <modal-title>Photo Upload</modal-title>\r\n\r\n        <modal-content>\r\n\r\n            <photo-upload></photo-upload>\r\n        \r\n        </modal-content>\r\n\r\n    </modal>\r\n\r\n</div>"
+
+/***/ },
+/* 312 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(313);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./photo-upload-modal.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./photo-upload-modal.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 313 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 314 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var photo_action_creator_1 = __webpack_require__(305);
+	var PhotoUploadComponent = (function () {
+	    function PhotoUploadComponent($element, photoActionCreator) {
+	        var _this = this;
+	        this.$element = $element;
+	        this.photoActionCreator = photoActionCreator;
+	        this.ngOnInit = function () {
+	            _this.drop.addEventListener("dragover", function (dragEvent) {
+	                dragEvent.stopPropagation();
+	                dragEvent.preventDefault();
+	            }, false);
+	            _this.drop.addEventListener("drop", _this.photoActionCreator.upload, false);
+	        };
+	        this.ngOnDestroy = function () { return _this.drop.removeEventListener("drop", _this.photoActionCreator.upload, false); };
+	    }
+	    Object.defineProperty(PhotoUploadComponent.prototype, "drop", {
+	        get: function () {
+	            return this.$element.find(".drop-zone")[0];
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    PhotoUploadComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(315),
+	            styles: __webpack_require__(316),
+	            selector: "photo-upload",
+	            viewProviders: ["$element", "photoActionCreator"],
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [Object, photo_action_creator_1.PhotoActionCreator])
+	    ], PhotoUploadComponent);
+	    return PhotoUploadComponent;
+	}());
+	exports.PhotoUploadComponent = PhotoUploadComponent;
+
+
+/***/ },
+/* 315 */
+/***/ function(module, exports) {
+
+	module.exports = "<div>\r\n    <div class=\"drop-zone\">DROP FILES HERE TO BE UPLOADED...</div>\r\n</div>"
+
+/***/ },
+/* 316 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(317);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./photo-upload.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./photo-upload.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 317 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 318 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8771,7 +8968,7 @@
 
 
 /***/ },
-/* 311 */
+/* 319 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8818,7 +9015,7 @@
 
 
 /***/ },
-/* 312 */
+/* 320 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8838,7 +9035,7 @@
 
 
 /***/ },
-/* 313 */
+/* 321 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8846,14 +9043,14 @@
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
 	var core_1 = __webpack_require__(3);
-	var product_editor_component_1 = __webpack_require__(314);
-	var product_list_component_1 = __webpack_require__(318);
-	var product_component_1 = __webpack_require__(322);
-	var products_container_component_1 = __webpack_require__(326);
-	var product_action_creator_1 = __webpack_require__(328);
-	var product_service_1 = __webpack_require__(333);
-	var reducers = __webpack_require__(334);
-	var actions = __webpack_require__(327);
+	var product_editor_component_1 = __webpack_require__(322);
+	var product_list_component_1 = __webpack_require__(326);
+	var product_component_1 = __webpack_require__(330);
+	var products_container_component_1 = __webpack_require__(334);
+	var product_action_creator_1 = __webpack_require__(336);
+	var product_service_1 = __webpack_require__(341);
+	var reducers = __webpack_require__(342);
+	var actions = __webpack_require__(335);
 	var quinntynebrownProductsModule = angular.module("quinntynebrown.products", []);
 	core_1.bootstrap(quinntynebrownProductsModule, {
 	    components: [product_component_1.ProductComponent, product_editor_component_1.ProductEditorComponent, products_container_component_1.ProductsContainerComponent, product_list_component_1.ProductListComponent],
@@ -8861,11 +9058,11 @@
 	    reducers: reducers,
 	    actions: actions
 	});
-	__export(__webpack_require__(335));
+	__export(__webpack_require__(343));
 
 
 /***/ },
-/* 314 */
+/* 322 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -8884,8 +9081,8 @@
 	    }
 	    ProductEditorComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(315),
-	            styles: [__webpack_require__(316)],
+	            template: __webpack_require__(323),
+	            styles: [__webpack_require__(324)],
 	            selector: "product-editor",
 	            inputs: ['entity', 'addOrUpdate', 'remove', 'create'],
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
@@ -8898,167 +9095,10 @@
 
 
 /***/ },
-/* 315 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"productEditor\">\r\n\r\n    <h1  data-ng-if=\"!vm.entity.id\">Create Product <span data-ng-if=\"vm.entity.name.length > 0\">: {{ vm.entity.name }}</span></h1>\r\n\r\n    <h1 data-ng-if=\"vm.entity.id\">Edit Product: {{ vm.entity.name }}</h1>\r\n\r\n    <tabs tabs-name=\"product-editor\">\r\n\r\n        <tab-title>General</tab-title>\r\n\r\n        <tab-content>\r\n            <div>\r\n                <input class=\"inputField\" type=\"text\" placeholder=\"Product Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n        </tab-content>\r\n\r\n    </tabs>\r\n\r\n    <div>\r\n        <calypso-button on-click=\"vm.addOrUpdate({ data: vm.entity })\" caption=\"Save\"></calypso-button>\r\n\r\n        <calypso-button on-click=\"vm.create()\" caption=\"Create\"></calypso-button>\r\n    </div>\r\n</div>\r\n"
-
-/***/ },
-/* 316 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(317);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(60)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./product-editor.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./product-editor.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 317 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(59)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "", ""]);
-
-	// exports
-
-
-/***/ },
-/* 318 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var ProductListComponent = (function () {
-	    function ProductListComponent() {
-	    }
-	    ProductListComponent = __decorate([
-	        core_1.Component({
-	            template: __webpack_require__(319),
-	            styles: [__webpack_require__(320)],
-	            selector: "product-list",
-	            inputs: ['entities', 'edit', 'remove'],
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], ProductListComponent);
-	    return ProductListComponent;
-	}());
-	exports.ProductListComponent = ProductListComponent;
-
-
-/***/ },
-/* 319 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"productList\">\r\n    <div class=\"productList-header\">\r\n        <h1>Products</h1>\r\n    </div>\r\n    \r\n    <div data-ng-repeat=\"entity in vm.entities\" class=\"productList-item\">\r\n        <div class=\"productList-name\">\r\n            {{ entity.name }}\r\n        </div>\r\n        <div class=\"productList-actions\">\r\n            <span data-ng-click=\"vm.edit({ entity: this.entity })\">edit</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span data-ng-click=\"vm.remove({ entity: this.entity })\">remove</span>\r\n        </div>\r\n        <div style=\"clear:both;\"></div>\r\n    </div>\r\n</div>\r\n"
-
-/***/ },
-/* 320 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(321);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(60)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./product-list.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./product-list.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 321 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(59)();
-	// imports
-
-
-	// module
-	exports.push([module.id, ".productList-name,\n.productList-actions {\n  position: relative;\n  float: left; }\n\n.productList-name {\n  min-width: 200px; }\n\n.productList-item {\n  height: 50px; }\n\n.productList-actions span {\n  cursor: pointer; }\n\n.productList-actions {\n  text-transform: uppercase; }\n", ""]);
-
-	// exports
-
-
-/***/ },
-/* 322 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var ProductComponent = (function () {
-	    function ProductComponent() {
-	    }
-	    ProductComponent = __decorate([
-	        core_1.Component({
-	            template: __webpack_require__(323),
-	            styles: [__webpack_require__(324)],
-	            selector: "product",
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], ProductComponent);
-	    return ProductComponent;
-	}());
-	exports.ProductComponent = ProductComponent;
-
-
-/***/ },
 /* 323 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"product\">\r\n\r\n</div>\r\n"
+	module.exports = "<div class=\"productEditor\">\r\n\r\n    <h1  data-ng-if=\"!vm.entity.id\">Create Product <span data-ng-if=\"vm.entity.name.length > 0\">: {{ vm.entity.name }}</span></h1>\r\n\r\n    <h1 data-ng-if=\"vm.entity.id\">Edit Product: {{ vm.entity.name }}</h1>\r\n\r\n    <tabs tabs-name=\"product-editor\">\r\n\r\n        <tab-title>General</tab-title>\r\n\r\n        <tab-content>\r\n            <div>\r\n                <input class=\"inputField\" type=\"text\" placeholder=\"Product Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n        </tab-content>\r\n\r\n    </tabs>\r\n\r\n    <div>\r\n        <calypso-button on-click=\"vm.addOrUpdate({ data: vm.entity })\" caption=\"Save\"></calypso-button>\r\n\r\n        <calypso-button on-click=\"vm.create()\" caption=\"Create\"></calypso-button>\r\n    </div>\r\n</div>\r\n"
 
 /***/ },
 /* 324 */
@@ -9076,8 +9116,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./product.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./product.component.scss");
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./product-editor.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./product-editor.component.scss");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -9115,9 +9155,166 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var actions = __webpack_require__(327);
-	var product_action_creator_1 = __webpack_require__(328);
-	var product_model_1 = __webpack_require__(329);
+	var ProductListComponent = (function () {
+	    function ProductListComponent() {
+	    }
+	    ProductListComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(327),
+	            styles: [__webpack_require__(328)],
+	            selector: "product-list",
+	            inputs: ['entities', 'edit', 'remove'],
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], ProductListComponent);
+	    return ProductListComponent;
+	}());
+	exports.ProductListComponent = ProductListComponent;
+
+
+/***/ },
+/* 327 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"productList\">\r\n    <div class=\"productList-header\">\r\n        <h1>Products</h1>\r\n    </div>\r\n    \r\n    <div data-ng-repeat=\"entity in vm.entities\" class=\"productList-item\">\r\n        <div class=\"productList-name\">\r\n            {{ entity.name }}\r\n        </div>\r\n        <div class=\"productList-actions\">\r\n            <span data-ng-click=\"vm.edit({ entity: this.entity })\">edit</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span data-ng-click=\"vm.remove({ entity: this.entity })\">remove</span>\r\n        </div>\r\n        <div style=\"clear:both;\"></div>\r\n    </div>\r\n</div>\r\n"
+
+/***/ },
+/* 328 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(329);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./product-list.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./product-list.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 329 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".productList-name,\n.productList-actions {\n  position: relative;\n  float: left; }\n\n.productList-name {\n  min-width: 200px; }\n\n.productList-item {\n  height: 50px; }\n\n.productList-actions span {\n  cursor: pointer; }\n\n.productList-actions {\n  text-transform: uppercase; }\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 330 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var ProductComponent = (function () {
+	    function ProductComponent() {
+	    }
+	    ProductComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(331),
+	            styles: [__webpack_require__(332)],
+	            selector: "product",
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], ProductComponent);
+	    return ProductComponent;
+	}());
+	exports.ProductComponent = ProductComponent;
+
+
+/***/ },
+/* 331 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"product\">\r\n\r\n</div>\r\n"
+
+/***/ },
+/* 332 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(333);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./product.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./product.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 333 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 334 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var actions = __webpack_require__(335);
+	var product_action_creator_1 = __webpack_require__(336);
+	var product_model_1 = __webpack_require__(337);
 	var ProductsContainerComponent = (function () {
 	    function ProductsContainerComponent($location, $routeParams, productActionCreator, _invokeAsync) {
 	        var _this = this;
@@ -9168,8 +9365,8 @@
 	    ProductsContainerComponent = __decorate([
 	        core_1.Component({
 	            routes: ["/admin/products", "/admin/product/edit/:productId"],
-	            template: __webpack_require__(330),
-	            styles: [__webpack_require__(331)],
+	            template: __webpack_require__(338),
+	            styles: [__webpack_require__(339)],
 	            selector: "products-container",
 	            viewProviders: ["$location", "$routeParams", "productActionCreator", "invokeAsync"],
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
@@ -9191,7 +9388,7 @@
 
 
 /***/ },
-/* 327 */
+/* 335 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -9250,7 +9447,7 @@
 
 
 /***/ },
-/* 328 */
+/* 336 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -9270,7 +9467,7 @@
 	};
 	var core_1 = __webpack_require__(3);
 	var modal_action_creator_1 = __webpack_require__(73);
-	var product_actions_1 = __webpack_require__(327);
+	var product_actions_1 = __webpack_require__(335);
 	var ProductActionCreator = (function (_super) {
 	    __extends(ProductActionCreator, _super);
 	    function ProductActionCreator($location, dispatcher, productService, guid, invokeAsync, modalActionCreator) {
@@ -9299,7 +9496,7 @@
 
 
 /***/ },
-/* 329 */
+/* 337 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -9312,19 +9509,19 @@
 
 
 /***/ },
-/* 330 */
+/* 338 */
 /***/ function(module, exports) {
 
 	module.exports = "<div>\r\n    <product-editor entity=\"vm.entity\" edit=\"vm.edit\" remove=\"vm.remove\" add-or-update=\"vm.addOrUpdate\" create=\"vm.create\"></product-editor>\r\n    <product-list entities=\"vm.entities\" edit=\"vm.edit\" remove=\"vm.remove\"></product-list>\r\n</div>\r\n"
 
 /***/ },
-/* 331 */
+/* 339 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(332);
+	var content = __webpack_require__(340);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -9344,7 +9541,7 @@
 	}
 
 /***/ },
-/* 332 */
+/* 340 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -9358,7 +9555,7 @@
 
 
 /***/ },
-/* 333 */
+/* 341 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -9401,11 +9598,11 @@
 
 
 /***/ },
-/* 334 */
+/* 342 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var actions = __webpack_require__(327);
+	var actions = __webpack_require__(335);
 	var core_1 = __webpack_require__(3);
 	exports.removeProductReducer = function (state, action) {
 	    if (action instanceof actions.RemoveProductAction)
@@ -9433,11 +9630,11 @@
 
 
 /***/ },
-/* 335 */
+/* 343 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var products_container_component_1 = __webpack_require__(326);
+	var products_container_component_1 = __webpack_require__(334);
 	exports.ProductsRoutes = [
 	    {
 	        path: "/admin/products",
@@ -9453,7 +9650,7 @@
 
 
 /***/ },
-/* 336 */
+/* 344 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -9461,14 +9658,14 @@
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
 	var core_1 = __webpack_require__(3);
-	var quote_editor_component_1 = __webpack_require__(337);
-	var quote_list_component_1 = __webpack_require__(341);
-	var quote_component_1 = __webpack_require__(345);
-	var quotes_container_component_1 = __webpack_require__(349);
-	var quote_action_creator_1 = __webpack_require__(351);
-	var quote_service_1 = __webpack_require__(356);
-	var reducers = __webpack_require__(357);
-	var actions = __webpack_require__(350);
+	var quote_editor_component_1 = __webpack_require__(345);
+	var quote_list_component_1 = __webpack_require__(349);
+	var quote_component_1 = __webpack_require__(353);
+	var quotes_container_component_1 = __webpack_require__(357);
+	var quote_action_creator_1 = __webpack_require__(359);
+	var quote_service_1 = __webpack_require__(364);
+	var reducers = __webpack_require__(365);
+	var actions = __webpack_require__(358);
 	var appQuotesModule = angular.module("quinntynebrown.quotes", []);
 	core_1.bootstrap(appQuotesModule, {
 	    components: [quote_component_1.QuoteComponent, quote_editor_component_1.QuoteEditorComponent, quotes_container_component_1.QuotesContainerComponent, quote_list_component_1.QuoteListComponent],
@@ -9476,11 +9673,11 @@
 	    reducers: reducers,
 	    actions: actions
 	});
-	__export(__webpack_require__(358));
+	__export(__webpack_require__(366));
 
 
 /***/ },
-/* 337 */
+/* 345 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -9499,8 +9696,8 @@
 	    }
 	    QuoteEditorComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(338),
-	            styles: [__webpack_require__(339)],
+	            template: __webpack_require__(346),
+	            styles: [__webpack_require__(347)],
 	            selector: "quote-editor",
 	            inputs: ['entity', 'addOrUpdate', 'remove', 'create'],
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
@@ -9513,167 +9710,10 @@
 
 
 /***/ },
-/* 338 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"quoteEditor\">\r\n\r\n    <h1  data-ng-if=\"!vm.entity.id\">Create Quote <span data-ng-if=\"vm.entity.name.length > 0\">: {{ vm.entity.name }}</span></h1>\r\n\r\n    <h1 data-ng-if=\"vm.entity.id\">Edit Quote: {{ vm.entity.name }}</h1>\r\n\r\n    <tabs tabs-name=\"quote-editor\">\r\n\r\n        <tab-title>General</tab-title>\r\n\r\n        <tab-content>\r\n            <div>\r\n                <input class=\"inputField\" type=\"text\" placeholder=\"Quote Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n        </tab-content>\r\n\r\n    </tabs>\r\n\r\n    <div>\r\n        <calypso-button on-click=\"vm.addOrUpdate({ data: vm.entity })\" caption=\"Save\"></calypso-button>\r\n\r\n        <calypso-button on-click=\"vm.create()\" caption=\"Create\"></calypso-button>\r\n    </div>\r\n</div>\r\n"
-
-/***/ },
-/* 339 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(340);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(60)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./quote-editor.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./quote-editor.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 340 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(59)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "", ""]);
-
-	// exports
-
-
-/***/ },
-/* 341 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var QuoteListComponent = (function () {
-	    function QuoteListComponent() {
-	    }
-	    QuoteListComponent = __decorate([
-	        core_1.Component({
-	            template: __webpack_require__(342),
-	            styles: [__webpack_require__(343)],
-	            selector: "quote-list",
-	            inputs: ['entities', 'edit', 'remove'],
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], QuoteListComponent);
-	    return QuoteListComponent;
-	}());
-	exports.QuoteListComponent = QuoteListComponent;
-
-
-/***/ },
-/* 342 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"quoteList\">\r\n    <div class=\"quoteList-header\">\r\n        <h1>Quotes</h1>\r\n    </div>\r\n    \r\n    <div data-ng-repeat=\"entity in vm.entities\" class=\"quoteList-item\">\r\n        <div class=\"quoteList-name\">\r\n            {{ entity.name }}\r\n        </div>\r\n        <div class=\"quoteList-actions\">\r\n            <span data-ng-click=\"vm.edit({ entity: this.entity })\">edit</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span data-ng-click=\"vm.remove({ entity: this.entity })\">remove</span>\r\n        </div>\r\n        <div style=\"clear:both;\"></div>\r\n    </div>\r\n</div>\r\n"
-
-/***/ },
-/* 343 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(344);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(60)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./quote-list.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./quote-list.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 344 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(59)();
-	// imports
-
-
-	// module
-	exports.push([module.id, ".quoteList-name,\n.quoteList-actions {\n  position: relative;\n  float: left; }\n\n.quoteList-name {\n  min-width: 200px; }\n\n.quoteList-item {\n  height: 50px; }\n\n.quoteList-actions span {\n  cursor: pointer; }\n\n.quoteList-actions {\n  text-transform: uppercase; }\n", ""]);
-
-	// exports
-
-
-/***/ },
-/* 345 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var QuoteComponent = (function () {
-	    function QuoteComponent() {
-	    }
-	    QuoteComponent = __decorate([
-	        core_1.Component({
-	            template: __webpack_require__(346),
-	            styles: [__webpack_require__(347)],
-	            selector: "quote",
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], QuoteComponent);
-	    return QuoteComponent;
-	}());
-	exports.QuoteComponent = QuoteComponent;
-
-
-/***/ },
 /* 346 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"quote\">\r\n\r\n</div>\r\n"
+	module.exports = "<div class=\"quoteEditor\">\r\n\r\n    <h1  data-ng-if=\"!vm.entity.id\">Create Quote <span data-ng-if=\"vm.entity.name.length > 0\">: {{ vm.entity.name }}</span></h1>\r\n\r\n    <h1 data-ng-if=\"vm.entity.id\">Edit Quote: {{ vm.entity.name }}</h1>\r\n\r\n    <tabs tabs-name=\"quote-editor\">\r\n\r\n        <tab-title>General</tab-title>\r\n\r\n        <tab-content>\r\n            <div>\r\n                <input class=\"inputField\" type=\"text\" placeholder=\"Quote Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n        </tab-content>\r\n\r\n    </tabs>\r\n\r\n    <div>\r\n        <calypso-button on-click=\"vm.addOrUpdate({ data: vm.entity })\" caption=\"Save\"></calypso-button>\r\n\r\n        <calypso-button on-click=\"vm.create()\" caption=\"Create\"></calypso-button>\r\n    </div>\r\n</div>\r\n"
 
 /***/ },
 /* 347 */
@@ -9691,8 +9731,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./quote.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./quote.component.scss");
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./quote-editor.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./quote-editor.component.scss");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -9730,9 +9770,166 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var actions = __webpack_require__(350);
-	var quote_action_creator_1 = __webpack_require__(351);
-	var quote_model_1 = __webpack_require__(352);
+	var QuoteListComponent = (function () {
+	    function QuoteListComponent() {
+	    }
+	    QuoteListComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(350),
+	            styles: [__webpack_require__(351)],
+	            selector: "quote-list",
+	            inputs: ['entities', 'edit', 'remove'],
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], QuoteListComponent);
+	    return QuoteListComponent;
+	}());
+	exports.QuoteListComponent = QuoteListComponent;
+
+
+/***/ },
+/* 350 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"quoteList\">\r\n    <div class=\"quoteList-header\">\r\n        <h1>Quotes</h1>\r\n    </div>\r\n    \r\n    <div data-ng-repeat=\"entity in vm.entities\" class=\"quoteList-item\">\r\n        <div class=\"quoteList-name\">\r\n            {{ entity.name }}\r\n        </div>\r\n        <div class=\"quoteList-actions\">\r\n            <span data-ng-click=\"vm.edit({ entity: this.entity })\">edit</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span data-ng-click=\"vm.remove({ entity: this.entity })\">remove</span>\r\n        </div>\r\n        <div style=\"clear:both;\"></div>\r\n    </div>\r\n</div>\r\n"
+
+/***/ },
+/* 351 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(352);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./quote-list.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./quote-list.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 352 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".quoteList-name,\n.quoteList-actions {\n  position: relative;\n  float: left; }\n\n.quoteList-name {\n  min-width: 200px; }\n\n.quoteList-item {\n  height: 50px; }\n\n.quoteList-actions span {\n  cursor: pointer; }\n\n.quoteList-actions {\n  text-transform: uppercase; }\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 353 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var QuoteComponent = (function () {
+	    function QuoteComponent() {
+	    }
+	    QuoteComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(354),
+	            styles: [__webpack_require__(355)],
+	            selector: "quote",
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], QuoteComponent);
+	    return QuoteComponent;
+	}());
+	exports.QuoteComponent = QuoteComponent;
+
+
+/***/ },
+/* 354 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"quote\">\r\n\r\n</div>\r\n"
+
+/***/ },
+/* 355 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(356);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./quote.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./quote.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 356 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 357 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var actions = __webpack_require__(358);
+	var quote_action_creator_1 = __webpack_require__(359);
+	var quote_model_1 = __webpack_require__(360);
 	var QuotesContainerComponent = (function () {
 	    function QuotesContainerComponent($location, $routeParams, quoteActionCreator, _invokeAsync) {
 	        var _this = this;
@@ -9783,8 +9980,8 @@
 	    QuotesContainerComponent = __decorate([
 	        core_1.Component({
 	            routes: ["/admin/quotes", "/admin/quote/edit/:quoteId"],
-	            template: __webpack_require__(353),
-	            styles: [__webpack_require__(354)],
+	            template: __webpack_require__(361),
+	            styles: [__webpack_require__(362)],
 	            selector: "quotes-container",
 	            viewProviders: ["$location", "$routeParams", "quoteActionCreator", "invokeAsync"],
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
@@ -9806,7 +10003,7 @@
 
 
 /***/ },
-/* 350 */
+/* 358 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -9865,7 +10062,7 @@
 
 
 /***/ },
-/* 351 */
+/* 359 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -9885,7 +10082,7 @@
 	};
 	var core_1 = __webpack_require__(3);
 	var modal_action_creator_1 = __webpack_require__(73);
-	var quote_actions_1 = __webpack_require__(350);
+	var quote_actions_1 = __webpack_require__(358);
 	var QuoteActionCreator = (function (_super) {
 	    __extends(QuoteActionCreator, _super);
 	    function QuoteActionCreator($location, dispatcher, quoteService, guid, invokeAsync, modalActionCreator) {
@@ -9914,7 +10111,7 @@
 
 
 /***/ },
-/* 352 */
+/* 360 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -9927,19 +10124,19 @@
 
 
 /***/ },
-/* 353 */
+/* 361 */
 /***/ function(module, exports) {
 
 	module.exports = "<div>\r\n    <quote-editor entity=\"vm.entity\" edit=\"vm.edit\" remove=\"vm.remove\" add-or-update=\"vm.addOrUpdate\" create=\"vm.create\"></quote-editor>\r\n    <quote-list entities=\"vm.entities\" edit=\"vm.edit\" remove=\"vm.remove\"></quote-list>\r\n</div>\r\n"
 
 /***/ },
-/* 354 */
+/* 362 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(355);
+	var content = __webpack_require__(363);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -9959,7 +10156,7 @@
 	}
 
 /***/ },
-/* 355 */
+/* 363 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -9973,7 +10170,7 @@
 
 
 /***/ },
-/* 356 */
+/* 364 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -10016,11 +10213,11 @@
 
 
 /***/ },
-/* 357 */
+/* 365 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var actions = __webpack_require__(350);
+	var actions = __webpack_require__(358);
 	var core_1 = __webpack_require__(3);
 	exports.removeQuoteReducer = function (state, action) {
 	    if (action instanceof actions.RemoveQuoteAction)
@@ -10048,7 +10245,7 @@
 
 
 /***/ },
-/* 358 */
+/* 366 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -10056,15 +10253,15 @@
 
 
 /***/ },
-/* 359 */
+/* 367 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	__webpack_require__(360);
+	__webpack_require__(368);
 	var core_1 = __webpack_require__(3);
-	var app_footer_component_1 = __webpack_require__(362);
-	var app_header_component_1 = __webpack_require__(366);
-	var admin_header_component_1 = __webpack_require__(370);
+	var app_footer_component_1 = __webpack_require__(370);
+	var app_header_component_1 = __webpack_require__(374);
+	var admin_header_component_1 = __webpack_require__(378);
 	var sharedModule = angular.module("quinntynebrown.shared", []);
 	core_1.bootstrap(sharedModule, {
 	    components: [app_footer_component_1.AppFooterComponent, app_header_component_1.AppHeaderComponent, admin_header_component_1.AdminHeaderComponent],
@@ -10072,13 +10269,13 @@
 
 
 /***/ },
-/* 360 */
+/* 368 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(361);
+	var content = __webpack_require__(369);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -10098,7 +10295,7 @@
 	}
 
 /***/ },
-/* 361 */
+/* 369 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -10112,7 +10309,7 @@
 
 
 /***/ },
-/* 362 */
+/* 370 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -10131,8 +10328,8 @@
 	    }
 	    AppFooterComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(363),
-	            styles: [__webpack_require__(364)],
+	            template: __webpack_require__(371),
+	            styles: [__webpack_require__(372)],
 	            selector: "app-footer",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -10144,19 +10341,19 @@
 
 
 /***/ },
-/* 363 */
+/* 371 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"app-footer\">\r\n\r\n</div>\r\n"
 
 /***/ },
-/* 364 */
+/* 372 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(365);
+	var content = __webpack_require__(373);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -10176,7 +10373,7 @@
 	}
 
 /***/ },
-/* 365 */
+/* 373 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -10190,7 +10387,7 @@
 
 
 /***/ },
-/* 366 */
+/* 374 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -10215,8 +10412,8 @@
 	    });
 	    AppHeaderComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(367),
-	            styles: [__webpack_require__(368)],
+	            template: __webpack_require__(375),
+	            styles: [__webpack_require__(376)],
 	            selector: "app-header",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -10228,19 +10425,19 @@
 
 
 /***/ },
-/* 367 */
+/* 375 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"app-header\">\r\n    <div class=\"app-header-inner\">\r\n        <h1>\r\n            {{ ::vm.title }}\r\n        </h1>\r\n        <div class=\"app-header-sub-nav\">\r\n            <a href=\"/\">Home</a>\r\n            &nbsp;&nbsp;|&nbsp;&nbsp;\r\n            <a>Blog</a>\r\n            &nbsp;&nbsp;|&nbsp;&nbsp;\r\n            <a>About</a>\r\n            &nbsp;&nbsp;|&nbsp;&nbsp;\r\n            <a href=\"/contact\">Contact</a>\r\n        </div>\r\n    </div>\r\n</div>\r\n"
 
 /***/ },
-/* 368 */
+/* 376 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(369);
+	var content = __webpack_require__(377);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -10260,7 +10457,7 @@
 	}
 
 /***/ },
-/* 369 */
+/* 377 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -10274,7 +10471,7 @@
 
 
 /***/ },
-/* 370 */
+/* 378 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -10296,8 +10493,8 @@
 	    }
 	    AdminHeaderComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(371),
-	            styles: [__webpack_require__(372)],
+	            template: __webpack_require__(379),
+	            styles: [__webpack_require__(380)],
 	            selector: "admin-header",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush,
 	            viewProviders: ["$location"]
@@ -10310,19 +10507,19 @@
 
 
 /***/ },
-/* 371 */
+/* 379 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"admin-header\">\r\n    <div class=\"admin-header-inner\">\r\n        <h1 class=\"admin-header-title\" data-ng-click=\"vm.onTitleClick()\">\r\n            Admin\r\n        </h1>\r\n    </div>\r\n</div>\r\n"
 
 /***/ },
-/* 372 */
+/* 380 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(373);
+	var content = __webpack_require__(381);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -10342,7 +10539,7 @@
 	}
 
 /***/ },
-/* 373 */
+/* 381 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -10356,7 +10553,7 @@
 
 
 /***/ },
-/* 374 */
+/* 382 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -10364,14 +10561,14 @@
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
 	var core_1 = __webpack_require__(3);
-	var social_share_item_editor_component_1 = __webpack_require__(375);
-	var social_share_item_list_component_1 = __webpack_require__(379);
-	var social_share_item_component_1 = __webpack_require__(383);
-	var social_share_items_container_component_1 = __webpack_require__(387);
-	var social_share_item_action_creator_1 = __webpack_require__(389);
-	var social_share_item_service_1 = __webpack_require__(394);
-	var reducers = __webpack_require__(395);
-	var actions = __webpack_require__(388);
+	var social_share_item_editor_component_1 = __webpack_require__(383);
+	var social_share_item_list_component_1 = __webpack_require__(387);
+	var social_share_item_component_1 = __webpack_require__(391);
+	var social_share_items_container_component_1 = __webpack_require__(395);
+	var social_share_item_action_creator_1 = __webpack_require__(397);
+	var social_share_item_service_1 = __webpack_require__(402);
+	var reducers = __webpack_require__(403);
+	var actions = __webpack_require__(396);
 	var appSocialShareItemsModule = angular.module("quinntynebrown.socialShareItems", []);
 	core_1.bootstrap(appSocialShareItemsModule, {
 	    components: [social_share_item_component_1.SocialShareItemComponent, social_share_item_editor_component_1.SocialShareItemEditorComponent, social_share_items_container_component_1.SocialShareItemsContainerComponent, social_share_item_list_component_1.SocialShareItemListComponent],
@@ -10379,11 +10576,11 @@
 	    reducers: reducers,
 	    actions: actions
 	});
-	__export(__webpack_require__(396));
+	__export(__webpack_require__(404));
 
 
 /***/ },
-/* 375 */
+/* 383 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -10402,8 +10599,8 @@
 	    }
 	    SocialShareItemEditorComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(376),
-	            styles: [__webpack_require__(377)],
+	            template: __webpack_require__(384),
+	            styles: [__webpack_require__(385)],
 	            selector: "social-share-item-editor",
 	            inputs: ['entity', 'addOrUpdate', 'remove', 'create'],
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
@@ -10416,167 +10613,10 @@
 
 
 /***/ },
-/* 376 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"socialShareItemEditor\">\r\n\r\n    <h1  data-ng-if=\"!vm.entity.id\">Create Social Share Item <span data-ng-if=\"vm.entity.name.length > 0\">: {{ vm.entity.name }}</span></h1>\r\n\r\n    <h1 data-ng-if=\"vm.entity.id\">Edit Social Share Item: {{ vm.entity.name }}</h1>\r\n\r\n    <tabs tabs-name=\"social-share-item-editor\">\r\n\r\n        <tab-title>General</tab-title>\r\n\r\n        <tab-content>\r\n            <div>\r\n                <input class=\"inputField\" type=\"text\" placeholder=\"Social Share Item Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n        </tab-content>\r\n\r\n    </tabs>\r\n\r\n    <div>\r\n        <calypso-button on-click=\"vm.addOrUpdate({ data: vm.entity })\" caption=\"Save\"></calypso-button>\r\n\r\n        <calypso-button on-click=\"vm.create()\" caption=\"Create\"></calypso-button>\r\n    </div>\r\n</div>\r\n"
-
-/***/ },
-/* 377 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(378);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(60)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./social-share-item-editor.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./social-share-item-editor.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 378 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(59)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "", ""]);
-
-	// exports
-
-
-/***/ },
-/* 379 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var SocialShareItemListComponent = (function () {
-	    function SocialShareItemListComponent() {
-	    }
-	    SocialShareItemListComponent = __decorate([
-	        core_1.Component({
-	            template: __webpack_require__(380),
-	            styles: [__webpack_require__(381)],
-	            selector: "social-share-item-list",
-	            inputs: ['entities', 'edit', 'remove'],
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], SocialShareItemListComponent);
-	    return SocialShareItemListComponent;
-	}());
-	exports.SocialShareItemListComponent = SocialShareItemListComponent;
-
-
-/***/ },
-/* 380 */
-/***/ function(module, exports) {
-
-	module.exports = "<div class=\"socialShareItemList\">\r\n    <div class=\"socialShareItemList-header\">\r\n        <h1>SocialShareItems</h1>\r\n    </div>\r\n    \r\n    <div data-ng-repeat=\"entity in vm.entities\" class=\"socialShareItemList-item\">\r\n        <div class=\"socialShareItemList-name\">\r\n            {{ entity.name }}\r\n        </div>\r\n        <div class=\"socialShareItemList-actions\">\r\n            <span data-ng-click=\"vm.edit({ entity: this.entity })\">edit</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span data-ng-click=\"vm.remove({ entity: this.entity })\">remove</span>\r\n        </div>\r\n        <div style=\"clear:both;\"></div>\r\n    </div>\r\n</div>\r\n"
-
-/***/ },
-/* 381 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(382);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(60)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./social-share-item-list.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./social-share-item-list.component.scss");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 382 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(59)();
-	// imports
-
-
-	// module
-	exports.push([module.id, ".socialShareItemList-name,\n.socialShareItemList-actions {\n  position: relative;\n  float: left; }\n\n.socialShareItemList-name {\n  min-width: 200px; }\n\n.socialShareItemList-item {\n  height: 50px; }\n\n.socialShareItemList-actions span {\n  cursor: pointer; }\n\n.socialShareItemList-actions {\n  text-transform: uppercase; }\n", ""]);
-
-	// exports
-
-
-/***/ },
-/* 383 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var SocialShareItemComponent = (function () {
-	    function SocialShareItemComponent() {
-	    }
-	    SocialShareItemComponent = __decorate([
-	        core_1.Component({
-	            template: __webpack_require__(384),
-	            styles: [__webpack_require__(385)],
-	            selector: "social-share-item",
-	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], SocialShareItemComponent);
-	    return SocialShareItemComponent;
-	}());
-	exports.SocialShareItemComponent = SocialShareItemComponent;
-
-
-/***/ },
 /* 384 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"social-share-item\">\r\n\r\n</div>\r\n"
+	module.exports = "<div class=\"socialShareItemEditor\">\r\n\r\n    <h1  data-ng-if=\"!vm.entity.id\">Create Social Share Item <span data-ng-if=\"vm.entity.name.length > 0\">: {{ vm.entity.name }}</span></h1>\r\n\r\n    <h1 data-ng-if=\"vm.entity.id\">Edit Social Share Item: {{ vm.entity.name }}</h1>\r\n\r\n    <tabs tabs-name=\"social-share-item-editor\">\r\n\r\n        <tab-title>General</tab-title>\r\n\r\n        <tab-content>\r\n            <div>\r\n                <input class=\"inputField\" type=\"text\" placeholder=\"Social Share Item Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n        </tab-content>\r\n\r\n    </tabs>\r\n\r\n    <div>\r\n        <calypso-button on-click=\"vm.addOrUpdate({ data: vm.entity })\" caption=\"Save\"></calypso-button>\r\n\r\n        <calypso-button on-click=\"vm.create()\" caption=\"Create\"></calypso-button>\r\n    </div>\r\n</div>\r\n"
 
 /***/ },
 /* 385 */
@@ -10594,8 +10634,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./social-share-item.component.scss", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./social-share-item.component.scss");
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./social-share-item-editor.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./social-share-item-editor.component.scss");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -10633,9 +10673,166 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var actions = __webpack_require__(388);
-	var social_share_item_action_creator_1 = __webpack_require__(389);
-	var social_share_item_model_1 = __webpack_require__(390);
+	var SocialShareItemListComponent = (function () {
+	    function SocialShareItemListComponent() {
+	    }
+	    SocialShareItemListComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(388),
+	            styles: [__webpack_require__(389)],
+	            selector: "social-share-item-list",
+	            inputs: ['entities', 'edit', 'remove'],
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], SocialShareItemListComponent);
+	    return SocialShareItemListComponent;
+	}());
+	exports.SocialShareItemListComponent = SocialShareItemListComponent;
+
+
+/***/ },
+/* 388 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"socialShareItemList\">\r\n    <div class=\"socialShareItemList-header\">\r\n        <h1>SocialShareItems</h1>\r\n    </div>\r\n    \r\n    <div data-ng-repeat=\"entity in vm.entities\" class=\"socialShareItemList-item\">\r\n        <div class=\"socialShareItemList-name\">\r\n            {{ entity.name }}\r\n        </div>\r\n        <div class=\"socialShareItemList-actions\">\r\n            <span data-ng-click=\"vm.edit({ entity: this.entity })\">edit</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span data-ng-click=\"vm.remove({ entity: this.entity })\">remove</span>\r\n        </div>\r\n        <div style=\"clear:both;\"></div>\r\n    </div>\r\n</div>\r\n"
+
+/***/ },
+/* 389 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(390);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./social-share-item-list.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./social-share-item-list.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 390 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".socialShareItemList-name,\n.socialShareItemList-actions {\n  position: relative;\n  float: left; }\n\n.socialShareItemList-name {\n  min-width: 200px; }\n\n.socialShareItemList-item {\n  height: 50px; }\n\n.socialShareItemList-actions span {\n  cursor: pointer; }\n\n.socialShareItemList-actions {\n  text-transform: uppercase; }\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 391 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var SocialShareItemComponent = (function () {
+	    function SocialShareItemComponent() {
+	    }
+	    SocialShareItemComponent = __decorate([
+	        core_1.Component({
+	            template: __webpack_require__(392),
+	            styles: [__webpack_require__(393)],
+	            selector: "social-share-item",
+	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], SocialShareItemComponent);
+	    return SocialShareItemComponent;
+	}());
+	exports.SocialShareItemComponent = SocialShareItemComponent;
+
+
+/***/ },
+/* 392 */
+/***/ function(module, exports) {
+
+	module.exports = "<div class=\"social-share-item\">\r\n\r\n</div>\r\n"
+
+/***/ },
+/* 393 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(394);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(60)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./social-share-item.component.scss", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/sass-loader/index.js!./social-share-item.component.scss");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 394 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(59)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "", ""]);
+
+	// exports
+
+
+/***/ },
+/* 395 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var actions = __webpack_require__(396);
+	var social_share_item_action_creator_1 = __webpack_require__(397);
+	var social_share_item_model_1 = __webpack_require__(398);
 	var SocialShareItemsContainerComponent = (function () {
 	    function SocialShareItemsContainerComponent($location, $routeParams, socialShareItemActionCreator, _invokeAsync) {
 	        var _this = this;
@@ -10686,8 +10883,8 @@
 	    SocialShareItemsContainerComponent = __decorate([
 	        core_1.Component({
 	            routes: ["/admin/socialshareitems", "/admin/socialshareitem/edit/:socialShareItemId"],
-	            template: __webpack_require__(391),
-	            styles: [__webpack_require__(392)],
+	            template: __webpack_require__(399),
+	            styles: [__webpack_require__(400)],
 	            selector: "social-share-items-container",
 	            viewProviders: ["$location", "$routeParams", "socialShareItemActionCreator", "invokeAsync"],
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
@@ -10709,7 +10906,7 @@
 
 
 /***/ },
-/* 388 */
+/* 396 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -10768,7 +10965,7 @@
 
 
 /***/ },
-/* 389 */
+/* 397 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -10788,7 +10985,7 @@
 	};
 	var core_1 = __webpack_require__(3);
 	var modal_action_creator_1 = __webpack_require__(73);
-	var social_share_item_actions_1 = __webpack_require__(388);
+	var social_share_item_actions_1 = __webpack_require__(396);
 	var SocialShareItemActionCreator = (function (_super) {
 	    __extends(SocialShareItemActionCreator, _super);
 	    function SocialShareItemActionCreator($location, dispatcher, socialShareItemService, guid, invokeAsync, modalActionCreator) {
@@ -10817,7 +11014,7 @@
 
 
 /***/ },
-/* 390 */
+/* 398 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -10830,19 +11027,19 @@
 
 
 /***/ },
-/* 391 */
+/* 399 */
 /***/ function(module, exports) {
 
 	module.exports = "<div>\r\n    <social-share-item-editor entity=\"vm.entity\" edit=\"vm.edit\" remove=\"vm.remove\" add-or-update=\"vm.addOrUpdate\" create=\"vm.create\"></social-share-item-editor>\r\n    <social-share-item-list entities=\"vm.entities\" edit=\"vm.edit\" remove=\"vm.remove\"></social-share-item-list>\r\n</div>\r\n"
 
 /***/ },
-/* 392 */
+/* 400 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(393);
+	var content = __webpack_require__(401);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -10862,7 +11059,7 @@
 	}
 
 /***/ },
-/* 393 */
+/* 401 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -10876,7 +11073,7 @@
 
 
 /***/ },
-/* 394 */
+/* 402 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -10919,11 +11116,11 @@
 
 
 /***/ },
-/* 395 */
+/* 403 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var actions = __webpack_require__(388);
+	var actions = __webpack_require__(396);
 	var core_1 = __webpack_require__(3);
 	exports.removeSocialShareItemReducer = function (state, action) {
 	    if (action instanceof actions.RemoveSocialShareItemAction)
@@ -10951,7 +11148,7 @@
 
 
 /***/ },
-/* 396 */
+/* 404 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -10959,7 +11156,7 @@
 
 
 /***/ },
-/* 397 */
+/* 405 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -10967,10 +11164,10 @@
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
 	var core_1 = __webpack_require__(3);
-	var photographer_component_1 = __webpack_require__(398);
-	var photographer_action_creator_1 = __webpack_require__(402);
-	var reducers = __webpack_require__(403);
-	var actions = __webpack_require__(404);
+	var photographer_component_1 = __webpack_require__(406);
+	var photographer_action_creator_1 = __webpack_require__(410);
+	var reducers = __webpack_require__(411);
+	var actions = __webpack_require__(412);
 	var photographersModule = angular.module("quinntynebrown.photographers", []);
 	core_1.bootstrap(photographersModule, {
 	    components: [photographer_component_1.PhotographerComponent],
@@ -10978,11 +11175,11 @@
 	    reducers: reducers,
 	    actions: actions
 	});
-	__export(__webpack_require__(405));
+	__export(__webpack_require__(413));
 
 
 /***/ },
-/* 398 */
+/* 406 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -11001,8 +11198,8 @@
 	    }
 	    PhotographerComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(399),
-	            styles: [__webpack_require__(400)],
+	            template: __webpack_require__(407),
+	            styles: [__webpack_require__(408)],
 	            selector: "photographer",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -11014,19 +11211,19 @@
 
 
 /***/ },
-/* 399 */
+/* 407 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"photographer\">\r\n\r\n</div>\r\n"
 
 /***/ },
-/* 400 */
+/* 408 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(401);
+	var content = __webpack_require__(409);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -11046,7 +11243,7 @@
 	}
 
 /***/ },
-/* 401 */
+/* 409 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -11060,7 +11257,7 @@
 
 
 /***/ },
-/* 402 */
+/* 410 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -11095,14 +11292,14 @@
 
 
 /***/ },
-/* 403 */
+/* 411 */
 /***/ function(module, exports) {
 
 	"use strict";
 
 
 /***/ },
-/* 404 */
+/* 412 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -11115,7 +11312,7 @@
 
 
 /***/ },
-/* 405 */
+/* 413 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -11123,7 +11320,7 @@
 
 
 /***/ },
-/* 406 */
+/* 414 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -11147,7 +11344,7 @@
 
 
 /***/ },
-/* 407 */
+/* 415 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -11165,7 +11362,7 @@
 
 
 /***/ },
-/* 408 */
+/* 416 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -11184,8 +11381,8 @@
 	    }
 	    AppComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(409),
-	            styles: [__webpack_require__(410)],
+	            template: __webpack_require__(417),
+	            styles: [__webpack_require__(418)],
 	            selector: "root-app",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -11197,19 +11394,19 @@
 
 
 /***/ },
-/* 409 */
+/* 417 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"app\">\r\n    <app-header></app-header>\r\n    <div data-ng-view></div>\r\n    <app-footer></app-footer>\r\n</div>"
 
 /***/ },
-/* 410 */
+/* 418 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(411);
+	var content = __webpack_require__(419);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -11229,7 +11426,7 @@
 	}
 
 /***/ },
-/* 411 */
+/* 419 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -11243,7 +11440,7 @@
 
 
 /***/ },
-/* 412 */
+/* 420 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -11264,8 +11461,8 @@
 	    }
 	    AdminAppComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(413),
-	            styles: [__webpack_require__(414)],
+	            template: __webpack_require__(421),
+	            styles: [__webpack_require__(422)],
 	            selector: "admin-app",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -11277,19 +11474,19 @@
 
 
 /***/ },
-/* 413 */
+/* 421 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"admin-app\">\r\n    <admin-header></admin-header>\r\n    <div class=\"admin-content-container\">\r\n        <div class=\"admin-side-nav\" data-ng-if=\"vm.currentUser\">\r\n            <ul>\r\n                <li><a href=\"/admin/articles\">Articles</a></li>\r\n                <li><a href=\"/admin/contacts\">Contacts</a></li>\r\n                <li><a href=\"/admin\">Galleries</a></li>\r\n                <li><a href=\"/admin/orders\">Orders</a></li>\r\n                <li><a href=\"/admin/photos\">Photos</a></li>\r\n                <li><a href=\"/admin/products\">Products</a></li>\r\n                <li><a href=\"/admin/apps\">Apps</a></li>\r\n                <li><a href=\"/admin/uis\">UIs</a></li>\r\n                <li><a href=\"/admin/sections\">Sections</a></li>\r\n                <li><a href=\"/admin/properties\">Properties</a></li>\r\n            </ul>\r\n        </div>\r\n        <div class=\"admin-main-content\" data-ng-view></div>\r\n    </div>\r\n</div>\r\n"
 
 /***/ },
-/* 414 */
+/* 422 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(415);
+	var content = __webpack_require__(423);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -11309,7 +11506,7 @@
 	}
 
 /***/ },
-/* 415 */
+/* 423 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();

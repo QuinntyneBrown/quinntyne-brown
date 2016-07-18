@@ -5,7 +5,7 @@ import { ModalActionCreator } from "angular-rx-ui/src/components/modal/modal.act
 
 @Component({
     template: require("./photo-upload-modal.component.html"),
-    styles: require("./photo-upload-modal.component.css"),
+    styles: require("./photo-upload-modal.component.scss"),
     selector: "photo-upload-modal",
     viewProviders: ["modalActionCreator"],
     changeDetection: ChangeDetectionStrategy.OnPush

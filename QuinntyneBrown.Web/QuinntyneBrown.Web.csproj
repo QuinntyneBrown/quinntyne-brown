@@ -687,7 +687,6 @@
     <Content Include="src\app\pages\thank-you-page-container.component.scss">
       <DependentUpon>thank-you-page-container.component.ts</DependentUpon>
     </Content>
-    <Content Include="src\assets\images\Squad.jpg" />
     <Content Include="src\assets\scss\_breakpoints.scss" />
     <Content Include="src\app\content-aggregation\components\property-editor.component.scss">
       <DependentUpon>property-editor.component.ts</DependentUpon>

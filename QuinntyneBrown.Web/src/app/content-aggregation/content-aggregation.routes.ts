@@ -14,7 +14,7 @@ export const ContentAggregationRoutes: Array<IRouteConfig> = [
         authorizationRequired: true
     },
     {
-        path: "/admin/app/:appid",
+        path: "/admin/app/edit/:appId",
         component: AppsContainerComponent,
         authorizationRequired: true
     },
@@ -24,7 +24,7 @@ export const ContentAggregationRoutes: Array<IRouteConfig> = [
         authorizationRequired: true
     },
     {
-        path: "/admin/properties/:propertyid",
+        path: "/admin/property/edit/:propertyid",
         component: PropertiesContainerComponent,
         authorizationRequired: true
     },
@@ -34,7 +34,7 @@ export const ContentAggregationRoutes: Array<IRouteConfig> = [
         authorizationRequired: true
     },
     {
-        path: "/admin/sections/:sectionid",
+        path: "/admin/section/edit/:sectionid",
         component: SectionsContainerComponent,
         authorizationRequired: true
     },
@@ -44,7 +44,7 @@ export const ContentAggregationRoutes: Array<IRouteConfig> = [
         authorizationRequired: true
     },
     {
-        path: "/admin/properties/:uiid",
+        path: "/admin/ui/edit/:uiid",
         component: UIsContainerComponent,
         authorizationRequired: true
     }

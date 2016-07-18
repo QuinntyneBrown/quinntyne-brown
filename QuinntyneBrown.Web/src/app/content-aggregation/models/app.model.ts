@@ -1,4 +1,7 @@
+import { Property } from "./property.model";
+
 export class App { 
 	id:number;
-	name:string;
+    name: string;
+    properties: Array<Property> = [];
 }

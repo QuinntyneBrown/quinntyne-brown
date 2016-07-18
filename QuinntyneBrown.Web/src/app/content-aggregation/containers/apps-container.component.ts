@@ -1,14 +1,16 @@
 import { CanActivate, ChangeDetectionStrategy, Component, pluck } from "angular-rx-ui/src/components/core";
 import * as actions from "../actions/app.actions";
+import { PropertyPickedAction } from "../actions/property.actions";
 import { AppActionCreator } from "../action-creators/app.action-creator";
 import { App } from "../models/app.model";
+import { PropertyActionCreator } from "../action-creators/property.action-creator";
 
 @Component({
     routes: ["/admin/apps","/admin/app/edit/:appId"],
     template: require("./apps-container.component.html"),
     styles: [require("./apps-container.component.scss")],
     selector: "apps-container",
-    viewProviders: ["$location","$routeParams","appActionCreator","invokeAsync"],
+    viewProviders: ["$location","$routeParams","appActionCreator","invokeAsync","propertyActionCreator"],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 @CanActivate(["$q", "$route", "invokeAsync", "appActionCreator", ($q: angular.IQService, $route: angular.route.IRouteService, invokeAsync, appActionCreator: AppActionCreator) => {
@@ -18,7 +20,11 @@ import { App } from "../models/app.model";
     return $q.all(promises);
 }])
 export class AppsContainerComponent { 
-    constructor(private $location: angular.ILocationService, private $routeParams: angular.route.IRouteParamsService, private appActionCreator: AppActionCreator, private _invokeAsync) { }
+    constructor(private $location: angular.ILocationService,
+        private $routeParams: angular.route.IRouteParamsService,
+        private appActionCreator: AppActionCreator,
+        private _invokeAsync,
+        private propertyActionCreator: PropertyActionCreator) { }
     storeOnChange = state => {        
         this.entities = state.apps;
 
@@ -34,6 +40,10 @@ export class AppsContainerComponent {
         if (state.lastTriggeredByAction instanceof actions.RemoveAppAction && this.entity && this.entity.id) {
             this.entity = pluck({ value: Number(this.$routeParams["appId"]), items: this.entities }) as App;
             if (Object.keys(this.entity).length === 0) { this.$location.path("/admin/apps"); }
+        }
+
+        if (state.lastTriggeredByAction instanceof PropertyPickedAction && this.entity && this.entity.id) {
+            this.entity.properties.push(state.lastTriggeredByAction.entity);
         }
     }
 
@@ -60,7 +70,7 @@ export class AppsContainerComponent {
             }
         });        
     };
-    addOrUpdateProperty = () => alert("add or update property");
+    addOrUpdateProperty = () => this.propertyActionCreator.openPropertyPickerModal();
     addOrUpdateUI = () => alert("add or update ui");
     entity: App;
     entities: Array<App>;

@@ -45,6 +45,8 @@ export class PhotosContainerComponent {
         }
     }
 
+    upload = () => this.photoActionCreator.openPhotoUploadModal();
+
     edit = entity => this.photoActionCreator.edit(entity);
     remove = entity => this.photoActionCreator.remove(entity);
     create = entity => this.photoActionCreator.create();
