@@ -39,6 +39,8 @@ namespace QuinntyneBrown
             container.RegisterType<ISocialShareItemService, SocialShareItemService>();
             container.RegisterType<IServiceProviderService, ServiceProviderService>();
             container.RegisterType<IProfessionalServiceService, ProfessionalServiceService>();
+            container.RegisterType<IMenuItemService, MenuItemService>();
+            container.RegisterType<IMenuService, MenuService>();
 
             container.RegisterInstance(AuthConfiguration.LazyConfig);
             container.RegisterInstance(TraceConfiguration.LazyConfig);

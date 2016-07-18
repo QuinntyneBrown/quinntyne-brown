@@ -24,6 +24,19 @@ namespace QuinntyneBrown.Services
                 .FirstOrDefault(x => x.Id == request.Id && x.IsDeleted == false);
             if (entity == null) _repository.Add(entity = new App());
             entity.Name = request.Name;
+            entity.UIs.Clear();
+            entity.Properties.Clear();
+
+            foreach (var property in request.Properties)
+            {
+                entity.Properties.Add(new AppProperty() { Property = _uow.Properties.GetById(property.Id) });
+            }
+
+            foreach (var ui in request.UIs)
+            {
+                entity.UIs.Add(_uow.UIs.GetById(ui.Id));
+            }
+
             _uow.SaveChanges();
             return new AppAddOrUpdateResponseDto(entity);
         }
@@ -47,11 +60,15 @@ namespace QuinntyneBrown.Services
 
         public AppDto GetById(int id)
         {
-            return new AppDto(GetAll().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault());
+            var app = GetAll().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault();
+            ResolveDynamicProperties(app.Properties);
+            return new AppDto(app);
         }
 
         public IQueryable<App> GetAll() => _repository.GetAll()
-            .Include(x=>x.UIs);
+            .Include(x => x.UIs)
+            .Include(x => x.Properties)
+            .Include("Properties.Property");
 
         protected readonly IUow _uow;
         protected readonly IRepository<App> _repository;

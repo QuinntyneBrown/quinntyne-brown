@@ -1,4 +1,5 @@
-import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/src/components/core";
+import { CanActivate, ChangeDetectionStrategy, Component, pluckOut } from "angular-rx-ui/src/components/core";
+import { App } from "../models/app.model";
 
 @Component({
     template: require("./app-editor.component.html"),
@@ -7,6 +8,10 @@ import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/s
     inputs: ['entity','addOrUpdate','remove','create'],
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppEditorComponent {}
+export class AppEditorComponent {
+    public removeProperty = options => pluckOut({ items: this.entity.properties, value: options.property.id });
+    public removeUI = options => pluckOut({ items: this.entity.uis, value: options.ui.id });
+    public entity: App;
+}
 
 

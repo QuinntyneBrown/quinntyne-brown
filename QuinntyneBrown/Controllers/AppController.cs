@@ -32,6 +32,7 @@ namespace QuinntyneBrown.Controllers
         public IHttpActionResult Get() { return Ok(_appService.Get()); }
 
         [Route("getById")]
+        [AllowAnonymous]
         [HttpGet]
         [ResponseType(typeof(AppDto))]
         public IHttpActionResult GetById(int id) { return Ok(_appService.GetById(id)); }

@@ -375,6 +375,45 @@
     <Content Include="src\app\app.component.scss">
       <DependentUpon>app.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\menu-items\menu-item-editor.component.scss">
+      <DependentUpon>menu-item-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menu-items\menu-item-editor.component.html">
+      <DependentUpon>menu-item-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menu-items\menu-item-list.component.html">
+      <DependentUpon>menu-item-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menu-items\menu-item.component.html">
+      <DependentUpon>menu-item.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menu-items\menu-item.component.scss">
+      <DependentUpon>menu-item.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menu-items\menu-items-container.component.html">
+      <DependentUpon>menu-items-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menus\menu-editor.component.scss">
+      <DependentUpon>menu-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menus\menu-editor.component.html">
+      <DependentUpon>menu-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menus\menu-list.component.html">
+      <DependentUpon>menu-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menus\menu-list.component.scss">
+      <DependentUpon>menu-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menus\menu.component.html">
+      <DependentUpon>menu.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menus\menu.component.scss">
+      <DependentUpon>menu.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menus\menus-container.component.html">
+      <DependentUpon>menus-container.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\pages\article-page-container.component.html">
       <DependentUpon>article-page-container.component.ts</DependentUpon>
     </Content>
@@ -780,6 +819,15 @@
     <Content Include="src\app\photos\photo-upload.component.scss">
       <DependentUpon>photo-upload.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\menus\menus-container.component.scss">
+      <DependentUpon>menus-container.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menu-items\menu-item-list.component.scss">
+      <DependentUpon>menu-item-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\menu-items\menu-items-container.component.scss">
+      <DependentUpon>menu-items-container.component.ts</DependentUpon>
+    </Content>
     <None Include="src\assets\scss\_varibles.scss" />
     <Content Include="tsconfig.json" />
     <Content Include="typings.json" />
@@ -842,6 +890,18 @@
     <TypeScriptCompile Include="src\app\articles\articles-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\articles.routes.ts" />
     <TypeScriptCompile Include="src\app\articles\index.ts" />
+    <TypeScriptCompile Include="src\app\menu-items\menu-items.routes.ts" />
+    <TypeScriptCompile Include="src\app\menus\index.ts" />
+    <TypeScriptCompile Include="src\app\menus\menu-editor.component.ts" />
+    <TypeScriptCompile Include="src\app\menus\menus.routes.ts" />
+    <TypeScriptCompile Include="src\app\menus\menu-list.component.ts" />
+    <TypeScriptCompile Include="src\app\menus\menu.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\menus\menu.actions.ts" />
+    <TypeScriptCompile Include="src\app\menus\menu.component.ts" />
+    <TypeScriptCompile Include="src\app\menus\menu.model.ts" />
+    <TypeScriptCompile Include="src\app\menus\menu.reducers.ts" />
+    <TypeScriptCompile Include="src\app\menus\menu.service.ts" />
+    <TypeScriptCompile Include="src\app\menus\menus-container.component.ts" />
     <TypeScriptCompile Include="src\app\pages\pages.routes.ts" />
     <TypeScriptCompile Include="src\app\pages\index.ts" />
     <TypeScriptCompile Include="src\app\contacts\contact.model.ts" />
@@ -1020,6 +1080,16 @@
     <TypeScriptCompile Include="src\app\pages\checkout-page-container.component.ts" />
     <TypeScriptCompile Include="src\app\pages\article-page-container.component.ts" />
     <TypeScriptCompile Include="src\app\pages\home-page-container.component.ts" />
+    <TypeScriptCompile Include="src\app\menu-items\menu-item.model.ts" />
+    <TypeScriptCompile Include="src\app\menu-items\index.ts" />
+    <TypeScriptCompile Include="src\app\menu-items\menu-items-container.component.ts" />
+    <TypeScriptCompile Include="src\app\menu-items\menu-item.actions.ts" />
+    <TypeScriptCompile Include="src\app\menu-items\menu-item.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\menu-items\menu-item.reducers.ts" />
+    <TypeScriptCompile Include="src\app\menu-items\menu-item.component.ts" />
+    <TypeScriptCompile Include="src\app\menu-items\menu-item.service.ts" />
+    <TypeScriptCompile Include="src\app\menu-items\menu-item-list.component.ts" />
+    <TypeScriptCompile Include="src\app\menu-items\menu-item-editor.component.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

@@ -44,6 +44,8 @@ namespace QuinntyneBrown.Data
         public IRepository<Quote> Quotes { get { return GetStandardRepo<Quote>(); } }
         public IRepository<SocialShareItem> SocialShareItems { get { return GetStandardRepo<SocialShareItem>(); } }
         public IRepository<ProfessionalService> ProfessionalServices { get { return GetStandardRepo<ProfessionalService>(); } }
+        public IRepository<Menu> Menus { get { return GetStandardRepo<Menu>(); } }
+        public IRepository<MenuItem> MenuItems { get { return GetStandardRepo<MenuItem>(); } }
 
         protected void ConfigureDbContext(IDbContext dbContext)
         {

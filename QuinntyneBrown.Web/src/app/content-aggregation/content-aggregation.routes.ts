@@ -24,7 +24,7 @@ export const ContentAggregationRoutes: Array<IRouteConfig> = [
         authorizationRequired: true
     },
     {
-        path: "/admin/property/edit/:propertyid",
+        path: "/admin/property/edit/:propertyId",
         component: PropertiesContainerComponent,
         authorizationRequired: true
     },

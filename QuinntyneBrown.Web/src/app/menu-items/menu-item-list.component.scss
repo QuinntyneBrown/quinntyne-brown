@@ -1,0 +1,22 @@
+.menuItemList-name,
+.menuItemList-actions {
+    position:relative;
+    float:left;
+}
+
+.menuItemList-name {
+    min-width:200px;
+}
+
+.menuItemList-item {
+    height:50px;
+}
+
+.menuItemList-actions span {
+    cursor:pointer;
+}
+
+.menuItemList-actions {
+    text-transform: uppercase;
+}
+   

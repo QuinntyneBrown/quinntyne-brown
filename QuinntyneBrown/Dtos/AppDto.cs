@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,6 +21,7 @@ namespace QuinntyneBrown.Dtos
 
         public int Id { get; set; }
         public string Name { get; set; }
+        [JsonProperty(PropertyName = "uis")]
         public ICollection<UIDto> UIs { get; set; } = new HashSet<UIDto>();
         public ICollection<PropertyDto> Properties = new HashSet<PropertyDto>();
     }

@@ -22,6 +22,8 @@ namespace QuinntyneBrown.Data
         IRepository<Quote> Quotes { get; }
         IRepository<SocialShareItem> SocialShareItems { get; }
         IRepository<ProfessionalService> ProfessionalServices { get; }
+        IRepository<Menu> Menus { get;}
+        IRepository<MenuItem> MenuItems { get; }
         void SaveChanges();
     }
 }

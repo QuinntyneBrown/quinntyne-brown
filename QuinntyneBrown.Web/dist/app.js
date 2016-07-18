@@ -3870,6 +3870,9 @@
 	var core_1 = __webpack_require__(3);
 	var AppEditorComponent = (function () {
 	    function AppEditorComponent() {
+	        var _this = this;
+	        this.removeProperty = function (options) { return core_1.pluckOut({ items: _this.entity.properties, value: options.property.id }); };
+	        this.removeUI = function (options) { return core_1.pluckOut({ items: _this.entity.uis, value: options.ui.id }); };
 	    }
 	    AppEditorComponent = __decorate([
 	        core_1.Component({
@@ -3890,7 +3893,7 @@
 /* 103 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"appEditor\">\r\n\r\n    <h1  data-ng-if=\"!vm.entity.id\">Create App <span data-ng-if=\"vm.entity.name.length > 0\">: {{ vm.entity.name }}</span></h1>\r\n\r\n    <h1 data-ng-if=\"vm.entity.id\">Edit App: {{ vm.entity.name }}</h1>\r\n\r\n    <tabs tabs-name=\"app-editor\">\r\n\r\n        <tab-title>General</tab-title>\r\n\r\n        <tab-content>\r\n            <div>\r\n                <input class=\"inputField\" type=\"text\" placeholder=\"App Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n        </tab-content>\r\n\r\n    </tabs>\r\n\r\n    <div>\r\n        <calypso-button on-click=\"vm.addOrUpdate({ data: vm.entity })\" caption=\"Save\"></calypso-button>\r\n\r\n        <calypso-button on-click=\"vm.create()\" caption=\"Create\"></calypso-button>\r\n    </div>\r\n</div>\r\n"
+	module.exports = "<div class=\"appEditor\">\r\n    <h1  data-ng-if=\"!vm.entity.id\">Create App <span data-ng-if=\"vm.entity.name.length > 0\">: {{ vm.entity.name }}</span></h1>\r\n\r\n    <h1 data-ng-if=\"vm.entity.id\">Edit App: {{ vm.entity.name }}</h1>\r\n\r\n    <tabs tabs-name=\"app-editor\">\r\n\r\n        <tab-title>General</tab-title>\r\n\r\n        <tab-content>\r\n            <div>\r\n                <input class=\"inputField\" type=\"text\" placeholder=\"App Name\" data-ng-model=\"vm.entity.name\" />\r\n            </div>\r\n        </tab-content>\r\n\r\n        <tab-title>Properties<span data-ng-if=\"vm.entity.id\"> ({{vm.entity.properties.length }})</span></tab-title>\r\n\r\n        <tab-content>\r\n            <div data-ng-repeat=\"property in vm.entity.properties\">\r\n                <span>{{ property.name }}</span>\r\n                <span class=\"app-editor-remove-child-link\" data-ng-click=\"vm.removeProperty({ property: property })\">REMOVE</span>\r\n            </div>\r\n        </tab-content>\r\n\r\n        <tab-title>UIs<span data-ng-if=\"vm.entity.id\"> ({{vm.entity.uis.length }})</span></tab-title>\r\n\r\n        <tab-content>\r\n            <div data-ng-repeat=\"ui in vm.entity.uis\">\r\n                <span>{{ ui.name }}</span>\r\n                <span class=\"app-editor-remove-child-link\" data-ng-click=\"vm.removeUI({ ui: ui })\">REMOVE</span>\r\n            </div>\r\n        </tab-content>\r\n\r\n    </tabs>\r\n\r\n    <div>\r\n        <calypso-button on-click=\"vm.addOrUpdate({ data: vm.entity })\" caption=\"Save\"></calypso-button>\r\n\r\n        <calypso-button on-click=\"vm.create()\" caption=\"Create\"></calypso-button>\r\n    </div>\r\n</div>\r\n"
 
 /***/ },
 /* 104 */
@@ -3927,7 +3930,7 @@
 
 
 	// module
-	exports.push([module.id, "", ""]);
+	exports.push([module.id, ".app-editor-remove-child-link {\n  cursor: pointer; }\n", ""]);
 
 	// exports
 
@@ -5343,6 +5346,7 @@
 	var App = (function () {
 	    function App() {
 	        this.properties = [];
+	        this.uis = [];
 	    }
 	    return App;
 	}());
@@ -6211,7 +6215,7 @@
 	        authorizationRequired: true
 	    },
 	    {
-	        path: "/admin/property/edit/:propertyid",
+	        path: "/admin/property/edit/:propertyId",
 	        component: containers_1.PropertiesContainerComponent,
 	        authorizationRequired: true
 	    },

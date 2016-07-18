@@ -4,6 +4,8 @@ require("./app/content-aggregation");
 require("./app/customers");
 require("./app/galleries");
 require("./app/login");
+require("./app/menu-items");
+require("./app/menus");
 require("./app/orders");
 require("./app/pages");
 require("./app/photos");
@@ -18,6 +20,8 @@ import { ContactsRoutes } from "./app/contacts";
 import { CustomersRoutes } from "./app/customers";
 import { GalleriesRoutes } from "./app/galleries";
 import { LoginRoutes } from "./app/login";
+import { MenuItemsRoutes } from "./app/menu-items";
+import { MenusRoutes } from "./app/menus";
 import { PhotosRoutes } from "./app/photos";
 import { PhotographersRoutes } from "./app/photographers";
 import { ProductsRoutes } from "./app/products";
@@ -44,6 +48,8 @@ const quinntynebrownAppModule = angular.module("quinntynebrownApp", [
     "quinntynebrown.customers",
     "quinntynebrown.galleries",
     "quinntynebrown.login",
+    "quinntynebrown.menus",
+    "quinntynebrown.menuItems",
     "quinntynebrown.orders",
     "quinntynebrown.pages",
     "quinntynebrown.photos",
@@ -68,6 +74,8 @@ bootstrap(quinntynebrownAppModule, {
         ...CustomersRoutes,
         ...GalleriesRoutes,
         ...LoginRoutes,
+        ...MenuItemsRoutes,
+        ...MenusRoutes,
         ...OrdersRoutes,
         ...PagesRoutes,
         ...PhotosRoutes,

@@ -32,6 +32,8 @@ namespace QuinntyneBrown.Data
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<SocialShareItem> SocialShareItems { get; set; }
         public DbSet<ProfessionalService> ProfessionalServices { get; set; }
+        public DbSet<Menu> Menus { get; set; }
+        public DbSet<MenuItem> MenuItems { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

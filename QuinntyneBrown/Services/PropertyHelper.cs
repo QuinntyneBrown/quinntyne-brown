@@ -44,6 +44,20 @@ namespace QuinntyneBrown.Services
             }
         }
 
+        public static void ResolveDynamicProperties(ICollection<AppProperty> appProperties, Dictionary<string, object> context = null)
+        {
+            foreach (var dynamicProperty in appProperties.Where(x => x.Property.IsDynamic))
+            {
+                var httpClient = CreateHttpClient(dynamicProperty.Property.BaseUri);
+                var response = httpClient.GetAsync($"{ResolveUri(dynamicProperty.Property.Uri, context)}").Result;
+                var dynamicData = response.Content.ReadAsAsync<dynamic>().Result;
+                dynamicProperty.Property.Value = SerializeObject(dynamicData, new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                });
+            }
+        }
+
         public static void ResolveDynamicProperties(ICollection<UISection> uiSections, Dictionary<string, object> context = null)
         {
             foreach (var uiSection in uiSections)

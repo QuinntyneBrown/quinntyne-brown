@@ -265,6 +265,8 @@
     <Compile Include="Models\Gallery.cs" />
     <Compile Include="Models\GalleryCategory.cs" />
     <Compile Include="Models\GalleryPhoto.cs" />
+    <Compile Include="Models\Menu.cs" />
+    <Compile Include="Models\MenuItem.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderProduct.cs" />
     <Compile Include="Models\Person.cs" />
@@ -442,6 +444,18 @@
     <Compile Include="Controllers\ServiceProviderController.cs" />
     <Compile Include="Services\ProfessionalServiceService.cs" />
     <Compile Include="Services\IProfessionalServiceService.cs" />
+    <Compile Include="Dtos\MenuDto.cs" />
+    <Compile Include="Dtos\MenuAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\MenuAddOrUpdateResponseDto.cs" />
+    <Compile Include="Dtos\MenuItemDto.cs" />
+    <Compile Include="Dtos\MenuItemAddOrUpdateRequestDto.cs" />
+    <Compile Include="Dtos\MenuItemAddOrUpdateResponseDto.cs" />
+    <Compile Include="Services\MenuItemService.cs" />
+    <Compile Include="Services\IMenuItemService.cs" />
+    <Compile Include="Services\MenuService.cs" />
+    <Compile Include="Services\IMenuService.cs" />
+    <Compile Include="Controllers\MenuController.cs" />
+    <Compile Include="Controllers\MenuItemController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
