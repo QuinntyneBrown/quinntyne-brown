@@ -1,0 +1,22 @@
+.professionalServiceList-name,
+.professionalServiceList-actions {
+    position:relative;
+    float:left;
+}
+
+.professionalServiceList-name {
+    min-width:200px;
+}
+
+.professionalServiceList-item {
+    height:50px;
+}
+
+.professionalServiceList-actions span {
+    cursor:pointer;
+}
+
+.professionalServiceList-actions {
+    text-transform: uppercase;
+}
+   

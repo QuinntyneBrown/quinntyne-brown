@@ -552,6 +552,21 @@
     <Content Include="src\app\products\products-container.component.html">
       <DependentUpon>products-container.component.ts</DependentUpon>
     </Content>
+    <Content Include="src\app\professional-service\professional-service-editor.component.html">
+      <DependentUpon>professional-service-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\professional-service\professional-service-list.component.html">
+      <DependentUpon>professional-service-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\professional-service\professional-service.component.html">
+      <DependentUpon>professional-service.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\professional-service\professional-service.component.scss">
+      <DependentUpon>professional-service.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\professional-service\professional-services-container.component.html">
+      <DependentUpon>professional-services-container.component.ts</DependentUpon>
+    </Content>
     <Content Include="src\app\quotes\quote-editor.component.html">
       <DependentUpon>quote-editor.component.ts</DependentUpon>
     </Content>
@@ -702,6 +717,16 @@
     <Content Include="src\app\content-aggregation\containers\sections-container.component.scss">
       <DependentUpon>sections-container.component.ts</DependentUpon>
     </Content>
+    <Content Include="package.json" />
+    <Content Include="src\app\professional-service\professional-service-editor.component.scss">
+      <DependentUpon>professional-service-editor.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\professional-service\professional-service-list.component.scss">
+      <DependentUpon>professional-service-list.component.ts</DependentUpon>
+    </Content>
+    <Content Include="src\app\professional-service\professional-services-container.component.scss">
+      <DependentUpon>professional-services-container.component.ts</DependentUpon>
+    </Content>
     <None Include="src\assets\scss\_varibles.scss" />
     <Content Include="tsconfig.json" />
     <Content Include="typings.json" />
@@ -757,9 +782,7 @@
       <Name>QuinntyneBrown</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="src\app\professional-services\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <TypeScriptCompile Include="src\app\articles\article-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\article-editor-container.component.ts" />
@@ -794,6 +817,7 @@
     <TypeScriptCompile Include="src\app\content-aggregation\reducers\index.ts" />
     <TypeScriptCompile Include="src\app\content-aggregation\services\index.ts" />
     <TypeScriptCompile Include="src\app\products\products.routes.ts" />
+    <TypeScriptCompile Include="src\app\professional-service\professional-services.routes.ts" />
     <TypeScriptCompile Include="src\app\quotes\quotes.routes.ts" />
     <TypeScriptCompile Include="src\app\shared\index.ts" />
     <TypeScriptCompile Include="src\app\social-share-items\social-share-items.routes.ts" />
@@ -923,6 +947,16 @@
     <TypeScriptCompile Include="src\app\contacts\contacts-container.component.ts" />
     <TypeScriptCompile Include="src\app\pages\biography-page-container.component.ts" />
     <TypeScriptCompile Include="src\app\pages\thank-you-page-container.component.ts" />
+    <TypeScriptCompile Include="src\app\professional-service\professional-service.model.ts" />
+    <TypeScriptCompile Include="src\app\professional-service\index.ts" />
+    <TypeScriptCompile Include="src\app\professional-service\professional-services-container.component.ts" />
+    <TypeScriptCompile Include="src\app\professional-service\professional-service.actions.ts" />
+    <TypeScriptCompile Include="src\app\professional-service\professional-service.action-creator.ts" />
+    <TypeScriptCompile Include="src\app\professional-service\professional-service.reducers.ts" />
+    <TypeScriptCompile Include="src\app\professional-service\professional-service.component.ts" />
+    <TypeScriptCompile Include="src\app\professional-service\professional-service.service.ts" />
+    <TypeScriptCompile Include="src\app\professional-service\professional-service-list.component.ts" />
+    <TypeScriptCompile Include="src\app\professional-service\professional-service-editor.component.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
