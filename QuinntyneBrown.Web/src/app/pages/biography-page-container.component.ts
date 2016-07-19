@@ -7,6 +7,6 @@ import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/s
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BiographyPageContainerComponent {
-    constructor() { }
+    storeOnChange = state => this.biographyPageHtmlBody = state.app.biographyHtmlBody;
     public biographyPageHtmlBody: string;
 }

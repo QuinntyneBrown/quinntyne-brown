@@ -69,7 +69,7 @@
 	var menu_items_1 = __webpack_require__(241);
 	var menus_1 = __webpack_require__(264);
 	var photos_1 = __webpack_require__(336);
-	var photographers_1 = __webpack_require__(452);
+	var photographers_1 = __webpack_require__(453);
 	var products_1 = __webpack_require__(367);
 	var quotes_1 = __webpack_require__(390);
 	var orders_1 = __webpack_require__(287);
@@ -77,11 +77,11 @@
 	var content_aggregation_1 = __webpack_require__(90);
 	var social_share_items_1 = __webpack_require__(428);
 	var core_1 = __webpack_require__(3);
-	var authorization_guard_1 = __webpack_require__(461);
-	var app_guard_1 = __webpack_require__(462);
-	var route_change_success_is_admin_reducer_1 = __webpack_require__(463);
-	var app_component_1 = __webpack_require__(464);
-	var admin_app_component_1 = __webpack_require__(468);
+	var authorization_guard_1 = __webpack_require__(462);
+	var app_guard_1 = __webpack_require__(463);
+	var route_change_success_is_admin_reducer_1 = __webpack_require__(464);
+	var app_component_1 = __webpack_require__(465);
+	var admin_app_component_1 = __webpack_require__(469);
 	var quinntynebrownAppModule = angular.module("quinntynebrownApp", [
 	    "components",
 	    "app.contentAggregation",
@@ -8989,6 +8989,8 @@
 	var core_1 = __webpack_require__(3);
 	var BiographyPageContainerComponent = (function () {
 	    function BiographyPageContainerComponent() {
+	        var _this = this;
+	        this.storeOnChange = function (state) { return _this.biographyPageHtmlBody = state.app.biographyHtmlBody; };
 	    }
 	    BiographyPageContainerComponent = __decorate([
 	        core_1.Component({
@@ -9045,7 +9047,7 @@
 
 
 	// module
-	exports.push([module.id, "", ""]);
+	exports.push([module.id, ".biography-page-body {\n  max-width: 1280px;\n  margin: 60px auto 0px; }\n", ""]);
 
 	// exports
 
@@ -12404,9 +12406,16 @@
 
 	"use strict";
 	var app_actions_1 = __webpack_require__(93);
+	var app_constants_1 = __webpack_require__(452);
 	exports.allAppsReducer = function (state, action) {
-	    if (action instanceof app_actions_1.AllAppsAction) {
-	        state.app = action.entities[0];
+	    if (action instanceof app_actions_1.AddOrUpdateAppAction) {
+	        state.app = state.app || { properties: [] };
+	        for (var i = 0; i < action.entity.properties.length; i++) {
+	            if (action.entity.properties[i].name === app_constants_1.appProperties.biography)
+	                state.app.biographyHtmlBody = action.entity.properties[i].htmlBody;
+	            if (action.entity.properties[i].name === app_constants_1.appProperties.products)
+	                state.app.products = JSON.parse(action.entity.properties[i].value);
+	        }
 	    }
 	    return state;
 	};
@@ -12414,6 +12423,21 @@
 
 /***/ },
 /* 452 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var appProperties = (function () {
+	    function appProperties() {
+	    }
+	    appProperties.biography = "Bio";
+	    appProperties.products = "Products";
+	    return appProperties;
+	}());
+	exports.appProperties = appProperties;
+
+
+/***/ },
+/* 453 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -12421,10 +12445,10 @@
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
 	var core_1 = __webpack_require__(3);
-	var photographer_component_1 = __webpack_require__(453);
-	var photographer_action_creator_1 = __webpack_require__(457);
-	var reducers = __webpack_require__(458);
-	var actions = __webpack_require__(459);
+	var photographer_component_1 = __webpack_require__(454);
+	var photographer_action_creator_1 = __webpack_require__(458);
+	var reducers = __webpack_require__(459);
+	var actions = __webpack_require__(460);
 	var photographersModule = angular.module("quinntynebrown.photographers", []);
 	core_1.bootstrap(photographersModule, {
 	    components: [photographer_component_1.PhotographerComponent],
@@ -12432,11 +12456,11 @@
 	    reducers: reducers,
 	    actions: actions
 	});
-	__export(__webpack_require__(460));
+	__export(__webpack_require__(461));
 
 
 /***/ },
-/* 453 */
+/* 454 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -12455,8 +12479,8 @@
 	    }
 	    PhotographerComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(454),
-	            styles: [__webpack_require__(455)],
+	            template: __webpack_require__(455),
+	            styles: [__webpack_require__(456)],
 	            selector: "photographer",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -12468,19 +12492,19 @@
 
 
 /***/ },
-/* 454 */
+/* 455 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"photographer\">\r\n\r\n</div>\r\n"
 
 /***/ },
-/* 455 */
+/* 456 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(456);
+	var content = __webpack_require__(457);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -12500,7 +12524,7 @@
 	}
 
 /***/ },
-/* 456 */
+/* 457 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -12514,7 +12538,7 @@
 
 
 /***/ },
-/* 457 */
+/* 458 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -12549,14 +12573,14 @@
 
 
 /***/ },
-/* 458 */
+/* 459 */
 /***/ function(module, exports) {
 
 	"use strict";
 
 
 /***/ },
-/* 459 */
+/* 460 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -12569,7 +12593,7 @@
 
 
 /***/ },
-/* 460 */
+/* 461 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -12577,7 +12601,7 @@
 
 
 /***/ },
-/* 461 */
+/* 462 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -12601,7 +12625,7 @@
 
 
 /***/ },
-/* 462 */
+/* 463 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -12611,16 +12635,16 @@
 	        "$route",
 	        "invokeAsync",
 	        "appActionCreator",
-	        function ($q, $route, invokeAsync, appActionCreator) {
-	            return invokeAsync(appActionCreator.all);
-	        }
-	    ],
+	        "store",
+	        function ($q, $route, invokeAsync, appActionCreator, store) {
+	            return invokeAsync({ action: appActionCreator.getById, params: { id: 2 } });
+	        }],
 	    route: "*"
 	};
 
 
 /***/ },
-/* 463 */
+/* 464 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -12638,7 +12662,7 @@
 
 
 /***/ },
-/* 464 */
+/* 465 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -12657,8 +12681,8 @@
 	    }
 	    AppComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(465),
-	            styles: [__webpack_require__(466)],
+	            template: __webpack_require__(466),
+	            styles: [__webpack_require__(467)],
 	            selector: "root-app",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -12670,19 +12694,19 @@
 
 
 /***/ },
-/* 465 */
+/* 466 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"app\">\r\n    <app-header></app-header>\r\n    <div data-ng-view></div>\r\n    <app-footer></app-footer>\r\n</div>"
 
 /***/ },
-/* 466 */
+/* 467 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(467);
+	var content = __webpack_require__(468);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -12702,7 +12726,7 @@
 	}
 
 /***/ },
-/* 467 */
+/* 468 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
@@ -12716,7 +12740,7 @@
 
 
 /***/ },
-/* 468 */
+/* 469 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -12737,8 +12761,8 @@
 	    }
 	    AdminAppComponent = __decorate([
 	        core_1.Component({
-	            template: __webpack_require__(469),
-	            styles: [__webpack_require__(470)],
+	            template: __webpack_require__(470),
+	            styles: [__webpack_require__(471)],
 	            selector: "admin-app",
 	            changeDetection: core_1.ChangeDetectionStrategy.OnPush
 	        }), 
@@ -12750,19 +12774,19 @@
 
 
 /***/ },
-/* 469 */
+/* 470 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"admin-app\">\r\n    <admin-header></admin-header>\r\n    <div class=\"admin-content-container\">\r\n        <div class=\"admin-side-nav\" data-ng-if=\"vm.currentUser\">\r\n            <ul>\r\n                <li><a href=\"/admin/articles\">Articles</a></li>\r\n                <li><a href=\"/admin/contacts\">Contacts</a></li>\r\n                <li><a href=\"/admin\">Galleries</a></li>\r\n                <li><a href=\"/admin/orders\">Orders</a></li>\r\n                <li><a href=\"/admin/photos\">Photos</a></li>\r\n                <li><a href=\"/admin/products\">Products</a></li>\r\n                <li><a href=\"/admin/apps\">Apps</a></li>\r\n                <li><a href=\"/admin/uis\">UIs</a></li>\r\n                <li><a href=\"/admin/sections\">Sections</a></li>\r\n                <li><a href=\"/admin/properties\">Properties</a></li>\r\n            </ul>\r\n        </div>\r\n        <div class=\"admin-main-content\" data-ng-view></div>\r\n    </div>\r\n</div>\r\n"
 
 /***/ },
-/* 470 */
+/* 471 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(471);
+	var content = __webpack_require__(472);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(60)(content, {});
@@ -12782,7 +12806,7 @@
 	}
 
 /***/ },
-/* 471 */
+/* 472 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(59)();
