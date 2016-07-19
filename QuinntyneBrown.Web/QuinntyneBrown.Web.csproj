@@ -945,6 +945,7 @@
     <TypeScriptCompile Include="src\app\products\products.routes.ts" />
     <TypeScriptCompile Include="src\app\professional-service\professional-services.routes.ts" />
     <TypeScriptCompile Include="src\app\quotes\quotes.routes.ts" />
+    <TypeScriptCompile Include="src\app\routing\app-guard.ts" />
     <TypeScriptCompile Include="src\app\shared\index.ts" />
     <TypeScriptCompile Include="src\app\social-share-items\social-share-items.routes.ts" />
     <TypeScriptCompile Include="src\main.ts" />

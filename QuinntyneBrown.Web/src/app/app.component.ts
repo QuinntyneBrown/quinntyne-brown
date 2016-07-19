@@ -1,4 +1,5 @@
 import { CanActivate, ChangeDetectionStrategy, Component } from "angular-rx-ui/src/components/core";
+import { AppActionCreator } from "./content-aggregation/action-creators/app.action-creator";
 
 @Component({
     template: require("./app.component.html"),

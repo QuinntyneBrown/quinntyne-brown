@@ -34,6 +34,7 @@ import { SocialShareItemsRoutes } from "./app/social-share-items";
 
 import { provide, provideRoutePromise, bootstrap } from "angular-rx-ui/src/components/core";
 import { authorizationGuard } from "angular-rx-ui/src/components/routing/authorization-guard";
+import { appGuard } from "./app/routing/app-guard";
 import { routeChangeSuccessIsAdminReducer } from "angular-rx-ui/src/components/routing/route-change-success-is-admin.reducer";
 
 import { AppComponent } from "./app/app.component";
@@ -65,7 +66,7 @@ bootstrap(quinntynebrownAppModule, {
     components:[AppComponent, AdminAppComponent],
     loginRedirectUrl: "/",
     html5Mode: true,
-    guards: [authorizationGuard],
+    guards: [authorizationGuard, appGuard],
     run:[routeChangeSuccessIsAdminReducer],
     routes: [        
         ...ArticlesRoutes,
