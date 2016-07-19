@@ -14,6 +14,7 @@ require("./app/quotes");
 require("./app/shared");
 require("./app/social-share-items");
 
+import * as reducers from "./app/app.reducers";
 
 import { ArticlesRoutes } from "./app/articles";
 import { ContactsRoutes } from "./app/contacts";
@@ -67,7 +68,8 @@ bootstrap(quinntynebrownAppModule, {
     loginRedirectUrl: "/",
     html5Mode: true,
     guards: [authorizationGuard, appGuard],
-    run:[routeChangeSuccessIsAdminReducer],
+    run: [routeChangeSuccessIsAdminReducer],
+    reducers: reducers,
     routes: [        
         ...ArticlesRoutes,
         ...ContactsRoutes,

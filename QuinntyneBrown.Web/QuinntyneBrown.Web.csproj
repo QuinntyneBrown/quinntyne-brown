@@ -885,6 +885,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <TypeScriptCompile Include="src\app\app.reducers.ts" />
     <TypeScriptCompile Include="src\app\articles\article-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\article-editor-container.component.ts" />
     <TypeScriptCompile Include="src\app\articles\articles-container.component.ts" />

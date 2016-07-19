@@ -53,7 +53,10 @@ namespace QuinntyneBrown.Services
         {
             ICollection<AppDto> response = new HashSet<AppDto>();
             var entities = GetAll().Where(x => x.IsDeleted == false).ToList();
-            foreach(var entity in entities) { response.Add(new AppDto(entity)); }    
+            foreach(var entity in entities) {
+                ResolveDynamicProperties(entity.Properties);
+                response.Add(new AppDto(entity));
+            }    
             return response;
         }
 
