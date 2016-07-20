@@ -1,0 +1,22 @@
+.articleList-name,
+.articleList-actions {
+    position:relative;
+    float:left;
+}
+
+.articleList-name {
+    min-width:200px;
+}
+
+.articleList-item {
+    height:50px;
+}
+
+.articleList-actions span {
+    cursor:pointer;
+}
+
+.articleList-actions {
+    text-transform: uppercase;
+}
+   
