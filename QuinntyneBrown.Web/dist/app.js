@@ -6965,7 +6965,7 @@
 /* 229 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"featured-gallery-container\">\r\n    <div class=\"featured-gallery-container-inner\">\r\n        <img class=\"featured-gallery-container-img\" src=\"http://www.quinntynebrown.com/api/photo/serve?uniqueid=1e6dce05-b78f-401d-991d-44a3920d80dd\" />\r\n    </div>    \r\n</div>\r\n"
+	module.exports = "<div class=\"featured-gallery-container\">\r\n    <div class=\"featured-gallery-container-inner\">\r\n        <img class=\"featured-gallery-container-img\" src=\"api/digitalasset/serve?name=HomePage_MainImage.jpg\" />\r\n    </div>    \r\n</div>\r\n"
 
 /***/ },
 /* 230 */

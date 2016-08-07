@@ -10,11 +10,11 @@ namespace QuinntyneBrown.Dtos
 
         }
 
-        public DigitalAssetUploadResponseDto(ICollection<DigitalAsset> photos)
+        public DigitalAssetUploadResponseDto(ICollection<DigitalAsset> digitalAssets)
         {
-            foreach (var photo in photos)
+            foreach (var digitalAsset in digitalAssets)
             {
-                Files.Add(new DigitalAssetDto(photo));
+                Files.Add(new DigitalAssetDto(digitalAsset));
             }
         }
 

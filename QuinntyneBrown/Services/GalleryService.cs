@@ -29,7 +29,7 @@ namespace QuinntyneBrown.Services
 
             entity.GalleryCategories.Clear();
             entity.ServiceProviderGalleries.Clear();
-            entity.GalleryPhotos.Clear();
+            entity.GalleryDigitalAssets.Clear();
 
             foreach (var category in request.Categories)
             {
@@ -39,11 +39,11 @@ namespace QuinntyneBrown.Services
                 });
             }
 
-            foreach (var photo in request.Photos)
+            foreach (var digitalAsset in request.DigitalAssets)
             {
-                entity.GalleryPhotos.Add(new GalleryDigitalAsset()
+                entity.GalleryDigitalAssets.Add(new GalleryDigitalAsset()
                 {
-                    Photo = _uow.Photos.GetById(photo.Id)
+                    DigitalAsset = _uow.DigitalAssets.GetById(digitalAsset.Id)
                 });
             }
 
@@ -82,10 +82,10 @@ namespace QuinntyneBrown.Services
         }
 
         public IQueryable<Gallery> GetAll() => _repository.GetAll()
-            .Include(x => x.GalleryPhotos)
+            .Include(x => x.GalleryDigitalAssets)
             .Include(x => x.CustomerGalleries)
             .Include(x => x.ServiceProviderGalleries)
-            .Include("GalleryPhotos.Photo")
+            .Include("GalleryDigitalAssets.DigitalAsset")
             .Include("PhotographerGalleries.Photographer")
             .Include("CustomerGalleries.Customer")
             .Where(x => x.IsDeleted == false);

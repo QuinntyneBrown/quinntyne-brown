@@ -22,6 +22,6 @@ namespace QuinntyneBrown.Models
         public int? AuthorId { get; set; }
         public Author Author { get; set; }
         public ICollection<ArticleCategory> ArticleCategories { get; set; } = new HashSet<ArticleCategory>();
-        public ICollection<ArticlePhoto> ArticlePhotos { get; set; } = new HashSet<ArticlePhoto>();
+        public ICollection<ArticleDigitalAsset> ArticleDigitalAssets { get; set; } = new HashSet<ArticleDigitalAsset>();
     }
 }

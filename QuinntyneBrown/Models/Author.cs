@@ -7,7 +7,7 @@
         public string Firstname { get; set; }
         public string Lastname { get; set; }
         public bool IsDeleted { get; set; }
-        public int? PhotoId { get; set; }
-        public DigitalAsset Photo { get; set; }
+        public int? DigitalAssetId { get; set; }
+        public DigitalAsset DigitalAsset { get; set; }
     }
 }

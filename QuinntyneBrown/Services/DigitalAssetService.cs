@@ -13,7 +13,7 @@ namespace QuinntyneBrown.Services
         public DigitalAssetService(IUow uow, ICacheProvider cacheProvider)
         {
             this.uow = uow;
-            this._repository = uow.Photos;
+            this._repository = uow.DigitalAssets;
             this.cache = cacheProvider.GetCache();
         }
 
@@ -53,9 +53,9 @@ namespace QuinntyneBrown.Services
             .Include(x=>x.GalleryDigitalAssets)
             .Include(x=>x.ServiceProviderDigitalAssets)
             .Include(x=>x.ArticleDigitalAssets)
-            .Include("GalleryPhotos.Gallery")
-            .Include("PhotographerPhotos.Photographer")
-            .Include("ArticlePhotos.Article")
+            .Include("GalleryDigitalAssets.Gallery")
+            .Include("PhotographerDigitalAssets.Photographer")
+            .Include("ArticleDigitalAssets.Article")
             .Where(x => x.IsDeleted == false);
 
         protected readonly IUow uow;

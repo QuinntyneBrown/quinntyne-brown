@@ -9,7 +9,7 @@ namespace QuinntyneBrown.Data
         IRepository<Section> Sections { get; }
         IRepository<Property> Properties { get; }
         IRepository<Article> Articles { get; }
-        IRepository<DigitalAsset> Photos { get; }
+        IRepository<DigitalAsset> DigitalAssets { get; }
         IRepository<Gallery> Galleries { get; }
         IRepository<User> Users { get; }
         IRepository<Role> Roles { get; }

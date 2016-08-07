@@ -2,14 +2,14 @@
 
 namespace QuinntyneBrown.Models
 {
-    public class ArticlePhoto
+    public class ArticleDigitalAsset
     {
         public int Id { get; set; }
         [ForeignKey("Article")]
         public int? ArticleId { get; set; }
-        [ForeignKey("Photo")]
-        public int? PhotoId { get; set; }
-        public DigitalAsset Photo { get; set; }
+        [ForeignKey("DigitalAsset")]
+        public int? DigitalAssetId { get; set; }
+        public DigitalAsset DigitalAsset { get; set; }
         public Article Article { get; set; }
 
     }

@@ -251,6 +251,9 @@
     <Compile Include="Helpers\FrontEndAppVersionHelper.cs" />
     <Compile Include="Helpers\FrontEndPreCacheHelper.cs" />
     <Compile Include="Helpers\StartupHelper.cs" />
+    <Compile Include="Migrations\AppConfiguration.cs" />
+    <Compile Include="Migrations\DigitalAssetConfiguration.cs" />
+    <Compile Include="Migrations\UserConfiguration.cs" />
     <Compile Include="Models\App.cs" />
     <Compile Include="Models\AppProperty.cs" />
     <Compile Include="Models\ArticleCategory.cs" />

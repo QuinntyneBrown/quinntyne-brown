@@ -7,9 +7,9 @@ namespace QuinntyneBrown.Models
         public int Id { get; set; }
         [ForeignKey("Customer")]
         public int? CustomerId { get; set; }
-        [ForeignKey("Photo")]
-        public int? PhotoId { get; set; }
+        [ForeignKey("DigitalAsset")]
+        public int? DigitalAssetId { get; set; }
         public Customer Customer { get; set; }
-        public DigitalAsset Photo { get; set; }
+        public DigitalAsset DigitalAsset { get; set; }
     }
 }

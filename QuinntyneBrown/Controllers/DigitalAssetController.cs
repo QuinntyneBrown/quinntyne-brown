@@ -22,39 +22,39 @@ namespace QuinntyneBrown.Controllers
     [RoutePrefix("api/digitalasset")]
     public class DigitalAssetController : ApiController
     {
-        public DigitalAssetController(IDigitalAssetService photoService, IUow uow, ICacheProvider cacheProvider)
+        public DigitalAssetController(IDigitalAssetService digitalAssetService, IUow uow, ICacheProvider cacheProvider)
         {
-            _photoService = photoService;
+            __digitalAssetService = digitalAssetService;
             _uow = uow;
-            _repository = uow.Photos;
+            _repository = uow.DigitalAssets;
             _cache = cacheProvider.GetCache();
         }
 
         [Route("add")]
         [HttpPost]
         [ResponseType(typeof(DigitalAssetAddOrUpdateResponseDto))]
-        public IHttpActionResult Add(DigitalAssetAddOrUpdateRequestDto dto) { return Ok(_photoService.AddOrUpdate(dto)); }
+        public IHttpActionResult Add(DigitalAssetAddOrUpdateRequestDto dto) { return Ok(__digitalAssetService.AddOrUpdate(dto)); }
 
         [Route("update")]
         [HttpPut]
         [ResponseType(typeof(DigitalAssetAddOrUpdateResponseDto))]
-        public IHttpActionResult Update(DigitalAssetAddOrUpdateRequestDto dto) { return Ok(_photoService.AddOrUpdate(dto)); }
+        public IHttpActionResult Update(DigitalAssetAddOrUpdateRequestDto dto) { return Ok(__digitalAssetService.AddOrUpdate(dto)); }
 
         [Route("get")]
         [AllowAnonymous]
         [HttpGet]
         [ResponseType(typeof(ICollection<DigitalAssetDto>))]
-        public IHttpActionResult Get() { return Ok(_photoService.Get()); }
+        public IHttpActionResult Get() { return Ok(__digitalAssetService.Get()); }
 
         [Route("getById")]
         [HttpGet]
         [ResponseType(typeof(DigitalAssetDto))]
-        public IHttpActionResult GetById(int id) { return Ok(_photoService.GetById(id)); }
+        public IHttpActionResult GetById(int id) { return Ok(__digitalAssetService.GetById(id)); }
 
         [Route("remove")]
         [HttpDelete]
         [ResponseType(typeof(int))]
-        public IHttpActionResult Remove(int id) { return Ok(_photoService.Remove(id)); }
+        public IHttpActionResult Remove(int id) { return Ok(__digitalAssetService.Remove(id)); }
 
         [AllowAnonymous]
         [Route("upload")]
@@ -99,10 +99,15 @@ namespace QuinntyneBrown.Controllers
         [Route("serve")]
         [HttpGet]
         [AllowAnonymous]
-        [CacheOutput(ClientTimeSpan = 1000, ServerTimeSpan = 1000)]
-        public HttpResponseMessage Serve([FromUri]Guid uniqueId, int? height = null)
+        [CacheOutput(ClientTimeSpan = 0, ServerTimeSpan = 0)]
+        public HttpResponseMessage Serve([FromUri]Guid? uniqueId = null, int? height = null, string name = null)
         {
-            DigitalAsset digitalAsset = _cache.FromCacheOrService(() => _repository.GetAll().FirstOrDefault(x => x.UniqueId == uniqueId), uniqueId.ToString());
+            var s = _repository.GetAll().FirstOrDefault();
+
+            var digitalAsset = uniqueId.HasValue ?
+                _cache.FromCacheOrService(() => _repository.GetAll().FirstOrDefault(x => x.UniqueId == uniqueId), uniqueId.ToString())
+                : _cache.FromCacheOrService(() => _repository.GetAll().FirstOrDefault(x => x.Name == name), name);
+
             HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
             if (digitalAsset == null)
                 return result;
@@ -111,7 +116,7 @@ namespace QuinntyneBrown.Controllers
             return result;
         }
         
-        protected readonly IDigitalAssetService _photoService;
+        protected readonly IDigitalAssetService __digitalAssetService;
         protected readonly IRepository<DigitalAsset> _repository;
         protected readonly IUow _uow;
         protected readonly ICache _cache;        

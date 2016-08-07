@@ -18,7 +18,7 @@ namespace QuinntyneBrown.Data
         public DbSet<UI> UIs { get; set; }
         public DbSet<Section> Sections { get; set; }
         public DbSet<Property> Properties { get; set; }
-        public DbSet<DigitalAsset> Photos { get; set; }
+        public DbSet<DigitalAsset> DigitalAssets { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Quote> Quotes { get; set; }
         public DbSet<Order> Orders { get; set; }
