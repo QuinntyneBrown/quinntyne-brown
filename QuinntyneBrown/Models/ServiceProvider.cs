@@ -4,7 +4,7 @@ namespace QuinntyneBrown.Models
 {
     public class ServiceProvider: Person
     {
-        public ICollection<ServiceProviderPhoto> ServiceProviderPhotos { get; set; } = new HashSet<ServiceProviderPhoto>();
+        public ICollection<ServiceProviderDigitalAsset> ServiceProviderPhotos { get; set; } = new HashSet<ServiceProviderDigitalAsset>();
         public ICollection<ServiceProviderGallery> ServiceProviderGalleries { get; set; } = new HashSet<ServiceProviderGallery>();
     }
 }

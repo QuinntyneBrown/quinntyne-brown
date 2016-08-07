@@ -8,6 +8,6 @@
         public string Lastname { get; set; }
         public bool IsDeleted { get; set; }
         public int? PhotoId { get; set; }
-        public Photo Photo { get; set; }
+        public DigitalAsset Photo { get; set; }
     }
 }

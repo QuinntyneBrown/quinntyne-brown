@@ -9,7 +9,7 @@ namespace QuinntyneBrown.Models
         public int? ArticleId { get; set; }
         [ForeignKey("Photo")]
         public int? PhotoId { get; set; }
-        public Photo Photo { get; set; }
+        public DigitalAsset Photo { get; set; }
         public Article Article { get; set; }
 
     }

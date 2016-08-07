@@ -41,7 +41,7 @@ namespace QuinntyneBrown.Services
 
             foreach (var photo in request.Photos)
             {
-                entity.GalleryPhotos.Add(new GalleryPhoto()
+                entity.GalleryPhotos.Add(new GalleryDigitalAsset()
                 {
                     Photo = _uow.Photos.GetById(photo.Id)
                 });

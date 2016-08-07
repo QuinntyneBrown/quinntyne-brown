@@ -64,6 +64,9 @@ namespace QuinntyneBrown.Services
         public AppDto GetById(int id)
         {
             var app = GetAll().Where(x => x.Id == id && x.IsDeleted == false).FirstOrDefault();
+            if (app == null)
+                return new AppDto();
+
             ResolveDynamicProperties(app.Properties);
             return new AppDto(app);
         }

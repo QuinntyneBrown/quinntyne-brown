@@ -26,7 +26,7 @@ namespace QuinntyneBrown
             container.RegisterType<ISectionService, SectionService>();
             container.RegisterType<IPropertyService, PropertyService>();
             container.RegisterType<IArticleService, ArticleService>();
-            container.RegisterType<IPhotoService, PhotoService>();
+            container.RegisterType<IDigitalAssetService, DigitalAssetService>();
             container.RegisterType<IGalleryService, GalleryService>();            
             container.RegisterType<ICustomerService, CustomerService>();
             container.RegisterType<IRssFeedService, RssFeedService>();
