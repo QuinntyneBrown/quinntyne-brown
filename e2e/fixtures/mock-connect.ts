@@ -52,7 +52,7 @@ export interface MockConnectLink {
 }
 
 /**
- * ConnectEndpoints in the browser (backend/src/FaithTech.Community.Api/Endpoints/ConnectEndpoints.cs):
+ * ConnectEndpoints in the browser (backend/src/QuinntyneBrown.Community.Api/Endpoints/ConnectEndpoints.cs):
  * one reusable link per City Lead or System Admin, replaced on request (ADR 0021).
  */
 export class MockConnect {

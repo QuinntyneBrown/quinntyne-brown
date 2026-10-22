@@ -19,7 +19,7 @@ COPY backend/global.json backend/Directory.Build.props backend/Directory.Package
 COPY backend/src/ ./src/
 # Infrastructure embeds the design tokens for the HTML emails.
 COPY docs/design-system/tokens/tokens.css /src/docs/design-system/tokens/tokens.css
-RUN dotnet publish src/FaithTech.Community.Api/FaithTech.Community.Api.csproj -c Release -o /out /p:UseAppHost=false
+RUN dotnet publish src/QuinntyneBrown.Community.Api/QuinntyneBrown.Community.Api.csproj -c Release -o /out /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
@@ -34,4 +34,4 @@ ENV ASPNETCORE_ENVIRONMENT=Production \
 EXPOSE 8080
 # The non-root user the .NET images provide.
 USER $APP_UID
-ENTRYPOINT ["dotnet", "FaithTech.Community.Api.dll"]
+ENTRYPOINT ["dotnet", "QuinntyneBrown.Community.Api.dll"]

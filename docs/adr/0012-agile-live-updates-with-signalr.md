@@ -11,7 +11,7 @@ Board moves and Planning Poker votes must reach other open viewers within 2 seco
 
 ## Decision
 
-- One hub, `AgileHub`, is mapped at `/hubs/agile` in `FaithTech.Community.Api`. It requires authentication like every endpoint; the browser passes its access token in the `access_token` query string, which OpenIddict validation reads by default.
+- One hub, `AgileHub`, is mapped at `/hubs/agile` in `QuinntyneBrown.Community.Api`. It requires authentication like every endpoint; the browser passes its access token in the `access_token` query string, which OpenIddict validation reads by default.
 - The hub only joins and leaves groups: `WatchBoard(workspaceId)` and `WatchPokerSession(sessionId)`. Both ask `WorkspaceAccessPolicy` first and throw a `HubException` for an outsider, so a non-member cannot even listen (L2-038 AC7). Staff may watch.
 - Every change goes over HTTP to an Application handler, which saves and then calls `IBoardNotifier` or `IPokerBroadcaster` (Application abstractions). `SignalRAgileNotifier` in the Api implements both over `IHubContext<AgileHub>`. Tests replace them with recording fakes.
 - Broadcasts carry no secrets: `CardMoved(itemId, status)` to `board:{workspaceId}`; `PokerChanged(sessionId)` to `poker:{sessionId}`, after which clients re-read the session. The Planning Poker page re-reads the workspace's current session (`GET /api/workspaces/{id}/poker-sessions/current`), so it also learns when the session has ended; `GET /api/poker-sessions/{id}` serves a client that holds the session id. Both reads withhold other participants' vote values until the facilitator reveals (only "voted" or "still choosing"), and always return the caller's own vote, which is how a reconnecting participant recovers it (L2-038 AC8).

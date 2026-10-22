@@ -151,7 +151,7 @@ function parseForm(data: Buffer | null, contentType: string): Form {
 }
 
 /**
- * ResourcesEndpoints in the browser (backend/src/FaithTech.Community.Api/Endpoints/ResourcesEndpoints.cs,
+ * ResourcesEndpoints in the browser (backend/src/QuinntyneBrown.Community.Api/Endpoints/ResourcesEndpoints.cs,
  * ADR 0017): visibility in every read (Private to the owner and System Admin, Shared to its members and the
  * current holders of its roles, Global to every member), owner-only writes, contributors only for adds.
  */

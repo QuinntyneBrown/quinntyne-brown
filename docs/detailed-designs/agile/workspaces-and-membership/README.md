@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community lets a City Lead run a team's work in an *Agile workspace*.
+QuinntyneBrown.Community lets a City Lead run a team's work in an *Agile workspace*.
 
 > **Agile workspace** — named container for a team's work items, run with either the Scrum or the Kanban method
 >
@@ -14,7 +14,7 @@ Community data is global, but workspace access comes from membership. Members cr
 
 This feature is the entry point of the agile subsystem. Every other agile feature (work items, board, sprints, switch method, archive and transfer, Planning Poker) relies on the membership model and the access policy defined here ([ADR 0011](../../../adr/0011-workspace-access-and-audit.md)).
 
-The repository layout in `AGENTS.md` lists the `Agile/` folders in `FaithTech.Community.Domain` and `FaithTech.Community.Application` and the `agile` feature library in `frontend/projects/` ([ADR 0010](../../../adr/0010-agile-feature-layout.md)).
+The repository layout in `AGENTS.md` lists the `Agile/` folders in `QuinntyneBrown.Community.Domain` and `QuinntyneBrown.Community.Application` and the `agile` feature library in `frontend/projects/` ([ADR 0010](../../../adr/0010-agile-feature-layout.md)).
 
 ## Description
 
@@ -112,7 +112,7 @@ Reads resolve the caller's access first through `WorkspaceAccessPolicy.LoadAsync
 
 Decisions recorded while building the feature:
 
-- Domain types for the agile subsystem live in `FaithTech.Community.Domain/Agile/`, the folder name these designs use; `AGENTS.md` lists it.
+- Domain types for the agile subsystem live in `QuinntyneBrown.Community.Domain/Agile/`, the folder name these designs use; `AGENTS.md` lists it.
 - `AddMember` takes the `Profile` so the Domain enforces the lead-or-volunteer rule itself; the owner cannot be removed as a member.
 - Domain rule violations throw `InvalidOperationException` (a broken rule) or `ArgumentException` (invalid input); there is no shared domain exception type. Handlers check permissions and preconditions first and map any remaining violation to a `400` or `409` result.
 - Handlers are grouped by concern (`WorkspacesHandler`, `WorkspaceSettingsHandler`) rather than one class per command. Request records (`CreateWorkspaceCommand`, `AddWorkspaceMembersCommand`, `RenameWorkspaceCommand`, `SwitchMethodCommand`) are validated by FluentValidation at the endpoint; there are no separate query types, `ListAsync` and `GetAsync` are handler methods.

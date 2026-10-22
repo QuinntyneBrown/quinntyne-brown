@@ -2,13 +2,13 @@
 
 ## Overview
 
-A City Lead meets someone new at an event and wants them in FaithTech Community, and in their own contacts, without typing an email into an invite. **Connect link** — a City Lead's personal, reusable link `{web app}/meet/{token}`, shown as a QR code. Anyone who opens it can join with email and a password; once their email is verified they become a private contact of that lead, linked to their profile, and the lead is notified.
+A City Lead meets someone new at an event and wants them in QuinntyneBrown.Community, and in their own contacts, without typing an email into an invite. **Connect link** — a City Lead's personal, reusable link `{web app}/meet/{token}`, shown as a QR code. Anyone who opens it can join with email and a password; once their email is verified they become a private contact of that lead, linked to their profile, and the lead is notified.
 
 A connect link is not an invite (`L2-010`, `L2-011`, [ADR 0006](../../../adr/0006-invite-tokens-and-acceptance.md)): no email is known, many people use the same code, it never expires, and it grants no role. The lead can replace it, which retires the old link at once ([ADR 0021](../../../adr/0021-connect-links.md)).
 
 ## Description
 
-Backend (`FaithTech.Community.*`):
+Backend (`QuinntyneBrown.Community.*`):
 
 - **`ConnectLink`** — Domain entity (`Domain/Invites/ConnectLink.cs`): `OwnerId` (the lead's profile, unique), `TokenHash` (SHA-256, hex, unique), `ProtectedToken` (the token encrypted with ASP.NET Data Protection) and `IssuedAt`. `Replace(hash, protectedToken, now)` swaps in a new token on the same row, so the old hash no longer exists.
 - **`IConnectTokenProtector`** — Application abstraction (`Application/Invites/ConnectLinks.cs`), implemented by **`DataProtectionConnectTokens`** in `Infrastructure/Invites/` under its own purpose. Only the owner's own `GET` unprotects it, to show the code again; lookups use the hash. Backend tests use a reversible fake.
@@ -51,7 +51,7 @@ The acceptance criteria are in [`docs/specs/L2.md`](../../../specs/L2.md). The a
 
 ### System context
 
-A City Lead shows their QR code; a new person opens it on their phone and joins. FaithTech Community emails the verification link and the lead's notification.
+A City Lead shows their QR code; a new person opens it on their phone and joins. QuinntyneBrown.Community emails the verification link and the lead's notification.
 
 ![C4 system context for connect by QR code](diagrams/c4-context.png)
 

@@ -4,7 +4,7 @@ LAYOUT_WITH_LEGEND()
 title Containers — Marketing page
 
 Person(visitor, "Visitor")
-System_Boundary(ftc, "FaithTech Community") {
+System_Boundary(ftc, "QuinntyneBrown.Community") {
   Container(mkt, "Marketing app", "Angular (frontend/projects/marketing)", "www.faithtech.community: hero, brochure video, sign-in and sign-up panel")
   Container(spa, "Community app", "Angular (frontend/projects/faithtech-community)", "WebApp:Origin: owns the PKCE session; /auth/continue and /auth/callback")
   Container(api, "Community API", "ASP.NET Core + OpenIddict", "/api/account/* (rate limited), /connect/*; CORS allows WebApp:Origin and Marketing:Origin with credentials")

@@ -15,17 +15,17 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Member" as actor
-box "Frontend — FaithTech Community web app (notifications library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (notifications library)" #E0F2FE
   participant "NotificationsPage" as page
   participant "HttpNotificationsService" as client
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "NotificationsEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "InAppNotificationsHandler" as h
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   database "Community database" as db
 end box
 actor -> page : Choose "Mark all as read"

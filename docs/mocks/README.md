@@ -1,6 +1,6 @@
-# FaithTech Community mocks
+# QuinntyneBrown.Community mocks
 
-Static HTML mocks for every page, dialog and notification, built from [`idea.txt`](../../idea.txt) and [`decisions.txt`](../../decisions.txt), styled with the [FaithTech Community design system](../design-system/README.md) (tokens and components inherited from Shelfie).
+Static HTML mocks for every page, dialog and notification, built from [`idea.txt`](../../idea.txt) and [`decisions.txt`](../../decisions.txt), styled with the [QuinntyneBrown.Community design system](../design-system/README.md) (tokens and components inherited from Shelfie).
 
 ## How to open
 

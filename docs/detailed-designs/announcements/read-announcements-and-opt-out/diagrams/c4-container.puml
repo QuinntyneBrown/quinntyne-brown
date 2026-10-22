@@ -3,9 +3,9 @@
 LAYOUT_WITH_LEGEND()
 title Containers — Read announcements and opt out
 Person(member, "Member", "Signed-in community member")
-System_Boundary(ftc, "FaithTech Community") {
+System_Boundary(ftc, "QuinntyneBrown.Community") {
   Container(web, "Web app", "Angular", "Shell, announcements feature library, api and components libraries")
-  Container(api, "Community API", "ASP.NET Core", "FaithTech.Community.Api with Application, Domain and Infrastructure")
+  Container(api, "Community API", "ASP.NET Core", "QuinntyneBrown.Community.Api with Application, Domain and Infrastructure")
   ContainerDb(db, "Community database", "PostgreSQL", "Persistent community data")
 }
 System_Ext(email, "Email provider", "SMTP/SendGrid")

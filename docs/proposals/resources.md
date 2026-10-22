@@ -1,6 +1,6 @@
 # Proposal: Resources
 
-A searchable home for the decks, logos, images, training materials and templates that FaithTech leads need, inside FaithTech Community.
+A searchable home for the decks, logos, images, training materials and templates that FaithTech leads need, inside QuinntyneBrown.Community.
 
 - Status: agreed; requirements written as `L1-020` and `L2-055` to `L2-066` in `docs/specs/`, awaiting detailed design
 - Date: 2026-10-22
@@ -10,7 +10,7 @@ A searchable home for the decks, logos, images, training materials and templates
 
 City Leads cannot find the materials they need. A city launch deck, the FaithTech logo pack, a hackathon judging rubric or a volunteer training slide set lives wherever its author last saved it: Google Drive, SharePoint, Canva, Dropbox, an email attachment or a laptop. New leads do not know what exists, experienced leads rebuild what already exists, and the one person who knows where a file lives becomes the bottleneck.
 
-FaithTech Community already holds the people, events and announcements of the community and already has global search. It is the natural place for the materials too.
+QuinntyneBrown.Community already holds the people, events and announcements of the community and already has global search. It is the natural place for the materials too.
 
 ## What we are building
 
@@ -60,7 +60,7 @@ Nothing in Resources is visible to anonymous visitors; public events remain the 
 
 A new resource defaults to **Global**, with the visibility picker always visible on the add dialog. The purpose of the feature is findability, and logos, decks and training are meant to be shared, so a private draft is a deliberate choice rather than the default. Rejected: private by default, which makes every upload need an extra step to become findable.
 
-Rejected: a city tier. Data in FaithTech Community is global with no city boundary; private contacts are the only exception, and this proposal does not add a second one.
+Rejected: a city tier. Data in QuinntyneBrown.Community is global with no city boundary; private contacts are the only exception, and this proposal does not add a second one.
 
 ### Who can contribute
 

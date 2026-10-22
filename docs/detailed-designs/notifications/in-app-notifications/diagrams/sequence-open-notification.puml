@@ -15,19 +15,19 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Member" as actor
-box "Frontend — FaithTech Community web app (app shell, components and api libraries)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (app shell, components and api libraries)" #E0F2FE
   participant "NotificationBellComponent\n+ NotificationPanelComponent" as bell
   participant "ShellNotificationsComponent" as shell
   participant "HttpNotificationsService" as client
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "NotificationsEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "InAppNotificationsHandler" as h
   participant "Notification" as n
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   database "Community database" as db
 end box
 shell -> client : list() on navigation and every 60 s

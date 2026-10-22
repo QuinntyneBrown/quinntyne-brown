@@ -15,22 +15,22 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Owner" as actor
-box "Frontend — FaithTech Community web app (components library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (components library)" #E0F2FE
   participant "BlockEditorComponent" as ed
   participant "SlashMenuComponent\n(Link to a page)" as plm
 end box
-box "Frontend — FaithTech Community web app (notes library and api library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (notes library and api library)" #E0F2FE
   participant "NotePage" as page
   participant "HttpNotesService" as svc
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "NotesEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "LinkSuggestionsHandler" as h
   participant "SaveNoteHandler" as save
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   database "Community database" as db
 end box
 actor -> ed : Types "[[run"

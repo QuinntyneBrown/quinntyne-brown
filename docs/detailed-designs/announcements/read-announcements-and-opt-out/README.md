@@ -43,7 +43,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-A member reads announcements in FaithTech Community and receives announcement email, with an unsubscribe link, through the email provider.
+A member reads announcements in QuinntyneBrown.Community and receives announcement email, with an unsubscribe link, through the email provider.
 
 ![C4 system context for read announcements and opt out](diagrams/c4-context.png)
 
@@ -79,6 +79,6 @@ The unsubscribe link carries a token that identifies the recipient, so the opt-o
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `Profile.SetAnnouncementEmailOptOut(bool)` stores the preference; it defaults to receiving announcement emails.

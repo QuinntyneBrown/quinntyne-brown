@@ -2,7 +2,7 @@
 
 ## Overview
 
-The marketing page is FaithTech Community's public front door at `www.faithtech.community`. A visitor learns what the community is from a split hero and a 21-second brochure video, then signs in, signs up or continues with Google without leaving the page, and lands in the community app with a real authorization code + PKCE session.
+The marketing page is QuinntyneBrown.Community's public front door at `www.faithtech.community`. A visitor learns what the community is from a split hero and a 21-second brochure video, then signs in, signs up or continues with Google without leaving the page, and lands in the community app with a real authorization code + PKCE session.
 
 **Marketing app** — the second Angular application in the workspace, `frontend/projects/marketing/`, served on its own host (ADR 0018)
 
@@ -72,7 +72,7 @@ See [`docs/specs/L2.md`](../../../specs/L2.md#l2-055-marketing-page) for `L2-074
 
 ### System context
 
-Visitors and members reach FaithTech Community through the marketing page; Google is the only external system.
+Visitors and members reach QuinntyneBrown.Community through the marketing page; Google is the only external system.
 
 ![C4 system context for the marketing page](diagrams/c4-context.png)
 

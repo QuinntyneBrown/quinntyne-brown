@@ -1,6 +1,6 @@
 # SharePoint and Dynamics features: what to adopt
 
-A quick review of Microsoft SharePoint and Dynamics 365 features, and whether FaithTech Community should adopt each one. Effort is relative: S (days), M (1 to 2 weeks), L (several weeks).
+A quick review of Microsoft SharePoint and Dynamics 365 features, and whether QuinntyneBrown.Community should adopt each one. Effort is relative: S (days), M (1 to 2 weeks), L (several weeks).
 
 - Date: 2026-10-22
 - Status: for discussion; any "Yes" still needs a proposal, spec, design and mock before code.

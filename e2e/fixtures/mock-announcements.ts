@@ -27,7 +27,7 @@ export interface AnnouncementsContext {
 const SENDERS = ['CommunicationsLead', 'SystemAdmin'];
 
 /**
- * Plays the announcements endpoints (backend/src/FaithTech.Community.Api/Endpoints/AnnouncementsEndpoints.cs):
+ * Plays the announcements endpoints (backend/src/QuinntyneBrown.Community.Api/Endpoints/AnnouncementsEndpoints.cs):
  * the audience resolves to members who are not suspended, and only Communications Leads and System Admins
  * may count or send (L2-029).
  */

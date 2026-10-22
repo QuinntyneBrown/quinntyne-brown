@@ -4,7 +4,7 @@ LAYOUT_WITH_LEGEND()
 title Containers — Contact photos and the person-card grid
 Person(lead, "Lead", "Keeps private contacts")
 Person(admin, "System Admin", "Holds full override across the site")
-System_Boundary(community, "FaithTech Community") {
+System_Boundary(community, "QuinntyneBrown.Community") {
   Container(web, "Web app", "Angular", "Shell, contacts feature library, api and components libraries")
   Container(api, "Community API", "ASP.NET Core", "Contact photo endpoints; serves contact images itself (ADR 0017)")
   ContainerDb(db, "Community database", "PostgreSQL", "Contacts, ContactPhotos, PhotoBlobTasks, audit log")

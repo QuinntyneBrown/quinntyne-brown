@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community is deployed to two hosts that share the parent domain `faithtech.community`: the community app, the API and the identity server on `app.faithtech.community`, and the marketing page on `www.faithtech.community` (ADR 0018, whose note that hosting was deferred this design resolves). While the product is in private preview, both hosts sit behind a wall. The wall works like a paywall: a visitor first sees a locked page, and only the owner, who knows a passphrase, gets past it to the site as it is today.
+QuinntyneBrown.Community is deployed to two hosts that share the parent domain `faithtech.community`: the community app, the API and the identity server on `app.faithtech.community`, and the marketing page on `www.faithtech.community` (ADR 0018, whose note that hosting was deferred this design resolves). While the product is in private preview, both hosts sit behind a wall. The wall works like a paywall: a visitor first sees a locked page, and only the owner, who knows a passphrase, gets past it to the site as it is today.
 
 - **wall** — the server-side gate in front of every request to either host; it refuses everything until the visitor holds a valid unlock
 - **wall page** — the neutral page the gate renders for a locked navigation: the title "Private preview", one passphrase field and an *Unlock* button, and nothing that names, describes or colours the product (`docs/mocks/pages/private-preview`)
@@ -19,7 +19,7 @@ The same change makes the product deployable: one container image serves the API
 
 ### Where the wall is enforced
 
-The API process is the only server. It fronts the static apps itself, so the wall is one ASP.NET Core middleware rather than a separate gate service or reverse proxy (ADR 0026). Rules live in `FaithTech.Community.Application/PrivatePreview/`, hashing and signing in `FaithTech.Community.Infrastructure/PrivatePreview/`, and the HTTP glue in `FaithTech.Community.Api/Middleware/PrivatePreview/`.
+The API process is the only server. It fronts the static apps itself, so the wall is one ASP.NET Core middleware rather than a separate gate service or reverse proxy (ADR 0026). Rules live in `QuinntyneBrown.Community.Application/PrivatePreview/`, hashing and signing in `QuinntyneBrown.Community.Infrastructure/PrivatePreview/`, and the HTTP glue in `QuinntyneBrown.Community.Api/Middleware/PrivatePreview/`.
 
 The pipeline in `Program.cs` runs, in order: `CorrelationIdMiddleware`, `SecurityHeadersMiddleware`, the Serilog request log, **`PrivatePreviewGateMiddleware`**, the exception handler and status code pages, **static sites**, CORS, authentication, `CurrentRolesMiddleware`, the rate limiter, authorization and the endpoints. Because the gate sits before the exception handler and the status code pages, a locked response is exactly what the gate writes: no problem-details body, no framework wording. Because it sits before routing, no endpoint, hub or static file is reached while locked.
 
@@ -64,7 +64,7 @@ The pipeline in `Program.cs` runs, in order: `CorrelationIdMiddleware`, `Securit
 ### Deployment — `backend/deploy/`, `eng/infra/`, `.github/workflows/`
 
 - **`backend/deploy/api.Dockerfile`** — stage 1 builds both Angular apps with their production configurations (`COMMUNITY_ORIGIN` = `https://app.faithtech.community`, session hint domain `faithtech.community`, no source maps); stage 2 publishes the API, with the design tokens Infrastructure embeds for emails; stage 3 is `mcr.microsoft.com/dotnet/aspnet:10.0`, runs as the non-root `app` user on port 8080 and copies the builds to `/app/sites/app` and `/app/sites/www`. The production builds no longer inline critical CSS (`angular.json`): Angular loads the rest of the stylesheet through an inline `onload` handler, which the apps' `script-src 'self'` blocks, leaving it on `media=print`.
-- **`backend/deploy/cli.Dockerfile`** — publishes the Cli project onto `mcr.microsoft.com/dotnet/aspnet:10.0` (Infrastructure uses ASP.NET Core Identity and Data Protection); entry point `dotnet FaithTech.Community.Cli.dll`, non-root.
+- **`backend/deploy/cli.Dockerfile`** — publishes the Cli project onto `mcr.microsoft.com/dotnet/aspnet:10.0` (Infrastructure uses ASP.NET Core Identity and Data Protection); entry point `dotnet QuinntyneBrown.Community.Cli.dll`, non-root.
 - **`backend/deploy/compose.yaml`** — local smoke test: PostgreSQL, Azurite, the Cli (`migrate`, `seed`) and the API image with the wall on, on `http://app.localhost:8080` and `http://www.localhost:8080`, with throwaway secrets.
 - **`eng/infra/main.bicep`** — resource-group scope: Log Analytics, a Container Apps environment, Azure Container Registry, a user-assigned identity with `AcrPull` and Key Vault Secrets User, Key Vault (RBAC, purge protection), PostgreSQL flexible server (Burstable B1ms, PostgreSQL 16, TLS required), a Storage account (HTTPS only, no public blob access), the API container app (`modules/container-app.bicep`: external ingress on 8080, HTTP redirected to HTTPS, one replica, liveness and startup probes on `/health/live`, every secret a Key Vault reference) and two manual Container Apps jobs on the Cli image, `migrate` and `seed`. The template derives and stores two secrets itself (`community-db-connection`, `blob-connection`); the owner sets the rest (`runbook.md`). `customDomainsStage` is `none`, then `issue` (adds both hosts unbound, issues their managed certificates with CNAME validation, then binds them with SNI in a second module deployment) and from then on `bound`. The app is deployed only when an API image is given and the jobs only when a Cli image is given, so a deploy can migrate before the API rolls out. `eng/infra/main.bicepparam` holds only non-secret values and reads the rest from the environment.
 - **Configuration in production** — `ASPNETCORE_ENVIRONMENT=Production`, `WebApp__Origin=https://app.faithtech.community`, `Marketing__Origin=https://www.faithtech.community` (CORS for the marketing hand-off), `PrivatePreview__CookieDomain=faithtech.community`, `StaticSites__ImageOrigins=https://<storage>.blob.core.windows.net`, `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true` (the client address is the last `X-Forwarded-For` entry, appended by the ingress, `L2-103` AC5). Secrets from Key Vault: `ConnectionStrings__Community`, `ConnectionStrings__Blobs`, `Identity__SigningCertificate`, `Identity__EncryptionCertificate`, `Smtp__*`, `Google__ClientId`, `Google__ClientSecret`, `PrivatePreview__PassphraseHash`, `PrivatePreview__SigningKey`.
@@ -107,7 +107,7 @@ The acceptance criteria are in `docs/specs/L2.md`.
 
 ### System context
 
-Every visitor reaches FaithTech Community through the wall; only the owner holds the passphrase. Azure hosts it and DNS points both hosts at it.
+Every visitor reaches QuinntyneBrown.Community through the wall; only the owner holds the passphrase. Azure hosts it and DNS points both hosts at it.
 
 ![C4 system context for the private preview wall](diagrams/c4-context.png)
 

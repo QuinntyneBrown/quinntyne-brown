@@ -16,5 +16,5 @@ Before opening an issue, please search existing issues and discussions.
 This is a community-maintained open-source project. Support is provided on a best-effort basis by
 maintainers and contributors; there is no service-level agreement.
 
-If you use a hosted FaithTech Community site and need help with your account, contact the
+If you use a hosted QuinntyneBrown.Community site and need help with your account, contact the
 administrators of that site rather than this repository.

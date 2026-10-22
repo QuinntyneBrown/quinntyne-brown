@@ -91,7 +91,7 @@ The server decides what RSVP data leaves the API. Attendees receive only the cou
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - Capacity was an open question; `L2-020` AC5 defines it, so `Event` enforces it. RSVPs are also refused once the event has started, matching "any time before the event" in `L2-022` AC2. Resolved.
 - Domain rule violations throw `InvalidOperationException` (a broken rule) or `ArgumentException` (invalid input); there is no shared domain exception type. Handlers check permissions and preconditions first and map any remaining violation to a `400` or `409` result.

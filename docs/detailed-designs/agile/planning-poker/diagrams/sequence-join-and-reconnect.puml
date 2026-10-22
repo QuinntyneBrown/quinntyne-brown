@@ -15,20 +15,20 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Signed-in user" as actor
-box "Frontend — FaithTech Community web app (agile library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (agile library)" #E0F2FE
   participant "PlanningPokerPage" as page
   participant "AgileService (AGILE_SERVICE)" as svc
   participant "SignalRAgileLiveService (AGILE_LIVE_SERVICE)" as live
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "WorkItemsEndpoints" as ep
   participant "AgileHub" as hub
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "PlanningPokerHandler" as h
   participant "WorkspaceAccessPolicy" as pol
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "CommunityDbContext" as ctx
   database "Community database" as db
 end box

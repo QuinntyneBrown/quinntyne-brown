@@ -13,8 +13,8 @@ The request step shows the same confirmation whether or not the email belongs to
 - **`ForgotPasswordPage`** — Angular page in the app shell, matching the `forgot-password` mock. It collects an email and shows the neutral confirmation.
 - **`ResetPasswordPage`** — Angular page matching the `reset-password` mock. It collects the new password and shows the expired-link state with a request-new-link action.
 - **`AuthService`** — contract in the `api` library, provided through the `AUTH_SERVICE` injection token and implemented by `HttpAuthService`. It wraps the account endpoints and the OIDC + PKCE client.
-- **`AccountEndpoints`** — minimal API route group in `FaithTech.Community.Api`. It maps the account routes, opts each one into anonymous access explicitly, and forwards the request to the Application handler. It holds no business logic.
-- **`CommunityDbContext`** — EF Core context in `FaithTech.Community.Infrastructure`. It stores ASP.NET Identity users alongside community data in PostgreSQL.
+- **`AccountEndpoints`** — minimal API route group in `QuinntyneBrown.Community.Api`. It maps the account routes, opts each one into anonymous access explicitly, and forwards the request to the Application handler. It holds no business logic.
+- **`CommunityDbContext`** — EF Core context in `QuinntyneBrown.Community.Infrastructure`. It stores ASP.NET Identity users alongside community data in PostgreSQL.
 - **`RequestPasswordResetCommand`** / **`RequestPasswordResetHandler`** — Application request and handler. The handler generates a reset token and sends the email only when the account exists, and returns the same result either way.
 - **`ResetPasswordCommand`** / **`ResetPasswordHandler`** — Application request and handler. The handler rejects tokens older than 1 hour or already used, applies the sign-up password rules (12 characters minimum, breached-password check), changes the password, updates the security stamp and revokes every OpenIddict token for the account.
 - **`ITokenRevocation`** — Infrastructure service that revokes all stored tokens for a user.
@@ -39,7 +39,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-The account holder requests and completes a reset in FaithTech Community, which sends reset links through the email provider.
+The account holder requests and completes a reset in QuinntyneBrown.Community, which sends reset links through the email provider.
 
 ![C4 system context for password reset](diagrams/c4-context.png)
 

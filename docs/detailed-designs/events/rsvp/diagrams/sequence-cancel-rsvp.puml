@@ -15,18 +15,18 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Member" as actor
-box "Frontend — FaithTech Community web app (events library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (events library)" #E0F2FE
   participant "EventPage" as page
   participant "CancelRsvpDialog" as dlg
   participant "HttpEventsService" as svc
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "EventsEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "CancelRsvpHandler" as h
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   database "Community database" as db
 end box
 

@@ -5,7 +5,7 @@ title System Context — Work items
 
 Person(member, "Workspace member", "Lead or volunteer added to a workspace")
 Person(staff, "Staff", "Read-only across workspaces")
-System(ftc, "FaithTech Community", "Community site with Agile team workspaces")
+System(ftc, "QuinntyneBrown.Community", "Community site with Agile team workspaces")
 System_Ext(email, "Email provider", "SMTP/SendGrid")
 
 Rel(member, ftc, "Creates and edits work items in")

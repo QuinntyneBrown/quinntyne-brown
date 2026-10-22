@@ -15,17 +15,17 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Member" as actor
-box "Frontend — FaithTech Community web app (profiles library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (profiles library)" #E0F2FE
   participant "EditProfilePage" as page
   participant "ProfilesService" as client
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "ProfilesEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "UploadPhotoHandler" as h
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "IImageProcessor" as ip
   participant "IPhotoStorage" as ps
   database "Community database" as db

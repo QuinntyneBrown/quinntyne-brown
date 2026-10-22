@@ -1,6 +1,6 @@
 # Journey videos
 
-Narrated demo videos of every FaithTech Community user journey that has a screen. Each journey has its
+Narrated demo videos of every QuinntyneBrown.Community user journey that has a screen. Each journey has its
 own folder holding `video.webm`, `poster.png`, `captions.vtt` and `narration.md`. A video is one
 continuous take of the real Angular app at 1280x720, with on-screen captions, embedded chapters, a
 WebVTT caption file, a poster frame and the narration text it was spoken from.

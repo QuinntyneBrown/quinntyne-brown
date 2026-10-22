@@ -2,7 +2,7 @@
 
 ## Project overview
 
-FaithTech Community is a full-stack community site for FaithTech staff, leads, volunteers, builders, event attendees and partners. Anyone can sign up and create a profile. The .NET backend owns persistence, permissions and authentication; the Angular frontend provides the app; Playwright covers end-to-end behavior and accessibility.
+QuinntyneBrown.Community is the full-stack community site of Quinntyne Brown, Christian, Chief Product Officer and founder, and City Lead for FaithTech Toronto. It serves FaithTech staff, leads, volunteers, builders, event attendees and partners, and is also a space for anyone and everyone Quinntyne works with or engages with. Anyone can sign up and create a profile. The .NET backend owns persistence, permissions and authentication; the Angular frontend provides the app; Playwright covers end-to-end behavior and accessibility.
 
 `idea.txt` is the original brief. `decisions.txt` holds the agreed decisions and wins where the two differ.
 
@@ -17,7 +17,7 @@ FaithTech Community is a full-stack community site for FaithTech staff, leads, v
 - Work that does not follow this structure is incomplete and MUST be corrected before it is considered done.
 
 ```text
-faithtech-community/
+quinntyne-brown/
 ├── AGENTS.md, CLAUDE.md, GEMINI.md   # Agent instructions (AGENTS.md is the source of truth)
 ├── README.md                         # Product overview, setup and development commands
 ├── LICENSE                           # MIT
@@ -29,33 +29,33 @@ faithtech-community/
 │   ├── pull_request_template.md      # PR checklist
 │   └── copilot-instructions.md       # Pointer to AGENTS.md
 ├── backend/                          # .NET solution
-│   ├── FaithTech.Community.sln
+│   ├── QuinntyneBrown.Community.sln
 │   ├── Directory.Build.props         # Shared build settings for every project
 │   ├── Directory.Packages.props      # Central NuGet package versions
 │   ├── global.json                   # Pinned .NET SDK
 │   ├── deploy/                       # Dockerfiles (API with both Angular builds, Cli) and the
 │   │                                 # local compose file (ADR 0026)
 │   ├── src/
-│   │   ├── FaithTech.Community.Domain/          # Entities, value objects, roles. Zero dependencies.
+│   │   ├── QuinntyneBrown.Community.Domain/          # Entities, value objects, roles. Zero dependencies.
 │   │   │                                        # One folder per feature, named as in Application/,
 │   │   │                                        # plus Agile/ for the agile workspace designs
-│   │   ├── FaithTech.Community.Application/     # Handlers, validators, DTO contracts, permission
+│   │   ├── QuinntyneBrown.Community.Application/     # Handlers, validators, DTO contracts, permission
 │   │   │                                        # checks; one folder per feature (Identity/,
 │   │   │                                        # Profiles/, Contacts/, Partners/, Team/, Events/, Search/,
 │   │   │                                        # Notifications/, Announcements/, Invites/, Admin/,
 │   │   │                                        # Resources/, Notes/, Agile/, PrivatePreview/)
-│   │   ├── FaithTech.Community.Infrastructure/  # DbContext, EF migrations, Postgres full-text
+│   │   ├── QuinntyneBrown.Community.Infrastructure/  # DbContext, EF migrations, Postgres full-text
 │   │   │                                        # search, Azure Blob, email, .ics, image resizing,
 │   │   │                                        # OpenIddict stores, audit log, seeder, private-preview
 │   │   │                                        # passphrase hashing and unlock signing
-│   │   ├── FaithTech.Community.Api/             # Endpoints, Program.cs, DI composition,
+│   │   ├── QuinntyneBrown.Community.Api/             # Endpoints, Program.cs, DI composition,
 │   │   │                                        # middleware. No business logic.
-│   │   └── FaithTech.Community.Cli/             # Database migrate, seed and reset commands
+│   │   └── QuinntyneBrown.Community.Cli/             # Database migrate, seed and reset commands
 │   └── tests/
-│       ├── FaithTech.Community.Application.Tests/     # Handler and authorization rule tests
-│       ├── FaithTech.Community.Infrastructure.Tests/  # Persistence, search, storage, email
-│       ├── FaithTech.Community.Api.Tests/             # Integration tests against the API
-│       └── FaithTech.Community.Cli.Tests/             # CLI command tests
+│       ├── QuinntyneBrown.Community.Application.Tests/     # Handler and authorization rule tests
+│       ├── QuinntyneBrown.Community.Infrastructure.Tests/  # Persistence, search, storage, email
+│       ├── QuinntyneBrown.Community.Api.Tests/             # Integration tests against the API
+│       └── QuinntyneBrown.Community.Cli.Tests/             # CLI command tests
 ├── frontend/                         # Angular workspace
 │   ├── angular.json, package.json, eslint.config.js, .prettierrc
 │   └── projects/
@@ -149,11 +149,11 @@ Stack: .NET (LTS), ASP.NET Core, EF Core, PostgreSQL (full-text search for globa
 
 Layer dependency direction (strict):
 
-- `FaithTech.Community.Domain`: entities, value objects, roles. Zero dependencies.
-- `FaithTech.Community.Application`: handlers, validators, DTO contracts, permission checks.
-- `FaithTech.Community.Infrastructure`: DbContext, migrations, Postgres, blob storage, email, auth services, seeder.
-- `FaithTech.Community.Api`: endpoints, `Program.cs`, DI composition, middleware.
-- `FaithTech.Community.Cli`: database migration, seeding and reset commands.
+- `QuinntyneBrown.Community.Domain`: entities, value objects, roles. Zero dependencies.
+- `QuinntyneBrown.Community.Application`: handlers, validators, DTO contracts, permission checks.
+- `QuinntyneBrown.Community.Infrastructure`: DbContext, migrations, Postgres, blob storage, email, auth services, seeder.
+- `QuinntyneBrown.Community.Api`: endpoints, `Program.cs`, DI composition, middleware.
+- `QuinntyneBrown.Community.Cli`: database migration, seeding and reset commands.
 
 Non-obvious rules:
 

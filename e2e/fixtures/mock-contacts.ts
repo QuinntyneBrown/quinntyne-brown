@@ -57,7 +57,7 @@ const LEAD_ROLES = ['CityLead', 'EventLead', 'CreateLead', 'CommunicationsLead']
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * ContactsEndpoints in the browser (backend/src/FaithTech.Community.Api/Endpoints/ContactsEndpoints.cs):
+ * ContactsEndpoints in the browser (backend/src/QuinntyneBrown.Community.Api/Endpoints/ContactsEndpoints.cs):
  * lead roles and System Admin only, another lead's contact is 404 (ADR 0014).
  */
 export class MockContacts {

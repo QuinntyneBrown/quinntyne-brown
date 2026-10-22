@@ -7,7 +7,7 @@
 
 ## Context
 
-FaithTech Community is about to be deployed to `app.faithtech.community` and `www.faithtech.community` (ADR 0018 left hosting, DNS, certificates and infrastructure for later). While it is in private preview, only the owner may see it: every other visitor must see one neutral unlock page that gives nothing about the product away, and every other request, including the API, the identity server, SignalR and static files, must be refused. A client-side check is not a wall. The repository layout reserves `backend/deploy/` for containers and `eng/infra/` for Azure infrastructure.
+QuinntyneBrown.Community is about to be deployed to `app.faithtech.community` and `www.faithtech.community` (ADR 0018 left hosting, DNS, certificates and infrastructure for later). While it is in private preview, only the owner may see it: every other visitor must see one neutral unlock page that gives nothing about the product away, and every other request, including the API, the identity server, SignalR and static files, must be refused. A client-side check is not a wall. The repository layout reserves `backend/deploy/` for containers and `eng/infra/` for Azure infrastructure.
 
 ## Decision
 

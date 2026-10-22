@@ -74,7 +74,7 @@ The manager confirms in `CancelEventDialog`. The handler marks the event cancell
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - The reason is required, as `L2-025` states; the earlier "optional reason" wording is corrected. Resolved.
 

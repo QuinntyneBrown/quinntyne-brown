@@ -2,7 +2,7 @@
 
 ## Overview
 
-An *announcement* is a message with a subject and a body that a Communications Lead or System Admin sends to a chosen audience. Announcements are the broadcast channel of FaithTech Community, distinct from notifications that the system raises automatically.
+An *announcement* is a message with a subject and a body that a Communications Lead or System Admin sends to a chosen audience. Announcements are the broadcast channel of QuinntyneBrown.Community, distinct from notifications that the system raises automatically.
 
 - **audience** — set of recipients chosen at compose time: everyone, the holders of one or more roles, or the RSVP list of one event
 - **recipient count** — number of members the chosen audience resolves to at the moment of preview
@@ -47,7 +47,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-A Communications Lead sends announcements through FaithTech Community, which delivers email through the email provider.
+A Communications Lead sends announcements through QuinntyneBrown.Community, which delivers email through the email provider.
 
 ![C4 system context for send an announcement](diagrams/c4-context.png)
 
@@ -77,7 +77,7 @@ The page previews the recipient count, then sends. Validation failures return 40
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `L2-029` lets an announcement target one or more roles; the audience holds a set of roles (`AudienceKind.Roles`) instead of a single role. `AlsoEmail` records the "Also send by email" choice (`L2-029` AC5). Resolved.
 - Domain rule violations throw `InvalidOperationException` (a broken rule) or `ArgumentException` (invalid input); there is no shared domain exception type. Handlers check permissions and preconditions first and map any remaining violation to a `400` or `409` result.

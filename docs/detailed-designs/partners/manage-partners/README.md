@@ -14,7 +14,7 @@ This feature covers creating, viewing and editing partner records. A new partner
 - **`PartnerFormPage`** — edit screen at `/partners/:id/edit` (mock `pages/partner-form`) with the same fields as `AddPartnerDialog` except the stage, which changes only by a move. It shows a read-only state when `canEdit` is false and an error summary with focus on the first invalid field.
 - **`partner-fields.ts`** — the form group, `fromPartner`, `toRequest`, `clientErrors`, `serverErrors` and `ownerOptions` that the dialog and the form page share.
 - **`PartnersService`** / **`PARTNERS_SERVICE`** / **`HttpPartnersService`** — API client in `api/src/lib/partners`: `getBoard()`, `get(id)`, `owners()`, `create(partner)`, `update(id, partner)` and `move(id, to, note)`, calling `GET /api/partners`, `GET /api/partners/{id}`, `GET /api/partners/owners`, `POST /api/partners`, `PUT /api/partners/{id}` and `POST /api/partners/{id}/stage`.
-- **`PartnersEndpoints`** — minimal API mapping in `FaithTech.Community.Api`; it holds no business logic. Create answers `201`, `400` or `403`; get answers `200`, `403` or `404`; update answers `200`, `400`, `403` or `404`; owners answers `200` or `403`.
+- **`PartnersEndpoints`** — minimal API mapping in `QuinntyneBrown.Community.Api`; it holds no business logic. Create answers `201`, `400` or `403`; get answers `200`, `403` or `404`; update answers `200`, `400`, `403` or `404`; owners answers `200` or `403`.
 - **`PartnerCommand`** — one request body for create and update (`Name`, `Website`, `Offering`, `OwnerId`, `ContactName`, `Email`, `Phone`, `Notes`, `Stage`); `Stage` applies on create only.
 - **`PartnerValidator`** and **`PartnerRules`** — a name is required ("Enter the organisation’s name."), the email must be well formed when present, other fields are at most 200 characters, notes at most 2,000, and a stage must be `Lead`, `InFunnel` or `Confirmed`.
 - **`ManagePartnersHandler`** — Application handler in `Partners/` with `CreateAsync`, `GetAsync`, `UpdateAsync`, `BoardAsync` (see `partners/partner-kanban-board`) and `OwnersAsync`.
@@ -82,7 +82,7 @@ Every permitted reader sees the same shared record (`L2-017` AC2). A lead or Sys
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `L2-017` adds website, offering and an owner (a lead) to a partner; `Partner` carries `Website`, `Offering` and `OwnerId`. Resolved.
 - Domain rule violations throw `InvalidOperationException` (a broken rule) or `ArgumentException` (invalid input); there is no shared domain exception type. Handlers check permissions and preconditions first and map any remaining violation to a `400` or `409` result.

@@ -2,7 +2,7 @@
 
 ## Overview
 
-A System Admin holds **full override** — authority to view or change any record in FaithTech Community, including records otherwise restricted to their owner, such as private contacts and Agile workspaces. This feature provides the admin users page, where a System Admin searches every account and sees each user's roles and status, and defines how override is applied across the rest of the system.
+A System Admin holds **full override** — authority to view or change any record in QuinntyneBrown.Community, including records otherwise restricted to their owner, such as private contacts and Agile workspaces. This feature provides the admin users page, where a System Admin searches every account and sees each user's roles and status, and defines how override is applied across the rest of the system.
 
 Override is not a separate set of screens. Each feature's Application permission check treats System Admin as permitted, and each overriding access is written to the audit log (`L2-041`). This document describes the override rule and the admin users page; the feature designs that own each record type apply the rule.
 
@@ -39,7 +39,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-The System Admin is the only actor. Override applies inside FaithTech Community; no external system participates.
+The System Admin is the only actor. Override applies inside QuinntyneBrown.Community; no external system participates.
 
 ![C4 system context for admin users page and override](diagrams/c4-context.png)
 

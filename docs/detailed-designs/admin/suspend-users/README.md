@@ -2,7 +2,7 @@
 
 ## Overview
 
-A System Admin may need to stop a person from using FaithTech Community, for example after misuse. **Suspension** — admin-imposed state of an account that refuses sign-in and revokes existing sessions until reinstatement. Suspension does not delete the profile or its data; reinstatement returns the account to normal use.
+A System Admin may need to stop a person from using QuinntyneBrown.Community, for example after misuse. **Suspension** — admin-imposed state of an account that refuses sign-in and revokes existing sessions until reinstatement. Suspension does not delete the profile or its data; reinstatement returns the account to normal use.
 
 This feature covers suspending a user with a reason and reinstating them. Only a System Admin may do either. Sign-in itself enforces the suspended state (`L2-003`), so this feature changes account state and revokes tokens, while the identity subsystem refuses later sign-ins.
 
@@ -78,7 +78,7 @@ The page opens `SuspendUserDialog`, which calls the API client. `SuspensionHandl
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - Suspension lives on `Profile`, not on a separate `UserAccount` entity: the Domain has no dependency on ASP.NET Identity, and sign-in already reads `Profile.IsSuspended` (`identity/sign-in-and-sign-out`). Resolved.
 - Domain rule violations throw `InvalidOperationException` (a broken rule) or `ArgumentException` (invalid input); there is no shared domain exception type. Handlers check permissions and preconditions first and map any remaining violation to a `400` or `409` result.

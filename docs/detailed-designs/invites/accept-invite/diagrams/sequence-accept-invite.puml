@@ -15,19 +15,19 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Invitee" as actor
-box "Frontend — FaithTech Community web app (invites library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (invites library)" #E0F2FE
   participant "AcceptInvitePage" as page
 end box
-box "Frontend — FaithTech Community web app (api library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (api library)" #E0F2FE
   participant "HttpInvitesService" as client
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "InvitesEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "AcceptInviteHandler" as h
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "AuditLog" as audit
   database "Community database" as db
 end box

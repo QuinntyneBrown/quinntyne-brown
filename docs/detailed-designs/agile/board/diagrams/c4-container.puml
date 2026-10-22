@@ -5,9 +5,9 @@ title Containers — Board
 
 Person(member, "Workspace member", "Lead or volunteer added to a workspace")
 Person(staff, "Staff", "Read-only across workspaces")
-System_Boundary(ftc, "FaithTech Community") {
+System_Boundary(ftc, "QuinntyneBrown.Community") {
   Container(web, "Web app", "Angular", "Shell, agile feature library, api and components libraries")
-  Container(api, "Community API", "ASP.NET Core", "FaithTech.Community.Api with Application, Domain and Infrastructure")
+  Container(api, "Community API", "ASP.NET Core", "QuinntyneBrown.Community.Api with Application, Domain and Infrastructure")
   ContainerDb(db, "Community database", "PostgreSQL", "Workspaces, work items, sprints, poker sessions")
 }
 

@@ -6,9 +6,9 @@ title Containers — RSVP
 Person(member, "Member", "Signed-in user who browses and RSVPs to events")
 Person(lead, "Event Lead / City Lead", "Creates, edits and cancels events")
 Person(staff, "Staff", "Read-only across events, sees full RSVP lists")
-System_Boundary(ftc, "FaithTech Community") {
+System_Boundary(ftc, "QuinntyneBrown.Community") {
   Container(spa, "Web app", "Angular", "Shell, events feature library, api and components libraries")
-  Container(api, "Community API", "ASP.NET Core", "FaithTech.Community.Api with Application, Domain and Infrastructure")
+  Container(api, "Community API", "ASP.NET Core", "QuinntyneBrown.Community.Api with Application, Domain and Infrastructure")
   ContainerDb(db, "Community database", "PostgreSQL", "Events, RSVPs, notifications and outbox")
 }
 System_Ext(email, "Email provider", "SMTP/SendGrid delivery")

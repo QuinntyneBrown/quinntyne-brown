@@ -9,13 +9,13 @@ actor "Visitor without an unlock" as actor
 box "Frontend — browser (no app bundle has loaded)" #E0F2FE
   participant "Browser" as browser
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "SecurityHeadersMiddleware" as hdr
   participant "PrivatePreviewGateMiddleware" as gate
   participant "WallPage" as page
   participant "Static sites, CORS, auth, endpoints, hub" as rest
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "HmacUnlockTokens" as tokens
 end box
 actor -> browser : Open https://app.faithtech.community/events/42

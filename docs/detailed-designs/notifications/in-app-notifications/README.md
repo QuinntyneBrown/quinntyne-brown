@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community tells members about activity that concerns them. A *notification* is a short record addressed to one member that describes something that happened, such as a contact signing up or an event being cancelled, and links to the related item. This feature covers the in-app channel: the bell in the app shell, its panel, and the notifications page. The email channel is described in the email notifications design (`L2-028`).
+QuinntyneBrown.Community tells members about activity that concerns them. A *notification* is a short record addressed to one member that describes something that happened, such as a contact signing up or an event being cancelled, and links to the related item. This feature covers the in-app channel: the bell in the app shell, its panel, and the notifications page. The email channel is described in the email notifications design (`L2-028`).
 
 - **notification** — record addressed to one recipient that names an occurrence and links to the item it concerns
 - **unread count** — number of the recipient's notifications that have no read time
@@ -17,7 +17,7 @@ Other features create notifications through one Application service, so every so
 - **`ShellNotificationsComponent`** — glue in the app shell (`faithtech-community/src/app/shell`) that feeds the bell and panel from `NotificationsService`. It reloads on every navigation and every 60 seconds while the tab is visible, marks an opened notice read and then navigates to its `LinkPath`. It is not in the `notifications` library, because the shell never imports a feature library eagerly (ADR 0016).
 - **`NotificationsPage`** — page in the `notifications` feature library (mock `pages/notifications`). It lists notifications newest first, 50 at a time with a **Show older notifications** button, filters to **All** or **Unread** (mock `pages/notifications/unread`), shows the empty state when none exist, and offers "Mark all as read".
 - **`NotificationsService`** / **`NOTIFICATIONS_SERVICE`** / **`HttpNotificationsService`** — API client contract, injection token and HTTP implementation in the `api` library.
-- **`NotificationsEndpoints`** — minimal API mapping in `FaithTech.Community.Api` for `GET /api/notifications?unreadOnly=&page=`, `GET /api/notifications/unread-count`, `POST /api/notifications/{id}/read` and `POST /api/notifications/read-all`. Another member's notification id answers `404`.
+- **`NotificationsEndpoints`** — minimal API mapping in `QuinntyneBrown.Community.Api` for `GET /api/notifications?unreadOnly=&page=`, `GET /api/notifications/unread-count`, `POST /api/notifications/{id}/read` and `POST /api/notifications/read-all`. Another member's notification id answers `404`.
 - **`InAppNotificationsHandler`** — lists a page of 50 of the caller's notifications ordered by `CreatedAt` descending, filtered by recipient (and, with `unreadOnly`, by a null `ReadAt`) in the database query, with `totalCount`, `unreadCount`, `hasMore` and each actor's name; counts the unread; and sets `ReadAt` on one or all of the caller's unread notifications.
 - **`INotificationPublisher`** — Application service other features call: `Publish` adds one in-app notification; `PublishAsync` adds one per recipient and queues their email (email notifications design).
 - **`Notification`** — Domain entity with `RecipientId`, `Kind`, `Title` (required), `LinkPath` (required), an optional `ActorId` (the member whose action raised it; the notice shows their initials, or "FaithTech" without one), `CreatedAt` and `ReadAt`. `MarkRead(at)` keeps the first read time.
@@ -49,7 +49,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-A member reads notifications that FaithTech Community creates about activity that concerns the member.
+A member reads notifications that QuinntyneBrown.Community creates about activity that concerns the member.
 
 ![C4 system context for in-app notifications](diagrams/c4-context.png)
 
@@ -85,7 +85,7 @@ The panel lists notifications newest first (`L2-027`). Opening one marks it read
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `NotificationKind` adds `InviteAccepted` (inviter notified, `L2-011` AC4) and `WorkspaceOwnerLostCityLead` (System Admin notified, `L2-037` AC2), which are in-app occurrences not listed in `L2-028`.
 - `NotificationKind` adds `NotePageShared` ("{Owner} shared {title} with you", linking to `/notes/{id}`), published in-app and by email through `INotificationPublisher.PublishAsync` by `NoteShareNotifier`; the email cannot be turned off (`L2-093`, `notes/share-and-visibility`).

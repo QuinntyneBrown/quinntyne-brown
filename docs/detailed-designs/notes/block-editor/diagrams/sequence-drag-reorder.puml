@@ -15,16 +15,16 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Owner" as actor
-box "Frontend — FaithTech Community web app (components library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (components library)" #E0F2FE
   participant "BlockEditorComponent" as ed
   participant "CDK drag-drop" as dd
   participant "Polite live region" as live
 end box
-box "Frontend — FaithTech Community web app (notes library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (notes library)" #E0F2FE
   participant "NotePage" as page
   participant "NoteAutosave" as auto
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "NotesEndpoints" as ep
 end box
 actor -> ed : Hover a block; grab its handle
