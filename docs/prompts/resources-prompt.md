@@ -2,7 +2,7 @@
 
 ## Goal
 
-Build, end to end, **Resources**: a searchable home inside FaithTech Community for the decks, logos, images,
+Build, end to end, **Resources**: a searchable home inside QuinntyneBrown.Community for the decks, logos, images,
 training materials and templates that leads cannot find today because they are scattered across Drive,
 SharePoint, Canva, Dropbox and email. Unlike earlier feature prompts, nothing exists yet for this subsystem: no
 requirements, mocks, designs, estimate or code. This prompt carries the decisions already agreed (below); the

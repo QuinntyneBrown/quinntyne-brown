@@ -6,17 +6,17 @@ skinparam roundcorner 12
 skinparam defaultFontName Arial
 skinparam ArrowColor #344054
 actor "City Lead, Staff or System Admin" as actor
-box "Frontend — FaithTech Community web app (profiles library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (profiles library)" #E0F2FE
   participant "PeoplePage" as page
   participant "HttpPeopleService" as svc
   participant "RoleDialogComponent" as dialog
   participant "HttpRolesService" as roles
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "PeopleEndpoints" as ep
   participant "RolesEndpoints" as rep
 end box
-box "Backend — FaithTech.Community.Application" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application" #ECFDF3
   participant "ListPeopleHandler" as h
   participant "ChangeRolesHandler" as ch
 end box

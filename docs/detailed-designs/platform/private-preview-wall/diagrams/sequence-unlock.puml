@@ -9,15 +9,15 @@ actor "Owner" as actor
 box "Frontend — wall page (server-rendered HTML)" #E0F2FE
   participant "Wall form" as form
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "PrivatePreviewGateMiddleware" as gate
   participant "WallPage" as page
 end box
-box "Backend — FaithTech.Community.Application" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application" #ECFDF3
   participant "UnlockHandler" as handler
   participant "UnlockAttempts" as attempts
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "Pbkdf2PassphraseHasher" as hasher
   participant "HmacUnlockTokens" as tokens
 end box

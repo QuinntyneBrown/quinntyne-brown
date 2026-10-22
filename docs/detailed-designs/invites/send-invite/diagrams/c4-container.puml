@@ -5,9 +5,9 @@ title Containers — Send an invite
 
 Person(lead, "Lead", "Holder of a lead role")
 Person(admin, "System Admin", "Holder of the System Admin role")
-System_Boundary(ftc, "FaithTech Community") {
+System_Boundary(ftc, "QuinntyneBrown.Community") {
   Container(spa, "Web app", "Angular", "Shell, invites feature library, api and components libraries")
-  Container(api, "Community API", "ASP.NET Core", "FaithTech.Community.Api with Application, Domain and Infrastructure")
+  Container(api, "Community API", "ASP.NET Core", "QuinntyneBrown.Community.Api with Application, Domain and Infrastructure")
   ContainerDb(db, "Community database", "PostgreSQL", "Accounts, profiles, invites and audit log")
 }
 System_Ext(email, "Email provider", "SMTP or SendGrid")

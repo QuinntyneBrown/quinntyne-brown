@@ -84,7 +84,7 @@ A drag or keyboard move goes over HTTP to `BoardHandler.MoveAsync`, which change
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `BoardHandler.MoveAsync` changes the status through `WorkItem.SetStatus`, which a task refuses (tasks have a done flag); the handler answers 409 before reaching the entity.
 

@@ -2,16 +2,20 @@
   <img src="docs/design-system/assets/qb-logo.svg" alt="QB" width="96" height="96">
 </p>
 
-# FaithTech Community
+# QuinntyneBrown.Community
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Status: in development](https://img.shields.io/badge/status-in%20development-orange.svg)](#project-status)
 [![Accessibility: WCAG 2.2 AA](https://img.shields.io/badge/a11y-WCAG%202.2%20AA-green.svg)](#accessibility)
 
-FaithTech Community is an open-source community platform for [FaithTech](https://faithtech.com)
-staff, city leads, volunteers, builders, event attendees and partners. Anyone can join and create a
-profile. Leads get the tools to run a city: events, private contacts, a partner pipeline, their team
-and Agile workspaces with Planning Poker.
+QuinntyneBrown.Community is the open-source community platform of Quinntyne Brown, Christian,
+Chief Product Officer and founder, and City Lead for [FaithTech](https://faithtech.com) Toronto.
+
+It serves the same purpose as a FaithTech city community: a home for staff, city leads, volunteers,
+builders, event attendees and partners, where leads get the tools to run a city: events, private
+contacts, a partner pipeline, their team and Agile workspaces with Planning Poker. It is also a
+space for anyone and everyone Quinntyne works with or engages with. Anyone can join and create a
+profile.
 
 > **Project status:** in development. Requirements, designs, mocks and the design system are in place,
 > and v1 is being built feature by feature. See [Project status](#project-status).
@@ -97,7 +101,7 @@ Architecture decisions are recorded in [`docs/adr/`](docs/adr/).
 ## Repository layout
 
 ```text
-faithtech-community/
+quinntyne-brown/
 ├── backend/          # .NET solution: src/ and tests/
 ├── frontend/         # Angular workspace: community app, marketing app, components, api and feature libraries
 ├── e2e/              # Playwright end-to-end and accessibility suite
@@ -116,8 +120,8 @@ The full, mandatory layout is in [AGENTS.md](AGENTS.md#repository-layout-mandato
 The HTML mocks show every page, dialog and notification in every state, in light and dark themes.
 
 ```sh
-git clone https://github.com/<org>/faithtech-community.git
-cd faithtech-community
+git clone https://github.com/QuinntyneBrown/quinntyne-brown.git
+cd quinntyne-brown
 # Open the gallery in your browser
 start docs/mocks/index.html      # Windows
 open docs/mocks/index.html       # macOS
@@ -146,18 +150,18 @@ When the application code lands you will need:
 docker compose -f backend/deploy/compose.yaml up -d postgres azurite
 
 # Apply migrations and seed data (the API never migrates on startup)
-dotnet run --project backend/src/FaithTech.Community.Cli -- migrate
-dotnet run --project backend/src/FaithTech.Community.Cli -- seed
+dotnet run --project backend/src/QuinntyneBrown.Community.Cli -- migrate
+dotnet run --project backend/src/QuinntyneBrown.Community.Cli -- seed
 
 # Make an account that has signed up the first System Admin (idempotent, audited)
-dotnet run --project backend/src/FaithTech.Community.Cli -- grant-admin you@example.org
+dotnet run --project backend/src/QuinntyneBrown.Community.Cli -- grant-admin you@example.org
 
 # Run the API
-dotnet run --project backend/src/FaithTech.Community.Api
+dotnet run --project backend/src/QuinntyneBrown.Community.Api
 
 # Isolated performance environment only: 200 verified load-test members, then the k6 run
 # (see docs/detailed-designs/platform/performance, "Load test")
-LOADTEST_PASSWORD=<12+ characters> dotnet run --project backend/src/FaithTech.Community.Cli -- seed-load-users 200
+LOADTEST_PASSWORD=<12+ characters> dotnet run --project backend/src/QuinntyneBrown.Community.Cli -- seed-load-users 200
 
 # Run the Angular app (http://localhost:4200) and the marketing page (http://localhost:4300)
 cd frontend && npm ci && npm start
@@ -180,8 +184,8 @@ PYTHON=.cache/kokoro-venv/bin/python node eng/videos/brochure/build.mjs
 docker compose -f backend/deploy/compose.yaml up --build --wait   # then open http://www.localhost:8080
 
 # The wall's secrets: a PBKDF2 hash of a passphrase read from standard input, and a signing key
-dotnet run --project backend/src/FaithTech.Community.Cli -- wall-hash
-dotnet run --project backend/src/FaithTech.Community.Cli -- wall-key
+dotnet run --project backend/src/QuinntyneBrown.Community.Cli -- wall-hash
+dotnet run --project backend/src/QuinntyneBrown.Community.Cli -- wall-key
 
 # Deploy (normally run by .github/workflows/deploy.yml); validate the templates without deploying
 eng/deploy.sh
@@ -193,7 +197,7 @@ Development keeps the wall off (`PrivatePreview:Enabled` is `false` in `appsetti
 ### Test (planned)
 
 ```sh
-dotnet test backend/FaithTech.Community.sln   # backend unit and integration tests
+dotnet test backend/QuinntyneBrown.Community.sln   # backend unit and integration tests
 cd frontend && npm test                        # Angular unit tests
 cd e2e && npx playwright test                  # end-to-end and axe checks (Chromium)
 ```

@@ -2,7 +2,7 @@
 
 ## Overview
 
-When a person a lead has recorded as a private contact later joins FaithTech Community, the lead benefits from connecting the two records. **Contact link** — association from a private contact to the real profile of the same person. A linked contact shows the profile's name and photo while keeping the lead's private notes.
+When a person a lead has recorded as a private contact later joins QuinntyneBrown.Community, the lead benefits from connecting the two records. **Contact link** — association from a private contact to the real profile of the same person. A linked contact shows the profile's name and photo while keeping the lead's private notes.
 
 The trigger is email verification, not sign-up. Once a new account verifies an email that matches one or more contacts, each owning lead receives an in-app and email notification offering to link. The notification opens the contact page, where the lead links the contact or chooses "Not them" and can still link later. Linking never reveals the contact or its notes to the person.
 
@@ -51,7 +51,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-The lead receives in-app and email notifications from FaithTech Community, which sends email through the email provider.
+The lead receives in-app and email notifications from QuinntyneBrown.Community, which sends email through the email provider.
 
 ![C4 system context for link a contact on sign-up](diagrams/c4-context.png)
 
@@ -93,7 +93,7 @@ The lead opens the contact from the notification, the email or the list alert an
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `L2-015` AC5 lets the lead discard notes while linking; `LinkTo` takes a `discardNotes` flag. A contact links once: linking an already-linked contact is rejected. Resolved.
 - "Not them" only hides the match prompt on the open page; nothing is stored, so the prompt returns on the next visit and the lead can still link (`L2-015` AC4).

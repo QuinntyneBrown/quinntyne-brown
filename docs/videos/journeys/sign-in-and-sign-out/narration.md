@@ -1,7 +1,7 @@
 # Sign in and sign out
 
 ## opening: Opening
-In this video you sign in to FaithTech Community, and sign out again. The app runs for real, against a local stand-in for the identity server, with a made-up account.
+In this video you sign in to QuinntyneBrown.Community, and sign out again. The app runs for real, against a local stand-in for the identity server, with a made-up account.
 
 ## protected: Members only
 Member pages are for signed-in members. When you open the home page without signing in, the app sends you to Welcome back, and remembers where you were going.

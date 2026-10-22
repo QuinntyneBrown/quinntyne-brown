@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community enforces every permission on the server. The UI may hide controls, but no data reaches a caller that the server has not authorized. This design describes the shared authorization mechanism that every feature endpoint and handler uses.
+QuinntyneBrown.Community enforces every permission on the server. The UI may hide controls, but no data reaches a caller that the server has not authorized. This design describes the shared authorization mechanism that every feature endpoint and handler uses.
 
 - **fallback policy** — ASP.NET Core authorization policy applied to every endpoint that does not opt out, requiring an authenticated caller
 - **anonymous endpoint** — endpoint explicitly marked with `AllowAnonymous`; `L2-042` lists the permitted set
@@ -44,7 +44,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-Every caller, signed in or anonymous, reaches FaithTech Community data only through API checks.
+Every caller, signed in or anonymous, reaches QuinntyneBrown.Community data only through API checks.
 
 ![C4 system context for server authorization](diagrams/c4-context.png)
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community holds people, events, partners, private contacts and Agile work items. Global search lets a signed-in member find any of them from one search box, with results grouped by kind.
+QuinntyneBrown.Community holds people, events, partners, private contacts and Agile work items. Global search lets a signed-in member find any of them from one search box, with results grouped by kind.
 
 Key terms:
 
@@ -48,7 +48,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-Members, leads and Staff search FaithTech Community from one box. What each sees depends on that person's roles.
+Members, leads and Staff search QuinntyneBrown.Community from one box. What each sees depends on that person's roles.
 
 ![C4 system context for global search](diagrams/c4-context.png)
 

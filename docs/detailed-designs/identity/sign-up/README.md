@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community is open: anyone can create an account and a profile. *Sign up* is the first step for every person who has not been invited, and the entry point that turns an anonymous visitor into a member.
+QuinntyneBrown.Community is open: anyone can create an account and a profile. *Sign up* is the first step for every person who has not been invited, and the entry point that turns an anonymous visitor into a member.
 
 **account** — ASP.NET Identity user record holding a name, an email and a hashed password
 
@@ -17,8 +17,8 @@ The slice runs from the `sign-up` mock page to the database and the email provid
 
 - **`SignUpPage`** — Angular page built from `components` form fields and buttons. It validates fields inline, moves focus to the first invalid field, announces errors through a live region and shows a busy state on the submit button while the request is in flight.
 - **`AuthService`** — contract in the `api` library, provided through the `AUTH_SERVICE` injection token and implemented by `HttpAuthService`. It wraps the account endpoints and the OIDC + PKCE client.
-- **`AccountEndpoints`** — minimal API route group in `FaithTech.Community.Api`. It maps the account routes, opts each one into anonymous access explicitly, and forwards the request to the Application handler. It holds no business logic.
-- **`CommunityDbContext`** — EF Core context in `FaithTech.Community.Infrastructure`. It stores ASP.NET Identity users alongside community data in PostgreSQL.
+- **`AccountEndpoints`** — minimal API route group in `QuinntyneBrown.Community.Api`. It maps the account routes, opts each one into anonymous access explicitly, and forwards the request to the Application handler. It holds no business logic.
+- **`CommunityDbContext`** — EF Core context in `QuinntyneBrown.Community.Infrastructure`. It stores ASP.NET Identity users alongside community data in PostgreSQL.
 - **`SignUpCommand`** — request carrying `Name`, `Email` and `Password`.
 - **`SignUpValidator`** — validator in the Application `Profiles/` folder `<TO SUPPLY: final folder for account handlers>`. It requires every field, limits the trimmed name to the profile editor's 100 characters (`UpdateProfileValidator.MaxName`, "Use 100 characters or fewer for your name."), checks the email format and requires a password of at least 12 characters. The sign-up page applies the same name rule before submitting.
 - **`IBreachedPasswordChecker`** — Application abstraction implemented in Infrastructure. It reports whether a password appears in a breached-password list. The source of the list is `<TO SUPPLY>`.
@@ -50,7 +50,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-A visitor creates an account in FaithTech Community, which sends the verification message through the email provider.
+A visitor creates an account in QuinntyneBrown.Community, which sends the verification message through the email provider.
 
 ![C4 system context for signing up](diagrams/c4-context.png)
 
@@ -80,6 +80,6 @@ The page validates inline before sending. The handler rejects weak passwords, cr
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `Profile` requires a non-blank name and starts with an empty `ProfileRole` collection (`L2-001`, `L2-008`).

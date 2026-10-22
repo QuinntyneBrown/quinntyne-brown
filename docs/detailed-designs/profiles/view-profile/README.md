@@ -15,7 +15,7 @@ Profiles are visible to signed-in members only. An anonymous visitor who request
 - **`ProfilePage`** — page in the `profiles` feature library at `/people/:id` (and `/people/me` for the caller's own profile), matching the `profile` mock. It composes `ProfileHeaderComponent` (featured photo or initials, name, role badges, home city, bio, photo strip), `EmptyStateComponent` for the no-photos and load-error states and `ButtonComponent` for *Edit profile* on the caller's own profile. While the profile loads, `ProfileHeaderComponent` shows a busy skeleton head (avatar, title and text) followed by a photo strip of four square `SkeletonComponent` tiles (`shape="square"`), so the photo area keeps the shape of the photos it is waiting for (`profile/loading` mock).
 - **`authGuard`** — app-shell route guard that redirects anonymous visitors to sign in before the `profiles` library loads.
 - **`ProfilesService`** — contract in the `api` library, provided through the `PROFILES_SERVICE` injection token and implemented by `HttpProfilesService`.
-- **`ProfilesEndpoints`** — minimal API route group in `FaithTech.Community.Api` under `/api/profiles`. Its endpoints require authentication by default and hold no business logic.
+- **`ProfilesEndpoints`** — minimal API route group in `QuinntyneBrown.Community.Api` under `/api/profiles`. Its endpoints require authentication by default and hold no business logic.
 - **`ICurrentUser`** — Application abstraction exposing the caller's user id and roles. The caller's profile id is read from `CommunityUser.ProfileId` by `ProfileAccess` (ADR 0004).
 - **`Profile`** — Domain entity holding `Name`, `Roles` and the `Photos` collection.
 - **`GetProfileHandler`** — Application handler for `GET /api/profiles/{id}` and `GET /api/profiles/me`. It loads the profile with photos and roles and returns a `ProfileDto`, or not-found. It reads only profiles, so an unlinked private contact is never found (ADR 0003).
@@ -44,7 +44,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-Members view profiles in FaithTech Community. Anonymous visitors are refused.
+Members view profiles in QuinntyneBrown.Community. Anonymous visitors are refused.
 
 ![C4 system context for viewing a profile](diagrams/c4-context.png)
 

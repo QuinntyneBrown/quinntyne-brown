@@ -74,7 +74,7 @@ Notes are returned newest first, including on a contact linked to a real profile
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - Notes are append-only in the Domain; editing and deleting single notes stay deferred until a requirement defines them.
 - The contact page's inline note form in the original mock is replaced by an Add note button and `AddNoteDialog`; the contact form's first note becomes the first `ContactNote` on create.

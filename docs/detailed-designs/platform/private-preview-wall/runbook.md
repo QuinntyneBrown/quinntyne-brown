@@ -1,6 +1,6 @@
 # Runbook: deploy behind the private-preview wall
 
-What the owner runs and supplies to put FaithTech Community on `app.faithtech.community` and `www.faithtech.community` behind the private-preview wall (ADR 0026, `README.md` in this folder). Nothing here is automated from the repository: it creates Azure resources, DNS records and production secrets, which cannot be undone from a pull request. Every command is for Bash (Azure Cloud Shell, macOS, Linux or WSL) with the Azure CLI signed in (`az login`).
+What the owner runs and supplies to put QuinntyneBrown.Community on `app.faithtech.community` and `www.faithtech.community` behind the private-preview wall (ADR 0026, `README.md` in this folder). Nothing here is automated from the repository: it creates Azure resources, DNS records and production secrets, which cannot be undone from a pull request. Every command is for Bash (Azure Cloud Shell, macOS, Linux or WSL) with the Azure CLI signed in (`az login`).
 
 ## What the owner supplies
 
@@ -65,7 +65,7 @@ az keyvault secret set --vault-name "$KV" --name wall-signing-key --output none 
 # OpenIddict signing and encryption certificates (production loads them as base64 PFX, no password).
 for use in signing:digitalSignature encryption:keyEncipherment; do
   name=${use%%:*}; usage=${use#*:}
-  openssl req -x509 -newkey rsa:2048 -nodes -days 730 -subj "/CN=FaithTech Community $name" \
+  openssl req -x509 -newkey rsa:2048 -nodes -days 730 -subj "/CN=QuinntyneBrown.Community $name" \
     -addext "keyUsage=critical,$usage" -keyout "$name.key" -out "$name.crt"
   openssl pkcs12 -export -inkey "$name.key" -in "$name.crt" -passout pass: -out "$name.pfx"
   az keyvault secret set --vault-name "$KV" --name "identity-$name-certificate" --output none --value "$(base64 -w0 "$name.pfx")"

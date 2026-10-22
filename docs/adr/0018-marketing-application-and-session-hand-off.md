@@ -7,7 +7,7 @@
 
 ## Context
 
-FaithTech Community needs a public marketing page at `www.faithtech.community` where a visitor can sign in, sign up or sign in with Google, and then land in the community app with a real authorization code + PKCE session. The community app is served on its own host (`WebApp:Origin`, for example `app.faithtech.community`) behind the same reverse proxy as the API and the identity server (`/api`, `/connect`). Public events are the only signed-out content inside the community app and must stay that way. The repository layout is mandatory; the implementation prompt for this feature (`docs/prompts/marketing-prompt.md`) approved `frontend/projects/marketing/` as a second Angular application and `eng/videos/brochure/` for the brochure video source.
+QuinntyneBrown.Community needs a public marketing page at `www.faithtech.community` where a visitor can sign in, sign up or sign in with Google, and then land in the community app with a real authorization code + PKCE session. The community app is served on its own host (`WebApp:Origin`, for example `app.faithtech.community`) behind the same reverse proxy as the API and the identity server (`/api`, `/connect`). Public events are the only signed-out content inside the community app and must stay that way. The repository layout is mandatory; the implementation prompt for this feature (`docs/prompts/marketing-prompt.md`) approved `frontend/projects/marketing/` as a second Angular application and `eng/videos/brochure/` for the brochure video source.
 
 ## Decision
 

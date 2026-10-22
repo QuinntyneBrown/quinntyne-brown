@@ -14,14 +14,14 @@ skinparam package {
   FontColor #101828
   BackgroundColor #F9FAFB
 }
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "ResourceMaintenanceWorker" as w
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "ResourceStorageRetryHandler" as r
   participant "PurgeArchivedResourcesHandler" as p
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "AzureBlobFileStorage" as store
   database "Community database" as db
 end box

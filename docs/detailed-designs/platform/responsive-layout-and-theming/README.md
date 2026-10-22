@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community runs on phones and desktops and in light and dark themes. This design describes the shared layout grid, breakpoints and theme switching that the app shell and the `components` library provide.
+QuinntyneBrown.Community runs on phones and desktops and in light and dark themes. This design describes the shared layout grid, breakpoints and theme switching that the app shell and the `components` library provide.
 
 - **breakpoint** — named viewport width threshold, from the design system tokens (`--layout-breakpoint-*`) that `BreakpointService` implements: XS <640px, SM >=640px, MD >=768px, LG >=1024px, XL >=1280px
 - **theme** — set of colour token values; light and dark themes define the same role names
@@ -46,7 +46,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-A member uses FaithTech Community on any device width and theme.
+A member uses QuinntyneBrown.Community on any device width and theme.
 
 ![C4 system context for responsive layout and theming](diagrams/c4-context.png)
 

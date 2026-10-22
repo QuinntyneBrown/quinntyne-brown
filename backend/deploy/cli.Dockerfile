@@ -10,7 +10,7 @@ COPY backend/global.json backend/Directory.Build.props backend/Directory.Package
 COPY backend/src/ ./src/
 # Infrastructure embeds the design tokens for the HTML emails.
 COPY docs/design-system/tokens/tokens.css /src/docs/design-system/tokens/tokens.css
-RUN dotnet publish src/FaithTech.Community.Cli/FaithTech.Community.Cli.csproj -c Release -o /out /p:UseAppHost=false
+RUN dotnet publish src/QuinntyneBrown.Community.Cli/QuinntyneBrown.Community.Cli.csproj -c Release -o /out /p:UseAppHost=false
 
 # Infrastructure uses ASP.NET Core Identity and Data Protection, so the Cli needs the ASP.NET Core runtime.
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
@@ -18,4 +18,4 @@ WORKDIR /app
 COPY --from=backend /out ./
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 USER $APP_UID
-ENTRYPOINT ["dotnet", "FaithTech.Community.Cli.dll"]
+ENTRYPOINT ["dotnet", "QuinntyneBrown.Community.Cli.dll"]

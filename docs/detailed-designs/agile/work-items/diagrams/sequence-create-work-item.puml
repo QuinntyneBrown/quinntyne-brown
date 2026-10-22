@@ -15,23 +15,23 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Workspace member" as actor
-box "Frontend — FaithTech Community web app (agile library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (agile library)" #E0F2FE
   participant "BacklogPage" as page
   participant "WorkItemDialog" as dlg
   participant "AgileService (AGILE_SERVICE)" as svc
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "WorkItemsEndpoints" as ep
   participant "ValidationEndpointFilter\n<CreateWorkItemCommand>" as filt
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "CreateWorkItemValidator" as val
   participant "WorkItemsHandler" as h
   participant "WorkspaceAccessPolicy" as pol
   participant "WorkItem" as ent
   participant "AgileNotifier" as ntf
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "CommunityDbContext" as ctx
   database "Community database" as db
   participant "IEmailQueue\n(OutboxEmailQueue)" as mail

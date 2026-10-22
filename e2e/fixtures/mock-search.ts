@@ -24,7 +24,7 @@ const LEADS = ['CityLead', 'EventLead', 'CreateLead', 'CommunicationsLead'];
 const LIMIT = 10;
 
 /**
- * Plays GET /api/search (backend/src/FaithTech.Community.Api/Endpoints/SearchEndpoints.cs) with the same
+ * Plays GET /api/search (backend/src/QuinntyneBrown.Community.Api/Endpoints/SearchEndpoints.cs) with the same
  * permission rules (L2-026 AC2): people and events for everyone, partners for leads, Staff and System Admin,
  * only the caller's own active contacts, and work items in the caller's workspaces (all for Staff and System
  * Admin). Every word of the term must appear, ignoring case.

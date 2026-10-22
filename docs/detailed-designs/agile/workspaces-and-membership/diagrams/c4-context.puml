@@ -7,7 +7,7 @@ Person(lead, "City Lead", "Owns Agile workspaces")
 Person(member, "Workspace member", "Lead or volunteer added to a workspace")
 Person(staff, "Staff", "Read-only across workspaces")
 Person(admin, "System Admin", "Full override, audited")
-System(ftc, "FaithTech Community", "Community site with Agile team workspaces")
+System(ftc, "QuinntyneBrown.Community", "Community site with Agile team workspaces")
 System_Ext(email, "Email provider", "SMTP/SendGrid")
 
 Rel(lead, ftc, "Creates and owns workspaces in")

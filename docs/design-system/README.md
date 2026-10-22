@@ -1,4 +1,4 @@
-# FaithTech Community design system
+# QuinntyneBrown.Community design system
 
 Extracted from [docs/mocks](../mocks/README.md) on 2026-10-21. Open [index.html](index.html) locally in Chrome.
 

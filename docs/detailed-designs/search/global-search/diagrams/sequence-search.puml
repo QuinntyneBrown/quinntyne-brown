@@ -15,18 +15,18 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Signed-in member" as actor
-box "Frontend — FaithTech Community web app (search library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (search library)" #E0F2FE
   participant "SearchPage" as page
   participant "HttpSearchService" as svc
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "SearchEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "GlobalSearchHandler" as h
   participant "ISearchSource (x5)" as src
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "PostgresFullTextSearch" as idx
   database "Community database" as db
 end box

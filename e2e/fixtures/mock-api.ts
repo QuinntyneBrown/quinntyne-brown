@@ -122,7 +122,7 @@ type Handler = (route: Route, body: Record<string, unknown>) => Promise<void> | 
 
 /**
  * Plays the Community API and identity server in the browser, following the backend contracts
- * (backend/src/FaithTech.Community.Api/Endpoints). The app's real PKCE flow runs against it.
+ * (backend/src/QuinntyneBrown.Community.Api/Endpoints). The app's real PKCE flow runs against it.
  */
 export class MockApi {
   readonly accounts = new Map<string, MockAccount>();

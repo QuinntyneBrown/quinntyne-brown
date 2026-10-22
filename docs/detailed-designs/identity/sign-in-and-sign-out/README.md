@@ -55,7 +55,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-The account holder signs in to FaithTech Community. Identity is hosted inside the system, so no external identity provider appears.
+The account holder signs in to QuinntyneBrown.Community. Identity is hosted inside the system, so no external identity provider appears.
 
 ![C4 system context for signing in and out](diagrams/c4-context.png)
 

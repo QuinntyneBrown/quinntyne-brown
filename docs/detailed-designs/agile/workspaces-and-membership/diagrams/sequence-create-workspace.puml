@@ -15,15 +15,15 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "City Lead" as actor
-box "Frontend — FaithTech Community web app (agile library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (agile library)" #E0F2FE
   participant "WorkspacesPage" as page
   participant "CreateWorkspaceDialog" as dlg
   participant "AgileService (AGILE_SERVICE)" as svc
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "WorkspacesEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "WorkspaceSettingsHandler" as sh
   participant "WorkspacesHandler" as h
   participant "WorkspaceAccessPolicy" as pol
@@ -31,7 +31,7 @@ box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
   participant "Workspace" as ent
   participant "AgileNotifier" as ntf
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "CommunityDbContext" as ctx
   participant "OutboxEmailSender" as email
   database "Community database" as db

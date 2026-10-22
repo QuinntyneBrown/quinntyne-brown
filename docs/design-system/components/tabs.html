@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tabs — FaithTech Community design system</title>
+<title>Tabs — QuinntyneBrown.Community design system</title>
 <meta name="description" content="Tabs for sibling views: navigation tabs with aria-current for workspace and admin sections, and APG tabs with aria-selected for in-page panels. States and both themes.">
 <link rel="stylesheet" href="../tokens/tokens.css">
 <link rel="stylesheet" href="../assets/components.css">
@@ -119,7 +119,7 @@
     </header>
 
     <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
-      <p>Tabs switch between sibling views of one thing: a workspace&rsquo;s Board, Backlog, Planning Poker and Settings, or the System Admin area&rsquo;s Users and Audit log. The same <code>.tabs</code> / <code>.tab</code> styles serve two different patterns, and choosing the right one is the main decision. Added for FaithTech Community.</p>      <ul><li><b>Navigation tabs</b> (<code>&lt;nav&gt;</code> of links with <code>aria-current="page"</code>): each tab is its own URL. This is the only pattern the mocks use, and the default for every new screen.</li><li><b>APG tabs</b> (<code>role="tablist"</code> of buttons with <code>aria-selected</code>): panels swap in place without changing the URL. Use only for a small in-page switch whose panels are not worth a route.</li><li>Use the <a href="tab-bar.html">tab bar</a> for the phone-wide primary navigation, and <a href="chip.html">chips</a> for filters.</li></ul>
+      <p>Tabs switch between sibling views of one thing: a workspace&rsquo;s Board, Backlog, Planning Poker and Settings, or the System Admin area&rsquo;s Users and Audit log. The same <code>.tabs</code> / <code>.tab</code> styles serve two different patterns, and choosing the right one is the main decision. Added for QuinntyneBrown.Community.</p>      <ul><li><b>Navigation tabs</b> (<code>&lt;nav&gt;</code> of links with <code>aria-current="page"</code>): each tab is its own URL. This is the only pattern the mocks use, and the default for every new screen.</li><li><b>APG tabs</b> (<code>role="tablist"</code> of buttons with <code>aria-selected</code>): panels swap in place without changing the URL. Use only for a small in-page switch whose panels are not worth a route.</li><li>Use the <a href="tab-bar.html">tab bar</a> for the phone-wide primary navigation, and <a href="chip.html">chips</a> for filters.</li></ul>
     </section>
     <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
       <div class="ds-anatomy">
@@ -194,7 +194,7 @@
       <ul><li>Resolved: the tab rows no longer carry an inline <code>margin-bottom</code>; <code>.tabs</code> owns the <code>--space-4</code> gap below it (and <code>ft-tabs</code> in Angular).</li><li>Resolved: the APG (<code>aria-selected</code>) pattern is documented as reserved, since no v1 mock needs in-page panels. The CSS selected style now requires <code>role="tab"</code>, so it cannot be put on links; in Angular, <code>ft-tabs</code> renders APG tabs only when no <code>ft-tab</code> has an <code>href</code>, and links only ever get <code>aria-current</code>.</li><li>Resolved: <code>.tab:hover, .tab[data-state="hover"]</code> share one rule in <code>components.css</code>, so the states matrix shows hover.</li><li>Resolved: the Admin &ldquo;Roles&rdquo; tab linked to <code>people/admin</code>, a page without the same tab row. It is removed; the Admin tabs are Users and Audit log, and roles are assigned from People (top bar), which already serves System Admin (<a href="../../mocks/pages/people/admin.html">pages/people/admin</a>).</li></ul>
     </section>
 
-    <footer class="ds-footer"><span>FaithTech Community design system · extracted from <a href="../../mocks/index.html">docs/mocks</a> on 2026-10-21</span><a href="#top">Back to top</a></footer>
+    <footer class="ds-footer"><span>QuinntyneBrown.Community design system · extracted from <a href="../../mocks/index.html">docs/mocks</a> on 2026-10-21</span><a href="#top">Back to top</a></footer>
   </main>
 </div>
 <script src="../assets/ds.js"></script>

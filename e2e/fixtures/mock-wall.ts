@@ -26,7 +26,7 @@ export class MockWall {
   private readonly template = readFileSync(
     join(
       __dirname,
-      '../../backend/src/FaithTech.Community.Api/Middleware/PrivatePreview/wall.html',
+      '../../backend/src/QuinntyneBrown.Community.Api/Middleware/PrivatePreview/wall.html',
     ),
     'utf8',
   );

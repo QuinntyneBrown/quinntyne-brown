@@ -1,7 +1,7 @@
 WEBVTT
 
 00:00:00.000 --> 00:00:11.000
-In this video you sign in to FaithTech Community, and sign out again. The app runs for real, against a local stand-in for the identity server, with a made-up account.
+In this video you sign in to QuinntyneBrown.Community, and sign out again. The app runs for real, against a local stand-in for the identity server, with a made-up account.
 
 00:00:11.000 --> 00:00:20.000
 Member pages are for signed-in members. When you open the home page without signing in, the app sends you to Welcome back, and remembers where you were going.

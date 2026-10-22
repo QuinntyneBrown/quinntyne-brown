@@ -15,16 +15,16 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "System Admin" as actor
-box "Frontend — FaithTech Community web app" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
   participant "AdminUsersPage\n(admin library)" as adminpage
   participant "WorkspaceSettingsPage\n(agile library)" as page
   participant "ReassignOwnerDialog" as dlg
   participant "AgileService\n(AGILE_SERVICE)" as svc
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "WorkspacesEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "ChangeRolesHandler\n(Admin)" as roles
   participant "CityLeadRoleRemovedHandler" as evt
   participant "AgileNotifier" as ntf
@@ -34,7 +34,7 @@ box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
   participant "Workspace" as ent
   participant "IAuditLog" as audit
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "CommunityDbContext" as ctx
   participant "OutboxEmailQueue" as email
   database "Community\ndatabase" as db

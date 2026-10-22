@@ -6,16 +6,16 @@ skinparam roundcorner 12
 skinparam defaultFontName Arial
 skinparam ArrowColor #344054
 actor "Member" as actor
-box "Frontend — FaithTech Community web app (app shell)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (app shell)" #E0F2FE
   participant "HomePage" as page
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "Events, Partners and Activity endpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application" #ECFDF3
   participant "ListActivityHandler" as h
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   database "Community database" as db
 end box
 actor -> page : Sign in, land on /

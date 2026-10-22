@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Accessibility — FaithTech Community design system</title>
-<meta name="description" content="FaithTech Community accessibility commitments: WCAG 2.2 AA checklist, keyboard paths for the Kanban, dialogs, bell panel, tables and forms, testing procedure and the component contract.">
+<title>Accessibility — QuinntyneBrown.Community design system</title>
+<meta name="description" content="QuinntyneBrown.Community accessibility commitments: WCAG 2.2 AA checklist, keyboard paths for the Kanban, dialogs, bell panel, tables and forms, testing procedure and the component contract.">
 <link rel="stylesheet" href="../tokens/tokens.css">
 <link rel="stylesheet" href="../assets/components.css">
 <link rel="stylesheet" href="../assets/ds.css">
@@ -119,33 +119,33 @@
     </header>
 
     <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
-      <p>FaithTech Community is used by adults with very different set-ups: Staff reviewing on a laptop, City Leads like Grace Okonkwo updating the partner pipeline on a phone between meetings, volunteers with a screen reader, and anonymous visitors who arrive on a shared public event page and RSVP as guests. The system commits to WCAG 2.2 level AA in both themes. This page lists the commitments, the keyboard path for each interactive screen, the tokens that enforce them and how each component page proves them.</p>
+      <p>QuinntyneBrown.Community is used by adults with very different set-ups: Staff reviewing on a laptop, City Leads like Grace Okonkwo updating the partner pipeline on a phone between meetings, volunteers with a screen reader, and anonymous visitors who arrive on a shared public event page and RSVP as guests. The system commits to WCAG 2.2 level AA in both themes. This page lists the commitments, the keyboard path for each interactive screen, the tokens that enforce them and how each component page proves them.</p>
     </section>
 
     <section class="ds-section" id="perceivable"><h2><a href="#perceivable">Perceivable</a></h2>
       <div class="ds-table-wrap"><table class="ds-table">
-        <thead><tr><th scope="col">Commitment</th><th scope="col">WCAG</th><th scope="col">Rule in FaithTech Community</th></tr></thead>
+        <thead><tr><th scope="col">Commitment</th><th scope="col">WCAG</th><th scope="col">Rule in QuinntyneBrown.Community</th></tr></thead>
         <tbody><tr><td>Text contrast</td><td>1.4.3</td><td>Body, label and secondary text at 4.5:1 or more on every surface it sits on, in both themes; large text at 3:1. Pairs live in <code>tokens/contrast-pairs.json</code>, including muted captions on Kanban cards and the badge counts.</td></tr><tr><td>Non-text contrast</td><td>1.4.11</td><td>Field edges, the focus ring, meaningful icons, the selected estimate card in Planning Poker and the unread dot in the bell panel at 3:1. Decorative dividers are exempt.</td></tr><tr><td>Use of colour</td><td>1.4.1</td><td>Status is colour + icon + words: “This event was cancelled”, “Read-only for Staff”, “Unread” in the notice meta; links are underlined; optional fields say “(optional)”.</td></tr><tr><td>Images</td><td>1.1.1</td><td>Profile photos require alt text before they save (“Describe what’s in the photo for people using screen readers.”); avatars with initials are <code>aria-hidden</code> beside the visible name; event photos have alt describing the scene.</td></tr><tr><td>Reflow and zoom</td><td>1.4.4, 1.4.10</td><td>Every screen works at 320px and 400% zoom: the Kanban columns stack, tables scroll inside <code>.table-wrap</code>, the sidebar becomes the tab bar.</td></tr><tr><td>Text spacing</td><td>1.4.12</td><td>No fixed heights on text containers; notice and card text wraps.</td></tr></tbody>
       </table></div>
     </section>
 
     <section class="ds-section" id="operable"><h2><a href="#operable">Operable</a></h2>
       <div class="ds-table-wrap"><table class="ds-table">
-        <thead><tr><th scope="col">Commitment</th><th scope="col">WCAG</th><th scope="col">Rule in FaithTech Community</th></tr></thead>
+        <thead><tr><th scope="col">Commitment</th><th scope="col">WCAG</th><th scope="col">Rule in QuinntyneBrown.Community</th></tr></thead>
         <tbody><tr><td>Keyboard</td><td>2.1.1, 2.1.2</td><td>Everything works with Tab, Shift+Tab, Enter, Space and Escape, with arrows inside menus, tabs and radio groups. No traps; dialogs and the bell panel release on Escape.</td></tr><tr><td>Dragging alternative</td><td>2.5.7</td><td>Every drag has a single-pointer, keyboard path: a partner card’s Move button opens the Move dialog (stage radio group plus an optional note); work-item cards on the team board do the same.</td></tr><tr><td>Focus visible</td><td>2.4.7</td><td>One ring everywhere: <code>--focus-ring-width</code> of <code>--color-focus-ring</code> with <code>--focus-ring-offset</code> on <code>:focus-visible</code>, at least 3:1 against what it sits on.</td></tr><tr><td>Focus not obscured</td><td>2.4.11</td><td>The sticky top bar, the tab bar, the bell panel and toasts never cover focus; <code>scroll-padding-top</code> matches the top bar.</td></tr><tr><td>Focus order</td><td>2.4.3</td><td>DOM order is visual order; no positive <code>tabindex</code>; Kanban columns read Lead, In funnel, Confirmed.</td></tr><tr><td>Bypass blocks</td><td>2.4.1</td><td>A skip link to <code>#main</code> on every page, then landmarks: banner, navigation, main.</td></tr><tr><td>Timing</td><td>2.2.1</td><td>No timeouts on forms. Toasts with an action (Undo, Try again) pause on hover and focus, and the action is also reachable elsewhere (archived contacts, the RSVP button).</td></tr><tr><td>Target size</td><td>2.5.8</td><td>At least 24px everywhere (<code>--target-min</code>); 44px for buttons, fields and icon buttons (<code>--target-comfortable</code>).</td></tr></tbody>
       </table></div>
     </section>
 
     <section class="ds-section" id="understandable"><h2><a href="#understandable">Understandable</a></h2>
       <div class="ds-table-wrap"><table class="ds-table">
-        <thead><tr><th scope="col">Commitment</th><th scope="col">WCAG</th><th scope="col">Rule in FaithTech Community</th></tr></thead>
+        <thead><tr><th scope="col">Commitment</th><th scope="col">WCAG</th><th scope="col">Rule in QuinntyneBrown.Community</th></tr></thead>
         <tbody><tr><td>Labels</td><td>3.3.2</td><td>A visible label on every control; placeholders are never labels; optional fields say so in the label (“Email (optional)”).</td></tr><tr><td>Errors</td><td>3.3.1, 3.3.3</td><td>Field errors name the fix (“Enter an email like name@example.org.”) with <code>aria-invalid="true"</code> and <code>aria-describedby</code>; a summary (“Fix 2 things to save”) links to each field and receives focus on submit.</td></tr><tr><td>Error prevention</td><td>3.3.4</td><td>Destructive actions are confirmed in a dialog that names the object (“Delete Ben Carter for good?”); typed confirmation where it cannot be undone (“Type DELETE in capitals to confirm.”); archiving and restoring a contact can be undone from its toast.</td></tr><tr><td>Redundant entry</td><td>3.3.7</td><td>A guest RSVP on a public event asks only for name and email once; an invite pre-fills the email on sign-up.</td></tr><tr><td>Accessible authentication</td><td>3.3.8</td><td>Sign-in allows paste and password managers (<code>autocomplete</code> set); no cognitive tests; password reset by email link.</td></tr><tr><td>Consistent help</td><td>3.2.6</td><td>Forbidden pages name who can help in the same place (“Ask Grace Okonkwo, your City Lead…”).</td></tr><tr><td>Language</td><td>3.1.1</td><td><code>lang="en"</code> on every page; English only in v1.</td></tr></tbody>
       </table></div>
     </section>
 
     <section class="ds-section" id="robust"><h2><a href="#robust">Robust</a></h2>
       <div class="ds-table-wrap"><table class="ds-table">
-        <thead><tr><th scope="col">Commitment</th><th scope="col">WCAG</th><th scope="col">Rule in FaithTech Community</th></tr></thead>
+        <thead><tr><th scope="col">Commitment</th><th scope="col">WCAG</th><th scope="col">Rule in QuinntyneBrown.Community</th></tr></thead>
         <tbody><tr><td>Name, role, value</td><td>4.1.2</td><td>Native elements first (<code>button</code>, <code>a</code>, <code>input</code>, <code>fieldset</code>, <code>table</code>); ARIA only to fill gaps, following the WAI-ARIA Authoring Practices pattern named on each component page. Estimate cards use <code>aria-pressed</code>.</td></tr><tr><td>Status messages</td><td>4.1.3</td><td>Success toasts in <code>role="status"</code> (“Invite sent”); failures in <code>role="alert"</code> (“Your RSVP wasn’t saved”); loading regions carry <code>aria-busy="true"</code> and a label (“Loading contacts”).</td></tr><tr><td>Valid HTML</td><td>—</td><td>No duplicate ids; no interactive element inside another (the Kanban card title link and its Move button are siblings).</td></tr></tbody>
       </table></div>
     </section>
@@ -214,7 +214,7 @@
       </table></div>
     </section>
 
-    <footer class="ds-footer"><span>FaithTech Community design system · extracted from <a href="../../mocks/index.html">docs/mocks</a> on 2026-10-21</span><a href="#top">Back to top</a></footer>
+    <footer class="ds-footer"><span>QuinntyneBrown.Community design system · extracted from <a href="../../mocks/index.html">docs/mocks</a> on 2026-10-21</span><a href="#top">Back to top</a></footer>
   </main>
 </div>
 <script src="../assets/ds.js"></script>

@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community sends email for the occurrences listed in `L2-028`: a contact signed up, an event cancelled or changed, invites, RSVP confirmations, role changes, Agile assignments and workspace additions, Planning Poker invitations, and announcements. This feature describes the shared outbound email pipeline that every one of those sources uses.
+QuinntyneBrown.Community sends email for the occurrences listed in `L2-028`: a contact signed up, an event cancelled or changed, invites, RSVP confirmations, role changes, Agile assignments and workspace additions, Planning Poker invitations, and announcements. This feature describes the shared outbound email pipeline that every one of those sources uses.
 
 - **email outbox** — table of rendered emails waiting to be delivered, written in the same transaction as the action that triggered them
 - **delivery worker** — background service that reads the outbox and hands each message to the email provider
@@ -45,7 +45,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-FaithTech Community sends notification email to members through an external email provider.
+QuinntyneBrown.Community sends notification email to members through an external email provider.
 
 ![C4 system context for email notifications](diagrams/c4-context.png)
 

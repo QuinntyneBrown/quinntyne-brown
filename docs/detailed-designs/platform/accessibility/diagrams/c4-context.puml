@@ -3,6 +3,6 @@
 LAYOUT_WITH_LEGEND()
 title System Context — Accessibility
 Person(user, "Member using assistive technology", "Keyboard, screen reader or magnification user")
-System(ftc, "FaithTech Community", "Community site for FaithTech staff, leads, volunteers, builders and partners")
+System(ftc, "QuinntyneBrown.Community", "Community site for FaithTech staff, leads, volunteers, builders and partners")
 Rel(user, ftc, "Uses")
 @enduml

@@ -11,7 +11,7 @@ box "Frontend — invites library" #E0F2FE
   participant "MyQrCodeDialog" as dlg
   participant "HttpConnectService" as svc
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "ConnectEndpoints" as ep
 end box
 box "Backend — Application and Domain" #ECFDF3

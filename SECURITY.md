@@ -1,6 +1,6 @@
 # Security policy
 
-FaithTech Community stores personal data, including private contact notes, so we take security
+QuinntyneBrown.Community stores personal data, including private contact notes, so we take security
 seriously and appreciate responsible disclosure.
 
 ## Supported versions

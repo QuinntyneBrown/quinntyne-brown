@@ -1,0 +1,24 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
+namespace QuinntyneBrown.Community.Cli;
+
+internal static class Program
+{
+    private static async Task<int> Main(string[] args)
+    {
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        var connectionString = configuration.GetConnectionString("Community")
+            ?? throw new InvalidOperationException("ConnectionStrings:Community is not configured.");
+
+        return await CliApp.RunAsync(
+            args,
+            options => options.UseNpgsql(connectionString),
+            configuration["WebApp:Origin"] ?? "http://localhost:4200");
+    }
+}

@@ -65,7 +65,7 @@ The slice runs from the `notes` feature library in the web app to the `NotePages
 
 ### End-to-end tests
 
-`e2e/fixtures/mock-notes.ts` is the fake for every `/api/notes` route: an in-memory page set seeded per test, the same visibility rule, version check and `409` body as the API, and loud failure for any unrecognised request. `e2e/pages/notes.page.ts` and `note.page.ts` own the selectors. `list-and-create.spec.ts`, `editor.spec.ts`, `page-settings.spec.ts` and `conflicts.spec.ts` cover the list, creation, autosave states, *Retry*, the conflict and access-changed banners (the fixture bumps the stored version or revokes access) and axe checks on each state. Unit specs cover `NoteAutosave` and `note-format.ts`; the API tests in `backend/tests/FaithTech.Community.Api.Tests/Notes/` cover create, list, save and conflicts.
+`e2e/fixtures/mock-notes.ts` is the fake for every `/api/notes` route: an in-memory page set seeded per test, the same visibility rule, version check and `409` body as the API, and loud failure for any unrecognised request. `e2e/pages/notes.page.ts` and `note.page.ts` own the selectors. `list-and-create.spec.ts`, `editor.spec.ts`, `page-settings.spec.ts` and `conflicts.spec.ts` cover the list, creation, autosave states, *Retry*, the conflict and access-changed banners (the fixture bumps the stored version or revokes access) and axe checks on each state. Unit specs cover `NoteAutosave` and `note-format.ts`; the API tests in `backend/tests/QuinntyneBrown.Community.Api.Tests/Notes/` cover create, list, save and conflicts.
 
 ### Accessibility
 

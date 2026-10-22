@@ -4,7 +4,7 @@ LAYOUT_WITH_LEGEND()
 title Containers — Share resources with members and roles
 Person(owner, "Owner", "Contributor or System Admin")
 Person(recipient, "Recipient", "Named member or role holder")
-System_Boundary(community, "FaithTech Community") {
+System_Boundary(community, "QuinntyneBrown.Community") {
   Container(web, "Web app", "Angular", "resources library dialogs with ft-person-picker; shell bell")
   Container(api, "Community API", "ASP.NET Core", "Resources endpoints, ShareNotifier, INotificationPublisher, email outbox worker")
   ContainerDb(db, "Community database", "PostgreSQL", "ResourceShareMembers, ResourceShareRoles, Notifications, EmailOutbox")

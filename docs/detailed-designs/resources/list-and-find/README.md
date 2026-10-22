@@ -2,7 +2,7 @@
 
 ## Overview
 
-A **resource** is a deck, logo, image, training material, template or other document that a contributor adds to FaithTech Community, either as an uploaded file or as an https link to something that lives in another app. Resources replace the Drive folders, SharePoint sites, Canva links and email attachments that leads search through today.
+A **resource** is a deck, logo, image, training material, template or other document that a contributor adds to QuinntyneBrown.Community, either as an uploaded file or as an https link to something that lives in another app. Resources replace the Drive folders, SharePoint sites, Canva links and email attachments that leads search through today.
 
 Key terms:
 

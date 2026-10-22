@@ -15,19 +15,19 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Communications Lead" as actor
-box "Frontend — FaithTech Community web app (announcements library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (announcements library)" #E0F2FE
   participant "ComposeAnnouncementPage" as page
   participant "HttpAnnouncementsService" as client
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "AnnouncementsEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "SendAnnouncementHandler" as h
   participant "AudienceResolver" as aud
   participant "INotificationPublisher" as pub
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   database "Community database" as db
 end box
 actor -> page : Choose audience

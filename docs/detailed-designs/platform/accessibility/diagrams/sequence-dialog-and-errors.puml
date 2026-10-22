@@ -15,13 +15,13 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Keyboard user" as actor
-box "Frontend — FaithTech Community web app (components library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (components library)" #E0F2FE
   participant "Feature page" as page
   participant "DialogService (CDK)" as dlg
   participant "FormFieldComponent" as ff
   participant "LiveAnnouncer" as live
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "<Feature>Endpoints" as ep
 end box
 actor -> page : Tab to button, press Enter (L2-044 #2)

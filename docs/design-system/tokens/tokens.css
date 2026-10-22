@@ -16,7 +16,7 @@
    page has not forced [data-theme="light"]. High-contrast tweaks apply
    under prefers-contrast: more and forced-colors.
 
-   FaithTech Community: violet accent (inherited from Shelfie until FaithTech brand colours are supplied), rounded system fonts, 44px controls, pastel
+   QuinntyneBrown.Community: violet accent (inherited from Shelfie until FaithTech brand colours are supplied), rounded system fonts, 44px controls, pastel
    avatar and event tints. Every pair in contrast-pairs.json passes WCAG 2.2 AA in both
    themes (scripts/check_contrast.py). Extracted from docs/mocks on
    2026-10-21; see docs/design-system/README.md for the drift log.

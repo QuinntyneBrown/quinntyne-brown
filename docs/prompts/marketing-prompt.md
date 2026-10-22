@@ -2,7 +2,7 @@
 
 ## Goal
 
-Give FaithTech Community a public marketing page, served at `www.faithtech.community`, built as its own
+Give QuinntyneBrown.Community a public marketing page, served at `www.faithtech.community`, built as its own
 Angular **application** project in the existing workspace: `frontend/projects/marketing/`.
 
 What a visitor sees and can do:
@@ -11,7 +11,7 @@ What a visitor sees and can do:
   (https://www.linkedin.com/home: a split hero, headline and sub-headline on one side, the sign-in form on the
   other, "Sign in with Google", "Join now", a calm product-first layout) and from https://www.shelfie.kids/
   (warm and friendly tone, generous whitespace, a product video in the hero, short benefit sections, one clear
-  call to action). It uses the FaithTech Community design system, not LinkedIn's or Shelfie's colours.
+  call to action). It uses the QuinntyneBrown.Community design system, not LinkedIn's or Shelfie's colours.
 - A brochure video of 30 seconds or less, embedded on the page with a poster, captions, visible player
   controls, no autoplay with sound and respect for `prefers-reduced-motion`.
 - Sign-in on the page itself (email and password, "Keep me signed in on this device", forgot-password link),
@@ -31,11 +31,11 @@ Where it lives today (real files):
   `.../pages/sign-up/`, `.../pages/auth-callback/`, `.../app.routes.ts`, `.../shell/public-shell.component.*`.
 - Auth client: `frontend/projects/api/src/lib/auth/` (`AUTH_SERVICE` contract in `auth.service.ts`,
   `OidcAuthClient` in `oidc-auth-client.service.ts`, `authInterceptor`).
-- Backend identity: `backend/src/FaithTech.Community.Application/Identity/` (`SignIn.cs`, `SignUp.cs`,
-  `CommunityUser.cs`), `backend/src/FaithTech.Community.Api/Endpoints/AccountEndpoints.cs` (route group
+- Backend identity: `backend/src/QuinntyneBrown.Community.Application/Identity/` (`SignIn.cs`, `SignUp.cs`,
+  `CommunityUser.cs`), `backend/src/QuinntyneBrown.Community.Api/Endpoints/AccountEndpoints.cs` (route group
   `/api/account`, auth rate-limit policy), `.../Endpoints/AuthorizationEndpoints.cs` (OpenIddict `/connect/*`),
-  `backend/src/FaithTech.Community.Api/Authentication/AuthenticationSetup.cs` (authentication schemes and
-  OpenIddict wiring), `backend/src/FaithTech.Community.Infrastructure/Identity/`.
+  `backend/src/QuinntyneBrown.Community.Api/Authentication/AuthenticationSetup.cs` (authentication schemes and
+  OpenIddict wiring), `backend/src/QuinntyneBrown.Community.Infrastructure/Identity/`.
 - There is no Google or external-login code anywhere in the repository today.
 - Mocks: `docs/mocks/pages/sign-in/`, `docs/mocks/pages/sign-up/`, `docs/mocks/pages/public-event/` (the only
   anonymous page today, with its "Sign in" top bar). Manifest: `docs/mocks/manifest.json`.

@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community lists events for signed-in members. An *event* is a dated gathering, held in person or online, that members can attend. Data is global, so the list spans every city.
+QuinntyneBrown.Community lists events for signed-in members. An *event* is a dated gathering, held in person or online, that members can attend. Data is global, so the list spans every city.
 
 This feature covers the events list page: upcoming events in date order, filtered by city, with an empty state and a clear cancelled marker. It is the entry point to the rest of the events subsystem.
 
@@ -45,7 +45,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-Members browse events in FaithTech Community.
+Members browse events in QuinntyneBrown.Community.
 
 ![C4 system context for event list and filter](diagrams/c4-context.png)
 
@@ -75,7 +75,7 @@ The handler orders upcoming events soonest first and applies the city filter on 
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `Event.RsvpCount` counts member and guest RSVPs; the list query computes the same count in the database.
 - The chips are exclusive, like the team list's role chips: one is pressed at a time. Upcoming means the event has not ended, so an event in progress is still listed. Hackathons and Online list upcoming events only; Past lists ended events, newest first.

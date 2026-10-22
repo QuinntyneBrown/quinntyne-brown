@@ -7,7 +7,7 @@
 
 ## Context
 
-A City Lead wants to show a QR code to someone they meet so that person can join FaithTech Community and become the lead's contact. An invite (ADR 0006) does not fit: it needs the person's email, works once and expires after 14 days. The code must work for everyone at an event, keep working on printed or shared copies, be retirable if it leaks, and grant nothing beyond joining.
+A City Lead wants to show a QR code to someone they meet so that person can join QuinntyneBrown.Community and become the lead's contact. An invite (ADR 0006) does not fit: it needs the person's email, works once and expires after 14 days. The code must work for everyone at an event, keep working on printed or shared copies, be retirable if it leaks, and grant nothing beyond joining.
 
 ## Decision
 

@@ -1,6 +1,6 @@
 # Proposal: Docs & notes
 
-Block-based pages where FaithTech members write, format, link and nest meeting notes, playbooks and how-tos, inside FaithTech Community.
+Block-based pages where FaithTech members write, format, link and nest meeting notes, playbooks and how-tos, inside QuinntyneBrown.Community.
 
 - Status: implemented; requirements `L1-022` and `L2-085` to `L2-099` in `docs/specs/`, designs in `docs/detailed-designs/notes/`, built in `notes` (backend, frontend and e2e)
 - Date: 2026-10-22
