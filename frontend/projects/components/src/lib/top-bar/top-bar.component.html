@@ -1,0 +1,43 @@
+<header class="top-bar">
+  <a class="top-bar__brand" [attr.href]="homeHref()">
+    <ft-logo-mark class="top-bar__mark" label="" />
+    <span>FaithTech</span>
+  </a>
+  @if (!anonymous()) {
+    <nav class="top-bar__nav" [attr.aria-label]="navLabel()">
+      @for (link of links(); track link.href) {
+        <a
+          class="top-bar__link"
+          [class.top-bar__link--secondary]="link.secondary"
+          [attr.href]="link.href"
+          [attr.aria-current]="link.current ? 'page' : null"
+          >{{ link.label }}</a
+        >
+      }
+      @if (moreLabel(); as moreText) {
+        <button
+          class="top-bar__link top-bar__more"
+          type="button"
+          aria-haspopup="dialog"
+          (click)="more.emit()"
+        >
+          {{ moreText }}
+        </button>
+      }
+    </nav>
+  }
+  <span class="top-bar__spacer"></span>
+  @if (!anonymous()) {
+    <form class="top-bar__search" role="search" (submit)="onSearch($event)">
+      <label class="top-bar__hidden" [attr.for]="searchId">{{ searchLabel() }}</label>
+      <ft-text-field
+        size="sm"
+        type="search"
+        name="q"
+        [inputId]="searchId"
+        [placeholder]="searchPlaceholder()"
+      />
+    </form>
+  }
+  <div class="top-bar__actions"><ng-content select="[ftTopBarActions]" /></div>
+</header>

@@ -1,0 +1,92 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Send an invite
+
+class Invite {
+  +Guid Id
+  +string Email
+  +string TokenHash
+  +Role? PreassignedRole
+  +Guid InvitedBy
+  +DateTimeOffset CreatedAt
+  +DateTimeOffset ExpiresAt
+  +string? Note
+  +DateTimeOffset? AcceptedAt
+  +Guid? AcceptedBy
+  +DateTimeOffset? RevokedAt
+  +Status(now: DateTimeOffset): InviteStatus
+  +MarkAccepted(by: Guid, now: DateTimeOffset): void
+  +Revoke(now: DateTimeOffset): void
+}
+enum InviteStatus {
+  Pending
+  Accepted
+  Expired
+  Revoked
+}
+class SendInviteCommand <<record>> {
+  +string? Email
+  +string? PreassignedRole
+  +string? Note
+}
+class SendInviteValidator {
+  +MaxNote: int = 500
+}
+class InviteSender {
+  +MaxPerDay: int = 50
+  +bool CanInvite
+  +SendAsync(command: SendInviteCommand): Task<(Result, InviteDto?)>
+  +CreateAsync(address: string, role: Role?, note: string?): Task<(Result, InviteDto?)>
+}
+class ManageInvitesHandler {
+  +ListAsync(): Task<IReadOnlyList<InviteDto>?>
+  +ResendAsync(id: Guid): Task<(Result, InviteDto?)>
+  +RevokeAsync(id: Guid): Task<Result>
+}
+class InviteDto <<record>> {
+  +Guid Id
+  +string Email
+  +string? PreassignedRole
+  +string Status
+  +string InvitedByName
+  +DateTimeOffset CreatedAt
+  +DateTimeOffset ExpiresAt
+  +DateTimeOffset? AcceptedAt
+  +DateTimeOffset? RevokedAt
+}
+class InviteTokens <<static>> {
+  +New(): string
+  +Hash(token: string): string
+}
+class RoleAssignmentPolicy {
+  +CanChange(role: Role): bool
+}
+interface ICurrentUser {
+  +Guid? UserId
+  +HasRole(role: Role): bool
+}
+interface IEmailSender {
+  +SendAsync(message: EmailMessage): Task
+}
+SendInviteValidator ..> SendInviteCommand : validates
+InviteSender ..> SendInviteCommand : handles
+InviteSender --> RoleAssignmentPolicy : uses
+InviteSender ..> ICurrentUser : uses
+InviteSender ..> IEmailSender : uses
+InviteSender ..> InviteTokens : uses
+InviteSender --> Invite : creates
+InviteSender ..> InviteDto : returns
+ManageInvitesHandler --> InviteSender : CanInvite, CreateAsync
+ManageInvitesHandler --> Invite : revokes
+ManageInvitesHandler ..> InviteDto : returns
+Invite --> InviteStatus : derives
+@enduml

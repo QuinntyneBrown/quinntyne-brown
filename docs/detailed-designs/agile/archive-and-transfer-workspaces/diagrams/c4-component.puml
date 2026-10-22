@@ -1,0 +1,41 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Archive and transfer workspaces
+
+Container_Boundary(web, "Web app") {
+  Component(page, "WorkspaceSettingsPage / WorkspacesPage", "Angular pages (agile library)", "Archive workspace, archived items with Restore; Archived list with Restore")
+  Component(adminpage, "AdminUsersPage", "Angular page (admin library)", "Alert A workspace needs a new owner, from listWorkspaces needsNewOwner")
+  Component(dlg, "ArchiveWorkspaceDialog / ArchiveWorkItemDialog / ReassignOwnerDialog", "CDK Dialogs", "Confirm archive, choose new City Lead owner")
+  Component(svc, "AgileService", "api library", "AGILE_SERVICE token, HttpAgileService")
+}
+Container_Boundary(api, "Community API") {
+  Component(ep, "WorkspacesEndpoints", "Minimal API", "/api/workspaces/{id}/archive|restore|archived-items|owner-candidates|owner, /api/items/{id}/archive|restore")
+  Component(h, "ArchiveHandler", "Application", "Archive and restore workspaces and items, archived items, owner candidates, reassign owner")
+  Component(list, "WorkspacesHandler", "Application", "ListAsync: archived rows for owner and System Admin, needsNewOwner for live workspaces")
+  Component(roles, "ChangeRolesHandler", "Application (Admin)", "Removes the City Lead role; raises CityLeadRoleRemoved")
+  Component(evt, "CityLeadRoleRemovedHandler", "Application", "Notifies every System Admin of each live workspace the former owner holds")
+  Component(pol, "WorkspaceAccessPolicy", "Application", "Owner → Admin → Member → Staff → Outsider; AuditOverride (Admin only), Audit")
+  Component(ntf, "AgileNotifier", "Application", "In-app notification plus queued email")
+  Component(audit, "IAuditLog", "Application (Admin)", "Audit log abstraction")
+  Component(email, "IEmailQueue (OutboxEmailQueue)", "Infrastructure", "Email outbox, written in the unit of work")
+  ComponentDb(db, "Community database", "PostgreSQL", "Agile tables; query filter hides archived rows")
+}
+
+Rel(page, dlg, "Opens")
+Rel(page, svc, "Calls")
+Rel(dlg, svc, "Calls")
+Rel(adminpage, svc, "listWorkspaces")
+Rel(adminpage, page, "Links to /workspaces/{id}/settings")
+Rel(svc, ep, "Calls", "JSON/HTTPS")
+Rel(ep, h, "Dispatches")
+Rel(ep, list, "GET /api/workspaces")
+Rel(h, pol, "AuthorizeAsync(manage), AuditOverride, Audit")
+Rel(pol, audit, "Record")
+Rel(roles, evt, "HandleAsync, QueueEmailsAsync")
+Rel(evt, ntf, "Notify System Admins")
+Rel(ntf, email, "Enqueue")
+Rel(h, db, "Persists", "EF Core")
+Rel(list, db, "Reads", "EF Core")
+Rel(evt, db, "Reads live owned workspaces and System Admins", "EF Core")
+@enduml

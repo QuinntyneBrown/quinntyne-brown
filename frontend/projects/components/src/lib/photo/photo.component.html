@@ -1,0 +1,27 @@
+<div
+  class="ft-photo"
+  [class.ft-photo--featured]="featured()"
+  [class.ft-photo--failed]="state() === 'failed'"
+  [class.ft-photo--uploading]="state() === 'uploading'"
+  [attr.aria-busy]="state() === 'uploading' ? 'true' : null"
+>
+  <div class="ft-photo__thumb">
+    @if (src(); as url) {
+      <img class="ft-photo__img" [src]="url" [alt]="alt()" />
+    } @else {
+      <span class="ft-photo__placeholder" role="img" [attr.aria-label]="alt()"></span>
+    }
+    @if (state() === 'uploading') {
+      <span class="ft-photo__spinner" aria-hidden="true"></span>
+    }
+    <ng-content />
+  </div>
+  @if (state() === 'uploading' && progress() !== null) {
+    <ft-progress class="ft-photo__progress" [value]="progress()!" [label]="uploadLabel()" />
+  }
+  <p class="ft-photo__status" role="status">
+    @if (state() === 'uploading') {
+      Uploading…{{ progress() === null ? '' : ' ' + progress() + '%' }}
+    }
+  </p>
+</div>

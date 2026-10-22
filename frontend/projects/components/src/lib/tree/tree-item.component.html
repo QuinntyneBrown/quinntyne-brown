@@ -1,0 +1,28 @@
+<div class="ft-tree-item__row">
+  @if (hasChildren()) {
+    <button
+      class="ft-tree-item__toggle"
+      type="button"
+      [attr.aria-expanded]="open()"
+      [attr.aria-controls]="childrenId"
+      [attr.aria-label]="'Contents of ' + label()"
+      (click)="open.set(!open())"
+    ></button>
+  }
+  @if (kind(); as k) {
+    <ft-badge [variant]="kindVariant()">{{ k }}</ft-badge>
+  }
+  @if (href(); as url) {
+    <a class="ft-tree-item__label" [attr.href]="url">{{ label() }}</a>
+  } @else {
+    <span class="ft-tree-item__label">{{ label() }}</span>
+  }
+  @if (meta(); as m) {
+    <span class="ft-tree-item__meta">{{ m }}</span>
+  }
+</div>
+@if (hasChildren()) {
+  <ul class="ft-tree-item__children" role="list" [id]="childrenId" [hidden]="!open()">
+    <ng-content />
+  </ul>
+}

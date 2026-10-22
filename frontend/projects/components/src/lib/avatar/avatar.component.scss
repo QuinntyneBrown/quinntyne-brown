@@ -1,0 +1,102 @@
+:host {
+  display: inline-grid;
+  flex: none;
+}
+
+.ft-avatar {
+  --avatar-size: var(--size-avatar-md);
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--avatar-size);
+  block-size: var(--avatar-size);
+  border-radius: var(--radius-full);
+  background: var(--color-accent-subtle);
+  color: var(--color-fg-accent);
+  font: var(--text-label);
+  overflow: hidden;
+  flex: none;
+  position: relative;
+}
+
+.ft-avatar__img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.ft-avatar[data-initials]::before {
+  content: attr(data-initials);
+}
+
+.ft-avatar--sm {
+  --avatar-size: var(--size-avatar-sm);
+  font-size: var(--font-size-xs);
+}
+
+.ft-avatar--md {
+  --avatar-size: var(--size-avatar-md);
+}
+
+.ft-avatar--lg {
+  --avatar-size: var(--size-avatar-lg);
+  font-size: var(--font-size-lg);
+}
+
+.ft-avatar--xl {
+  --avatar-size: var(--size-avatar-xl);
+  font-size: var(--font-size-xl);
+}
+
+/* The person card's photo (components/person-card.html). */
+.ft-avatar--2xl {
+  --avatar-size: var(--size-cover-lg);
+  font: var(--text-h3);
+}
+
+.ft-avatar--sky {
+  background: var(--color-cover-sky);
+  color: var(--color-fg-on-cover);
+}
+
+.ft-avatar--sun {
+  background: var(--color-cover-sun);
+  color: var(--color-fg-on-cover);
+}
+
+.ft-avatar--lilac {
+  background: var(--color-cover-lilac);
+  color: var(--color-fg-on-cover);
+}
+
+.ft-avatar--sage {
+  background: var(--color-cover-sage);
+  color: var(--color-fg-on-cover);
+}
+
+.ft-avatar--rose {
+  background: var(--color-cover-rose);
+  color: var(--color-fg-on-cover);
+}
+
+.ft-avatar--mint {
+  background: var(--color-cover-mint);
+  color: var(--color-fg-on-cover);
+}
+
+.ft-avatar--peach {
+  background: var(--color-cover-peach);
+  color: var(--color-fg-on-cover);
+}
+
+.ft-avatar-trigger {
+  display: inline-grid;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+
+  &:hover .ft-avatar {
+    box-shadow: 0 0 0 var(--border-width-thick) var(--color-border-strong);
+  }
+}

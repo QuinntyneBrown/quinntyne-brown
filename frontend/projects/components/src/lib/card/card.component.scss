@@ -1,0 +1,51 @@
+:host {
+  --card-bg: var(--color-bg-surface);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--card-bg);
+  border: var(--border-width-hairline) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+  color: var(--color-fg-default);
+}
+
+:host(.ft-card--flush) {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+:host(.ft-card--flush) .ft-card__header {
+  padding: var(--space-6) var(--space-6) var(--space-2);
+}
+
+:host(.ft-card--strip) {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+:host(.ft-card--success) {
+  background: linear-gradient(135deg, var(--color-success-bg), var(--card-bg));
+}
+
+.ft-card__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.ft-card__title {
+  margin: 0;
+  font: var(--text-h4);
+}
+
+:host(.ft-card--strip) .ft-card__header {
+  inline-size: 100%;
+}

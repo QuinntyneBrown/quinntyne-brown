@@ -1,0 +1,25 @@
+:host {
+  --ft-icon-size: var(--size-icon-md);
+  display: inline-flex;
+  flex: none;
+  inline-size: var(--ft-icon-size);
+  block-size: var(--ft-icon-size);
+}
+
+:host(.ft-icon--sm) {
+  --ft-icon-size: var(--size-icon-sm);
+}
+
+:host(.ft-icon--lg) {
+  --ft-icon-size: var(--size-icon-lg);
+}
+
+svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

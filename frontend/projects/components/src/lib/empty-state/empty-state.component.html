@@ -1,0 +1,12 @@
+<span class="ft-empty__icon" aria-hidden="true"><ft-icon [name]="iconName()" size="lg" /></span>
+@if (headingLevel() === 1) {
+  <h1 class="ft-empty__title">{{ heading() }}</h1>
+} @else if (headingLevel() === 3) {
+  <h3 class="ft-empty__title">{{ heading() }}</h3>
+} @else {
+  <h2 class="ft-empty__title">{{ heading() }}</h2>
+}
+@if (text(); as t) {
+  <p class="ft-empty__text">{{ t }}</p>
+}
+<div class="ft-empty__actions"><ng-content select="[actions]" /></div>

@@ -1,0 +1,86 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Assign roles
+enum Role {
+  CityLead
+  EventLead
+  CreateLead
+  CommunicationsLead
+  Staff
+  Volunteer
+  ProductEngineer
+  Attendee
+  SystemAdmin
+}
+class Profile {
+  +Guid Id
+  +string Name
+  +IReadOnlyCollection<ProfileRole> Roles
+  +IReadOnlyList<object> DomainEvents
+  +AddRole(role: Role, grantedBy: Guid, nowUtc: DateTime): void
+  +RemoveRole(role: Role): void
+  +HasRole(role: Role): bool
+  +ClearDomainEvents(): void
+}
+class CityLeadRoleRemoved {
+  +Guid ProfileId
+}
+class ProfileRole {
+  +Guid ProfileId
+  +Role Role
+  +DateTime GrantedAtUtc
+  +Guid GrantedBy
+}
+class AssignRoleCommand <<record>> {
+  +string? Role
+}
+class RoleAssignmentPolicy {
+  +{static} CityLeadRoles: IReadOnlyList<Role>
+  +bool CanChangeRoles
+  +bool NotifiesOwner
+  +CanChange(role: Role): bool
+}
+class ChangeRolesHandler {
+  +LastSystemAdminMessage: string
+  +AssignAsync(profileId: Guid, role: string?): Task<(Result, IReadOnlyList<string>?)>
+  +RemoveAsync(profileId: Guid, role: string?): Task<(Result, IReadOnlyList<string>?)>
+}
+class RoleChangeNotifier {
+  +Notify(ownerProfileId: Guid, title: string): void
+  +EmailAsync(ownerProfileId: Guid, title: string): Task
+}
+class ProfileAccess {
+  +CallerProfileIdAsync(): Task<Guid?>
+}
+interface ICurrentUser {
+  +Guid? UserId
+  +IReadOnlyCollection<Role> Roles
+  +HasRole(role: Role): bool
+}
+interface IAuditLog {
+  +Record(actorId: Guid, action: string, targetType: string, targetId: string, before: object?, after: object?): void
+}
+interface IEmailQueue {
+  +Enqueue(message: EmailMessage): void
+}
+Profile "1" *-- "*" ProfileRole
+ProfileRole --> Role
+Profile ..> CityLeadRoleRemoved : raises
+ChangeRolesHandler ..> AssignRoleCommand : role from body
+ChangeRolesHandler --> RoleAssignmentPolicy
+ChangeRolesHandler --> Profile : mutates
+ChangeRolesHandler ..> ProfileAccess : actor id
+ChangeRolesHandler ..> IAuditLog
+ChangeRolesHandler ..> RoleChangeNotifier
+RoleAssignmentPolicy ..> ICurrentUser
+RoleChangeNotifier ..> IEmailQueue
+@enduml

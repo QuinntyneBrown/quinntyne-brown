@@ -1,0 +1,26 @@
+<ft-dialog
+  [heading]="'Suspend ' + data.name + '?'"
+  description="They’ll be signed out everywhere and can’t sign in until reinstated. This is recorded in the audit log."
+  icon="suspended"
+  tone="danger"
+  [busy]="busy()"
+  (closed)="ref.close(false)"
+>
+  <ft-stack>
+    @if (failed()) {
+      <ft-alert status="danger" heading="Account not suspended">
+        We couldn’t reach FaithTech. Nothing was changed — try again.
+      </ft-alert>
+    }
+    @if (refusal(); as message) {
+      <ft-alert status="danger" heading="Account not suspended">{{ message }}</ft-alert>
+    }
+    <ft-form-field required label="Reason (recorded in the audit log)" [error]="error()">
+      <ft-textarea [formControl]="reason" [rows]="3" initialFocus [readonly]="busy()" />
+    </ft-form-field>
+  </ft-stack>
+  <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close(false)">Cancel</ft-button>
+  <ft-button ftDialogFooter variant="danger" [loading]="busy()" (click)="confirm()">
+    {{ busy() ? 'Suspending…' : 'Suspend' }}
+  </ft-button>
+</ft-dialog>

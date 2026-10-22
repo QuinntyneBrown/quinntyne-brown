@@ -1,0 +1,73 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Email notifications
+class EmailMessage <<record>> {
+  +string To
+  +string Subject
+  +string Body
+  +IReadOnlyList<EmailAttachment>? Attachments
+  +string? HtmlBody
+}
+class OutboxMessage {
+  +Guid Id
+  +string To
+  +string Subject
+  +string Body
+  +string? HtmlBody
+  +string? AttachmentsJson
+  +DateTimeOffset CreatedAt
+  +DateTimeOffset NextAttemptAt
+  +int Attempts
+  +DateTimeOffset? SentAt
+  +DateTimeOffset? FailedAt
+  +string? LastError
+}
+interface IEmailQueue {
+  +Enqueue(m: EmailMessage): void
+}
+class OutboxEmailQueue
+interface IEmailSender {
+  +SendAsync(m: EmailMessage): Task
+}
+class OutboxEmailSender
+class EmailTemplateRenderer <<static>> {
+  +Render(subject: string, textBody: string): string
+}
+class EmailOutboxDispatcher {
+  +MaxAttempts: int = 5
+  +DispatchPendingAsync(ct: CancellationToken): Task
+}
+class EmailOutboxWorker <<BackgroundService>> {
+  #ExecuteAsync(ct: CancellationToken): Task
+}
+interface IEmailTransport {
+  +SendAsync(m: EmailMessage): Task
+}
+class SmtpEmailTransport
+class Profile {
+  +bool AnnouncementEmailsOptedOut
+}
+interface INotificationPublisher {
+  +PublishAsync(recipientIds, kind, title, linkPath, actorId, email): Task<int>
+}
+INotificationPublisher ..> IEmailQueue : uses
+INotificationPublisher ..> Profile : checks opt-out
+OutboxEmailQueue ..|> IEmailQueue
+OutboxEmailSender ..|> IEmailSender
+OutboxEmailSender ..> OutboxEmailQueue : enqueues and saves
+OutboxEmailQueue ..> EmailTemplateRenderer : renders HtmlBody
+OutboxEmailQueue ..> OutboxMessage : adds
+EmailOutboxWorker ..> EmailOutboxDispatcher : runs
+EmailOutboxDispatcher ..> OutboxMessage : reads / updates
+EmailOutboxDispatcher ..> IEmailTransport : uses
+SmtpEmailTransport ..|> IEmailTransport
+@enduml

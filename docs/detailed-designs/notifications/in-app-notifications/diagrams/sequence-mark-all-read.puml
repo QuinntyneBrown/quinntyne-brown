@@ -1,0 +1,45 @@
+@startuml
+title UML sequence behaviour — Mark all as read
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Member" as actor
+box "Frontend — FaithTech Community web app (notifications library)" #E0F2FE
+  participant "NotificationsPage" as page
+  participant "HttpNotificationsService" as client
+end box
+box "Backend — FaithTech.Community.Api" #D1FADF
+  participant "NotificationsEndpoints" as ep
+end box
+box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+  participant "InAppNotificationsHandler" as h
+end box
+box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Choose "Mark all as read"
+page -> client : markAllRead()
+client -> ep : POST /api/notifications/read-all
+ep -> h : MarkAllReadAsync()
+h -> db : Load caller's notifications where ReadAt is null
+db --> h : Unread notifications
+h -> db : MarkRead(now) on each, save changes (L2-027 #3)
+h --> ep : Success
+ep --> client : 204
+client --> page : Unread count 0
+opt no notifications exist
+  page --> actor : Empty state (L2-027 #4)
+end
+page --> actor : Badge cleared
+@enduml

@@ -1,0 +1,87 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Send an announcement
+enum AudienceKind {
+  Everyone
+  Roles
+  EventRsvps
+}
+class AnnouncementAudience {
+  +AudienceKind Kind
+  +IReadOnlySet<Role> Roles
+  +Guid? EventId
+  +{static} Everyone(): AnnouncementAudience
+  +{static} ForRoles(roles: Role[]): AnnouncementAudience
+  +{static} ForEventRsvps(eventId: Guid): AnnouncementAudience
+}
+class Announcement {
+  +Guid Id
+  +string Subject
+  +string Body
+  +AnnouncementAudience Audience
+  +Guid SenderId
+  +DateTimeOffset SentAt
+  +bool AlsoEmail
+  +AddRecipients(profileIds: IEnumerable<Guid>): void
+}
+class AnnouncementRecipient {
+  +Guid AnnouncementId
+  +Guid ProfileId
+}
+class AudienceRequest <<record>> {
+  +string? Kind
+  +IReadOnlyList<string>? Roles
+  +Guid? EventId
+}
+class SendAnnouncementCommand <<record>> {
+  +string? Subject
+  +string? Body
+  +AudienceRequest? Audience
+  +bool AlsoEmail = true
+}
+class SendAnnouncementHandler {
+  +CountAsync(r: AudienceRequest): Task<(Result, int)>
+  +SendAsync(c: SendAnnouncementCommand): Task<(Result, AnnouncementSent?)>
+}
+class AudienceRequestValidator
+class SendAnnouncementValidator
+class AnnouncementAccess {
+  +bool CanSend
+}
+class AudienceResolver {
+  +FromRequestAsync(r: AudienceRequest): Task<AnnouncementAudience?>
+  +RecipientIds(a: AnnouncementAudience): IQueryable<Guid>
+}
+interface INotificationPublisher {
+  +PublishAsync(recipientIds, kind, title, linkPath, actorId, email): Task<int>
+}
+interface IUnsubscribeTokens {
+  +Issue(profileId: Guid): string
+}
+interface ICurrentUser {
+  +bool HasRole(role: Role)
+}
+AnnouncementAudience --> AudienceKind
+Announcement *-- AnnouncementAudience
+Announcement "1" *-- "*" AnnouncementRecipient
+SendAnnouncementCommand *-- AudienceRequest
+SendAnnouncementHandler ..> SendAnnouncementCommand : handles
+SendAnnouncementValidator ..> SendAnnouncementCommand : validates
+SendAnnouncementValidator ..> AudienceRequestValidator : uses
+AnnouncementAccess ..> ICurrentUser : reads roles
+SendAnnouncementHandler ..> AnnouncementAccess : authorizes
+SendAnnouncementHandler ..> AudienceResolver : resolves
+AudienceResolver ..> AnnouncementAudience : builds
+SendAnnouncementHandler ..> IUnsubscribeTokens : link per email
+SendAnnouncementHandler ..> INotificationPublisher : uses
+SendAnnouncementHandler --> Announcement : creates
+@enduml

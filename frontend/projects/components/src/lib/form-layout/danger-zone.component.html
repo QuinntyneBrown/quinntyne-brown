@@ -1,0 +1,7 @@
+<section class="zone" [attr.aria-labelledby]="headingId">
+  <div>
+    <h3 [id]="headingId">{{ heading() }}</h3>
+    <p><ng-content /></p>
+  </div>
+  <ng-content select="[ftDangerAction]" />
+</section>

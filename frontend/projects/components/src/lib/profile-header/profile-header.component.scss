@@ -1,0 +1,77 @@
+:host {
+  display: block;
+}
+
+.ft-profile-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: var(--border-width-hairline) solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-1);
+}
+
+.ft-profile-header__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.ft-profile-header__body {
+  display: flex;
+  flex: 1 1 12rem;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+
+.ft-profile-header__name {
+  margin: 0;
+  font: var(--text-h1);
+  overflow-wrap: anywhere;
+}
+
+.ft-profile-header__roles,
+.ft-profile-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ft-profile-header__muted {
+  color: var(--color-fg-muted);
+}
+
+.ft-profile-header__where {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.ft-profile-header__bio {
+  margin: 0;
+}
+
+.ft-profile-header__photos {
+  margin-block-start: var(--space-5);
+}
+
+.ft-profile-header__photos-title {
+  margin: 0 0 var(--space-3);
+  /* The section-title role (docs/design-system/foundations/typography.html). */
+  font: var(--text-h4);
+}
+
+.ft-profile-header__strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 7rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

@@ -1,0 +1,43 @@
+:host {
+  display: block;
+}
+
+.summary {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  color: var(--color-danger-fg);
+  background: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  border-inline-start: var(--space-1) solid var(--color-danger-solid);
+  border-radius: var(--radius-md);
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-accent);
+    outline-offset: var(--focus-ring-offset);
+  }
+}
+
+ft-icon {
+  color: var(--color-danger-icon);
+  margin-block-start: var(--space-0-5);
+}
+
+.title {
+  font: var(--text-label);
+}
+
+ol {
+  margin: var(--space-1) 0 0;
+  padding-inline-start: var(--space-5);
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-accent);
+    outline-offset: var(--focus-ring-offset);
+  }
+}

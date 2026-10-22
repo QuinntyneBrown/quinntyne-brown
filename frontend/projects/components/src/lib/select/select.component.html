@@ -1,0 +1,25 @@
+<select
+  class="select"
+  [attr.id]="id()"
+  [attr.name]="name()"
+  [disabled]="disabled()"
+  [attr.aria-label]="ariaLabel()"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-invalid]="invalid()"
+  [attr.aria-required]="required()"
+  (change)="onChangeEvent($event)"
+  (blur)="onBlur()"
+>
+  @if (placeholder()) {
+    <option value="" [selected]="value() === ''">{{ placeholder() }}</option>
+  }
+  @for (option of options(); track option.value) {
+    <option
+      [value]="option.value"
+      [disabled]="option.disabled"
+      [selected]="option.value === value()"
+    >
+      {{ option.label }}
+    </option>
+  }
+</select>

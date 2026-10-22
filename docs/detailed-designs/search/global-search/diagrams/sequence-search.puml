@@ -1,0 +1,60 @@
+@startuml
+title UML sequence behaviour — Search across the community
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Signed-in member" as actor
+box "Frontend — FaithTech Community web app (search library)" #E0F2FE
+  participant "SearchPage" as page
+  participant "HttpSearchService" as svc
+end box
+box "Backend — FaithTech.Community.Api" #D1FADF
+  participant "SearchEndpoints" as ep
+end box
+box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+  participant "GlobalSearchHandler" as h
+  participant "ISearchSource (x5)" as src
+end box
+box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+  participant "PostgresFullTextSearch" as idx
+  database "Community database" as db
+end box
+
+actor -> page : Type term and submit
+alt term shorter than 2 characters
+  page --> actor : Show hint; no search runs (L2-026)
+else valid term
+  page -> page : Loading state
+  page -> svc : search(term)
+  svc -> ep : GET /api/search?q=term
+  ep -> h : SearchAsync(q)
+  h -> h : Trim; 2 to 200 characters, else 400 (L2-026)
+  loop each source in order: people, events, partners, contacts, work items
+    h -> src : SearchAsync(term, caller, 10)
+    src -> src : Start from what the caller may open (L2-026 permission filters):\nown contacts only; partners for leads, Staff, System Admin;\nwork items for workspace members, Staff, System Admin
+    src -> idx : Match(filtered query, term, document)
+    idx -> db : SearchVector @@ to_tsquery('english', 'gra:* & she:*'),\norder by ts_rank, permission filter in the same SQL (L2-026)
+    db --> src : Ranked rows (at most 10)
+    src --> h : SearchResultItems
+  end
+  h --> ep : SearchResultsDto (non-empty groups)
+  ep --> svc : 200 OK
+  svc --> page : Results
+  alt no matches
+    page --> actor : Empty state suggesting other terms (L2-026)
+  else matches
+    page --> actor : People, events, partners, contacts, work items groups (L2-026)
+  end
+end
+@enduml

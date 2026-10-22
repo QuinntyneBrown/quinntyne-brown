@@ -1,0 +1,7 @@
+@if (icon()) {
+  <ft-icon [name]="icon()!" size="sm" />
+}
+<ng-content />
+@if (shortcut(); as keys) {
+  <span class="ft-menu-item__shortcut" aria-hidden="true">{{ keys }}</span>
+}

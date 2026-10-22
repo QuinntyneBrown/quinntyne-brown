@@ -1,0 +1,69 @@
+@startuml
+title UML sequence behaviour — Add a story to the active sprint
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Workspace member" as actor
+box "Frontend — FaithTech Community web app (agile library)" #E0F2FE
+  participant "WorkItemPage" as page
+  participant "AgileService (AGILE_SERVICE)" as svc
+end box
+box "Backend — FaithTech.Community.Api" #D1FADF
+  participant "WorkspacesEndpoints" as ep
+  participant "ValidationEndpointFilter\n<AddStoriesToSprintCommand>" as filt
+end box
+box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+  participant "SprintsHandler" as h
+  participant "WorkspaceAccessPolicy" as pol
+  participant "WorkItem (story)" as wi
+end box
+box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+  participant "CommunityDbContext" as ctx
+  database "Community database" as db
+end box
+actor -> page : Open a backlog story in a Scrum workspace
+page -> svc : getSprints(workspaceId)
+svc --> page : SprintsDto.Active
+page --> actor : "Sprint: Backlog · Add to <sprint>" (hidden when no sprint is active or the story is Done)
+actor -> page : Choose "Add to <sprint>"
+page -> svc : addStoriesToSprint(workspaceId, sprintId, [storyId])
+svc -> ep : POST /api/workspaces/{id}/sprints/{sprintId}/stories
+ep -> filt : Validate body (at least one story id)
+filt -> h : AddStoriesAsync(workspaceId, sprintId, command)
+h -> pol : AuthorizeAsync(workspaceId, manage = false)
+pol --> h : Workspace and caller (Staff 403, outsider 404)
+h -> ctx : Load sprint of this workspace
+ctx -> db : SELECT
+db --> ctx : Sprint or none
+alt sprint missing
+h --> ep : Result.NotFound
+ep --> svc : 404 Not Found
+else sprint closed
+h --> ep : Result.Conflict("A closed sprint takes no more stories.")
+ep --> svc : 409 Problem
+svc --> page : Error toast
+else sprint active (or planned)
+h -> ctx : Load the stories by id, same workspace, Kind = Story
+ctx -> db : SELECT
+db --> ctx : Rows (400 "StoryIds" when any is missing)
+h -> wi : MoveToSprint(sprint): SprintId = sprint.Id (L2-035 AC2)
+h -> pol : AuditOverride(caller, "sprint.stories.added", ...) (System Admin only)
+h -> ctx : SaveChangesAsync
+ctx -> db : UPDATE work item
+h --> ep : Result.Ok
+ep --> svc : 204 No Content
+svc --> page : Done
+page --> actor : Toast "Added to <sprint>"; item reloaded showing its sprint
+end
+@enduml

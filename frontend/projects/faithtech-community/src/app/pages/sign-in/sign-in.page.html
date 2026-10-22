@@ -1,0 +1,11 @@
+<ft-auth-layout>
+  <ft-card>
+    <ft-stack>
+      <h1 class="text-center">Welcome back</h1>
+      <ft-sign-in-form [busy]="busy()" [failure]="failure()" (submitted)="submit($event)" />
+    </ft-stack>
+  </ft-card>
+  <p class="text-caption text-center">
+    New to FaithTech? <ft-link href="/sign-up">Create an account</ft-link>
+  </p>
+</ft-auth-layout>

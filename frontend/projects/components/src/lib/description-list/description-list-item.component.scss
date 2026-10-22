@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.ft-dl {
+  margin: 0;
+}
+
+.ft-dl__term {
+  font: var(--text-label);
+  color: var(--color-fg-muted);
+}
+
+.ft-dl__detail {
+  margin: var(--space-1) 0 0;
+  font: var(--text-body);
+  color: var(--color-fg-default);
+  overflow-wrap: anywhere;
+}
+
+.ft-dl__missing {
+  color: var(--color-fg-muted);
+}

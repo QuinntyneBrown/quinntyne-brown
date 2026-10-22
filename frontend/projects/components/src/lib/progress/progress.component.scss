@@ -1,0 +1,47 @@
+:host {
+  display: block;
+}
+
+.ft-progress-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ft-progress {
+  flex: 1;
+  inline-size: 100%;
+  block-size: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-subtle-hover);
+  overflow: hidden;
+}
+
+.ft-progress--lg {
+  block-size: var(--space-3);
+}
+
+.ft-progress__bar {
+  block-size: 100%;
+  inline-size: var(--value, 0%);
+  background: var(--color-accent);
+  border-radius: inherit;
+  transition: inline-size var(--duration-slow) var(--ease-standard);
+}
+
+.ft-progress--complete .ft-progress__bar {
+  background: var(--color-success-solid);
+}
+
+.ft-progress-label {
+  font: var(--text-label);
+  color: var(--color-fg-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-progress__bar {
+    transition: none;
+  }
+}

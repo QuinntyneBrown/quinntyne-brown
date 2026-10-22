@@ -1,0 +1,37 @@
+:host {
+  display: block;
+  margin-block-start: var(--space-4);
+}
+
+ft-page-header {
+  display: block;
+  margin-block-end: var(--space-4);
+}
+
+.loading {
+  display: grid;
+  gap: var(--layout-gutter);
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+}
+
+.description,
+.text,
+.muted,
+.caption {
+  margin: 0;
+}
+
+.muted {
+  color: var(--color-fg-muted);
+}
+
+.caption {
+  color: var(--color-fg-muted);
+  font: var(--text-caption);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}

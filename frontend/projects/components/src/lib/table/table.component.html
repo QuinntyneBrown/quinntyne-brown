@@ -1,0 +1,46 @@
+<div class="ft-table__wrap">
+  <table class="ft-table" [attr.aria-busy]="busy() || loading() ? 'true' : null">
+    <caption class="ft-table__caption" [textContent]="caption()"></caption>
+    <thead>
+      <tr>
+        @for (col of columns(); track col.key) {
+          <th scope="col">
+            @if (col.hideHeader) {
+              <span class="ft-table__visually-hidden">{{ col.header }}</span>
+            } @else {
+              {{ col.header }}
+            }
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        @for (i of skeletonRows(); track i) {
+          <tr>
+            @for (col of columns(); track col.key) {
+              <td><ft-skeleton shape="text" /></td>
+            }
+          </tr>
+        }
+      } @else {
+        @for (row of rows(); track $index) {
+          <tr>
+            @for (col of columns(); track col.key) {
+              <td [class.ft-table__mono]="col.mono">
+                @if (col.template; as tpl) {
+                  <ng-container
+                    [ngTemplateOutlet]="tpl"
+                    [ngTemplateOutletContext]="{ $implicit: row }"
+                  />
+                } @else {
+                  {{ row[col.key] }}
+                }
+              </td>
+            }
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

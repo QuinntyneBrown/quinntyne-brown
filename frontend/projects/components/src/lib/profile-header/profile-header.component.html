@@ -1,0 +1,62 @@
+@if (loading()) {
+  <div class="ft-profile-header" role="status" aria-busy="true" aria-label="Loading profile">
+    <div class="ft-profile-header__head">
+      <ft-skeleton shape="avatar" size="xl" />
+      <div class="ft-profile-header__body">
+        <ft-skeleton shape="title" width="12rem" />
+        <ft-skeleton shape="text" width="8rem" />
+      </div>
+    </div>
+    <ft-skeleton shape="text" />
+  </div>
+  <div class="ft-profile-header__photos">
+    <ul class="ft-profile-header__strip" aria-hidden="true">
+      @for (tile of [1, 2, 3, 4]; track tile) {
+        <li><ft-skeleton shape="square" /></li>
+      }
+    </ul>
+  </div>
+} @else {
+  <div class="ft-profile-header">
+    <div class="ft-profile-header__head">
+      <ft-avatar size="xl" [name]="name()" [color]="avatarColor()" [src]="photoUrl()" />
+      <div class="ft-profile-header__body">
+        <h1 class="ft-profile-header__name">{{ name() }}</h1>
+        <div class="ft-profile-header__roles">
+          @for (role of roles(); track role) {
+            <ft-badge variant="role">{{ role }}</ft-badge>
+          } @empty {
+            <span class="ft-profile-header__muted">No role yet</span>
+          }
+        </div>
+        @if (where()) {
+          <p class="ft-profile-header__muted ft-profile-header__where">
+            @if (location()) {
+              <ft-icon name="location" size="sm" />
+            }
+            <span>{{ where() }}</span>
+          </p>
+        }
+      </div>
+      <div class="ft-profile-header__actions">
+        <ng-content select="[actions]" />
+      </div>
+    </div>
+    @if (bio()) {
+      <p class="ft-profile-header__bio">{{ bio() }}</p>
+    } @else if (emptyBio(); as prompt) {
+      <p class="ft-profile-header__bio ft-profile-header__muted">{{ prompt }}</p>
+    }
+  </div>
+
+  @if (photos().length > 0) {
+    <section class="ft-profile-header__photos" aria-labelledby="ft-profile-header-photos">
+      <h2 id="ft-profile-header-photos" class="ft-profile-header__photos-title">Photos</h2>
+      <ul class="ft-profile-header__strip">
+        @for (photo of photos(); track $index) {
+          <li><ft-photo [src]="photo.url" [alt]="photo.alt" /></li>
+        }
+      </ul>
+    </section>
+  }
+}

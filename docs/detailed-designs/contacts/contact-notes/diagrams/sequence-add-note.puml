@@ -1,0 +1,66 @@
+@startuml
+title UML sequence behaviour — Add a note
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Lead" as actor
+box "Frontend — FaithTech Community web app (contacts library)" #E0F2FE
+  participant "ContactPage" as page
+  participant "AddNoteDialog" as dlg
+  participant "HttpContactsService" as svc
+end box
+box "Backend — FaithTech.Community.Api" #D1FADF
+  participant "ContactsEndpoints" as ep
+  participant "AddContactNoteValidator" as v
+end box
+box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+  participant "ContactNotesHandler" as h
+  participant "ContactAccess" as acc
+  participant "Contact" as c
+end box
+box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+  participant "AuditLog" as audit
+  database "Community database" as db
+end box
+actor -> page : Choose Add note
+page -> dlg : Open with {contactId, contactName}
+actor -> dlg : Type note and save
+alt empty or over 2,000 characters
+  dlg --> actor : "Write a note to save." or the length message
+else valid
+  dlg -> svc : addNote(contactId, body)
+  svc -> ep : POST /api/contacts/{id}/notes
+  ep -> v : Validate body
+  ep -> h : AddAsync(contactId, command)
+  h -> acc : AuthorizeAsync(contactId)
+  alt NotFound
+    h --> ep : NotFound
+    ep --> svc : 404 (L2-012 AC1)
+    svc --> dlg : Error
+    dlg --> actor : Failed alert in the dialog
+  else Owner or AdminOverride
+    h -> c : AddNote(body, nowUtc)
+    h -> acc : AuditOverride(kind, actor, contact, "contact.note-added")
+    opt AdminOverride
+      acc -> audit : Record contact.note-added
+    end
+    h -> db : Insert ContactNote with CreatedAtUtc (L2-014 AC1)
+    h --> ep : ContactNoteDto
+    ep --> svc : 201 Created
+    svc --> dlg : Note
+    dlg --> page : Close with the note
+    page --> actor : Note shown first
+  end
+end
+@enduml

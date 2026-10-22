@@ -1,0 +1,22 @@
+<textarea
+  class="textarea"
+  [attr.id]="id()"
+  [attr.name]="name()"
+  [rows]="rows()"
+  [value]="value()"
+  [placeholder]="placeholder()"
+  [readOnly]="readonly()"
+  [disabled]="disabled()"
+  [attr.aria-label]="ariaLabel()"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-invalid]="invalid()"
+  [attr.aria-required]="required()"
+  [attr.cdkFocusInitial]="initialFocus() ? '' : null"
+  (input)="onInput($event)"
+  (blur)="onBlur()"
+></textarea>
+@if (left() !== null) {
+  <div class="field__count" [class.field__count--over]="left()! < 0" [id]="countId">
+    {{ countText() }}
+  </div>
+}

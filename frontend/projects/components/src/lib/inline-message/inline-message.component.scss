@@ -1,0 +1,11 @@
+:host {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1);
+  font: var(--text-body-sm);
+  color: var(--color-danger-fg);
+}
+
+ft-icon {
+  margin-block-start: var(--space-0-5);
+}

@@ -1,0 +1,17 @@
+@if (errors().length) {
+  <div #box class="summary" role="alert" tabindex="-1">
+    <ft-icon name="error" />
+    <div class="body">
+      <div class="title">{{ title() }}</div>
+      <ol>
+        @for (error of errors(); track error.fieldId) {
+          <li>
+            <a [attr.href]="'#' + error.fieldId" (click)="select($event, error)">{{
+              error.message
+            }}</a>
+          </li>
+        }
+      </ol>
+    </div>
+  </div>
+}

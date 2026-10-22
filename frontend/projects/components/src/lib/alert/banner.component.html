@@ -1,0 +1,13 @@
+<div [class]="'alert banner alert--' + status()" [attr.role]="role()">
+  <ft-icon class="alert__icon" [name]="icon()" />
+  <div class="alert__body">
+    <div class="alert__title">{{ heading() }}</div>
+    <div class="alert__text"><ng-content /></div>
+    <div class="alert__actions"><ng-content select="[ftAlertActions]" /></div>
+  </div>
+  @if (dismissible()) {
+    <button class="alert__close" type="button" aria-label="Dismiss" (click)="dismissed.emit()">
+      <ft-icon name="close" size="sm" />
+    </button>
+  }
+</div>

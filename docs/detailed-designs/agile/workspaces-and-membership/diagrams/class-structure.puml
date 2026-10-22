@@ -1,0 +1,123 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Agile workspaces and membership
+
+enum WorkspaceMethod {
+  Scrum
+  Kanban
+}
+enum WorkspaceAccess {
+  Outsider
+  Staff
+  Admin
+  Member
+  Owner
+}
+class WorkspaceCaller <<record>> {
+  +Guid ProfileId
+  +WorkspaceAccess Access
+  +bool CanRead
+  +bool CanEdit
+  +bool CanManage
+  +bool IsOverride
+  +Refuse(manage: bool): Result?
+}
+class Workspace {
+  +Guid Id
+  +string Name
+  +WorkspaceMethod Method
+  +Guid OwnerId
+  +bool IsArchived
+  +Rename(name: string): void
+  +IsMember(profileId: Guid): bool
+  +AddMember(profile: Profile, now: DateTimeOffset): void
+  +RemoveMember(profileId: Guid, items: IEnumerable<WorkItem>): void
+  +SwitchMethod(target: WorkspaceMethod, sprints, stories): void
+}
+class WorkspaceMember {
+  +Guid WorkspaceId
+  +Guid ProfileId
+  +DateTimeOffset AddedAt
+}
+class CreateWorkspaceCommand <<record>> {
+  +string? Name
+  +string? Method
+  +IReadOnlyList<Guid>? MemberIds
+}
+class AddWorkspaceMembersCommand <<record>> {
+  +IReadOnlyList<Guid>? ProfileIds
+}
+class RenameWorkspaceCommand <<record>> {
+  +string? Name
+}
+class SwitchMethodCommand <<record>> {
+  +string? Method
+}
+class WorkspacesHandler {
+  +CreateAsync(command: CreateWorkspaceCommand): Task<(Result, WorkspaceDto?)>
+  +ListAsync(): Task<IReadOnlyList<WorkspaceSummaryDto>>
+  +GetAsync(id: Guid): Task<WorkspaceDto?>
+}
+class WorkspaceMembership {
+  +AddMembersAsync(workspace: Workspace, actor: Guid, profileIds): Task<IReadOnlyList<Guid>?>
+}
+class WorkspaceSettingsHandler {
+  +AddMembersAsync(workspaceId: Guid, command: AddWorkspaceMembersCommand): Task<Result>
+  +RemoveMemberAsync(workspaceId: Guid, profileId: Guid): Task<Result>
+  +RenameAsync(workspaceId: Guid, command: RenameWorkspaceCommand): Task<Result>
+  +SwitchMethodAsync(workspaceId: Guid, command: SwitchMethodCommand): Task<Result>
+  +CandidatesAsync(workspaceId: Guid?): Task<(Result, IReadOnlyList<MemberCandidateDto>?)>
+}
+class WorkspaceAccessPolicy {
+  +bool ReadsEverything
+  +bool IsSystemAdmin
+  +CallerProfileIdAsync(): Task<Guid?>
+  +Classify(workspace: Workspace, caller: Guid?): WorkspaceAccess
+  +Visible(workspaces: IQueryable<Workspace>, caller: Guid?): IQueryable<Workspace>
+  +LoadAsync(workspaceId: Guid, includeArchived: bool): Task<(Workspace?, WorkspaceCaller)>
+  +AuthorizeAsync(workspaceId: Guid, manage: bool, includeArchived: bool): Task<(Workspace, WorkspaceCaller, Result?)>
+  +Audit(caller, action, targetType, targetId, before, after): void
+  +AuditOverride(caller, action, targetType, targetId, before, after): void
+}
+interface ICurrentUser {
+  +Guid? UserId
+  +IReadOnlyCollection<Role> Roles
+  +HasRole(role: Role): bool
+}
+class AgileNotifier {
+  +Notify(actor, recipient, kind, title, linkPath, subject, body): void
+  +SendEmailsAsync(): Task
+}
+interface IAuditLog {
+  +Record(actorId, action, targetType, targetId, before, after): void
+}
+Workspace "1" *-- "*" WorkspaceMember
+Workspace --> WorkspaceMethod
+WorkspaceCaller --> WorkspaceAccess
+WorkspacesHandler ..> CreateWorkspaceCommand : handles
+WorkspaceSettingsHandler ..> AddWorkspaceMembersCommand : handles
+WorkspaceSettingsHandler ..> RenameWorkspaceCommand : handles
+WorkspaceSettingsHandler ..> SwitchMethodCommand : handles
+WorkspacesHandler --> Workspace : creates, reads
+WorkspaceSettingsHandler --> Workspace : mutates
+WorkspaceMembership --> Workspace : AddMember
+WorkspacesHandler ..> WorkspaceMembership
+WorkspaceSettingsHandler ..> WorkspaceMembership
+WorkspacesHandler ..> WorkspaceAccessPolicy
+WorkspaceSettingsHandler ..> WorkspaceAccessPolicy
+WorkspaceAccessPolicy --> WorkspaceCaller : returns
+WorkspaceAccessPolicy ..> ICurrentUser
+WorkspaceAccessPolicy ..> IAuditLog
+WorkspaceMembership ..> AgileNotifier
+WorkspacesHandler ..> AgileNotifier : SendEmailsAsync
+WorkspaceSettingsHandler ..> AgileNotifier : SendEmailsAsync
+@enduml

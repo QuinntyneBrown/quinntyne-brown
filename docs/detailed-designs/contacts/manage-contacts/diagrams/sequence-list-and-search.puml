@@ -1,0 +1,54 @@
+@startuml
+title UML sequence behaviour — List and search contacts
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Lead" as actor
+box "Frontend — FaithTech Community web app (contacts library)" #E0F2FE
+  participant "ContactsPage" as list
+  participant "HttpContactsService" as svc
+end box
+box "Backend — FaithTech.Community.Api" #D1FADF
+  participant "ContactsEndpoints" as ep
+end box
+box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+  participant "ManageContactsHandler" as h
+  participant "ContactAccess" as acc
+end box
+box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> list : Open /contacts or search for a term
+list -> svc : list(term)
+svc -> ep : GET /api/contacts?q=term
+ep -> h : ListAsync(term)
+h -> acc : CanKeepContacts, CallerProfileIdAsync()
+alt no lead role and not System Admin
+  h --> ep : null
+  ep --> svc : 403
+  svc --> list : Error
+  list --> actor : Forbidden state
+else may keep contacts
+  h -> db : OwnerId = caller AND ArchivedAtUtc IS NULL (L2-012 AC3)\nand, with a term, lower(name, email, organization or note body) contains term
+  db --> h : Rows with linked profile name and signed-up flag
+  h --> ep : ContactSummaryDto list by name, status Private, SignedUp or Member (L2-013 AC3)
+  ep --> svc : 200 OK
+  svc --> list : Contacts
+  alt none
+    list --> actor : Empty state inviting to add a contact (L2-013 AC4)
+  else some
+    list --> actor : List of cards at every width (L2-013 AC5); alert for a contact who signed up
+  end
+end
+@enduml
