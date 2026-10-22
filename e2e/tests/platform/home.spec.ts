@@ -225,7 +225,7 @@ test.describe('Home', () => {
 
     await expect(home.heading).toHaveText('Welcome, Leah');
     await expect(home.subtitle).toHaveText(
-      'You’re part of the FaithTech community. Here’s how to get started.',
+      'You’re part of the Quinntyne Brown community. Here’s how to get started.',
     );
     await expect(
       home.onboardingCard('Finish your profile').getByRole('link', { name: 'Edit profile' }),

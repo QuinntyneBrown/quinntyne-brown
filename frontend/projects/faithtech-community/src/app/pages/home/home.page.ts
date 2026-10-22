@@ -66,7 +66,7 @@ interface FeedRow {
 /** Coming up shows the next three events (docs/mocks/pages/home). */
 const COMING_UP = 3;
 /** Notifications carry no actor yet (PR #335), so the community speaks for them. */
-const SYSTEM_ACTOR = 'FaithTech Community';
+const SYSTEM_ACTOR = 'Quinntyne Brown Community';
 const LONG_DATE = new Intl.DateTimeFormat('en-GB', {
   weekday: 'long',
   day: 'numeric',

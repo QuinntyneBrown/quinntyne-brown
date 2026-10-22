@@ -51,7 +51,7 @@ export class MarketingPage {
       level: 1,
       name: 'Build with people who share your faith',
     });
-    this.eyebrow = page.getByText('FaithTech Community', { exact: true });
+    this.eyebrow = page.getByText('Quinntyne Brown Community', { exact: true });
     this.lead = page.getByText(/^Meet the builders, leads and volunteers in your city/);
     this.topBar = page.getByRole('banner');
     this.topBarJoin = this.topBar.getByRole('button', { name: 'Join now' });
