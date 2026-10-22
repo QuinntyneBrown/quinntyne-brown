@@ -1,0 +1,49 @@
+/* Marketing rebrand ("QB remix"): the FaithTech design system tokens, re-weighted
+   around the QB monogram. Very low text density: big type, one line per idea,
+   whitespace does the work. Tokens only; no raw colours or sizes. */
+
+.qb { background: var(--color-bg-canvas); color: var(--color-fg-default); }
+.qb-bar { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4) var(--space-6); max-width: 72rem; margin: 0 auto; }
+.qb-bar__brand { display: inline-flex; align-items: center; gap: var(--space-3); font-weight: var(--font-weight-semibold); color: var(--color-fg-default); text-decoration: none; }
+.qb-bar__spacer { flex: 1; }
+
+.qb-main { max-width: 72rem; margin: 0 auto; padding: 0 var(--space-6); }
+.qb-section { padding: var(--space-16, 4rem) 0; border-top: var(--border-width-hairline) solid var(--color-border-default); }
+.qb-section:first-child { border-top: 0; }
+.qb-kicker { font: var(--text-overline); letter-spacing: .12em; text-transform: uppercase; color: var(--color-fg-accent); margin: 0 0 var(--space-4); }
+.qb-h2 { font-size: var(--font-size-4xl); line-height: 1.1; margin: 0 0 var(--space-8); letter-spacing: -.02em; }
+
+/* Hero: monogram, name, one line, sign-in. */
+.qb-hero { display: grid; gap: var(--space-12, 3rem); align-items: center; padding: var(--space-12, 3rem) 0 var(--space-16, 4rem); }
+.qb-hero__mark { width: 6rem; height: 6rem; border-radius: var(--radius-lg); box-shadow: 0 0 0 var(--space-2) var(--color-accent-subtle); }
+.qb-hero__title { font-size: clamp(var(--font-size-5xl), 8vw, 5.5rem); line-height: 1; letter-spacing: -.035em; margin: var(--space-8) 0 var(--space-4); }
+.qb-hero__title span { color: var(--color-fg-accent); }
+.qb-hero__line { font-size: var(--font-size-xl); color: var(--color-fg-muted); margin: 0; }
+.qb-hero__panel { max-width: 26rem; width: 100%; justify-self: end; }
+@media (min-width: 960px) { .qb-hero { grid-template-columns: 1.3fr 1fr; } }
+@media (max-width: 959px) { .qb-hero__panel { justify-self: stretch; max-width: none; } }
+
+/* Professional: four numbers, then the places. */
+.qb-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: var(--space-8); list-style: none; margin: 0; padding: 0; }
+.qb-stats strong { display: block; font-size: var(--font-size-5xl); line-height: 1; letter-spacing: -.03em; color: var(--color-fg-accent); }
+.qb-stats span { color: var(--color-fg-muted); }
+.qb-orgs { display: flex; flex-wrap: wrap; gap: var(--space-3); list-style: none; margin: var(--space-12, 3rem) 0 0; padding: 0; }
+.qb-orgs li { padding: var(--space-2) var(--space-4); border-radius: var(--radius-full, 999px); background: var(--color-bg-subtle); font-weight: var(--font-weight-medium); }
+
+/* Pinned repositories, pulled from GitHub. */
+.qb-repos { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: var(--space-6); list-style: none; margin: 0; padding: 0; }
+.qb-repo { display: block; border-radius: var(--radius-lg); overflow: hidden; background: var(--color-bg-surface); border: var(--border-width-hairline) solid var(--color-border-default); color: inherit; text-decoration: none; transition: transform var(--duration-fast, 120ms) var(--easing-standard, ease), box-shadow var(--duration-fast, 120ms); }
+.qb-repo:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
+.qb-repo:focus-visible { outline: var(--border-width-focus, 2px) solid var(--color-focus-ring); outline-offset: 3px; }
+.qb-repo img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--color-bg-surface-sunken); }
+.qb-repo__name { display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-5, 1.25rem); font-weight: var(--font-weight-semibold); font-size: var(--font-size-lg); }
+.qb-repo__name small { font-weight: var(--font-weight-regular); font-size: var(--font-size-sm); color: var(--color-fg-muted); }
+.qb-repo--skeleton { aspect-ratio: 16 / 12; background: var(--color-bg-subtle); border: 0; animation: qb-pulse 1.4s ease-in-out infinite; }
+@keyframes qb-pulse { 50% { opacity: .55; } }
+.qb-more { margin-top: var(--space-6); }
+
+.qb-foot { max-width: 72rem; margin: 0 auto; padding: var(--space-8) var(--space-6); display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; color: var(--color-fg-muted); }
+.qb-foot__spacer { flex: 1; }
+
+@media (prefers-reduced-motion: reduce) { .qb-repo, .qb-repo--skeleton { transition: none; animation: none; } .qb-repo:hover { transform: none; } }
+.qb--reduced .qb-repo, .qb--reduced .qb-repo--skeleton { transition: none; animation: none; }

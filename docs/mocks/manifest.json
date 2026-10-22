@@ -30,13 +30,14 @@
         "sign-up-success",
         "google-busy",
         "google-failed",
-        "video-unavailable",
+        "repos-loading",
+        "repos-unavailable",
         "reduced-motion"
       ],
       "not_applicable": {
-        "loading": "A static page; the forms and video render without fetching anything.",
-        "empty": "This screen has no collection that could be empty.",
-        "error": "Every request on the page is a form submission with its own error state (sign-in-unreachable, sign-up-error, google-failed)."
+        "loading": "Only the pinned repositories fetch; see repos-loading.",
+        "empty": "With no pins the projects section is not rendered.",
+        "error": "Each request has its own error state (sign-in-unreachable, sign-up-error, google-failed, repos-unavailable)."
       }
     },
     {
