@@ -1,0 +1,21 @@
+:host {
+  display: block;
+  margin-block-start: var(--space-4);
+}
+
+ft-page-header,
+ft-alert {
+  display: block;
+  margin-block-end: var(--space-4);
+}
+
+.loading {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 48rem) {
+  .loading {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

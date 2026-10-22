@@ -1,0 +1,52 @@
+@startuml
+title UML sequence behaviour — Unsubscribe from an email link
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Email recipient" as actor
+box "Frontend — FaithTech Community web app (announcements library)" #E0F2FE
+  participant "UnsubscribePage" as page
+  participant "HttpAnnouncementsService" as client
+end box
+box "Backend — FaithTech.Community.Api" #D1FADF
+  participant "AnnouncementsEndpoints" as ep
+end box
+box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+  participant "UnsubscribeHandler" as h
+end box
+box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+  participant "DataProtectionUnsubscribeTokens" as tok
+  database "Community database" as db
+end box
+actor -> page : Open email link /unsubscribe?token= (anonymous, GET changes nothing)
+page -> client : unsubscribe(token)
+client -> ep : POST /api/announcements/unsubscribe { token } (anonymous, rate-limited)
+ep -> h : UnsubscribeAsync(UnsubscribeCommand)
+h -> tok : Read(token)
+alt valid token, under one year old
+  tok --> h : profileId
+  h -> db : Set AnnouncementEmailsOptedOut = true (L2-030 #3)
+  db --> h : Saved
+  h --> ep : Ok
+  ep --> client : 204
+  client --> page : Success
+  page --> actor : Unsubscribed confirmation
+else invalid or expired
+  tok --> h : null
+  h --> ep : Invalid
+  ep --> client : 400 ProblemDetails
+  client --> page : Error
+  page --> actor : "This unsubscribe link doesn't work."
+end
+@enduml

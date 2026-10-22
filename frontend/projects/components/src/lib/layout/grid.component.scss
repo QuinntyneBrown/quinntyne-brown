@@ -1,0 +1,9 @@
+:host {
+  display: grid;
+  gap: var(--layout-gutter);
+  grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+}
+
+:host(.ft-grid--auto) {
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+}

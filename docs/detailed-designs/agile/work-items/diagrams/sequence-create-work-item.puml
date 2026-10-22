@@ -1,0 +1,87 @@
+@startuml
+title UML sequence behaviour — Create a work item
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Workspace member" as actor
+box "Frontend — FaithTech Community web app (agile library)" #E0F2FE
+  participant "BacklogPage" as page
+  participant "WorkItemDialog" as dlg
+  participant "AgileService (AGILE_SERVICE)" as svc
+end box
+box "Backend — FaithTech.Community.Api" #D1FADF
+  participant "WorkItemsEndpoints" as ep
+  participant "ValidationEndpointFilter\n<CreateWorkItemCommand>" as filt
+end box
+box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+  participant "CreateWorkItemValidator" as val
+  participant "WorkItemsHandler" as h
+  participant "WorkspaceAccessPolicy" as pol
+  participant "WorkItem" as ent
+  participant "AgileNotifier" as ntf
+end box
+box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+  participant "CommunityDbContext" as ctx
+  database "Community database" as db
+  participant "IEmailQueue\n(OutboxEmailQueue)" as mail
+end box
+actor -> page : Choose "New item"
+page -> dlg : Open WorkItemDialog (create)
+actor -> dlg : Enter kind, title, parent, assignee, points
+opt title empty, or task without a story
+dlg --> actor : Inline error (L2-033 AC5; L2-032 AC3)
+end
+dlg -> svc : createWorkItem(workspaceId, request)
+svc -> ep : POST /api/workspaces/{id}/items
+ep -> filt : Validate body
+filt -> val : ValidateAsync(CreateWorkItemCommand)
+alt kind, title, description or points invalid
+val --> filt : Errors (L2-033 AC1)
+filt --> svc : 400 ValidationProblem (per field)
+svc --> dlg : Field errors
+dlg --> actor : Show inline errors
+else valid
+filt -> h : CreateAsync(workspaceId, command)
+h -> pol : AuthorizeAsync(workspaceId, manage = NeedsManage(kind))
+pol --> h : Workspace and caller (outsider 404, Staff or member without the right 403)
+h -> ctx : Load parent by ParentId
+ctx -> db : SELECT
+db --> ctx : Parent or none
+h -> h : WorkItemRules.ParentProblem(kind, parent) (L2-032 AC1, AC2, AC3)
+h -> h : workspace.IsMember(AssigneeId) (L2-033 AC4)
+alt parent link or assignee invalid
+h --> ep : Result.Invalid("ParentId" | "AssigneeId")
+ep --> svc : 400 ValidationProblem
+svc --> dlg : Field errors
+dlg --> actor : Show inline errors
+else valid
+h -> ent : new WorkItem(workspaceId, kind, title, description, parent)
+h -> ent : Assign(assigneeId, workspace); SetStoryPoints (stories)
+opt assignee set and not the caller
+h -> ntf : Notify(actor, assignee, WorkItemAssigned, ...) (L2-033 AC3)
+ntf -> ctx : Add Notification
+end
+h -> pol : AuditOverride(caller, "workitem.created", ...) (System Admin only)
+h -> ntf : QueueEmailsAsync
+ntf -> mail : Enqueue(assignment email)
+h -> ctx : SaveChangesAsync
+ctx -> db : INSERT work item, notification and outbox row in one transaction
+h --> ep : (Result.Ok, WorkItemDto)
+ep --> svc : 201 Created /api/items/{id}
+svc --> dlg : WorkItemDto
+dlg --> page : Close with created item
+page --> actor : Toast and refreshed backlog tree
+end
+end
+@enduml

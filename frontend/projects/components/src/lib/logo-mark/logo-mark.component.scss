@@ -1,0 +1,15 @@
+:host {
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--size-avatar-xl);
+  block-size: var(--size-avatar-xl);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-2);
+}
+
+svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}

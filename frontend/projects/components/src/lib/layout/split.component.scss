@@ -1,0 +1,11 @@
+:host {
+  display: grid;
+  gap: var(--layout-gutter);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 64rem) {
+  :host {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+}

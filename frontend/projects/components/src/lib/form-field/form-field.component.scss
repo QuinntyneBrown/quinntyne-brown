@@ -1,0 +1,48 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+:host(.ft-form-field--sm),
+:host(.ft-form-field--md),
+:host(.ft-form-field--lg) {
+  max-inline-size: 100%;
+}
+
+:host(.ft-form-field--sm) {
+  inline-size: 12rem;
+}
+
+:host(.ft-form-field--md) {
+  inline-size: 14rem;
+}
+
+:host(.ft-form-field--lg) {
+  inline-size: 16rem;
+}
+
+.label {
+  font: var(--text-label);
+  color: var(--color-fg-default);
+}
+
+.optional {
+  color: var(--color-fg-subtle);
+  font-weight: var(--font-weight-regular);
+}
+
+// Always rendered so its live region exists before an error. Empty, it takes no room: its
+// negative margin cancels the column gap; with an error, the message restores the gap.
+.field__errors {
+  margin-block-start: calc(-1 * var(--space-1));
+
+  ft-inline-message {
+    margin-block-start: var(--space-1);
+  }
+}
+
+.field__help {
+  font: var(--text-body-sm);
+  color: var(--color-fg-muted);
+}

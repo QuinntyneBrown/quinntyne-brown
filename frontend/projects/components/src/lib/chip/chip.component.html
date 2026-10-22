@@ -1,0 +1,22 @@
+<ng-template #content><ng-content /></ng-template>
+@if (href(); as url) {
+  <a
+    class="ft-chip"
+    [class.ft-chip--pressed]="current()"
+    [attr.href]="url"
+    [attr.aria-current]="current() ? 'page' : null"
+  >
+    <ng-container [ngTemplateOutlet]="content" />
+  </a>
+} @else {
+  <button
+    type="button"
+    class="ft-chip"
+    [class.ft-chip--pressed]="pressed()"
+    [attr.aria-pressed]="pressed()"
+    [disabled]="disabled()"
+    (click)="toggle()"
+  >
+    <ng-container [ngTemplateOutlet]="content" />
+  </button>
+}

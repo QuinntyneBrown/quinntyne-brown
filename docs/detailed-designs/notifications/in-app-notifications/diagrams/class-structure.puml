@@ -1,0 +1,66 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — In-app notifications
+enum NotificationKind {
+  ContactSignedUp
+  EventCancelled
+  EventChanged
+  Invite
+  InviteAccepted
+  RsvpConfirmed
+  RoleChanged
+  WorkItemAssigned
+  WorkspaceMemberAdded
+  WorkspaceOwnerLostCityLead
+  PlanningPokerInvite
+  Announcement
+}
+class Notification {
+  +Guid Id
+  +Guid RecipientId
+  +NotificationKind Kind
+  +string Title
+  +string LinkPath
+  +Guid? ActorId
+  +DateTimeOffset CreatedAt
+  +DateTimeOffset? ReadAt
+  +bool IsRead
+  +MarkRead(at: DateTimeOffset): void
+}
+class NotificationPage {
+  +IReadOnlyList<NotificationDto> Items
+  +int Page
+  +int PageSize
+  +int TotalCount
+  +int UnreadCount
+  +bool HasMore
+}
+class InAppNotificationsHandler {
+  +{static} PageSize: int = 50
+  +ListAsync(unreadOnly: bool, page: int): Task<NotificationPage>
+  +UnreadCountAsync(): Task<int>
+  +MarkReadAsync(id: Guid): Task<Result>
+  +MarkAllReadAsync(): Task
+}
+interface INotificationPublisher {
+  +Publish(recipientProfileId: Guid, kind: NotificationKind, title: string, linkPath: string): void
+  +PublishAsync(recipientIds, kind, title, linkPath, actorId, email): Task<int>
+}
+interface ICurrentUser {
+  +Guid UserId
+}
+Notification --> NotificationKind : has
+InAppNotificationsHandler ..> NotificationPage : returns
+InAppNotificationsHandler ..> ICurrentUser : uses
+InAppNotificationsHandler "1" --> "*" Notification : reads / marks read
+INotificationPublisher ..> Notification : creates
+@enduml

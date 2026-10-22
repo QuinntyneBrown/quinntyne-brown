@@ -1,0 +1,34 @@
+:host {
+  display: block;
+  padding: var(--space-4);
+  background: var(--color-bg-subtle);
+  border-inline-start: var(--border-width-thick) solid var(--color-accent);
+  border-radius: var(--radius-md);
+  color: var(--color-fg-default);
+  overflow-wrap: anywhere;
+}
+
+.ft-note__body ::ng-deep p {
+  margin: 0;
+}
+
+.ft-note__body ::ng-deep p + p {
+  margin-block-start: var(--space-2);
+}
+
+.ft-note__meta {
+  margin: var(--space-2) 0 0;
+  font: var(--text-caption);
+  color: var(--color-fg-muted);
+}
+
+/* Skeleton lines share the note's subtle fill, so a loading note sits on the surface instead. */
+:host(.ft-note--skeleton) {
+  background: var(--color-bg-surface);
+  border-inline-start-color: var(--color-border-default);
+}
+
+.ft-note__meta-skeleton {
+  margin-block-start: var(--space-2);
+  block-size: 0.75em;
+}

@@ -1,0 +1,26 @@
+<div
+  class="ft-estimate-picker"
+  role="group"
+  [attr.aria-labelledby]="labelId"
+  [attr.aria-invalid]="isInvalid() ? 'true' : null"
+  [attr.aria-describedby]="error() ? errorId : null"
+>
+  <div class="ft-estimate-picker__label" [id]="labelId">{{ label() }}</div>
+  <div class="ft-estimate-picker__deck">
+    @for (option of options(); track option) {
+      <button
+        class="ft-estimate-choice"
+        type="button"
+        [attr.aria-pressed]="value() === option"
+        [disabled]="disabled()"
+        (click)="toggle(option)"
+      >
+        <span class="ft-estimate-choice__value">{{ option }}</span>
+        <span class="ft-estimate-choice__unit">{{ option === '?' ? 'Unsure' : 'points' }}</span>
+      </button>
+    }
+  </div>
+  @if (error()) {
+    <ft-inline-message [id]="errorId">{{ error() }}</ft-inline-message>
+  }
+</div>

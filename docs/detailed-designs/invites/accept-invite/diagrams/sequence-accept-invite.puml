@@ -1,0 +1,73 @@
+@startuml
+title UML sequence behaviour — accept an invite
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Invitee" as actor
+box "Frontend — FaithTech Community web app (invites library)" #E0F2FE
+  participant "AcceptInvitePage" as page
+end box
+box "Frontend — FaithTech Community web app (api library)" #E0F2FE
+  participant "HttpInvitesService" as client
+end box
+box "Backend — FaithTech.Community.Api" #D1FADF
+  participant "InvitesEndpoints" as ep
+end box
+box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+  participant "AcceptInviteHandler" as h
+end box
+box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+  participant "AuditLog" as audit
+  database "Community database" as db
+end box
+actor -> page : Open /accept-invite/{token}
+page -> client : getInvite(token)
+client -> ep : POST /api/invites/lookup { token } (anonymous)
+ep -> h : LookUpAsync(token)
+h -> db : Find invite by InviteTokens.Hash(token)
+alt unknown token
+  h --> ep : null
+  ep --> client : 404
+  page --> actor : "This invite link isn’t valid" with link to sign-up (L2-011 AC2)
+else invite found
+  h --> ep : InviteLookupDto (status, email, inviter, role, hasAccount)
+  ep --> client : 200 OK
+  alt status is Expired, Revoked or Accepted
+    page --> actor : Matching error with link to normal sign-up (L2-011 AC2)
+  else Pending, not signed in, no account uses the email
+    actor -> page : Enter name and password
+    page -> client : acceptInvite(token, { name, password })
+    client -> ep : POST /api/invites/accept (anonymous)
+    ep -> ep : AcceptInviteValidator
+    ep -> h : AcceptAsync(command)
+    h -> db : Create profile and user with EmailConfirmed = true (L2-011 AC1)
+  else Pending, signed in with the invited email
+    actor -> page : Accept invite
+    page -> client : acceptInvite(token)
+    client -> ep : POST /api/invites/accept
+    ep -> h : AcceptAsync(command)
+    h -> db : Load caller's account; email must match (else 409) (L2-011 AC3)
+  end
+  h -> audit : Record(inviter, "role.granted", ...) when a role is pre-assigned (L2-041)
+  h -> db : Grant role, mark invite accepted, add InviteAccepted notification (L2-011 AC4)
+  h -> db : SaveChanges in one unit of work
+  h --> ep : Ok
+  ep --> client : 204 No Content
+  page --> actor : Sign in if new, then go to /people/me
+end
+note over page
+  Signed in with another email: wrong-account.
+  An account already uses the email: Sign in to accept.
+end note
+@enduml

@@ -1,0 +1,105 @@
+<div class="ft-picture-list" role="group" aria-label="Photos">
+  <div class="ft-picture-list__head">
+    <h3 class="ft-picture-list__title">Photos</h3>
+    <ft-badge>{{ photos().length }} of {{ max() }}</ft-badge>
+    <ft-button
+      #addButton
+      [disabled]="full()"
+      [describedBy]="full() ? noteId : null"
+      (click)="openChooser()"
+      ><ft-icon name="add" /> Add photos</ft-button
+    >
+    <input
+      #fileInput
+      hidden
+      type="file"
+      multiple
+      tabindex="-1"
+      aria-hidden="true"
+      [attr.accept]="accept"
+      (change)="onFiles($event)"
+    />
+  </div>
+
+  @if (full()) {
+    <p class="ft-picture-list__note" [id]="noteId">
+      That’s {{ max() }} photos, the most a {{ subject() }} can have. Remove one to add another.
+    </p>
+  } @else {
+    <p class="ft-picture-list__note">
+      @if (photos().length === 0) {
+        {{ copy().empty }}
+      }
+      {{ copy().note }}
+    </p>
+  }
+
+  @for (note of rejections(); track note) {
+    <p class="ft-picture-list__note ft-picture-list__note--error">{{ note }}</p>
+  }
+
+  @if (photos().length > 0) {
+    <ul class="ft-picture-list__grid">
+      @for (photo of photos(); track photo.id ?? photo.url ?? $index; let i = $index) {
+        <li class="ft-picture-list__item">
+          <ft-photo
+            [src]="photo.url"
+            [alt]="photo.alt"
+            [featured]="photo.featured"
+            [state]="photo.state ?? null"
+            [progress]="photo.progress ?? null"
+            [uploadLabel]="'Uploading photo ' + (i + 1)"
+          >
+            @if (photo.featured) {
+              <span class="ft-picture-list__featured"
+                ><ft-badge variant="success">Featured</ft-badge></span
+              >
+            }
+            <span class="ft-picture-list__remove">
+              <ft-button
+                variant="secondary"
+                size="sm"
+                [iconOnly]="true"
+                [label]="'Remove photo ' + (i + 1)"
+                (click)="remove(i)"
+              >
+                <ft-icon name="close" size="sm" />
+              </ft-button>
+            </span>
+          </ft-photo>
+          <ft-form-field
+            required
+            [label]="'Photo ' + (i + 1) + ' description'"
+            [error]="altError(photo)"
+          >
+            <ft-text-field
+              size="sm"
+              [ngModel]="photo.alt"
+              (ngModelChange)="altChange.emit({ index: i, alt: $event })"
+            />
+          </ft-form-field>
+          @if (photo.error) {
+            <p class="ft-picture-list__note ft-picture-list__note--error">{{ photo.error }}</p>
+          }
+          @if (photo.storing) {
+            <p class="ft-picture-list__note" role="status">
+              {{ copy().storing }}
+            </p>
+          }
+          @if (photo.pending) {
+            <p class="ft-picture-list__note">{{ pendingText() }}</p>
+          }
+          @if (featurable() && !photo.featured && (!photo.pending || subject() === 'contact')) {
+            <ft-button
+              variant="ghost"
+              size="sm"
+              [label]="'Feature photo ' + (i + 1)"
+              (click)="featured.emit(i)"
+              ><ft-icon name="star" /> Feature</ft-button
+            >
+          }
+        </li>
+      }
+    </ul>
+  }
+</div>

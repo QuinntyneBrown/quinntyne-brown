@@ -1,0 +1,11 @@
+<label class="switch">
+  <input
+    type="checkbox"
+    role="switch"
+    [checked]="checked()"
+    [disabled]="disabled()"
+    (change)="onToggle($event)"
+    (blur)="onBlur()"
+  />
+  <span class="text"><ng-content /></span>
+</label>

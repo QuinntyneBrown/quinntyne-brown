@@ -1,0 +1,91 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Event list and filter
+
+enum EventType {
+  Gathering
+  BuildersNight
+  Hackathon
+  PrayerAndPlanning
+  Panel
+}
+
+enum EventFormat {
+  InPerson
+  Online
+}
+
+enum EventVisibility {
+  MembersOnly
+  Public
+}
+
+class Event <<Domain entity>> {
+  +Guid Id
+  +string Title
+  +string Description
+  +EventType Type
+  +DateTimeOffset StartsAt
+  +DateTimeOffset EndsAt
+  +string City
+  +EventFormat Format
+  +string? Venue
+  +string? OnlineLink
+  +int? Capacity
+  +EventVisibility Visibility
+  +bool IsCancelled
+  +string? CancellationReason
+  +int Sequence
+  +Guid CreatedById
+  +int RsvpCount
+  +bool IsFull
+  +Update(title, description, type, startsAt, endsAt, city, format, venue, onlineLink, capacity, visibility): void
+  +Cancel(reason: string): void
+  +Rsvp(profileId: Guid, now: DateTimeOffset): Rsvp
+  +GuestRsvp(name: string, email: string, now: DateTimeOffset): Rsvp
+  +CancelRsvp(profileId: Guid): void
+  +CancelGuestRsvp(rsvpId: Guid): void
+}
+Event --> EventType
+Event --> EventFormat
+Event --> EventVisibility
+
+class Rsvp <<Domain entity>> {
+  +Guid Id
+  +Guid EventId
+  +Guid? ProfileId
+  +string? GuestName
+  +string? GuestEmail
+  +DateTimeOffset CreatedAt
+  +bool IsGuest
+}
+Event "1" *-- "*" Rsvp : rsvps
+
+class ListEventsQuery {
+  +string? City
+}
+class ListEventsHandler {
+  +Handle(query: ListEventsQuery): Task<IReadOnlyList<EventSummaryDto>>
+}
+class EventSummaryDto {
+  +Guid Id
+  +string Title
+  +DateTimeOffset StartsAt
+  +string City
+  +EventFormat Format
+  +int RsvpCount
+  +bool IsCancelled
+}
+ListEventsHandler ..> ListEventsQuery : handles
+ListEventsHandler ..> Event : reads
+ListEventsHandler ..> EventSummaryDto : returns
+@enduml

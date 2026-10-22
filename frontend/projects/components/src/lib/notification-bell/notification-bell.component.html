@@ -1,0 +1,32 @@
+<button
+  #trigger
+  cdkOverlayOrigin
+  #origin="cdkOverlayOrigin"
+  class="ft-notification-bell"
+  type="button"
+  aria-haspopup="dialog"
+  [attr.aria-label]="label()"
+  [attr.aria-expanded]="open()"
+  [attr.aria-controls]="open() ? panelId : null"
+  (click)="toggle()"
+>
+  <ft-icon name="notifications" />
+  @if (unread() > 0) {
+    <ft-badge class="ft-notification-bell__count" variant="count" aria-hidden="true">{{
+      unread()
+    }}</ft-badge>
+  }
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin"
+  [cdkConnectedOverlayOpen]="open()"
+  [cdkConnectedOverlayPositions]="positions"
+  (attach)="focusFirst()"
+  (detach)="onDetach()"
+  (overlayOutsideClick)="onOutsideClick($event)"
+  (overlayKeydown)="onKeydown($event)"
+>
+  <div [id]="panelId"><ng-content /></div>
+</ng-template>

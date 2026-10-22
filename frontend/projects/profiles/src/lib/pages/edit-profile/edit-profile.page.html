@@ -1,0 +1,107 @@
+<ft-breadcrumb>
+  <ft-breadcrumb-item [href]="profileHref()">{{
+    other() ? profile()!.name : 'Profile'
+  }}</ft-breadcrumb-item>
+  <ft-breadcrumb-item>Edit profile</ft-breadcrumb-item>
+</ft-breadcrumb>
+
+@switch (state()) {
+  @case ('loading') {
+    <ft-page-header title="Edit profile" />
+    <div class="loading" role="status" aria-busy="true" aria-label="Loading your profile">
+      @for (card of [1, 2]; track card) {
+        <ft-card>
+          <ft-stack>
+            <ft-skeleton shape="title" />
+            <ft-skeleton />
+            <ft-skeleton />
+          </ft-stack>
+        </ft-card>
+      }
+    </div>
+  }
+  @case ('forbidden') {
+    <h1 class="visually-hidden">Edit profile</h1>
+    <ft-empty-state
+      heading="You can only edit your own profile"
+      [text]="'Ask a System Admin if ' + profile()!.name + '’s profile needs a change.'"
+    >
+      <ft-button actions variant="primary" [href]="profileHref()">Back to profile</ft-button>
+    </ft-empty-state>
+  }
+  @case ('error') {
+    <ft-page-header title="Edit profile" />
+    <ft-empty-state
+      variant="error"
+      heading="We couldn’t load your profile"
+      text="Check your connection and try again. If it keeps happening, we’ve already been told about it."
+    >
+      <ft-button actions variant="primary" (click)="load()">Try again</ft-button>
+    </ft-empty-state>
+  }
+  @case ('loaded') {
+    <ft-page-header
+      [title]="title()"
+      [subtitle]="
+        other()
+          ? 'You’re editing as System Admin. Every change is recorded in the audit log.'
+          : 'Visible to everyone signed in to FaithTech.'
+      "
+    />
+    <form [formGroup]="form" (ngSubmit)="save()" ftFormErrorFocus novalidate>
+      <ft-stack width="lg">
+        <ft-error-summary [errors]="summary()" action="save your profile" />
+        @if (failed()) {
+          <ft-alert status="danger" heading="We couldn’t save your profile">
+            Something went wrong on our side. Your changes are still here — try again.
+          </ft-alert>
+        }
+        @if (photosFailed()) {
+          <ft-alert status="danger" heading="Some photos weren’t saved">
+            Your details were saved. Check the photos marked below and try again.
+          </ft-alert>
+        }
+        <ft-card [heading]="aboutHeading()" [headingLevel]="2">
+          <ft-stack>
+            <ft-form-field #nameField required label="Name" [error]="error('name')">
+              <ft-text-field formControlName="name" autocomplete="name" />
+            </ft-form-field>
+            <ft-form-field
+              #homeCityField
+              label="Home city"
+              [optional]="true"
+              [error]="error('homeCity')"
+            >
+              <ft-text-field formControlName="homeCity" autocomplete="address-level2" />
+            </ft-form-field>
+            <ft-form-field
+              #bioField
+              label="Bio"
+              [optional]="true"
+              help="Up to 400 characters."
+              [error]="error('bio')"
+            >
+              <ft-textarea formControlName="bio" [rows]="4" [maxlength]="400" />
+            </ft-form-field>
+          </ft-stack>
+        </ft-card>
+        <ft-card>
+          <ft-picture-list
+            [photos]="listPhotos()"
+            [max]="10"
+            (picked)="pick($event)"
+            (removed)="remove($event)"
+            (featured)="feature($event)"
+            (altChange)="describe($event)"
+          />
+        </ft-card>
+        <ft-form-actions>
+          <ft-button variant="ghost" [href]="profileHref()">Cancel</ft-button>
+          <ft-button type="submit" variant="primary" [loading]="busy()">
+            {{ busy() ? 'Saving…' : 'Save profile' }}
+          </ft-button>
+        </ft-form-actions>
+      </ft-stack>
+    </form>
+  }
+}

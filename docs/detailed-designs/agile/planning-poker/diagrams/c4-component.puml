@@ -1,0 +1,38 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Planning Poker
+
+Container_Boundary(web, "Web app") {
+  Component(page, "PlanningPokerPage", "Angular page (agile)", "Deck, participants, facilitator controls; re-reads the session on each change")
+  Component(dlg, "StartPokerDialog", "CDK Dialog (agile)", "Stories and invitees")
+  Component(svc, "AgileService / HttpAgileService", "api library (AGILE_SERVICE)", "startPokerSession, getCurrentPokerSession, vote, revealVotes, revote, setFinalPoints, endPokerSession")
+  Component(live, "AgileLiveService / SignalRAgileLiveService", "api library (AGILE_LIVE_SERVICE)", "watchPokerSession; emits on PokerChanged and after a reconnect")
+}
+Container_Boundary(api, "Community API") {
+  Component(ep, "WorkItemsEndpoints", "Minimal API", "/api/workspaces/{id}/poker-sessions, /api/poker-sessions/{id}/...")
+  Component(hub, "AgileHub", "SignalR hub (/hubs/agile)", "WatchPokerSession joins poker:{sessionId}; no business logic")
+  Component(bc, "SignalRAgileNotifier", "Api, IPokerBroadcaster", "Sends PokerChanged(sessionId) to the group")
+  Component(h, "PlanningPokerHandler", "Application", "Start, current, get, vote, reveal, re-vote, set points, end")
+  Component(pol, "WorkspaceAccessPolicy", "Application", "Member, Staff, System Admin and outsider checks; audits overrides")
+  Component(ntf, "AgileNotifier", "Application", "In-app invite notifications and email")
+  Component(ent, "PokerSession", "Domain entity", "Stories, rounds and votes")
+  ComponentDb(db, "Community database", "PostgreSQL", "Agile tables")
+}
+
+Rel(page, dlg, "Opens")
+Rel(dlg, svc, "Calls")
+Rel(page, svc, "Calls and re-reads")
+Rel(page, live, "Subscribes")
+Rel(svc, ep, "Calls", "JSON/HTTPS")
+Rel(live, hub, "WatchPokerSession(sessionId)", "SignalR")
+Rel(ep, h, "Dispatches")
+Rel(h, pol, "Checks access")
+Rel(hub, pol, "Checks access")
+Rel(h, ent, "Mutates")
+Rel(h, ntf, "Notifies invitees")
+Rel(h, db, "Persists", "EF Core")
+Rel(h, bc, "PokerChangedAsync via IPokerBroadcaster")
+Rel(bc, hub, "Sends to group", "IHubContext")
+Rel(hub, live, "PokerChanged(sessionId)", "SignalR")
+@enduml

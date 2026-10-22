@@ -1,0 +1,34 @@
+<figure class="video-player">
+  <div class="video-player__frame">
+    @if (unavailable()) {
+      <img class="video-player__media" [src]="poster()" [alt]="posterAlt()" />
+      <div class="video-player__unavailable">
+        <ft-alert status="warning" heading="This video can’t play right now">
+          Please try again later.
+        </ft-alert>
+      </div>
+    } @else {
+      <video
+        class="video-player__media"
+        controls
+        preload="none"
+        playsinline
+        [attr.aria-label]="label()"
+        [poster]="poster()"
+        (error)="unavailable.set(true)"
+      >
+        <source [src]="src()" [type]="type()" (error)="unavailable.set(true)" />
+        <track
+          kind="captions"
+          default
+          [src]="captions()"
+          [srclang]="captionsLanguage()"
+          [label]="captionsLabel()"
+        />
+      </video>
+    }
+  </div>
+  @if (caption(); as line) {
+    <figcaption class="video-player__caption">{{ line }}</figcaption>
+  }
+</figure>

@@ -1,0 +1,35 @@
+<ft-auth-layout>
+  @if (sentTo(); as email) {
+    <ft-card>
+      <ft-stack>
+        <h1 class="text-center">Check your inbox</h1>
+        <p class="text-center">We sent a link to {{ email }}</p>
+        <p class="text-center">
+          <ft-link href="/sign-in">I’ve verified my email</ft-link>
+        </p>
+      </ft-stack>
+    </ft-card>
+    <p class="text-caption text-center">
+      Didn’t get it? Check spam, or
+      <ft-link [href]="verifyEmailLink(email)">send it again</ft-link>
+    </p>
+  } @else {
+    <ft-card>
+      <ft-stack>
+        <h1 class="text-center">Join FaithTech</h1>
+        <p class="text-center text-muted">
+          Builders, leads, volunteers, partners and anyone curious about faith and technology.
+        </p>
+        <ft-sign-up-form
+          [busy]="busy()"
+          [unreachable]="unreachable()"
+          [serverErrors]="serverErrors()"
+          (submitted)="submit($event)"
+        />
+      </ft-stack>
+    </ft-card>
+    <p class="text-caption text-center">
+      Already a member? <ft-link href="/sign-in">Sign in</ft-link>
+    </p>
+  }
+</ft-auth-layout>

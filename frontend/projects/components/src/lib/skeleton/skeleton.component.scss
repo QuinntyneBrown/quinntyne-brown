@@ -1,0 +1,85 @@
+:host {
+  display: block;
+  min-block-size: 1em;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-subtle) 25%,
+    var(--color-bg-subtle-hover) 37%,
+    var(--color-bg-subtle) 63%
+  );
+  background-size: 400% 100%;
+  animation: ft-skeleton-shimmer var(--duration-loop) var(--ease-standard) infinite;
+}
+
+:host(.ft-skeleton--text) {
+  block-size: 1em;
+  margin-block: 0.25em;
+}
+
+:host(.ft-skeleton--title) {
+  block-size: 1.5em;
+  inline-size: 40%;
+}
+
+:host(.ft-skeleton--rect) {
+  border-radius: var(--radius-md);
+}
+
+/* A square tile that fills its grid cell: a profile photo still loading. */
+:host(.ft-skeleton--square) {
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+}
+
+:host(.ft-skeleton--avatar) {
+  flex: none;
+  border-radius: var(--radius-full);
+  inline-size: var(--size-avatar-sm);
+  block-size: var(--size-avatar-sm);
+}
+
+/* A Kanban card still loading (.skeleton--card in the design system). */
+:host(.ft-skeleton--card) {
+  border-radius: var(--radius-md);
+  block-size: var(--space-16);
+}
+
+:host(.ft-skeleton--date-badge) {
+  flex: none;
+  border-radius: var(--radius-md);
+  inline-size: var(--size-avatar-lg);
+  block-size: var(--size-avatar-lg);
+}
+
+:host(.ft-skeleton--avatar-md) {
+  inline-size: var(--size-avatar-md);
+  block-size: var(--size-avatar-md);
+}
+
+:host(.ft-skeleton--avatar-lg) {
+  inline-size: var(--size-avatar-lg);
+  block-size: var(--size-avatar-lg);
+}
+
+:host(.ft-skeleton--avatar-xl) {
+  inline-size: var(--size-avatar-xl);
+  block-size: var(--size-avatar-xl);
+}
+
+@keyframes ft-skeleton-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+    background: var(--color-bg-subtle);
+  }
+}

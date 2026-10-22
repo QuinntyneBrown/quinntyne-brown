@@ -1,0 +1,79 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Global search
+
+class GlobalSearchHandler {
+  +MinimumLength: int = 2
+  +MaximumLength: int = 200
+  +GroupLimit: int = 10
+  +SearchAsync(q: string?): Task<(Result, SearchResultsDto?)>
+}
+interface ICurrentUser {
+  +Guid? UserId
+}
+interface ISearchSource {
+  +SearchResultKind Kind
+  +SearchAsync(term: string, caller: Guid, limit: int): Task<IReadOnlyList<SearchResultItem>>
+}
+class PeopleSearchSource
+class EventsSearchSource
+class PartnersSearchSource
+class ContactsSearchSource
+class WorkItemsSearchSource
+interface IFullTextSearch {
+  +Match<T>(source: IQueryable<T>, term: string, document: Expression<Func<T, string>>): IQueryable<T>
+}
+class PostgresFullTextSearch {
+  +Match<T>(...): IQueryable<T>
+  +{static} PrefixQuery(term: string): string?
+}
+class SearchVectors <<static>> {
+  +Column: string = "SearchVector"
+  +{static} Configure(builder: ModelBuilder): void
+}
+enum SearchResultKind {
+  Person
+  Event
+  Partner
+  Contact
+  WorkItem
+}
+class SearchResultsDto {
+  +IReadOnlyList<SearchResultGroup> Groups
+}
+class SearchResultGroup {
+  +string Kind
+  +IReadOnlyList<SearchResultItem> Items
+}
+class SearchResultItem {
+  +Guid Id
+  +string Title
+  +string Snippet
+  +string Route
+  +DateTimeOffset? StartsAt
+  +string? Badge
+}
+GlobalSearchHandler ..> ICurrentUser
+GlobalSearchHandler "1" --> "*" ISearchSource : asks in Kind order
+GlobalSearchHandler ..> SearchResultsDto : returns
+PeopleSearchSource ..|> ISearchSource
+EventsSearchSource ..|> ISearchSource
+PartnersSearchSource ..|> ISearchSource
+ContactsSearchSource ..|> ISearchSource
+WorkItemsSearchSource ..|> ISearchSource
+ISearchSource --> SearchResultKind
+ISearchSource ..> IFullTextSearch : uses
+PostgresFullTextSearch ..|> IFullTextSearch
+PostgresFullTextSearch ..> SearchVectors : matches column
+SearchResultsDto "1" *-- "*" SearchResultGroup
+SearchResultGroup "1" *-- "*" SearchResultItem
+@enduml

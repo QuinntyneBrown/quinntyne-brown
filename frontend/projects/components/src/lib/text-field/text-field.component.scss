@@ -1,0 +1,100 @@
+:host {
+  display: block;
+}
+
+.group {
+  --field-height: var(--control-height-md);
+
+  position: relative;
+}
+
+.group--sm {
+  --field-height: var(--control-height-sm);
+}
+
+.group--lg {
+  --field-height: var(--control-height-lg);
+}
+
+.input {
+  inline-size: 100%;
+  box-sizing: border-box;
+  block-size: var(--field-height);
+  padding-inline: var(--space-3);
+  font: var(--text-body);
+  color: var(--color-fg-default);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+
+  &::placeholder {
+    color: var(--color-fg-subtle);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-accent);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  &:disabled {
+    color: var(--color-fg-disabled);
+    background: var(--color-bg-surface-sunken);
+    border-color: var(--color-border-default);
+  }
+
+  &[aria-invalid='true'] {
+    border-color: var(--color-danger-solid);
+  }
+}
+
+.input--sm {
+  padding-block: var(--space-1);
+  font-size: var(--font-size-sm);
+}
+
+.input--lg {
+  font-size: var(--font-size-lg);
+}
+
+.group--action .input {
+  padding-inline-end: var(--field-height);
+}
+
+.action {
+  position: absolute;
+  inset-block: var(--space-1);
+  inset-inline-end: var(--space-1);
+  inline-size: calc(var(--field-height) - var(--space-2));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--color-fg-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+
+  svg {
+    inline-size: var(--size-icon-md);
+    block-size: var(--size-icon-md);
+    fill: none;
+    stroke: currentcolor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &:hover {
+    background: var(--color-bg-subtle-hover);
+  }
+
+  &[aria-pressed='true'] {
+    color: var(--color-fg-accent);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-accent);
+    outline-offset: var(--focus-ring-offset);
+  }
+}

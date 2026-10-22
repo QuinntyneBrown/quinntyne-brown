@@ -1,0 +1,56 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Suspend users
+class Profile {
+  +Guid Id
+  +string Name
+  +bool IsSuspended
+  +string? SuspendedReason
+  +DateTime? SuspendedAtUtc
+  +Suspend(reason: string, nowUtc: DateTime): void
+  +Reinstate(): void
+}
+class SuspendUserCommand <<record>> {
+  +string? Reason
+}
+class SuspendUserValidator {
+  +MaxReason: int = 500
+}
+class SuspensionHandler {
+  +SuspendAsync(profileId: Guid, command: SuspendUserCommand): Task<Result>
+  +ReinstateAsync(profileId: Guid): Task<Result>
+}
+interface ITokenRevocation {
+  +RevokeAllAsync(userId: Guid): Task
+}
+class TokenRevocation {
+  +RevokeAllAsync(userId: Guid): Task
+}
+interface IAuditLog {
+  +Record(actorId: Guid, action: string, targetType: string, targetId: string, before: object?, after: object?): void
+}
+interface ICurrentUser {
+  +Guid? UserId
+  +HasRole(role: Role): bool
+}
+class ProfileAccess {
+  +CallerProfileIdAsync(): Task<Guid?>
+}
+SuspendUserValidator ..> SuspendUserCommand : validates
+SuspensionHandler ..> SuspendUserCommand : handles
+SuspensionHandler --> Profile : mutates
+SuspensionHandler ..> ITokenRevocation
+SuspensionHandler ..> IAuditLog
+SuspensionHandler ..> ICurrentUser : requires System Admin
+SuspensionHandler ..> ProfileAccess : actor id
+TokenRevocation ..|> ITokenRevocation
+@enduml

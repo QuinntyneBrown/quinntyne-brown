@@ -1,0 +1,14 @@
+<fieldset
+  role="radiogroup"
+  [attr.aria-required]="required() ? 'true' : null"
+  [attr.aria-describedby]="error() ? errorId : null"
+  [attr.aria-invalid]="error() ? 'true' : null"
+>
+  <legend>{{ legend() }}</legend>
+  <ng-content />
+  <div class="errors" aria-live="polite">
+    @if (error()) {
+      <ft-inline-message [id]="errorId">{{ error() }}</ft-inline-message>
+    }
+  </div>
+</fieldset>

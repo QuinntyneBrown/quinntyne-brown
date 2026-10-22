@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  margin-block-start: var(--space-4);
+}
+
+ft-page-header {
+  margin-block-end: var(--space-4);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-block-end: var(--space-4);
+}
+
+.city {
+  inline-size: 12rem;
+}
+
+.more {
+  margin-block-start: var(--space-3);
+}
+
+.count {
+  margin: 0;
+  color: var(--color-fg-muted);
+  font: var(--text-caption);
+}
+
+ft-alert {
+  display: block;
+  margin-block-start: var(--space-3);
+}

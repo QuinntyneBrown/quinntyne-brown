@@ -1,0 +1,25 @@
+<div class="ft-notification-panel" role="dialog" aria-label="Notifications">
+  <div class="ft-notification-panel__header">
+    <strong>Notifications</strong>
+    @if (hasUnread()) {
+      <ft-button variant="ghost" size="sm" (click)="markAllRead.emit()">Mark all read</ft-button>
+    }
+  </div>
+
+  @if (shown().length > 0) {
+    <ft-notice-list
+      [notices]="shown()"
+      [deferNavigation]="deferNavigation()"
+      (noticeOpened)="noticeOpened.emit($event)"
+    />
+  } @else {
+    <div class="ft-notification-panel__empty">
+      <strong>You’re all caught up</strong>
+      <span>New notifications show up here.</span>
+    </div>
+  }
+
+  <div class="ft-notification-panel__footer">
+    <ft-link [href]="seeAllHref()">See all</ft-link>
+  </div>
+</div>

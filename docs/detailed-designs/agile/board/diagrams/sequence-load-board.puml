@@ -1,0 +1,65 @@
+@startuml
+title UML sequence behaviour — Load the board
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Workspace member or Staff" as actor
+box "Frontend — FaithTech Community web app (agile library)" #E0F2FE
+  participant "BoardPage" as page
+  participant "AgileService (AGILE_SERVICE)" as svc
+  participant "SignalRAgileLiveService (AGILE_LIVE_SERVICE)" as live
+end box
+box "Backend — FaithTech.Community.Api" #D1FADF
+  participant "WorkItemsEndpoints" as ep
+  participant "AgileHub" as hub
+end box
+box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+  participant "BoardHandler" as h
+  participant "WorkspaceAccessPolicy" as pol
+end box
+box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+  participant "CommunityDbContext" as ctx
+  database "Community database" as db
+end box
+actor -> page : Open /workspaces/{id}
+page -> svc : getBoard(workspaceId, filter?)
+svc -> ep : GET /api/workspaces/{id}/board?initiativeId|epicId|noEpic
+ep -> h : GetAsync(workspaceId, initiativeId, epicId, noEpic)
+h -> pol : LoadAsync(workspaceId)
+alt outsider
+pol --> h : Outsider
+h --> ep : null
+ep --> svc : 404 Not Found
+svc --> page : Not found
+else caller may read
+pol --> h : Caller
+h -> ctx : Work items of the workspace; active sprint for Scrum
+ctx -> db : SELECT
+db --> ctx : Rows
+alt Scrum workspace
+h -> h : Stories in the active sprint only, filter ignored (L2-034 AC3)
+else Kanban workspace
+h -> h : All non-archived stories, narrowed by initiative, epic or no epic
+end
+h --> ep : BoardDto: To Do, In Progress, Done with task counts (L2-034 AC1)
+ep --> svc : 200 OK
+svc --> page : Board
+page -> live : watchBoard(workspaceId)
+live -> hub : WatchBoard(workspaceId)
+hub -> pol : LoadAsync(workspaceId)
+pol --> hub : Caller may read
+hub -> hub : Add connection to group board:{workspaceId}
+page --> actor : KanbanBoardComponent renders columns, or tabs below sm 640px (L2-034 AC4)
+end
+@enduml

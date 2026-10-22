@@ -1,0 +1,52 @@
+@startuml
+title UML sequence behaviour — Search users
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "System Admin" as actor
+box "Frontend — FaithTech Community web app (admin library)" #E0F2FE
+  participant "AdminUsersPage" as page
+end box
+box "Frontend — FaithTech Community web app (api library)" #E0F2FE
+  participant "HttpAdminUsersService" as svc
+end box
+box "Backend — FaithTech.Community.Api" #D1FADF
+  participant "AdminUsersEndpoints" as ep
+end box
+box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+  participant "SearchUsersHandler" as h
+  participant "ICurrentUser" as cur
+end box
+box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Enter search term
+page -> svc : search(term, page)
+svc -> ep : GET /api/admin/users?q=term&page=n (HANDLES_FORBIDDEN)
+ep -> h : HandleAsync(term, page)
+h -> cur : HasRole(SystemAdmin)
+alt not System Admin
+  h --> ep : null
+  ep --> svc : 403
+  svc --> page : HttpErrorResponse 403
+  page --> actor : Show the page's forbidden state
+else System Admin
+  h -> db : Match name or email, order by name, take 25 (L2-040 AC1)
+  db --> h : Accounts with roles, suspension and email confirmation
+  h --> ep : PagedResult<AdminUserSummary>
+  ep --> svc : 200 OK
+  svc --> page : Users
+  page --> actor : Show users, roles and status; Show more users when more remain
+end
+@enduml

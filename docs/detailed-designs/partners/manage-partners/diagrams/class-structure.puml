@@ -1,0 +1,131 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Manage partners
+enum PartnerStage {
+  Lead
+  InFunnel
+  Confirmed
+}
+class Partner {
+  +Guid Id
+  +string Name
+  +string? Website
+  +string? Offering
+  +Guid? OwnerId
+  +string? ContactName
+  +string? Email
+  +string? Phone
+  +string? Notes
+  +PartnerStage Stage
+  +IReadOnlyCollection<PartnerStageChange> StageChanges
+  +Update(name, website, offering, ownerId, contactName, email, phone, notes): void
+  +MoveTo(stage: PartnerStage, by: Guid, nowUtc: DateTime, note: string?): void
+}
+class PartnerStageChange {
+  +Guid Id
+  +Guid PartnerId
+  +PartnerStage From
+  +PartnerStage To
+  +Guid MovedBy
+  +DateTime MovedAtUtc
+  +string? Note
+}
+class PartnerAccess {
+  +bool CanRead
+  +bool CanWrite
+  +CallerProfileIdAsync(): Task<Guid>
+  +AuditAdminWrite(actor: Guid, partner: Partner, action: string, before: object?, after: object?): void
+}
+class PartnerViews {
+  +ToDtoAsync(partner: Partner): Task<PartnerDto>
+}
+interface ICurrentUser {
+  +Guid? UserId
+  +IReadOnlyCollection<Role> Roles
+  +HasRole(role: Role): bool
+}
+class LeadRoles <<static>> {
+  +{static} All: IReadOnlyList<Role>
+  +{static} HoldsLeadRole(current: ICurrentUser): bool
+}
+interface IAuditLog {
+  +Record(actorId: Guid, action: string, targetType: string, targetId: string, before: object?, after: object?): void
+}
+Partner --> PartnerStage
+Partner "1" *-- "*" PartnerStageChange
+PartnerAccess ..> ICurrentUser
+PartnerAccess ..> LeadRoles
+PartnerAccess ..> IAuditLog : System Admin without a lead role
+PartnerViews --> PartnerAccess : CanEdit
+class PartnerDto <<record>> {
+  +Guid Id
+  +string Name
+  +string? Website
+  +string? Offering
+  +Guid? OwnerId
+  +string? OwnerName
+  +string? ContactName
+  +string? Email
+  +string? Phone
+  +string? Notes
+  +string Stage
+  +IReadOnlyList<PartnerStageChangeDto> History
+  +bool CanEdit
+}
+class PartnerStageChangeDto <<record>> {
+  +string From
+  +string To
+  +Guid MovedById
+  +string MovedByName
+  +DateTime MovedAtUtc
+  +string? Note
+}
+PartnerViews ..> PartnerDto : builds
+PartnerDto "1" *-- "*" PartnerStageChangeDto : newest first
+
+class PartnerCommand <<record>> {
+  +string? Name
+  +string? Website
+  +string? Offering
+  +Guid? OwnerId
+  +string? ContactName
+  +string? Email
+  +string? Phone
+  +string? Notes
+  +string? Stage
+}
+class PartnerRules <<static>> {
+  +MaxField = 200
+  +MaxNotes = 2000
+  +{static} TryParseStage(value: string?, out stage: PartnerStage): bool
+}
+class PartnerValidator
+class ManagePartnersHandler {
+  +CreateAsync(command: PartnerCommand): Task<(Result, PartnerDto?)>
+  +GetAsync(id: Guid): Task<(Result, PartnerDto?)>
+  +UpdateAsync(id: Guid, command: PartnerCommand): Task<(Result, PartnerDto?)>
+  +BoardAsync(): Task<PartnerBoardDto?>
+  +OwnersAsync(): Task<IReadOnlyList<PartnerOwnerDto>?>
+}
+class PartnerOwnerDto <<record>> {
+  +Guid ProfileId
+  +string Name
+}
+PartnerValidator ..> PartnerCommand
+PartnerValidator ..> PartnerRules
+ManagePartnersHandler ..> PartnerCommand : handles
+ManagePartnersHandler --> PartnerAccess
+ManagePartnersHandler --> PartnerViews
+ManagePartnersHandler --> Partner : creates, updates
+ManagePartnersHandler ..> LeadRoles : owner must hold one
+ManagePartnersHandler ..> PartnerOwnerDto : lists
+@enduml

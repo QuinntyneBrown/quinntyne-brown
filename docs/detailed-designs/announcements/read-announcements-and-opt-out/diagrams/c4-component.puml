@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Read announcements and opt out
+Container_Boundary(api, "Community API") {
+  Component(ep, "AnnouncementsEndpoints", "Minimal API", "Authenticated reads; anonymous unsubscribe")
+  Component(list, "ListMyAnnouncementsHandler", "Application handler", "Caller's announcements newest first")
+  Component(opt, "AnnouncementEmailOptOutHandler", "Application handler", "Reads and saves preference")
+  Component(unsub, "UnsubscribeHandler", "Application handler", "Opt-out from email link")
+  Component(tok, "DataProtectionUnsubscribeTokens", "Infrastructure IUnsubscribeTokens", "Data Protection tokens")
+  ComponentDb(db, "CommunityDbContext", "EF Core", "announcements, profiles")
+}
+Rel(ep, list, "ListAsync(page)")
+Rel(ep, opt, "GetAsync / SetAsync(AnnouncementEmailOptOut)")
+Rel(ep, unsub, "UnsubscribeAsync(UnsubscribeCommand)")
+Rel(unsub, tok, "Reads token")
+Rel(list, db, "Queries")
+Rel(opt, db, "Reads and updates profile")
+Rel(unsub, db, "Updates profile")
+@enduml

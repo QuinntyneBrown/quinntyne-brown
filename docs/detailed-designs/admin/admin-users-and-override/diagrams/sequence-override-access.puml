@@ -1,0 +1,60 @@
+@startuml
+title UML sequence behaviour — Override access to an owned record (profile edit)
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "System Admin" as actor
+box "Frontend — FaithTech Community web app (profiles library)" #E0F2FE
+  participant "EditProfilePage" as page
+  participant "HttpProfilesService" as svc
+end box
+box "Backend — FaithTech.Community.Api" #D1FADF
+  participant "ProfilesEndpoints" as ep
+end box
+box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+  participant "UpdateProfileHandler" as h
+  participant "ProfileAccess" as access
+end box
+box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+  participant "AuditLog" as audit
+  database "Community database" as db
+end box
+actor -> page : Change a profile owned by another member
+page -> svc : updateProfile(id, details)
+svc -> ep : PUT /api/profiles/{id}
+ep -> h : HandleAsync(id, UpdateProfileCommand)
+h -> access : AuthorizeEditAsync(id)
+access -> db : Resolve caller's profile id
+alt caller is the owner
+  access --> h : Owner
+  h -> db : Load and change profile
+  h -> db : SaveChanges (no audit entry)
+  h --> ep : Ok
+  ep --> svc : 204 No Content
+else caller is System Admin
+  access --> h : AdminOverride, actor (L2-040 AC2)
+  h -> db : Load and change profile
+  h -> audit : Record(actor, "profile.updated", "Profile", id, before, after) (L2-041)
+  audit -> db : Add AuditEntry to the unit of work
+  h -> db : SaveChanges (change and entry together)
+  h --> ep : Ok
+  ep --> svc : 204 No Content
+else other caller
+  access --> h : Forbidden
+  h --> ep : Forbidden
+  ep --> svc : 403 ProblemDetails
+end
+svc --> page : Result
+page --> actor : Present result
+@enduml

@@ -1,0 +1,32 @@
+:host {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--size-avatar-md);
+  block-size: var(--size-avatar-md);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-subtle);
+}
+
+:host(.ft-icon-tile--sm) {
+  inline-size: var(--size-avatar-sm);
+  block-size: var(--size-avatar-sm);
+}
+
+:host(.ft-icon-tile--image) {
+  overflow: hidden;
+  background: var(--color-bg-subtle);
+  border: var(--border-width-hairline) solid var(--color-border-default);
+}
+
+img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ft-icon-tile__emoji {
+  font-size: var(--font-size-xl);
+  line-height: 1;
+}

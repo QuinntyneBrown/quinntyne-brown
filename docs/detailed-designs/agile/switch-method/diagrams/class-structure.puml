@@ -1,0 +1,52 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Switch method
+
+enum WorkspaceMethod {
+  Scrum
+  Kanban
+}
+class Workspace {
+  +WorkspaceMethod Method
+  +SwitchMethod(target: WorkspaceMethod, sprints: IEnumerable<Sprint>, stories: IEnumerable<WorkItem>): void
+}
+class Sprint {
+  +SprintState State
+  +int? CompletedPoints
+  +int? CommittedPoints
+  +Close(stories: IEnumerable<WorkItem>): void
+}
+class WorkItem {
+  +Guid? SprintId
+  +WorkItemStatus Status
+  ~ReturnToBacklog(): void
+}
+class SwitchMethodCommand <<record>> {
+  +string? Method
+}
+class SwitchMethodValidator
+class WorkspaceSettingsHandler {
+  +SwitchMethodAsync(workspaceId: Guid, cmd: SwitchMethodCommand): Task<Result>
+}
+class WorkspaceAccessPolicy {
+  +AuthorizeAsync(workspaceId: Guid, manage: bool): Task<(Workspace, WorkspaceCaller, Result?)>
+  +AuditOverride(caller: WorkspaceCaller, action: string, ...): void
+}
+Workspace --> WorkspaceMethod
+Workspace ..> Sprint : closes non-closed (to Kanban)
+Workspace ..> WorkItem : ReturnToBacklog when not Done (to Scrum)
+Sprint ..> WorkItem : ReturnToBacklog when not Done
+SwitchMethodValidator ..> SwitchMethodCommand : validates
+WorkspaceSettingsHandler ..> SwitchMethodCommand : handles
+WorkspaceSettingsHandler --> WorkspaceAccessPolicy : authorizes with
+WorkspaceSettingsHandler --> Workspace : SwitchMethod
+@enduml

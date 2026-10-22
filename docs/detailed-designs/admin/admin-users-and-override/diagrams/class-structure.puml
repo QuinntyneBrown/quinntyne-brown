@@ -1,0 +1,58 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Admin users page and override
+enum UserStatus {
+  Active
+  Suspended
+  Unverified
+}
+class AdminUserSummary <<record>> {
+  +Guid Id
+  +string Name
+  +string Email
+  +IReadOnlyList<string> Roles
+  +string Status
+}
+class SearchUsersHandler {
+  +PageSize: int = 25
+  +HandleAsync(term: string?, page: int): Task<PagedResult<AdminUserSummary>?>
+}
+interface ICurrentUser {
+  +Guid? UserId
+  +IReadOnlyCollection<Role> Roles
+  +bool IsAuthenticated
+  +HasRole(role: Role): bool
+}
+enum EditAccess {
+  Owner
+  AdminOverride
+  Forbidden
+}
+class ProfileAccess {
+  +CallerProfileIdAsync(): Task<Guid?>
+  +CanEdit(profileId: Guid, callerProfileId: Guid?): bool
+  +AuthorizeEditAsync(profileId: Guid): Task<(EditAccess, Guid Actor)>
+}
+class UpdateProfileHandler {
+  +HandleAsync(profileId: Guid, command: UpdateProfileCommand): Task<Result>
+}
+interface IAuditLog {
+  +Record(actorId: Guid, action: string, targetType: string, targetId: string, before: object?, after: object?): void
+}
+SearchUsersHandler ..> ICurrentUser : requires System Admin
+SearchUsersHandler ..> AdminUserSummary : returns
+AdminUserSummary ..> UserStatus : Status name
+ProfileAccess ..> ICurrentUser
+ProfileAccess ..> EditAccess : returns
+UpdateProfileHandler --> ProfileAccess
+UpdateProfileHandler ..> IAuditLog : Record() when AdminOverride
+@enduml
