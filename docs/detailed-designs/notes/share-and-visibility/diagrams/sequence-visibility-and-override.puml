@@ -15,18 +15,18 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Caller" as actor
-box "Frontend — FaithTech Community web app (notes library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (notes library)" #E0F2FE
   participant "NotePage" as page
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "NotesEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "GetNoteHandler / SaveNoteHandler" as h
   participant "NoteAccess" as acc
   participant "IAuditLog" as audit
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   database "Community database" as db
 end box
 actor -> page : Open /notes/{id}

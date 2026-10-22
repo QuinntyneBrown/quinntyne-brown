@@ -15,19 +15,19 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "System Admin" as actor
-box "Frontend — FaithTech Community web app (resources library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (resources library)" #E0F2FE
   participant "TransferOwnershipDialog" as dlg
   participant "HttpResourcesService" as svc
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "ResourcesEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "ResourceMembersHandler" as mem
   participant "TransferOwnershipHandler" as h
   participant "INotificationPublisher" as pub
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "AuditLog" as audit
   database "Community database" as db
 end box

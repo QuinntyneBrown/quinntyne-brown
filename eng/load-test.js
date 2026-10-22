@@ -6,7 +6,7 @@
 //
 //   1. Seed 200 distinct, verified members (load-001@loadtest.invalid onwards; .invalid can never
 //      receive mail):
-//        LOADTEST_PASSWORD=<12+ characters> dotnet run --project backend/src/FaithTech.Community.Cli -- seed-load-users 200
+//        LOADTEST_PASSWORD=<12+ characters> dotnet run --project backend/src/QuinntyneBrown.Community.Cli -- seed-load-users 200
 //   2. Start the API for that environment with these explicit settings, which nothing else sets:
 //        RateLimits__AuthPerMinute=1000   (setup signs 200 members in from one load-generator address)
 //        RateLimits__PerMinute=1000       (the same address's anonymous sign-in steps)
@@ -17,7 +17,7 @@
 //               -e LOADTEST_PASSWORD=<same password> -e SUMMARY_PATH=load-test-summary.json eng/load-test.js
 //
 // Search (L2-026 AC5): also seed 100,000 searchable records before the run, so search runs over them:
-//        dotnet run --project backend/src/FaithTech.Community.Cli -- seed-search-records 100000
+//        dotnet run --project backend/src/QuinntyneBrown.Community.Cli -- seed-search-records 100000
 //
 // Every request in the measured scenario must answer 2xx: any other status counts as a failure,
 // and the thresholds fail the run. Reads are the member's own session, profile and the team list.

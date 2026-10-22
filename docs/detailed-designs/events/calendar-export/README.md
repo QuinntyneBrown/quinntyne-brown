@@ -73,7 +73,7 @@ The handler checks visibility before writing the file. The writer emits a stable
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `Event.Update` and `Event.Cancel` each increment `Sequence` once; the writer reads it unchanged.
 

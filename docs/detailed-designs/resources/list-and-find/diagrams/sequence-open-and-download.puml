@@ -15,19 +15,19 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Signed-in member" as actor
-box "Frontend — FaithTech Community web app (resources library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (resources library)" #E0F2FE
   participant "ResourcePage" as page
   participant "HttpResourcesService" as svc
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "ResourcesEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "GetResourceHandler" as get
   participant "DownloadResourceHandler" as dl
   participant "ResourceAccess" as acc
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "AuditLog" as audit
   participant "AzureBlobFileStorage" as store
   database "Community database" as db

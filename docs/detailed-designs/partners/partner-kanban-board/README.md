@@ -76,7 +76,7 @@ Drag, the Move dialog and the keyboard path all send the same request; the move 
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - Moving a partner to the stage it is already in is rejected and records no history. Domain rule violations throw `InvalidOperationException` (a broken rule) or `ArgumentException` (invalid input); there is no shared domain exception type. Handlers check permissions and preconditions first and map any remaining violation to a `400` or `409` result.
 - At XS the board's own column tabs show one `KanbanColumnComponent` at a time; the mock gained a `tabs` state.

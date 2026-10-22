@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design describes the shared measures that keep FaithTech Community responsive: bounded, paged queries on the server and a small, lazy-loaded bundle on the client.
+This design describes the shared measures that keep QuinntyneBrown.Community responsive: bounded, paged queries on the server and a small, lazy-loaded bundle on the client.
 
 - **p95 latency** — response time under which 95 percent of requests complete
 - **page** — bounded slice of a list result, described by page number and page size
@@ -40,7 +40,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-A member uses FaithTech Community, which answers within the latency targets of `L2-046`.
+A member uses QuinntyneBrown.Community, which answers within the latency targets of `L2-046`.
 
 ![C4 system context for performance](diagrams/c4-context.png)
 
@@ -72,7 +72,7 @@ The first visit to a feature route loads its library lazily; the list request re
 
 `eng/load-test.js` checks `L2-046` AC1 with real persistence and 200 distinct identities. It is never run against production, a shared environment or the e2e fake. Normal backend tests stay on the EF in-memory provider.
 
-1. **Members.** `LOADTEST_PASSWORD=<12+ characters> dotnet run --project backend/src/FaithTech.Community.Cli -- seed-load-users 200` creates verified members `load-001@loadtest.invalid` onwards. `.invalid` is a reserved top-level domain, so no mail can reach a person. The members have no role. The password comes only from the environment, the count is 1 to 1000, and the command is safe to re-run.
+1. **Members.** `LOADTEST_PASSWORD=<12+ characters> dotnet run --project backend/src/QuinntyneBrown.Community.Cli -- seed-load-users 200` creates verified members `load-001@loadtest.invalid` onwards. `.invalid` is a reserved top-level domain, so no mail can reach a person. The members have no role. The password comes only from the environment, the count is 1 to 1000, and the command is safe to re-run.
 2. **API settings.** The isolated environment sets `RateLimits__AuthPerMinute=1000` and `RateLimits__PerMinute=1000`, because setup signs 200 members in from one load-generator address. Nothing else sets them. Without them the production defaults stay at 20 auth requests and 100 requests a minute, and `WebProtectionTests` proves both.
 3. **Run.** `k6 run -e BASE_URL=https://<api> -e WEB_ORIGIN=https://<web app> -e LOADTEST_PASSWORD=<password> -e SUMMARY_PATH=load-test-summary.json eng/load-test.js`.
    - Setup signs each member in through the real sign-in, code + PKCE and token flow.

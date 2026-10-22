@@ -16,7 +16,7 @@ export interface MockNotification {
 const PAGE_SIZE = 50;
 
 /**
- * Plays the notifications endpoints (backend/src/FaithTech.Community.Api/Endpoints/NotificationsEndpoints.cs):
+ * Plays the notifications endpoints (backend/src/QuinntyneBrown.Community.Api/Endpoints/NotificationsEndpoints.cs):
  * each caller lists and marks only their own notifications, newest first, 50 to a page (L2-027).
  */
 export class MockNotifications {

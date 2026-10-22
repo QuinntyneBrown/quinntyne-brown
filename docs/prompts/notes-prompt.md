@@ -2,7 +2,7 @@
 
 ## Goal
 
-Build, end to end, **Docs & notes** (feature name `notes`): a place inside FaithTech Community where members write, format and link pages made of flexible blocks that they can drag into any order. Today leads keep meeting notes, playbooks and how-tos in Drive, SharePoint and email. Nothing exists yet for this subsystem: no requirements, mocks, designs, estimate or code. The closest neighbour to copy for structure and house style is **Resources** (`frontend/projects/resources/`, `docs/detailed-designs/resources/`, `docs/prompts/resources-prompt.md`, `docs/proposals/resources.md`).
+Build, end to end, **Docs & notes** (feature name `notes`): a place inside QuinntyneBrown.Community where members write, format and link pages made of flexible blocks that they can drag into any order. Today leads keep meeting notes, playbooks and how-tos in Drive, SharePoint and email. Nothing exists yet for this subsystem: no requirements, mocks, designs, estimate or code. The closest neighbour to copy for structure and house style is **Resources** (`frontend/projects/resources/`, `docs/detailed-designs/resources/`, `docs/prompts/resources-prompt.md`, `docs/proposals/resources.md`).
 
 What users get (suggestions the implementer may adjust within the scope lock):
 

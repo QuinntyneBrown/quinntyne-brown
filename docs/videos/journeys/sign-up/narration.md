@@ -1,7 +1,7 @@
 # Sign up
 
 ## opening: Opening
-Welcome to FaithTech Community. In this video you create an account. Anyone can join, and it takes one short form. This recording runs the real app against a local stand-in for the server, with made-up details.
+Welcome to QuinntyneBrown.Community. In this video you create an account. Anyone can join, and it takes one short form. This recording runs the real app against a local stand-in for the server, with made-up details.
 
 ## open-form: The sign-up form
 You start on the Join FaithTech page. It asks for three things: your full name, your email address and a password.

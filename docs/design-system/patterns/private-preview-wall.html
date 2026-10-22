@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Private preview wall — FaithTech Community design system</title>
+<title>Private preview wall — QuinntyneBrown.Community design system</title>
 <meta name="description" content="The unbranded unlock page the server shows on app and www before the owner unlocks the private preview: composition, neutral accent, states and the rules that keep the product hidden.">
 <link rel="stylesheet" href="../tokens/tokens.css">
 <link rel="stylesheet" href="../tokens/neutral-accent.css">
@@ -121,7 +121,7 @@
 
     <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
       <p>The wall is composed of the <a href="../components/card.html">card</a> in the auth layout, one <a href="../components/form-field.html">form field</a> with its inline error, the <a href="../components/alert.html">alert</a> for lock-out and server errors, and a full-width large primary <a href="../components/button.html">button</a>. Its <code>&lt;html&gt;</code> carries <code>data-accent="neutral"</code>, which loads <code>tokens/neutral-accent.css</code> after <code>tokens.css</code>: the accent, link and focus-ring roles become greys in both themes, and every other role is unchanged.</p>
-      <p><b>It is not an Angular screen.</b> The server renders it before either application bundle is allowed to load, so it cannot use <code>frontend/projects/components</code> (whose bundle and <code>ft-</code> selectors would describe the product). The server's template (<code>backend/src/FaithTech.Community.Api/Middleware/PrivatePreview/wall.html</code>) inlines the few rules of these classes that it needs, by role, under a per-response CSP nonce (ADR 0026). When this page changes, change that template in the same commit.</p>
+      <p><b>It is not an Angular screen.</b> The server renders it before either application bundle is allowed to load, so it cannot use <code>frontend/projects/components</code> (whose bundle and <code>ft-</code> selectors would describe the product). The server's template (<code>backend/src/QuinntyneBrown.Community.Api/Middleware/PrivatePreview/wall.html</code>) inlines the few rules of these classes that it needs, by role, under a per-response CSP nonce (ADR 0026). When this page changes, change that template in the same commit.</p>
     </section>
 
     <section class="ds-section" id="when"><h2><a href="#when">When to use</a></h2>
@@ -229,7 +229,7 @@
     <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don't</a></h2>
       <div class="ds-dodont">
         <figure class="ds-do"><div class="ds-example__canvas" data-accent="neutral"><p class="text-center"><b>Private preview</b></p></div><figcaption>Use the neutral title, with the neutral accent.</figcaption></figure>
-        <figure class="ds-dont"><div class="ds-example__canvas"><p class="text-center"><b>FaithTech Community is coming soon</b></p></div><figcaption>Don't name, describe or colour the product, not even in the tab title, favicon or an image name.</figcaption></figure>
+        <figure class="ds-dont"><div class="ds-example__canvas"><p class="text-center"><b>QuinntyneBrown.Community is coming soon</b></p></div><figcaption>Don't name, describe or colour the product, not even in the tab title, favicon or an image name.</figcaption></figure>
         <figure class="ds-do"><div class="ds-example__canvas"><p>That passphrase didn’t work. Check it and try again.</p></div><figcaption>Refuse every failure with the same words.</figcaption></figure>
         <figure class="ds-dont"><div class="ds-example__canvas"><p>Your form expired. Reload and try again.</p></div><figcaption>Don't explain why a particular attempt failed.</figcaption></figure>
       </div>
@@ -243,7 +243,7 @@
       <p>Drift: none. New in this update: the neutral accent scope (<code>tokens/neutral-accent.css</code>).</p>
     </section>
 
-    <footer class="ds-footer"><span>FaithTech Community design system · extracted from <a href="../../mocks/index.html">docs/mocks</a> on 2026-10-21</span><a href="#top">Back to top</a></footer>
+    <footer class="ds-footer"><span>QuinntyneBrown.Community design system · extracted from <a href="../../mocks/index.html">docs/mocks</a> on 2026-10-21</span><a href="#top">Back to top</a></footer>
   </main>
 </div>
 <script src="../assets/ds.js"></script>

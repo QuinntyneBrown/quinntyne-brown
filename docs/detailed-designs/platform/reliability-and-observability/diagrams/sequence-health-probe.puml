@@ -15,10 +15,10 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Operator" as actor
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "Health checks" as hc
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "DatabaseHealthCheck" as dbc
   participant "BlobStorageHealthCheck" as bc
   database "Community database" as db

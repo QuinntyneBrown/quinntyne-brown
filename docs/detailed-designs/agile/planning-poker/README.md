@@ -97,7 +97,7 @@ Opening the page reads the workspace's current session, then `AgileHub.WatchPoke
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `L2-038` AC1 starts a session for one or more stories estimated one at a time; the session holds `StoryIds` and a current story instead of a single `StoryId`, and is complete after the last story. Resolved.
 - `PokerSession` also keeps `IsClosed`, `LastStoryId` and `LastPoints` so everyone sees the agreed estimate, and offers `WithdrawVote` (pressing the chosen card again) and `End`.

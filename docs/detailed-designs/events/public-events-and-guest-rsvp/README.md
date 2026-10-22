@@ -2,7 +2,7 @@
 
 ## Overview
 
-Profiles and most content in FaithTech Community are visible to signed-in members only. Public events are the one exception: an anonymous visitor may open a public event's share link, read the event, RSVP as a guest and download its `.ics`.
+Profiles and most content in QuinntyneBrown.Community are visible to signed-in members only. Public events are the one exception: an anonymous visitor may open a public event's share link, read the event, RSVP as a guest and download its `.ics`.
 
 Key terms:
 
@@ -83,7 +83,7 @@ The rate limiter rejects the eleventh guest RSVP from one IP address within an h
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - The guest cancel link (`L2-023` AC6) removes the RSVP through `Event.CancelGuestRsvp(rsvpId)`, which only removes guest RSVPs.
 

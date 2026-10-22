@@ -2,7 +2,7 @@
 
 ## Overview
 
-A lead keeps private contacts for people they meet who have not joined FaithTech Community yet. Recognising someone at the next event is easier with a face, so a lead (any lead role) or a System Admin can add up to 10 photos of a contact, each with a description, and choose one to feature. The contacts list becomes a grid of **person cards**: a decorative cover band, the featured photo (or the person's initials) in a large circle, the name with its status badge, the organisation and city, a secondary line and a *View profile* link, plus a round × that opens the archive confirmation.
+A lead keeps private contacts for people they meet who have not joined QuinntyneBrown.Community yet. Recognising someone at the next event is easier with a face, so a lead (any lead role) or a System Admin can add up to 10 photos of a contact, each with a description, and choose one to feature. The contacts list becomes a grid of **person cards**: a decorative cover band, the featured photo (or the person's initials) in a large circle, the name with its status badge, the organisation and city, a secondary line and a *View profile* link, plus a round × that opens the archive confirmation.
 
 Contact photos are as private as the contact (`L2-012`, ADR 0014): only the owning lead and System Admin can see them, change them or fetch their images, and the server enforces it. This is stricter than profile photos, whose read URLs are one-hour SAS links ([ADR 0002](../../../adr/0002-photo-storage-abstraction-and-urls.md)); a contact photo is only ever served by the authenticated API ([ADR 0017](../../../adr/0017-contact-photos-private-images-and-person-cards.md)).
 
@@ -67,7 +67,7 @@ The acceptance criteria are in [`docs/specs/L2.md`](../../../specs/L2.md). They 
 
 ### System context
 
-Leads and System Admin manage contact photos in FaithTech Community, which stores the images in Azure Blob Storage.
+Leads and System Admin manage contact photos in QuinntyneBrown.Community, which stores the images in Azure Blob Storage.
 
 ![C4 system context for contact photos](diagrams/c4-context.png)
 

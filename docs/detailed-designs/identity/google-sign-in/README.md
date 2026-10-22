@@ -2,7 +2,7 @@
 
 ## Overview
 
-"Sign in with Google" and "Sign up with Google" are one button and one flow on the marketing page. Google is FaithTech Community's first external sign-in method. A Google account whose verified email matches an existing account signs into that account; a new Google account creates an account with no role and a verified email, as any sign-up does. The result is the same short-lived `ftc.session` cookie the password path sets, followed by the community app's authorization code + PKCE flow.
+"Sign in with Google" and "Sign up with Google" are one button and one flow on the marketing page. Google is QuinntyneBrown.Community's first external sign-in method. A Google account whose verified email matches an existing account signs into that account; a new Google account creates an account with no role and a verified email, as any sign-up does. The result is the same short-lived `ftc.session` cookie the password path sets, followed by the community app's authorization code + PKCE flow.
 
 **ID token** — the signed JWT Google returns from its token endpoint, carrying `sub`, `email`, `email_verified`, `name`, `aud`, `iss`, `exp` and the `nonce` FaithTech sent
 
@@ -53,13 +53,13 @@ No schema change: `CommunityDbContext` derives from `IdentityDbContext<Community
 
 ### Acceptance criteria
 
-See [`docs/specs/L2.md`](../../../specs/L2.md#l2-059-google-sign-in). Backend criteria are traced by `backend/tests/FaithTech.Community.Api.Tests/Identity/GoogleSignInTests.cs` and `backend/tests/FaithTech.Community.Infrastructure.Tests/Identity/GoogleIdTokenValidatorTests.cs`; the page's behaviour by `e2e/tests/marketing/google-sign-in.spec.ts`.
+See [`docs/specs/L2.md`](../../../specs/L2.md#l2-059-google-sign-in). Backend criteria are traced by `backend/tests/QuinntyneBrown.Community.Api.Tests/Identity/GoogleSignInTests.cs` and `backend/tests/QuinntyneBrown.Community.Infrastructure.Tests/Identity/GoogleIdTokenValidatorTests.cs`; the page's behaviour by `e2e/tests/marketing/google-sign-in.spec.ts`.
 
 ## Diagrams
 
 ### System context
 
-Google is an external identity provider; FaithTech Community keeps its own accounts.
+Google is an external identity provider; QuinntyneBrown.Community keeps its own accounts.
 
 ![C4 system context for Google sign-in](diagrams/c4-context.png)
 

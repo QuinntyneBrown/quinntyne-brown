@@ -14,7 +14,7 @@ The edit happens on the dedicated `edit-profile` screen at `/people/me/edit`, no
 
 - **`EditProfilePage`** — page in the `profiles` feature library, matching the `edit-profile` mock. It uses `FormFieldComponent`, `TextFieldComponent` and `TextareaComponent` (with `maxlength` 400 on the bio, which shows the characters-left counter), an `ErrorSummaryComponent` and inline errors on a failed save, a `FormActionsComponent` row that puts the ghost *Cancel* link first and the busy *Save profile* button last, end-aligned like a dialog footer, and `ToastService` for the "Profile saved" toast.
 - **`ProfilesService`** — contract in the `api` library, provided through the `PROFILES_SERVICE` injection token and implemented by `HttpProfilesService`.
-- **`ProfilesEndpoints`** — minimal API route group in `FaithTech.Community.Api` under `/api/profiles`. Its endpoints require authentication by default and hold no business logic.
+- **`ProfilesEndpoints`** — minimal API route group in `QuinntyneBrown.Community.Api` under `/api/profiles`. Its endpoints require authentication by default and hold no business logic.
 - **`ICurrentUser`** — Application abstraction exposing the caller's user id and roles. **`ProfileAccess`** resolves the caller's profile from `CommunityUser.ProfileId` and decides owner, System Admin (audited) or forbidden (ADR 0004).
 - **`Profile`** — Domain entity holding `Name`, `Roles` and the `Photos` collection.
 - **`UpdateProfileCommand`** carries `ProfileId`, `Name`, `HomeCity` and `Bio`.
@@ -74,7 +74,7 @@ The page and the validator reject invalid names. The handler returns 403 to any 
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `L2-006` covers name, home city and bio while this design covered only the name. `Profile.Update(name, homeCity, bio)` replaces `Rename`; it rejects a blank name, and length limits stay in the validator. Resolved.
 - Home city is free text (up to 100 characters) on a text field rather than a fixed select: there is no list of cities to choose from. The mock is updated. Resolved.

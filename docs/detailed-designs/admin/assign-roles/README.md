@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community grants permissions through *global roles*. A **global role** — named permission set held by a profile, not tied to any city. The nine roles are City Lead, Event Lead, Create Lead, Communications Lead, Staff, Volunteer, Product Engineer, Attendee and System Admin. A profile may hold any combination of them, and a new account holds none.
+QuinntyneBrown.Community grants permissions through *global roles*. A **global role** — named permission set held by a profile, not tied to any city. The nine roles are City Lead, Event Lead, Create Lead, Communications Lead, Staff, Volunteer, Product Engineer, Attendee and System Admin. A profile may hold any combination of them, and a new account holds none.
 
 This feature covers adding and removing roles on a profile. Two tiers of authority apply. A City Lead may add or remove the Event Lead, Create Lead, Communications Lead, Volunteer, Product Engineer and Attendee roles on any profile. Only a System Admin may grant or remove City Lead, Staff and System Admin. Every role change is audited, and the profile owner is notified when a City Lead changes their roles. The last remaining System Admin role can never be removed, so the site always keeps an administrator.
 
@@ -16,7 +16,7 @@ The slice runs from the profile page in the web app to the `ProfileRole` rows in
 - **`ProfilePage`** — page in the `profiles` library that opens `RoleDialogComponent` with `DialogService`. It offers only the roles `assignableRoles(callerRoles)` returns, and passes a `submit` that calls `ROLES_SERVICE` and replaces the profile's roles with the returned set, so the badges update without a page reload. The `admin` library does not open the dialog; the admin users page links to the profile.
 - **`RolesService`** / **`ROLES_SERVICE`** / **`HttpRolesService`** — API client contract, injection token and HTTP implementation in the `api` library. They call `POST /api/profiles/{id}/roles` and `DELETE /api/profiles/{id}/roles/{role}`. Requests carry the `HANDLES_FORBIDDEN` `HttpContextToken`, so a `403` reaches the dialog instead of the global `/forbidden` redirect.
 - **`assignableRoles`**, **`ROLE_LABELS`** and **`ROLE_DESCRIPTIONS`** — exports of `api/src/lib/shared/role.ts` that mirror `RoleAssignmentPolicy` and label each role in the dialog.
-- **`RolesEndpoints`** — minimal API mapping in `FaithTech.Community.Api`. It authenticates the caller and calls the handler; it holds no business logic. Both routes return the profile's new role set.
+- **`RolesEndpoints`** — minimal API mapping in `QuinntyneBrown.Community.Api`. It authenticates the caller and calls the handler; it holds no business logic. Both routes return the profile's new role set.
 - **`AssignRoleCommand`** (`Role`) — request body of the add route. The profile id and, for removal, the role come from the route.
 - **`ChangeRolesHandler`** — Application handler in `Admin/` with `AssignAsync(profileId, role)` and `RemoveAsync(profileId, role)`. It asks `RoleAssignmentPolicy` whether the caller may change the role, applies the change to `Profile`, records an audit entry for every change and, when the caller is a City Lead without System Admin, notifies the profile owner through `RoleChangeNotifier`. It resolves the caller's profile id, used as the actor, through `ProfileAccess.CallerProfileIdAsync`.
 - **`RoleAssignmentPolicy`** — concrete Application class. `CanChangeRoles` is true for a City Lead or System Admin; `CanChange(role)` allows a System Admin any role and a City Lead the six roles in `CityLeadRoles`; `NotifiesOwner` is true for a City Lead without System Admin. The last-System-Admin check is a count in `ChangeRolesHandler`, not a policy method.
@@ -59,7 +59,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-City Leads and System Admins change roles on member profiles through FaithTech Community. The site notifies the affected member by email through the email provider.
+City Leads and System Admins change roles on member profiles through QuinntyneBrown.Community. The site notifies the affected member by email through the email provider.
 
 ![C4 system context for assign roles](diagrams/c4-context.png)
 
@@ -95,7 +95,7 @@ The `profiles` feature library in the Angular web app opens the role dialog from
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - Role count: `L2-008` lists nine roles and the Domain `Role` enumeration holds exactly those nine. The earlier single `Lead` value is replaced by City Lead, Event Lead, Create Lead and Communications Lead. Resolved.
 - Roles persist as `ProfileRole` rows (table `ProfileRoles`, key profile and role), replacing the earlier text-array column.

@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community shows a clear, recoverable page when a route is unknown, an action is forbidden, the server fails or the browser goes offline. These pages live in the app shell so every feature library reaches them the same way. The mocks are `pages/not-found`, `pages/forbidden`, `pages/server-error`, `pages/offline` and `notifications/banner`.
+QuinntyneBrown.Community shows a clear, recoverable page when a route is unknown, an action is forbidden, the server fails or the browser goes offline. These pages live in the app shell so every feature library reaches them the same way. The mocks are `pages/not-found`, `pages/forbidden`, `pages/server-error`, `pages/offline` and `notifications/banner`.
 
 - **reference ID** — correlation ID shown on the server error page so a member can quote it and an operator can find the matching log entry (`L2-047`)
 - **offline banner** — persistent banner shown while the browser reports no network connection
@@ -36,7 +36,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-A member uses FaithTech Community and sees a recoverable page when something fails.
+A member uses QuinntyneBrown.Community and sees a recoverable page when something fails.
 
 ![C4 system context for error and system pages](diagrams/c4-context.png)
 

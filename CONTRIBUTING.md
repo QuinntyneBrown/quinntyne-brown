@@ -1,4 +1,4 @@
-# Contributing to FaithTech Community
+# Contributing to QuinntyneBrown.Community
 
 Thank you for your interest in contributing! This document explains how to report issues, propose
 changes and get a pull request merged.

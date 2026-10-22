@@ -42,7 +42,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-The owning lead archives, restores and deletes contacts within FaithTech Community; no external system participates.
+The owning lead archives, restores and deletes contacts within QuinntyneBrown.Community; no external system participates.
 
 ![C4 system context for archive, restore and delete contacts](diagrams/c4-context.png)
 
@@ -78,7 +78,7 @@ The dialog keeps Delete disabled until the input is exactly `DELETE`; `ArchiveCo
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - Domain rule violations throw `InvalidOperationException` (a broken rule) or `ArgumentException` (invalid input); there is no shared domain exception type. Handlers check permissions and preconditions first and map any remaining violation to a `400` or `409` result.
 

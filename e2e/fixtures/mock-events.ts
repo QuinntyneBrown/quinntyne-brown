@@ -11,7 +11,7 @@ export interface MockRsvp {
   cancelToken?: string;
 }
 
-/** An event as the Events table holds it (FaithTech.Community.Domain.Events.Event). */
+/** An event as the Events table holds it (QuinntyneBrown.Community.Domain.Events.Event). */
 export interface MockEvent {
   id: string;
   title: string;
@@ -160,7 +160,7 @@ function fields(body: Record<string, unknown>): Partial<MockEvent> {
 }
 
 /**
- * Plays the events endpoints (backend/src/FaithTech.Community.Api/Endpoints/EventsEndpoints.cs)
+ * Plays the events endpoints (backend/src/QuinntyneBrown.Community.Api/Endpoints/EventsEndpoints.cs)
  * over an in-memory list of events, with the same filters and permission rules.
  */
 export class MockEvents {

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **team** — everyone in FaithTech Community who holds a lead role (City Lead, Event Lead, Create Lead or Communications Lead) or the Volunteer role. Team membership is derived from roles, not stored separately: a profile joins the team when it gains one of those roles and leaves when it loses the last one.
+The **team** — everyone in QuinntyneBrown.Community who holds a lead role (City Lead, Event Lead, Create Lead or Communications Lead) or the Volunteer role. Team membership is derived from roles, not stored separately: a profile joins the team when it gains one of those roles and leaves when it loses the last one.
 
 The team page lets any signed-in member see who the team is, with name, photo and roles, and filter by role. The `team-board` mock is a separate Agile workspace screen and is outside this slice.
 
@@ -69,7 +69,7 @@ Membership is computed from current roles, so a profile that loses its last team
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - Team membership stays derived from roles through `TeamRoles.IsTeamMember`; nothing is stored. Resolved.
 - Sort order, filter values, the default city and the photo avatar: resolved in [ADR 0007](../../../adr/0007-team-list-filters-and-photos.md). Paging: resolved in [ADR 0015](../../../adr/0015-team-list-paging.md).

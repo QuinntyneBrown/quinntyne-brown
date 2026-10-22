@@ -15,18 +15,18 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Lead" as actor
-box "Frontend — FaithTech Community web app (contacts library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (contacts library)" #E0F2FE
   participant "ContactsPage" as list
   participant "HttpContactsService" as svc
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "ContactsEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "ManageContactsHandler" as h
   participant "ContactAccess" as acc
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   database "Community database" as db
 end box
 actor -> list : Open /contacts or search for a term

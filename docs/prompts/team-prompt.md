@@ -17,7 +17,7 @@ What users get:
 
 Where it lives today:
 
-- Backend: `backend/src/FaithTech.Community.Domain/Team/TeamRoles.cs` only. Application, Infrastructure and Api
+- Backend: `backend/src/QuinntyneBrown.Community.Domain/Team/TeamRoles.cs` only. Application, Infrastructure and Api
   have no team code. Reuse the finished `Profiles` feature for profile and photo data.
 - Frontend: `frontend/projects/team/` (placeholder with `SCAFFOLD.md`), plus `api` and `components`.
 - Mocks: `docs/mocks/pages/team/` and `docs/mocks/pages/team-board/`.

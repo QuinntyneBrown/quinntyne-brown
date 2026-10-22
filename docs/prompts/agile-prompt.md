@@ -45,7 +45,7 @@ Out of scope: hackathon teams, projects and judging (v2); anything not in the se
 and says the tree changes only with explicit approval and must be updated first. This prompt is that approval, and
 only for these additions:
 
-- `backend/src/FaithTech.Community.Application/Agile/` (handlers, validators, DTOs, permission checks).
+- `backend/src/QuinntyneBrown.Community.Application/Agile/` (handlers, validators, DTOs, permission checks).
 - `frontend/projects/agile/` as a feature library with `public-api.ts`, lazy-loaded by the app shell, depending
   only on `components` and `api`. Register it in `angular.json`, tsconfig paths and the workspace as the other
   feature libraries are.

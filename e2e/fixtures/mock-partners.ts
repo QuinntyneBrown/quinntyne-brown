@@ -38,7 +38,7 @@ const LEAD_ROLES = ['CityLead', 'EventLead', 'CreateLead', 'CommunicationsLead']
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * PartnersEndpoints in the browser (backend/src/FaithTech.Community.Api/Endpoints/PartnersEndpoints.cs):
+ * PartnersEndpoints in the browser (backend/src/QuinntyneBrown.Community.Api/Endpoints/PartnersEndpoints.cs):
  * lead roles, Staff and System Admin read; Staff never write; everyone else gets 403 (ADR 0014).
  */
 export class MockPartners {

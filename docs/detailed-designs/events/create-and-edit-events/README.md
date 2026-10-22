@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community is a community site for FaithTech staff, leads, volunteers, builders, event attendees and partners. An *event* is a dated gathering, held in person or online, that members can attend. Data is global, so every event is visible across cities, subject to its visibility.
+QuinntyneBrown.Community is a community site for FaithTech staff, leads, volunteers, builders, event attendees and partners. An *event* is a dated gathering, held in person or online, that members can attend. Data is global, so every event is visible across cities, subject to its visibility.
 
 This feature covers authoring an event: creating a new one and editing an existing one. It belongs to the events subsystem, which also covers listing, RSVP, public pages, calendar export and cancellation.
 
@@ -21,7 +21,7 @@ The slice runs from the event form page to the database.
 
 - **`EventFormPage`** — routed page in the `events` feature library (mock: `docs/mocks/pages/event-form/`). It hosts the create and edit form, shows inline validation errors and a busy state while saving. It composes form fields, date-time inputs and buttons from the `components` library.
 - **`EventsService` / `EVENTS_SERVICE`** — API client contract and injection token in the `api` library. `HttpEventsService` implements it with `createEvent(request)` and `updateEvent(id, request)`.
-- **`EventsEndpoints`** — minimal API mapping in `FaithTech.Community.Api` for `POST /api/events` and `PUT /api/events/{id}`. Both require authentication and dispatch to the Application layer.
+- **`EventsEndpoints`** — minimal API mapping in `QuinntyneBrown.Community.Api` for `POST /api/events` and `PUT /api/events/{id}`. Both require authentication and dispatch to the Application layer.
 - **`CreateEventCommand` / `UpdateEventCommand`** — request objects carrying title, description, type, start, end, city, format, venue or link, optional capacity, and visibility.
 - **`EventCommandValidator`** — validator that rejects an end before the start, an in-person event without a venue and an online event without a link (`L2-020`).
 - **`CreateEventHandler` / `UpdateEventHandler`** — Application handlers. Each checks `EventPermissions.CanManageEvents` and returns 403 for any other role, then writes the `Event` entity. `UpdateEventHandler` increments `Event.Sequence` and raises an `EventChanged` notification for each member RSVP.
@@ -54,7 +54,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-Event managers author events in FaithTech Community. Members who RSVP'd receive change notifications in the app.
+Event managers author events in QuinntyneBrown.Community. Members who RSVP'd receive change notifications in the app.
 
 ![C4 system context for create and edit events](diagrams/c4-context.png)
 
@@ -90,7 +90,7 @@ An edit increments the event's `Sequence` and records an in-app notification for
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - Event types follow `L2-020`: Gathering, Builders night, Hackathon, Prayer & planning and Panel, replacing the earlier `Standard`/`Hackathon` pair. Resolved.
 - Capacity: `L2-020` AC1 and AC5 define an optional capacity; `Event.Capacity` is nullable and `Event.IsFull` refuses RSVPs at capacity. Resolved.

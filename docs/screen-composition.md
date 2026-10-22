@@ -23,7 +23,7 @@ Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the 
 ### Private preview wall — any path on `app.` and `www.faithtech.community` while locked, rendered by the server (`pages/private-preview`: default, busy, invalid, locked-out, error, redirect)
 
 - Not an Angular screen: the API's private-preview gate renders it before either app bundle may load, so it cannot use `@faithtech-community/components` (ADR 0026). It composes the design system's classes instead: auth layout, `card`, `field` with `field__error`, `alert` (`warning` for locked-out, `danger` for error) and `btn btn--primary btn--lg btn--block`, under the neutral accent scope (`data-accent="neutral"`, design system `patterns/private-preview-wall.html`).
-- Local (server template `backend/src/FaithTech.Community.Api/Middleware/PrivatePreview/wall.html`): the inline, nonce-protected copy of those rules read by role, the plain-HTML form (`csrf`, `returnUrl`, `passphrase`) and the small script that shows the busy state. No logo, product name, description, favicon or brand colour.
+- Local (server template `backend/src/QuinntyneBrown.Community.Api/Middleware/PrivatePreview/wall.html`): the inline, nonce-protected copy of those rules read by role, the plain-HTML form (`csrf`, `returnUrl`, `passphrase`) and the small script that shows the busy state. No logo, product name, description, favicon or brand colour.
 
 ### Sign in — `/sign-in` (`pages/sign-in`: default, invalid, busy, locked, error, suspended)
 
@@ -91,7 +91,7 @@ Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the 
 
 ### Connect — `/meet/:token` (`pages/connect`: default, loading, invalid, error, busy, email-exists, signed-in, pending, own-code)
 
-- Library: `AuthLayoutComponent`, `CardComponent`, `StackComponent`, `PersonSummaryComponent` (the lead's photo, name and "City Lead · Toronto"), `AlertComponent` (error summary; unreachable; signed-in success "Connected with {lead}"; pending and own-code info; invalid warning "Link not recognised"), `FormFieldComponent` + `TextFieldComponent` (Full name, Email, Password with `reveal`), `FormErrorFocusDirective`, `ButtonComponent` (*Create account and connect* with `loading`, *Create an account*, *Sign in*, *Try again*, *Go to FaithTech Community*), `LinkComponent` (*Sign in to connect*), `SkeletonComponent` while the token is checked.
+- Library: `AuthLayoutComponent`, `CardComponent`, `StackComponent`, `PersonSummaryComponent` (the lead's photo, name and "City Lead · Toronto"), `AlertComponent` (error summary; unreachable; signed-in success "Connected with {lead}"; pending and own-code info; invalid warning "Link not recognised"), `FormFieldComponent` + `TextFieldComponent` (Full name, Email, Password with `reveal`), `FormErrorFocusDirective`, `ButtonComponent` (*Create account and connect* with `loading`, *Create an account*, *Sign in*, *Try again*, *Go to QuinntyneBrown.Community*), `LinkComponent` (*Sign in to connect*), `SkeletonComponent` while the token is checked.
 - `ConnectPage` in `invites`, routed by `CONNECT_ROUTES` (`/meet` because `/connect/*` is the identity server's).
 - Local: the `<form>` element, the `h1`, and the consent caption saying what connecting does.
 

@@ -15,21 +15,21 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Workspace owner" as actor
-box "Frontend — FaithTech Community web app (agile library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (agile library)" #E0F2FE
   participant "WorkspaceSettingsPage" as page
   participant "RemoveWorkspaceMemberDialog" as dlg
   participant "AgileService (AGILE_SERVICE)" as svc
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "WorkspacesEndpoints" as ep
 end box
-box "Backend — FaithTech.Community.Application and Domain" #ECFDF3
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
   participant "WorkspaceSettingsHandler" as h
   participant "WorkspaceAccessPolicy" as pol
   participant "Workspace" as ent
   participant "IAuditLog" as audit
 end box
-box "Backend — FaithTech.Community.Infrastructure" #FFF4E5
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
   participant "CommunityDbContext" as ctx
   database "Community database" as db
 end box

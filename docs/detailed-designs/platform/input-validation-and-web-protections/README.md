@@ -2,7 +2,7 @@
 
 ## Overview
 
-FaithTech Community accepts input from members and anonymous visitors, so every request passes the same set of protections before any business rule runs. This design describes the shared validation pipeline and the HTTP protections configured once in `FaithTech.Community.Api`.
+QuinntyneBrown.Community accepts input from members and anonymous visitors, so every request passes the same set of protections before any business rule runs. This design describes the shared validation pipeline and the HTTP protections configured once in `QuinntyneBrown.Community.Api`.
 
 - **validation problem details** — RFC 9457 response body with an `errors` map from field name to messages
 - **security headers** — HSTS, Content-Security-Policy, `X-Content-Type-Options` and frame protection added to every response
@@ -43,7 +43,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-Every caller sends requests to FaithTech Community through the same protections.
+Every caller sends requests to QuinntyneBrown.Community through the same protections.
 
 ![C4 system context for input validation and web protections](diagrams/c4-context.png)
 

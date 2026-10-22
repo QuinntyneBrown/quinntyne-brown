@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **audit log** — append-only record of every System Admin action and every role change in FaithTech Community. Each **audit entry** — immutable row naming the actor, the action, the target, the before and after values, the time in UTC and the caller's IP address. The log supports accountability for the override authority that System Admins hold.
+The **audit log** — append-only record of every System Admin action and every role change in QuinntyneBrown.Community. Each **audit entry** — immutable row naming the actor, the action, the target, the before and after values, the time in UTC and the caller's IP address. The log supports accountability for the override authority that System Admins hold.
 
 This feature covers both writing entries, which other features trigger through `IAuditLog`, and reading them on the audit log page. Only a System Admin may read the log. No user, including a System Admin, may edit or delete an entry: the API exposes no such operation.
 
@@ -41,7 +41,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-System Admins read the log; every admin and role-changing action inside FaithTech Community writes to it. No external system participates.
+System Admins read the log; every admin and role-changing action inside QuinntyneBrown.Community writes to it. No external system participates.
 
 ![C4 system context for audit log](diagrams/c4-context.png)
 
@@ -77,7 +77,7 @@ Only System Admins may read entries, filtered by category, actor and date range 
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - Filter categories (`L2-041` AC2) map onto the `Action` values written by each feature; the Domain does not add a separate category field.
 - Categories: `roles` → actions starting `role.`; `suspensions` → `user.suspended`, `user.reinstated`; `contacts` → actions starting `contact.`; `deletions` → actions ending `.deleted`.

@@ -88,7 +88,7 @@ const TYPES = [
 ];
 
 /**
- * NotesEndpoints in the browser (backend/src/FaithTech.Community.Api/Endpoints/NotesEndpoints.cs, ADR 0025):
+ * NotesEndpoints in the browser (backend/src/QuinntyneBrown.Community.Api/Endpoints/NotesEndpoints.cs, ADR 0025):
  * visibility in every read (Private to the owner and System Admin, Shared to its members and the current holders
  * of its roles, Global to every member), owner-only writes, and a 409 when a save is based on an old version.
  */

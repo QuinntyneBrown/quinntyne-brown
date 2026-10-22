@@ -15,12 +15,12 @@ skinparam package {
   BackgroundColor #F9FAFB
 }
 actor "Member" as actor
-box "Frontend — FaithTech Community web app (app shell library)" #E0F2FE
+box "Frontend — QuinntyneBrown.Community web app (app shell library)" #E0F2FE
   participant "Feature page" as page
   participant "httpErrorInterceptor" as int
   participant "ServerErrorPage" as err
 end box
-box "Backend — FaithTech.Community.Api" #D1FADF
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
   participant "Community API pipeline" as ep
 end box
 actor -> page : Act

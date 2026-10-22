@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design describes how FaithTech Community stays available when a dependency fails and how operators see what happens in production.
+This design describes how QuinntyneBrown.Community stays available when a dependency fails and how operators see what happens in production.
 
 - **liveness probe** — `/health/live`, reporting whether the API process runs
 - **readiness probe** — `/health/ready`, reporting whether the database and blob storage are reachable
@@ -19,7 +19,7 @@ The middleware order is fixed: request logging sits outside the exception-handli
 - **Log redaction** — structured log enrichers exclude personal data such as names, emails and request bodies.
 - **Health checks** — `AddHealthChecks()` with a `live` check (no dependencies) and `ready` checks for PostgreSQL and Azure Blob storage, mapped to `/health/live` and `/health/ready` as anonymous endpoints.
 - **Outbox-based side effects** — email (see email notifications design) and photo blob writes and deletes are queued and retried, so the core action commits even when the email provider or blob storage is down. Photos are resized and validated in the request, which needs no external service. If the blob write fails, the photo commits as storing and a `PhotoBlobTask` carries the processed image until `PhotoStorageRetryWorker` stores it (ADR 0013, manage-profile-photos design).
-- **Migrations** — the API does not call `Database.Migrate()`. `FaithTech.Community.Cli` runs `migrate`.
+- **Migrations** — the API does not call `Database.Migrate()`. `QuinntyneBrown.Community.Cli` runs `migrate`.
 
 ## Requirements
 
@@ -42,7 +42,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-An operator probes FaithTech Community health and reads its logs.
+An operator probes QuinntyneBrown.Community health and reads its logs.
 
 ![C4 system context for reliability and observability](diagrams/c4-context.png)
 

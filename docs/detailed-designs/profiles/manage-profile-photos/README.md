@@ -15,7 +15,7 @@ Uploads accept JPEG, PNG or WebP files of 5 MB or less whose content matches the
 - **`EditProfilePage`** photo section — part of the `profiles` feature library, matching the `edit-profile` mock. It uses `PictureListComponent`, which checks type and size in the browser, disables *Add photos* at 10 photos and explains the limit. A chosen file appears as a *pending* photo (not saved yet, no *Feature* action) with an empty description; *Save profile* uploads each pending photo and saves changed descriptions. A missing description blocks the save with "Describe this photo" in the error summary. *Feature* acts at once. The featured photo's ring and its *Featured* badge sit on the thumbnail (badge top-left, *Remove* top-right), so every description field lines up across the grid and featuring another photo moves only the badge and ring.
 - **`DeletePhotoDialog`** — opened through `DialogService` from a saved photo's *Remove* button, matching the `delete-photo` mock (default, busy, failed). It calls `deletePhoto` and closes with the updated profile. A pending photo is removed without a dialog because nothing is stored yet.
 - **`ProfilesService`** — contract in the `api` library, provided through the `PROFILES_SERVICE` injection token and implemented by `HttpProfilesService`.
-- **`ProfilesEndpoints`** — minimal API route group in `FaithTech.Community.Api` under `/api/profiles`. Its endpoints require authentication by default and hold no business logic.
+- **`ProfilesEndpoints`** — minimal API route group in `QuinntyneBrown.Community.Api` under `/api/profiles`. Its endpoints require authentication by default and hold no business logic.
 - **`ICurrentUser`** — Application abstraction exposing the caller's user id and roles; **`ProfileAccess`** decides owner, audited System Admin or 403 (ADR 0004).
 - **`Profile`** — Domain entity holding `Name`, `Roles` and the `Photos` collection.
 - **`UploadPhotoCommand`** / **`UploadPhotoHandler`** — `POST /api/profiles/{id}/photos`, multipart fields `file` and `altText`, answering `201` with the `PhotoDto`. The handler checks permission, the 10-photo limit, alt text ("Describe this photo."), size (5 MB) and content against extension, answering `400` keyed `File` or `AltText` so each shows inline, then resizes, strips metadata, stores the blob under `profiles/{profileId}/{blobId}.{ext}` and adds a `ProfilePhoto`. The first photo becomes featured. If storage refuses the write, the photo is still added with `IsStored = false`, and a `PhotoBlobTask` (`Save`) holding the processed bytes commits in the same save. The response is still `201`, with `isStored: false` and `url: null` (ADR 0013).
@@ -54,7 +54,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-Members manage their own photos in FaithTech Community. Photo storage is part of the system, shown at container level.
+Members manage their own photos in QuinntyneBrown.Community. Photo storage is part of the system, shown at container level.
 
 ![C4 system context for managing profile photos](diagrams/c4-context.png)
 
@@ -90,7 +90,7 @@ Featuring clears every other featured flag. Deleting the featured photo after co
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `ProfilePhoto` rejects empty alt text; `Profile.AddPhoto` rejects an eleventh photo and features the first; `Profile.Feature` and `Profile.RemovePhoto` reject an unknown photo id. Domain rule violations throw `InvalidOperationException` (a broken rule) or `ArgumentException` (invalid input); there is no shared domain exception type. Handlers check permissions and preconditions first and map any remaining violation to a `400` or `409` result.
 - Photos persist in a `ProfilePhotos` table owned by `Profiles`.

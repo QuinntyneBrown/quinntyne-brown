@@ -5,7 +5,7 @@ title System Context — Archive, restore, purge and transfer resources
 Person(owner, "Owner", "Contributor who owns the resource")
 Person(admin, "System Admin", "Overrides anything on a resource and transfers ownership, audited")
 Person(newowner, "New owner", "Contributor who receives a transferred resource")
-System(community, "FaithTech Community", "Community site for FaithTech staff, leads, volunteers, builders and partners")
+System(community, "QuinntyneBrown.Community", "Community site for FaithTech staff, leads, volunteers, builders and partners")
 System_Ext(blob, "Azure Blob Storage", "Private resources container")
 System_Ext(mail, "Email provider", "SMTP / SendGrid")
 Rel(owner, community, "Archives and restores own resources using")

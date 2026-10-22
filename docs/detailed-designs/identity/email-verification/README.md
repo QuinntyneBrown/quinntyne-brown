@@ -14,8 +14,8 @@ An unverified account that signs in sees only the verify-email page with a resen
 
 - **`VerifyEmailPage`** — Angular page in the app shell, matching the `verify-email` mock. It shows the pending, success and expired-link states and offers a resend button.
 - **`AuthService`** — contract in the `api` library, provided through the `AUTH_SERVICE` injection token and implemented by `HttpAuthService`. It wraps the account endpoints and the OIDC + PKCE client.
-- **`AccountEndpoints`** — minimal API route group in `FaithTech.Community.Api`. It maps the account routes, opts each one into anonymous access explicitly, and forwards the request to the Application handler. It holds no business logic.
-- **`CommunityDbContext`** — EF Core context in `FaithTech.Community.Infrastructure`. It stores ASP.NET Identity users alongside community data in PostgreSQL.
+- **`AccountEndpoints`** — minimal API route group in `QuinntyneBrown.Community.Api`. It maps the account routes, opts each one into anonymous access explicitly, and forwards the request to the Application handler. It holds no business logic.
+- **`CommunityDbContext`** — EF Core context in `QuinntyneBrown.Community.Infrastructure`. It stores ASP.NET Identity users alongside community data in PostgreSQL.
 - **`ConfirmEmailCommand`** / **`ConfirmEmailHandler`** — Application request and handler. The handler validates the token through `UserManager.ConfirmEmailAsync`, rejects tokens older than 24 hours or already used, and sets `EmailConfirmed`.
 - **`ResendVerificationCommand`** / **`ResendVerificationHandler`** — Application request and handler. The handler counts resends in the last hour and rejects the fourth with a "try again later" result.
 - **`VerificationResendLog`** — Infrastructure record of resend timestamps per account. Its storage form (table or cache) is `<TO SUPPLY>`.
@@ -43,7 +43,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 
 ### System context
 
-The account holder confirms an email address in FaithTech Community, which sends verification links through the email provider.
+The account holder confirms an email address in QuinntyneBrown.Community, which sends verification links through the email provider.
 
 ![C4 system context for email verification](diagrams/c4-context.png)
 
@@ -79,6 +79,6 @@ The handler sends a fresh link unless more than 3 resends occurred in the last h
 
 ## Open questions
 
-Decisions recorded while building the Domain layer (`FaithTech.Community.Domain`):
+Decisions recorded while building the Domain layer (`QuinntyneBrown.Community.Domain`):
 
 - `EmailVerified` is a Domain record because `CommunityUser` is an Infrastructure Identity type; the Application handler raises it rather than an entity.
