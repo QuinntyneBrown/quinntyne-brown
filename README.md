@@ -11,14 +11,11 @@
 QuinntyneBrown.Community is the open-source community platform of Quinntyne Brown, Christian,
 Chief Product Officer and founder, and City Lead for [FaithTech](https://faithtech.com) Toronto.
 
-It serves the same purpose as a FaithTech city community: a home for staff, city leads, volunteers,
+It serves as a home for FaithTech staff, city leads, volunteers,
 builders, event attendees and partners, where leads get the tools to run a city: events, private
 contacts, a partner pipeline, their team and Agile workspaces with Planning Poker. It is also a
 space for anyone and everyone Quinntyne works with or engages with. Anyone can join and create a
 profile.
-
-> **Project status:** in development. Requirements, designs, mocks and the design system are in place,
-> and v1 is being built feature by feature. See [Project status](#project-status).
 
 ## Contents
 
@@ -40,7 +37,7 @@ profile.
 
 | Area | What it does |
 |---|---|
-| **Marketing page** | A public page at www.faithtech.community with a 21-second captioned brochure video, where visitors sign in, sign up or continue with Google and land in the community app. |
+| **Marketing page** | A public page at www.quinntynebrown.com with a 21-second captioned brochure video, where visitors sign in, sign up or continue with Google and land in the community app. |
 | **Profiles** | Every member has a profile with a name, bio and up to 10 photos (one featured, alt text required). Profiles are visible to signed-in members. |
 | **Events** | Members-only or public events with city, venue and an online/in-person flag. Public events get a shareable page with guest RSVP (no account needed) and an `.ics` download. Cancelling notifies everyone who RSVP'd. Hackathons are an event type. |
 | **Contacts** | Leads keep private contacts and notes, visible only to them and System Admin. When a contact signs up with the same verified email, the lead is notified and can link to the real profile while keeping their notes. Archive and restore. |
@@ -177,7 +174,7 @@ PYTHON=.cache/kokoro-venv/bin/python node eng/videos/brochure/build.mjs
 
 ### Deploy behind the private-preview wall
 
-`app.faithtech.community` and `www.faithtech.community` run as one Azure Container Apps app behind a server-side wall until private preview ends ([ADR 0026](docs/adr/0026-private-preview-wall-and-hosting.md)). The owner's steps, from DNS records to lifting the wall, are in the [runbook](docs/detailed-designs/platform/private-preview-wall/runbook.md).
+`app.faithtech.community` and `www.quinntynebrown.com` run as one Azure Container Apps app behind a server-side wall until private preview ends ([ADR 0026](docs/adr/0026-private-preview-wall-and-hosting.md)). The owner's steps, from DNS records to lifting the wall, are in the [runbook](docs/detailed-designs/platform/private-preview-wall/runbook.md).
 
 ```sh
 # Smoke-test the production images locally with the wall on (passphrase: "local smoke test passphrase")
