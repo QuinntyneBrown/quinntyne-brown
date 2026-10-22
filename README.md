@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/design-system/assets/logo.svg" alt="FaithTech" width="96" height="96">
+  <img src="docs/design-system/assets/qb-logo.svg" alt="QB" width="96" height="96">
 </p>
 
 # FaithTech Community
