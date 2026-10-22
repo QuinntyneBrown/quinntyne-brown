@@ -3,9 +3,9 @@
 using './main.bicep'
 
 param namePrefix = 'ftc'
-param appHost = 'app.faithtech.community'
-param wwwHost = 'www.faithtech.community'
-param cookieDomain = 'faithtech.community'
+param appHost = 'community.quinntynebrown.com'
+param wwwHost = 'www.quinntynebrown.com'
+param cookieDomain = 'quinntynebrown.com'
 param apiImage = readEnvironmentVariable('API_IMAGE', '')
 param cliImage = readEnvironmentVariable('CLI_IMAGE', '')
 param customDomainsStage = readEnvironmentVariable('CUSTOM_DOMAINS_STAGE', 'none')

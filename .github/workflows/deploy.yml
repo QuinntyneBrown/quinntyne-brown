@@ -1,0 +1,79 @@
+# Publishes the marketing page to https://www.quinntynebrown.com and the community app, API and identity server to
+# https://community.quinntynebrown.com: one container app serves both hosts (ADR 0026). Setup and DNS:
+# docs/detailed-designs/platform/private-preview-wall/runbook.md.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      shared_only:
+        description: Create only the shared resources (first run, before the Key Vault secrets exist)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    # Pushes deploy only once the owner sets the DEPLOY_ENABLED variable (runbook step 7); manual runs always may.
+    if: github.event_name == 'workflow_dispatch' || vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: backend/global.json
+      - name: Backend tests
+        run: dotnet test backend/QuinntyneBrown.Community.sln --configuration Release
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Frontend lint, format and build
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run format:check
+          npm run lint
+          npm run build:libs
+          npm run build
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://www.quinntynebrown.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy (shared resources, images, migrate, seed, API)
+        env:
+          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          POSTGRES_ADMIN_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
+          IMAGE_TAG: ${{ github.sha }}
+          CUSTOM_DOMAINS_STAGE: ${{ vars.CUSTOM_DOMAINS_STAGE || 'none' }}
+          PRIVATE_PREVIEW_ENABLED: ${{ vars.PRIVATE_PREVIEW_ENABLED || 'true' }}
+          GOOGLE_SIGN_IN_ENABLED: ${{ vars.GOOGLE_SIGN_IN_ENABLED || 'false' }}
+          SHARED_ONLY: ${{ inputs.shared_only || false }}
+        run: bash eng/deploy.sh
+      - name: Smoke check
+        if: ${{ !inputs.shared_only && vars.CUSTOM_DOMAINS_STAGE == 'bound' }}
+        run: |
+          for host in www.quinntynebrown.com community.quinntynebrown.com; do
+            curl -fsS --retry 10 --retry-delay 15 --retry-all-errors "https://$host/health/live"
+            echo " $host"
+          done

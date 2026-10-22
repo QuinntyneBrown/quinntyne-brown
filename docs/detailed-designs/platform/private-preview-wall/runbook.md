@@ -1,13 +1,13 @@
 # Runbook: deploy behind the private-preview wall
 
-What the owner runs and supplies to put QuinntyneBrown.Community on `app.faithtech.community` and `www.faithtech.community` behind the private-preview wall (ADR 0026, `README.md` in this folder). Nothing here is automated from the repository: it creates Azure resources, DNS records and production secrets, which cannot be undone from a pull request. Every command is for Bash (Azure Cloud Shell, macOS, Linux or WSL) with the Azure CLI signed in (`az login`).
+What the owner runs and supplies to put QuinntyneBrown.Community on `community.quinntynebrown.com` and `www.quinntynebrown.com` behind the private-preview wall (ADR 0026, `README.md` in this folder). Nothing here is automated from the repository: it creates Azure resources, DNS records and production secrets, which cannot be undone from a pull request. Every command is for Bash (Azure Cloud Shell, macOS, Linux or WSL) with the Azure CLI signed in (`az login`).
 
 ## What the owner supplies
 
 | Item | Where it goes |
 |------|---------------|
 | An Azure subscription and a region (for example `canadacentral`) | Steps 1 and 2 |
-| Control of DNS for `faithtech.community` | Step 6 |
+| Control of DNS for `quinntynebrown.com` | Step 6 |
 | A long private-preview passphrase (at least 16 characters; five or more random words is better) | Step 4, only its hash is stored |
 | SMTP credentials (SendGrid: user name `apikey` and an API key) | Step 4 |
 | A PostgreSQL administrator password (32+ random characters) | Step 2, GitHub secret |
@@ -20,7 +20,7 @@ Never commit any of these, paste them into an issue or pull request, or pass the
 ```bash
 RG=rg-faithtech-community
 LOCATION=canadacentral
-REPO=QuinntyneBrown/faithtech-community
+REPO=QuinntyneBrown/quinntyne-brown
 az group create --name "$RG" --location "$LOCATION"
 
 # An app registration that GitHub Actions signs in as, with no client secret (OpenID Connect).
@@ -83,34 +83,37 @@ unset SMTP_PASSWORD
 # az keyvault secret set --vault-name "$KV" --name google-client-secret --value ...
 ```
 
-The Google OAuth client's redirect URI is `https://app.faithtech.community/api/account/google/callback` (ADR 0019).
+The Google OAuth client's redirect URI is `https://community.quinntynebrown.com/api/account/google/callback` (ADR 0019).
 
 ## 5. First full deploy
 
-**Actions → Deploy → Run workflow** (box unticked). It tests the backend, pushes both images, runs `migrate` then `seed` as Container Apps jobs (the API never migrates on startup; `seed` is the production seed only: the `web` OpenIddict client for `https://app.faithtech.community`, the System Admin roster and the starter resources), and then rolls out the API. The log ends with the container app's address and the DNS verification ID. `https://<address>/health/live` answers `Healthy`; any other path answers 403 with the wall page. The wall cannot be unlocked on that address, because the unlock cookie is for `faithtech.community`.
+**Actions → Deploy → Run workflow** (box unticked). It tests the backend, pushes both images, runs `migrate` then `seed` as Container Apps jobs (the API never migrates on startup; `seed` is the production seed only: the `web` OpenIddict client for `https://community.quinntynebrown.com`, the System Admin roster and the starter resources), and then rolls out the API. The log ends with the container app's address and the DNS verification ID. `https://<address>/health/live` answers `Healthy`; any other path answers 403 with the wall page. The wall cannot be unlocked on that address, because the unlock cookie is for `quinntynebrown.com`.
 
 ## 6. DNS and certificates
 
-At the DNS provider for `faithtech.community`:
+At the DNS provider for `quinntynebrown.com`:
 
 | Type | Name | Value |
 |------|------|-------|
-| CNAME | `app` | the container app address from step 5 |
-| CNAME | `www` | the container app address from step 5 |
-| TXT | `asuid.app` | the DNS verification ID from step 5 |
+| CNAME | `community` | the container app address from step 5 |
+| CNAME | `www` | the container app address from step 5 (replaces `quinntynebrown.github.io`) |
+| TXT | `asuid.community` | the DNS verification ID from step 5 |
 | TXT | `asuid.www` | the DNS verification ID from step 5 |
+| URL Redirect (301) | `@` | `https://www.quinntynebrown.com` (replaces the four GitHub Pages `A` records) |
 
-When the records resolve (`dig +short CNAME app.faithtech.community`), set the GitHub variable `CUSTOM_DOMAINS_STAGE` = `issue` and run **Deploy**: it adds both hosts, has Azure issue a managed certificate for each, and binds them. Then set `CUSTOM_DOMAINS_STAGE` = `bound` and leave it there. HTTP is redirected to HTTPS and every response carries HSTS.
+The apex `quinntynebrown.com` is served by GitHub Pages from `QuinntyneBrown/quinntyne-brown-profile` until this step. Change the records above, keep the email records, then decommission that site: remove the Pages custom domain (`'{"cname":null}' | gh api -X PUT repos/QuinntyneBrown/quinntyne-brown-profile/pages --input -`) and disable its `deploy-pages.yml` workflow.
+
+When the records resolve (`dig +short CNAME community.quinntynebrown.com` and `www`), set the GitHub variable `CUSTOM_DOMAINS_STAGE` = `issue` and run **Deploy**: it adds both hosts, has Azure issue a managed certificate for each, and binds them. Then set `CUSTOM_DOMAINS_STAGE` = `bound` and leave it there. HTTP is redirected to HTTPS and every response carries HSTS.
 
 ## 7. Check, then deploy on every push
 
-1. Open `https://www.faithtech.community`: only "Private preview" and the passphrase field. Unlock: the marketing page appears, and `https://app.faithtech.community` opens without asking again.
-2. `curl -sI https://app.faithtech.community/api/me` → `403`, `X-Robots-Tag: noindex, nofollow`, no `Server` header.
+1. Open `https://www.quinntynebrown.com`: only "Private preview" and the passphrase field. Unlock: the marketing page appears, and `https://community.quinntynebrown.com` opens without asking again.
+2. `curl -sI https://community.quinntynebrown.com/api/me` → `403`, `X-Robots-Tag: noindex, nofollow`, no `Server` header.
 3. Set the variable `DEPLOY_ENABLED` = `true` to deploy every push to `main`.
 
 ## Make yourself System Admin
 
-Sign up on `app.faithtech.community` and verify the email, then run the Cli's `grant-admin` from your machine through a temporary firewall opening:
+Sign up on `community.quinntynebrown.com` and verify the email, then run the Cli's `grant-admin` from your machine through a temporary firewall opening:
 
 ```bash
 PG=$(az postgres flexible-server list --resource-group "$RG" --query "[0].name" --output tsv)
@@ -149,4 +152,4 @@ Set the GitHub variable `PRIVATE_PREVIEW_ENABLED` = `false` and run **Deploy**. 
 ## Known limits
 
 - One replica: lockouts and the Data Protection key ring are in memory, so a restart clears lockouts and invalidates outstanding verification, reset and unsubscribe links (ADR 0026; persisting the key ring is deferred).
-- The apex `faithtech.community` is not served or redirected (deferred).
+- The apex `quinntynebrown.com` is not served by the app; the DNS provider redirects it to `www`.

@@ -1,6 +1,6 @@
 // FaithTech Community on Azure Container Apps (ADR 0026, docs/detailed-designs/platform/private-preview-wall).
-// One container app serves app.faithtech.community (community app, API, identity server) and
-// www.faithtech.community (marketing page) behind the private-preview wall. Every secret lives in Key Vault; this
+// One container app serves community.quinntynebrown.com (community app, API, identity server) and
+// www.quinntynebrown.com (marketing page) behind the private-preview wall. Every secret lives in Key Vault; this
 // template holds none. Runbook: docs/detailed-designs/platform/private-preview-wall/runbook.md.
 
 targetScope = 'resourceGroup'
@@ -13,13 +13,13 @@ param namePrefix string = 'ftc'
 param location string = resourceGroup().location
 
 @description('Host of the community app, API and identity server.')
-param appHost string = 'app.faithtech.community'
+param appHost string = 'community.quinntynebrown.com'
 
 @description('Host of the marketing page.')
-param wwwHost string = 'www.faithtech.community'
+param wwwHost string = 'www.quinntynebrown.com'
 
 @description('Parent domain for the unlock cookie, so one unlock covers both hosts.')
-param cookieDomain string = 'faithtech.community'
+param cookieDomain string = 'quinntynebrown.com'
 
 @description('API image, for example <registry>/faithtech-community-api:<commit>. Empty leaves the container app as it is.')
 param apiImage string = ''
@@ -39,7 +39,7 @@ param googleSignInEnabled bool = false
 
 param smtpHost string = 'smtp.sendgrid.net'
 param smtpPort int = 587
-param smtpFrom string = 'FaithTech Community <no-reply@faithtech.community>'
+param smtpFrom string = 'FaithTech Community <no-reply@quinntynebrown.com>'
 
 param postgresAdminLogin string = 'ftcadmin'
 
