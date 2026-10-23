@@ -20,5 +20,5 @@ The marketing page embeds a brochure video of 30 seconds or less with a poster, 
 - Re-run `node eng/videos/brochure/build.mjs` when the script or the deck changes, and commit the three assets.
 - Kokoro needs Python 3.10+ with `pip install kokoro soundfile`; pass that interpreter as `PYTHON` (for example a venv in `.cache/kokoro-venv`). The model downloads once to the Hugging Face cache, then the build runs offline.
 - The current render (21 seconds) uses Kokoro `af_heart` at speed 1.1 (`KOKORO_VOICE`, `KOKORO_SPEED`). It replaced the first render's robotic espeak voice. The captions and timings are regenerated from each new narration.
-- 2026-10-23: re-rendered with the home-base script (first person, Shelfie and Sweet Hand, "make a profile") using `--engine edge` (`en-US-AndrewMultilingualNeural`), because Kokoro has no wheels for the ARM64 Windows build machine. The edge engine needs the network during the build.
+- 2026-10-23: re-rendered (16 seconds) with the home-base script (Shelfie and Sweet Hand, "make a profile") using `--engine edge` (`en-US-AndrewMultilingualNeural`), because Kokoro has no wheels for the ARM64 Windows build machine. The edge engine needs the network during the build.
 - The brochure is not in `docs/videos/journeys/` and is not recorded by `Record-JourneyVideos.ps1`.

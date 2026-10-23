@@ -2,7 +2,7 @@
 
 ## Overview
 
-The marketing page is QuinntyneBrown.Community's public front door at `www.faithtech.community`, and Quinntyne Brown's own page: a home base for the people he collaborates with. A visitor, who most likely already works with Quinntyne, meets him from a split hero and a 24-second brochure video, sees what is being built in the open, then signs in, signs up or continues with Google without leaving the page, and lands in the community app with a real authorization code + PKCE session.
+The marketing page is QuinntyneBrown.Community's public front door at `www.faithtech.community`, and Quinntyne Brown's own page: a home base for the people he collaborates with. A visitor, who most likely already works with Quinntyne, meets him from a split hero and a 16-second brochure video, sees what is being built in the open, then signs in, signs up or continues with Google without leaving the page, and lands in the community app with a real authorization code + PKCE session.
 
 **Marketing app** — the second Angular application in the workspace, `frontend/projects/marketing/`, served on its own host (ADR 0018)
 
@@ -50,7 +50,7 @@ Static content in `LandingPage`; nothing is fetched, so it renders for every vis
 
 ### Brochure video
 
-- Source in `eng/videos/brochure/`: `script.md` (the narration, 24 seconds: first person, Shelfie and Sweet Hand, "make a profile"), `deck.html` (a timed slide deck using the design-system tokens, mock photos and the project covers) and `build.mjs` (narration by Kokoro-82M `af_heart`, or edge-tts `en-US-AndrewMultilingualNeural` with `--engine edge` as in the current render, WebVTT captions, Playwright frame capture, ffmpeg mux) (ADR 0020). `node eng/videos/brochure/build.mjs` fails when the result is longer than 30 seconds.
+- Source in `eng/videos/brochure/`: `script.md` (the narration, 16 seconds: Shelfie and Sweet Hand, "make a profile"), `deck.html` (a timed slide deck using the design-system tokens, mock photos and the project covers) and `build.mjs` (narration by Kokoro-82M `af_heart`, or edge-tts `en-US-AndrewMultilingualNeural` with `--engine edge` as in the current render, WebVTT captions, Playwright frame capture, ffmpeg mux) (ADR 0020). `node eng/videos/brochure/build.mjs` fails when the result is longer than 30 seconds.
 - Shipped assets: `frontend/projects/marketing/public/brochure/brochure.webm`, `brochure-poster.jpg` and `brochure.en.vtt`. The captions are the script; the page shows no transcript.
 - `VideoPlayerComponent` renders `<video controls preload="none" poster>` with a default English captions track and no `autoplay`; on the media `error` event it swaps to the poster image with a warning alert.
 
