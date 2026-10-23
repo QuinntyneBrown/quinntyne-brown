@@ -7,7 +7,7 @@ import { LogoMarkComponent } from './logo-mark.component';
   template: `<ft-logo-mark [label]="label()" />`,
 })
 class HostComponent {
-  label = signal('FaithTech');
+  label = signal('QB');
 }
 
 function setup() {
@@ -18,10 +18,10 @@ function setup() {
 }
 
 describe('LogoMarkComponent', () => {
-  it('is an image named FaithTech by default', () => {
+  it('is an image named QB by default', () => {
     const { svg } = setup();
     expect(svg().getAttribute('role')).toBe('img');
-    expect(svg().getAttribute('aria-label')).toBe('FaithTech');
+    expect(svg().getAttribute('aria-label')).toBe('QB');
   });
 
   it('uses the 64 unit artwork', () => {
