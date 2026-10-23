@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 /**
- * The FaithTech mark tile for the auth screens. Named "FaithTech" by default; pass an empty `label`
+ * The QB monogram tile for the auth screens and top bar. Named "QB" by default; pass an empty `label`
  * when a visible brand name sits next to it so the name is not read twice.
  */
 @Component({
@@ -11,5 +11,5 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LogoMarkComponent {
-  readonly label = input('FaithTech');
+  readonly label = input('QB');
 }

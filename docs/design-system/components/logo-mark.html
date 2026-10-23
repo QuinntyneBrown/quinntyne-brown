@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Logo mark — QuinntyneBrown.Community design system</title>
-<meta name="description" content="The FaithTech logo mark: a 64px tile holding logo.svg, centred above the card on sign in, sign up, verify email, invite and password screens.">
+<meta name="description" content="The QB logo mark: a 64px tile holding logo.svg, centred above the card on sign in, sign up, verify email, invite and password screens.">
 <link rel="stylesheet" href="../tokens/tokens.css">
 <link rel="stylesheet" href="../assets/components.css">
 <link rel="stylesheet" href="../assets/ds.css">
@@ -111,7 +111,7 @@
     <header class="ds-header">
       <p class="ds-kicker">Component · Identity</p>
       <h1>Logo mark</h1>
-      <p class="ds-lead">The FaithTech mark as its own tile: a violet rounded square with a white cross inside a faint ring. It sits centred above the card on every sign-in style screen.</p>
+      <p class="ds-lead">The QB monogram as its own tile: a violet rounded square with white pixel-style "q" and "B" letters, a cross rising from the B. It sits centred above the card on every sign-in style screen and, at 32px, in the top bar.</p>
       <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: stable</span><span class="ds-pill"><code>&lt;span&gt;</code> with <code>&lt;img&gt;</code></span></div>
       <ul class="ds-toc">
         <li><a href="#overview">Overview</a></li><li><a href="#anatomy">Anatomy</a></li><li><a href="#variants">Variants</a></li><li><a href="#sizes">Sizes</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive</a></li><li><a href="#theming">Theming</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don't</a></li><li><a href="#tokens">Tokens</a></li><li><a href="#code">Code</a></li><li><a href="#sources">Sources</a></li>
@@ -126,7 +126,7 @@
     <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
       <div class="ds-anatomy">
         <figure class="ds-anatomy__figure">
-          <span class="logo-mark"><img src="../assets/logo.svg" alt="FaithTech" width="64" height="64"></span>
+          <span class="logo-mark"><img src="../assets/logo.svg" alt="QB" width="64" height="64"></span>
           <span class="ds-callout" style="left: 50%; top: 20%;" aria-hidden="true">1</span>
           <span class="ds-callout" style="left: 50%; top: 55%;" aria-hidden="true">2</span>
           <span class="ds-callout" style="left: 50%; top: 92%;" aria-hidden="true">3</span>
@@ -143,10 +143,10 @@
       <p>Not applicable: there is one logo mark, wrapped in <code>.logo</code> on the auth card. The FaithTech mocks do not animate it.</p>
       <div class="ds-example">
         <div class="ds-example__canvas">
-          <div class="logo"><span class="logo-mark"><img src="../assets/logo.svg" alt="FaithTech" width="64" height="64"></span></div>
+          <div class="logo"><span class="logo-mark"><img src="../assets/logo.svg" alt="QB" width="64" height="64"></span></div>
         </div>
         <div class="ds-example__caption"><span>Exactly as it appears above the Sign in card.</span></div>
-        <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class="logo"&gt;&lt;span class="logo-mark"&gt;&lt;img src="../../assets/logo.svg" alt="FaithTech" width="64" height="64"&gt;&lt;/span&gt;&lt;/div&gt;</code></pre></details>
+        <details class="ds-example__code"><summary>HTML</summary><pre><code>&lt;div class="logo"&gt;&lt;span class="logo-mark"&gt;&lt;img src="../../assets/logo.svg" alt="QB" width="64" height="64"&gt;&lt;/span&gt;&lt;/div&gt;</code></pre></details>
       </div>
     </section>
 
@@ -168,14 +168,14 @@
     <section class="ds-section" id="theming"><h2><a href="#theming">Theming</a></h2>
       <p>The SVG carries its own brand violet and white, so the artwork is identical in light and dark. Only the shadow changes, because <code>--shadow-2</code> is redefined per theme. If FaithTech supplies brand colours, replace <code>logo.svg</code>; no token change is needed.</p>
       <div class="ds-themes">
-        <div data-theme="light"><div class="cluster"><span class="logo-mark"><img src="../assets/logo.svg" alt="FaithTech" width="64" height="64"></span></div></div>
-        <div data-theme="dark"><div class="cluster"><span class="logo-mark"><img src="../assets/logo.svg" alt="FaithTech" width="64" height="64"></span></div></div>
+        <div data-theme="light"><div class="cluster"><span class="logo-mark"><img src="../assets/logo.svg" alt="QB" width="64" height="64"></span></div></div>
+        <div data-theme="dark"><div class="cluster"><span class="logo-mark"><img src="../assets/logo.svg" alt="QB" width="64" height="64"></span></div></div>
       </div>
     </section>
 
     <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
       <h3>Role and pattern</h3>
-      <p>An image with <code>alt="FaithTech"</code>, as the mocks use. On auth pages there is no other brand name, so the mark identifies the site; the page <code>&lt;h1&gt;</code> ("Sign in", "Create your account") then names the screen. If a visible "QuinntyneBrown.Community" heading is ever added next to it, switch to <code>alt=""</code> so the name is not read twice.</p>
+      <p>An image with <code>alt="QB"</code>, as the mocks use. On auth pages there is no other brand name, so the mark identifies the site; the page <code>&lt;h1&gt;</code> ("Sign in", "Create your account") then names the screen. If a visible "QuinntyneBrown.Community" heading is ever added next to it, switch to <code>alt=""</code> so the name is not read twice.</p>
       <h3>Keyboard and focus</h3>
       <p>Not interactive and never in the tab order. It is not a link home; auth pages have no home to return to.</p>
       <h3>Contrast</h3>
@@ -188,13 +188,13 @@
       <ul>
         <li>Never put text inside the tile or a caption over it.</li>
         <li>Never redraw the mark with an icon or emoji; always use <code>logo.svg</code>.</li>
-        <li>Alt text is the organisation name only: "FaithTech", not "FaithTech logo".</li>
+        <li>Alt text is the organisation name only: "QB", not "QB logo".</li>
       </ul>
     </section>
 
     <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don't</a></h2>
       <div class="ds-dodont">
-        <figure class="ds-do"><div class="ds-example__canvas"><span class="logo-mark"><img src="../assets/logo.svg" alt="FaithTech" width="64" height="64"></span></div><figcaption>Use the tile once, centred above the auth card.</figcaption></figure>
+        <figure class="ds-do"><div class="ds-example__canvas"><span class="logo-mark"><img src="../assets/logo.svg" alt="QB" width="64" height="64"></span></div><figcaption>Use the tile once, centred above the auth card.</figcaption></figure>
         <figure class="ds-dont"><div class="ds-example__canvas"><span class="avatar avatar--lg" aria-hidden="true">FT</span></div><figcaption>Don't stand in initials or an avatar for the mark. That reads as a person, not the organisation.</figcaption></figure>
       </div>
     </section>
@@ -214,7 +214,7 @@
     <section class="ds-section" id="code"><h2><a href="#code">Code</a></h2>
       <pre><code>&lt;div class="logo"&gt;
   &lt;span class="logo-mark"&gt;
-    &lt;img src="../../assets/logo.svg" alt="FaithTech" width="64" height="64"&gt;
+    &lt;img src="../../assets/logo.svg" alt="QB" width="64" height="64"&gt;
   &lt;/span&gt;
 &lt;/div&gt;</code></pre>
       <table class="ds-table"><thead><tr><th scope="col">Class</th><th scope="col">Effect</th></tr></thead><tbody>
