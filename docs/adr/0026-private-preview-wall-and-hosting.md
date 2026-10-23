@@ -33,3 +33,7 @@ QuinntyneBrown.Community is about to be deployed to `app.faithtech.community` an
 ## Addendum (2026-10-23): hosts moved to quinntynebrown.com
 
 The site is deployed as `app.quinntynebrown.com` (community app, API, identity server) and `www.quinntynebrown.com` (marketing page), with the unlock cookie and the session hint on `quinntynebrown.com`. Nothing else in this decision changes: the two hosts are still one site on one parent domain, which is what the wall cookie and the marketing page's credentialed calls need. `eng/infra/main.bicepparam`, the production environment files of both Angular applications, the runbook and `.github/workflows/` carry the new hosts; the Google and GitHub OAuth callbacks are `https://app.quinntynebrown.com/api/account/{google,github}/callback`.
+
+## Addendum (2026-10-23): private preview ended
+
+The wall is lifted: `eng/deploy.sh`, `eng/infra/main.bicepparam` and `.github/workflows/deploy.yml` default `PRIVATE_PREVIEW_ENABLED` to `false`, so `www.quinntynebrown.com` and `app.quinntynebrown.com` are open to everyone. The middleware, its tests and the Key Vault secrets stay in place; the GitHub variable `PRIVATE_PREVIEW_ENABLED=true` puts the wall back without a code change. The API's own default (`PrivatePreview:Enabled` = `true` outside Development) is unchanged, so a container started without the variable still refuses to serve until it is told otherwise.

@@ -149,9 +149,9 @@ restart
 
 A restart also clears lockouts, which live in memory.
 
-## Lift the wall
+## The wall is off (private preview ended 2026-10-23)
 
-Set the GitHub variable `PRIVATE_PREVIEW_ENABLED` = `false` and run **Deploy**. The site is then open to everyone, `X-Robots-Tag` and the wall's `robots.txt` stop, and sign-in and every permission rule apply exactly as before. To put the wall back, set it to `true` and deploy.
+The Deploy workflow, `eng/deploy.sh` and `main.bicepparam` default `PRIVATE_PREVIEW_ENABLED` to `false`: both sites are open to everyone, `X-Robots-Tag` and the wall's `robots.txt` are off, and sign-in and every permission rule apply exactly as before. To put the wall back, set the GitHub variable `PRIVATE_PREVIEW_ENABLED` = `true` and run **Deploy** (the hash and key are still in Key Vault); set it to `false` or delete it to lift it again.
 
 ## Known limits
 

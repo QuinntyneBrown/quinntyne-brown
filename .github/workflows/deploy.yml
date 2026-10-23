@@ -7,7 +7,7 @@
 # every successful CI run on main. Repository variables steer the stages (runbook.md):
 #   AZURE_RESOURCE_GROUP      the resource group (required)
 #   CUSTOM_DOMAINS_STAGE      none | issue | bound
-#   PRIVATE_PREVIEW_ENABLED   true | false (lift the wall)
+#   PRIVATE_PREVIEW_ENABLED   false (default) | true to put the wall back
 #   GOOGLE_SIGN_IN_ENABLED    true once google-client-id/secret are in Key Vault
 #   GH_SIGN_IN_ENABLED        true once github-client-id/secret are in Key Vault
 name: Deploy
@@ -45,7 +45,7 @@ jobs:
     env:
       RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
       CUSTOM_DOMAINS_STAGE: ${{ vars.CUSTOM_DOMAINS_STAGE || 'none' }}
-      PRIVATE_PREVIEW_ENABLED: ${{ vars.PRIVATE_PREVIEW_ENABLED || 'true' }}
+      PRIVATE_PREVIEW_ENABLED: ${{ vars.PRIVATE_PREVIEW_ENABLED || 'false' }}
       GOOGLE_SIGN_IN_ENABLED: ${{ vars.GOOGLE_SIGN_IN_ENABLED || 'false' }}
       GITHUB_SIGN_IN_ENABLED: ${{ vars.GH_SIGN_IN_ENABLED || 'false' }}
       SHARED_ONLY: ${{ inputs.shared_only && 'true' || 'false' }}
