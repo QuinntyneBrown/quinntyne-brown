@@ -2,9 +2,8 @@
   <ft-container>
     <div class="landing">
       <ft-landing-hero
-        eyebrow="Quinntyne Brown"
-        heading="Builds software. Builds community."
-        lead="I’m Quinntyne Brown: a Christian, a Chief Product Officer and founder, and City Lead for FaithTech Toronto. This is home for the builders, leads, volunteers and partners I work with. Make a profile, meet the community and build with us."
+        heading="Let’s build great products together. Welcome."
+        lead="I’m Quinntyne Brown — a Christian, a founder who builds and ships products. If we’re working on something together, this is where it lives: the people, the events, the notes and the backlog. Make a profile so we can stay connected."
       >
         <ft-cluster ftHeroActions gap="2">
           <ft-button variant="outline" size="sm" [href]="linkedInUrl" target="_blank"
@@ -39,11 +38,8 @@
               </p>
             </ft-empty-state>
           } @else if (joining()) {
-            <h2 #panelHeading tabindex="-1">Join Quinntyne Brown</h2>
-            <p class="text-muted">
-              Free for builders, leads, volunteers, partners and anyone curious about faith and
-              technology.
-            </p>
+            <h2 #panelHeading tabindex="-1">Create your profile</h2>
+            <p class="text-muted">So we can stay connected on what we’re building together.</p>
             <ft-sign-up-form
               divider="or"
               [busy]="busy()"
@@ -103,8 +99,10 @@
               >
             </ft-sign-in-form>
             <p class="text-center">
-              New to Quinntyne Brown?
-              <ft-button variant="ghost" size="sm" (click)="show('join')">Join now</ft-button>
+              First time here?
+              <ft-button variant="ghost" size="sm" (click)="show('join')"
+                >Create a profile</ft-button
+              >
             </p>
           }
         </ft-card>
@@ -112,54 +110,30 @@
           ftHeroMedia
           src="/brochure/brochure.webm"
           poster="/brochure/brochure-poster.jpg"
-          posterAlt="FaithTech builders pairing at a hackathon table"
+          posterAlt="Quinntyne Brown’s open-source projects: the Shelfie and Sweet Hand covers"
           captions="/brochure/brochure.en.vtt"
-          label="Quinntyne Brown in 21 seconds"
-          caption="Quinntyne Brown in 21 seconds · captions on"
+          label="Quinntyne Brown in 16 seconds"
         />
       </ft-landing-hero>
-      <ft-landing-section eyebrow="Work" heading="Fifteen years shipping.">
-        <div class="landing__figures">
-          @for (figure of figures; track figure.label) {
-            <ft-stat variant="figure" [label]="figure.label" [value]="figure.value" />
-          }
-        </div>
-        <ul class="landing__employers" aria-label="Where I’ve worked">
-          @for (employer of employers; track employer) {
-            <li>
-              <ft-badge variant="role">{{ employer }}</ft-badge>
-            </li>
-          }
-        </ul>
-      </ft-landing-section>
-      <ft-landing-section eyebrow="Pinned on GitHub" heading="Things I’m building.">
+      <ft-landing-section heading="What I’m building in the open. Jump in anywhere.">
         <ul class="landing__projects">
           @for (project of projects; track project.name) {
             <ft-project-card
               [name]="project.name"
               [language]="project.language"
-              [href]="projectUrl(project.name)"
+              [description]="project.description"
+              [href]="projectUrl(project.repo)"
+              [image]="'/projects/' + project.image + '.webp'"
             />
           }
         </ul>
         <p><ft-link [href]="gitHubUrl">All on GitHub →</ft-link></p>
       </ft-landing-section>
-      <section class="landing__section" aria-labelledby="why-join">
-        <h2 id="why-join">Why join</h2>
-        <ft-grid [auto]="true">
-          <ft-benefit icon="team" heading="Find your city team">
-            See who builds near you, from first-time volunteers to city leads.
-          </ft-benefit>
-          <ft-benefit icon="events" heading="Show up together">
-            RSVP to builders nights and hackathons, and add them to your calendar.
-          </ft-benefit>
-          <ft-benefit icon="workspaces" heading="Build what matters">
-            Plan projects with your team that serve churches, shelters and neighbours.
-          </ft-benefit>
-        </ft-grid>
-      </section>
-      <ft-cta-band heading="Ready to build with us?" text="It’s free, and it takes a minute.">
-        <ft-button variant="primary" size="lg" (click)="show('join')">Join now</ft-button>
+      <ft-cta-band
+        heading="Let’s stay connected."
+        text="Make a profile so we can keep building together."
+      >
+        <ft-button variant="primary" size="lg" (click)="show('join')">Create a profile</ft-button>
       </ft-cta-band>
     </div>
   </ft-container>

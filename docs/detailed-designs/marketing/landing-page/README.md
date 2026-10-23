@@ -2,7 +2,7 @@
 
 ## Overview
 
-The marketing page is QuinntyneBrown.Community's public front door at `www.faithtech.community`, and Quinntyne Brown's own page: part résumé, part invitation. A visitor meets Quinntyne Brown and learns what the community is from a split hero and a 21-second brochure video, sees the work behind it and what is being built now, then signs in, signs up or continues with Google without leaving the page, and lands in the community app with a real authorization code + PKCE session.
+The marketing page is QuinntyneBrown.Community's public front door at `www.faithtech.community`, and Quinntyne Brown's own page: a home base for the people he collaborates with. A visitor, who most likely already works with Quinntyne, meets him from a split hero and a 16-second brochure video, sees what is being built in the open, then signs in, signs up or continues with Google without leaving the page, and lands in the community app with a real authorization code + PKCE session.
 
 **Marketing app** — the second Angular application in the workspace, `frontend/projects/marketing/`, served on its own host (ADR 0018)
 
@@ -12,7 +12,7 @@ The marketing page is QuinntyneBrown.Community's public front door at `www.faith
 
 **Session hint** — the non-secret `ftc.signed-in=1` cookie the community app writes for the shared parent domain while it keeps a "Keep me signed in" session; it only decides a redirect
 
-Composition follows a split product hero (headline, profile links and video beside the sign-in form at desktop, stacked on phones), then a work section with figures and employers, a grid of pinned projects, short benefit sections, one call to action and one footer. Every colour, type and spacing value comes from `docs/design-system/tokens/`.
+Composition follows a split product hero (headline, profile links and video beside the sign-in form at desktop, stacked on phones), then a grid of pinned projects, one call to action and one footer. Every colour, type and spacing value comes from `docs/design-system/tokens/`.
 
 ## Description
 
@@ -26,8 +26,8 @@ Composition follows a split product hero (headline, profile links and video besi
 
 ### Marketing app
 
-- **`MarketingAppComponent`** — the shell: `SkipLinkComponent`, `TopBarComponent` `anonymous` with *Join now* and *Sign in*, the router outlet and `SiteFooterComponent`. Routes: `''` → `LandingPage`; `'**'` → redirect to `''`.
-- **`LandingPage`** — composes `LandingHeroComponent` with the profile links (`ftHeroActions`), the panel (`CardComponent` holding `SignInFormComponent` or `SignUpFormComponent`, the Google button in `ftAuthAlternatives`) and the media (`VideoPlayerComponent`); the work section; the projects section; three `BenefitComponent`s and the `CtaBandComponent`. Query parameters drive its state: `join` shows the sign-up form, `google=failed|suspended` shows the Google outcome, `returnUrl` is carried into the hand-off. On init it calls `AUTH_SERVICE.hasKeptSession()` and replaces the location with the community app home when it is true (L2-074 AC6).
+- **`MarketingAppComponent`** — the shell: `SkipLinkComponent`, `TopBarComponent` `anonymous` with *Create a profile* and *Sign in*, the router outlet and `SiteFooterComponent`. Routes: `''` → `LandingPage`; `'**'` → redirect to `''`.
+- **`LandingPage`** — composes `LandingHeroComponent` with the profile links (`ftHeroActions`), the panel (`CardComponent` holding `SignInFormComponent` or `SignUpFormComponent`, the Google button in `ftAuthAlternatives`) and the media (`VideoPlayerComponent`, `label` only, no `caption`); the projects section; and the `CtaBandComponent` ("Let’s stay connected." / "Make a profile so we can keep building together." / *Create a profile*). Query parameters drive its state: `join` shows the sign-up form, `google=failed|suspended` shows the Google outcome, `returnUrl` is carried into the hand-off. On init it calls `AUTH_SERVICE.hasKeptSession()` and replaces the location with the community app home when it is true (L2-074 AC6).
 - **Sign in** — the page posts through `AUTH_SERVICE.signInWithPassword`, shows the same failures as the app's sign-in page through `SignInFormComponent`, and on success shows "Signing you in…" (with the unverified notice when `emailVerified` is false) and navigates to `${COMMUNITY_ORIGIN}/auth/continue?returnUrl=…&keepSignedIn=1|0`. Only app-relative `returnUrl`s (`/…`, not `//…`) are carried.
 - **Sign up** — `AUTH_SERVICE.signUp`, `signUpFieldErrors` from `api` for server validation, "Check your inbox" with a link to `${COMMUNITY_ORIGIN}/verify-email?email=…` to send it again.
 - **Google** — `AUTH_SERVICE.signInWithGoogle(returnUrl, keepSignedIn)` navigates to `${api}/account/google/start`; the button shows busy until the browser leaves (`docs/detailed-designs/identity/google-sign-in`).
@@ -37,11 +37,10 @@ Composition follows a split product hero (headline, profile links and video besi
 
 Static content in `LandingPage`; nothing is fetched, so it renders for every visitor and keeps the page free of member data.
 
-- **Hero copy** — eyebrow "Quinntyne Brown", `<h1>` "Builds software. Builds community.", and a first-person lead that introduces Quinntyne Brown and invites the visitor to make a profile.
+- **Hero copy** — no eyebrow; `<h1>` "Let’s build great products together. Welcome."; a first-person lead that introduces Quinntyne Brown, says this is where the work he shares with the visitor lives, and asks them to make a profile so they can stay connected. The sign-in panel says "First time here?" before *Create a profile*; the sign-up panel is headed "Create your profile" with the subline "So we can stay connected on what we’re building together."
 - **Profile links** — a `ClusterComponent` in the hero's new `ftHeroActions` slot, under the lead: `ButtonComponent` links (`href`) "LinkedIn" (`https://www.linkedin.com/in/quinntynebrown`) and "GitHub" (`https://github.com/QuinntyneBrown`), both `target="_blank"` (the button adds `rel="noopener"`), and "Download résumé" pointing at `/resume/quinntyne-brown-resume.pdf` with the `download` attribute. `ButtonComponent` gains a `download` input, set on its `<a>`.
-- **Work** — a section labelled by its `<h2>` "Fifteen years shipping.", with the `.overline` eyebrow "Work"; four `StatComponent`s with the new `figure` variant (value above label in the accent colour; the label stays first in the DOM and names the group) in a `ClusterComponent`, then the employers as `role` `BadgeComponent`s in a labelled list.
-- **Things I’m building** — a section labelled by "Things I’m building.", eyebrow "Pinned on GitHub"; a `<ul>` grid of the new `ProjectCardComponent` (`listitem`): a decorative thumbnail (an image from `public/projects/` when one is given, else a tinted tile with the project's initial), the name as the card's only link (stretched over the card) and the language. Each project links to its GitHub repository search (`https://github.com/QuinntyneBrown?tab=repositories&q=<name>`) until the exact repository URLs are confirmed; "All on GitHub →" is an `ft-link` to the profile.
-- **Assets** — `public/resume/quinntyne-brown-resume.pdf` and optional `public/projects/<slug>.png` thumbnails, served from the marketing origin, so the CSP's `img-src 'self'` holds.
+- **What I’m building in the open** — a section labelled by "What I’m building in the open. Jump in anywhere.", no eyebrow; a `<ul>` grid of `ProjectCardComponent` (`listitem`): a decorative thumbnail (an image from `public/projects/` when one is given, else a tinted tile with the project's initial), the name as the card's only link (stretched over the card), the languages and a one-line `description` of the project (`.project-card__description`, caption type, full width under the name). Each project shows its cover from `public/projects/<slug>.webp` and links to its GitHub repository (`https://github.com/QuinntyneBrown/<repo>`); "All on GitHub →" is an `ft-link` to the profile.
+- **Assets** — `public/resume/quinntyne-brown-resume.pdf` and `public/projects/<slug>.webp` project covers, served from the marketing origin, so the CSP's `img-src 'self'` holds.
 
 ### Community app
 
@@ -51,9 +50,9 @@ Static content in `LandingPage`; nothing is fetched, so it renders for every vis
 
 ### Brochure video
 
-- Source in `eng/videos/brochure/`: `script.md` (the narration, 21 seconds), `deck.html` (a timed slide deck using the design-system tokens and mock photos) and `build.mjs` (Kokoro-82M `af_heart` narration and WebVTT captions, Playwright frame capture, ffmpeg mux) (ADR 0020). `node eng/videos/brochure/build.mjs` fails when the result is longer than 30 seconds.
+- Source in `eng/videos/brochure/`: `script.md` (the narration, 16 seconds: Shelfie and Sweet Hand, "make a profile"), `deck.html` (a timed slide deck using the design-system tokens, mock photos and the project covers) and `build.mjs` (narration by Kokoro-82M `af_heart`, or edge-tts `en-US-AndrewMultilingualNeural` with `--engine edge` as in the current render, WebVTT captions, Playwright frame capture, ffmpeg mux) (ADR 0020). `node eng/videos/brochure/build.mjs` fails when the result is longer than 30 seconds.
 - Shipped assets: `frontend/projects/marketing/public/brochure/brochure.webm`, `brochure-poster.jpg` and `brochure.en.vtt`. The captions are the script; the page shows no transcript.
-- `VideoPlayerComponent` renders `<video controls preload="none" poster>` with a default English captions track and no `autoplay`; on the media `error` event it swaps to the poster image with a warning alert.
+- `VideoPlayerComponent` renders `<video controls preload="none" poster>` with an English captions track that is off until the visitor turns it on (`captionsOn` defaults to false) and no `autoplay`; on the media `error` event it swaps to the poster image with a warning alert.
 
 ### Security and privacy
 
@@ -71,7 +70,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 | `L2-076` | `L1-001`, `L1-021` | Sign in from the marketing page with every `L2-003` outcome. |
 | `L2-077` | `L1-001`, `L1-021` | Sign up from the marketing page with every `L2-001` outcome. |
 | `L2-079` | `L1-015`, `L1-021` | Rate limiting, no enumeration difference, CORS, CSP, no trackers. |
-| `L2-132` | `L1-021` | Quinntyne Brown on the page: hero copy, LinkedIn, GitHub and résumé links, work figures and employers, pinned projects. |
+| `L2-132` | `L1-021` | Quinntyne Brown on the page: hero copy, LinkedIn, GitHub and résumé links, pinned projects with descriptions, the call to action. |
 
 Google sign-in (`L2-078`) is designed in [`identity/google-sign-in`](../../identity/google-sign-in/README.md). The rules reused from `L2-001`, `L2-002`, `L2-003`, `L2-004`, `L2-039`, `L2-043`, `L2-044` and `L2-045` are cross-referenced, not repeated.
 
@@ -121,5 +120,5 @@ The session hint sends the member straight to the community app, which still val
 
 1. A session that is not kept lives in one tab's session storage, so the marketing page cannot see it and shows the page; the visitor signs in again (consistent with `L2-003` AC8).
 2. Hosting, DNS, certificates and the CSP header are deferred; the policy above is the requirement for whoever hosts it.
-3. The exact GitHub repository URLs for the pinned projects, their screenshots and the final résumé PDF are supplied by Quinntyne Brown; until then the cards link to a repository search and show initial tiles.
+3. The final résumé PDF is supplied by Quinntyne Brown.
 4. The Google button on the community app's own sign-in page, other providers, testimonials, pricing, analytics, cookie banners and further marketing pages are deferred.

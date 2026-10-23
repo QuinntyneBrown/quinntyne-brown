@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core
 import { AlertComponent } from '../alert/alert.component';
 
 /**
- * A self-hosted video with the browser's own controls, a poster and a default captions track
+ * A self-hosted video with the browser's own controls, a poster and a captions track (off by default)
  * (docs/design-system/components/video-player.html). It never autoplays. When the file cannot
  * play it shows the poster with a message.
  */
@@ -20,8 +20,10 @@ export class VideoPlayerComponent {
   readonly poster = input.required<string>();
   /** Alt text for the poster when it stands in for a video that cannot play. */
   readonly posterAlt = input.required<string>();
-  /** WebVTT captions, shown by default. */
+  /** WebVTT captions, offered in the browser's controls. */
   readonly captions = input.required<string>();
+  /** Whether the captions start switched on; off by default, so the viewer chooses. */
+  readonly captionsOn = input(false);
   readonly captionsLanguage = input('en');
   readonly captionsLabel = input('English');
   /** Accessible name of the video, including its length. */

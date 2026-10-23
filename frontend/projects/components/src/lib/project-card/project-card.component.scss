@@ -66,3 +66,10 @@
   font: var(--text-caption);
   color: var(--color-fg-muted);
 }
+
+.project-card__description {
+  flex-basis: 100%;
+  margin: 0;
+  font: var(--text-caption);
+  color: var(--color-fg-muted);
+}

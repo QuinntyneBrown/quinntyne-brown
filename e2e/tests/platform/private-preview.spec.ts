@@ -112,7 +112,7 @@ test.describe('Private preview wall', () => {
     await wall.unlockWith(api.wall.passphrase);
 
     await expect(marketing.heading).toBeVisible();
-    await expect(marketing.eyebrow).toBeVisible();
+    await expect(marketing.lead).toBeVisible();
     await signIn.open();
     await expect(signIn.heading).toBeVisible();
     await expect(wall.heading).toHaveCount(0);

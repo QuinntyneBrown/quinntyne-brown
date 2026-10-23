@@ -10,16 +10,14 @@ test.describe('Marketing page', () => {
     await marketing.open();
 
     await expect(marketing.heading).toBeVisible();
-    await expect(marketing.eyebrow).toBeVisible();
     await expect(marketing.lead).toBeVisible();
     await expect(marketing.topBarJoin).toBeVisible();
     await expect(marketing.topBarSignIn).toBeVisible();
-    await expect(marketing.benefitsHeading).toBeVisible();
-    await expect(marketing.benefits).toHaveText([
-      'Find your city team',
-      'Show up together',
-      'Build what matters',
-    ]);
+    await expect(marketing.panel).toContainText('First time here?');
+    await expect(marketing.panelJoin).toBeVisible();
+    await expect(marketing.callToAction).toContainText(
+      'Make a profile so we can keep building together.',
+    );
     await expect(marketing.callToActionJoin).toBeVisible();
     await expect(marketing.footer).toContainText('© 2026 Quinntyne Brown');
     await axe.check();
@@ -33,9 +31,10 @@ test.describe('Marketing page', () => {
 
     await marketing.open();
 
-    await expect(marketing.eyebrow).toBeVisible();
     await expect(marketing.heading).toBeVisible();
-    await expect(marketing.lead).toBeVisible();
+    await expect(marketing.lead).toHaveText(
+      'I’m Quinntyne Brown — a Christian, a founder who builds and ships products. If we’re working on something together, this is where it lives: the people, the events, the notes and the backlog. Make a profile so we can stay connected.',
+    );
     await expect(marketing.linkedIn).toHaveAttribute(
       'href',
       'https://www.linkedin.com/in/quinntynebrown',
@@ -63,48 +62,61 @@ test.describe('Marketing page', () => {
     expect((await download).suggestedFilename()).toBe('quinntyne-brown-resume.pdf');
   });
 
-  // Traces to: L2-132 AC3
-  test('the work section shows the figures and the employers', async ({ page }) => {
-    const marketing = new MarketingPage(page);
-
-    await marketing.open();
-
-    await expect(marketing.workEyebrow).toBeVisible();
-    expect(await marketing.figureTexts()).toEqual([
-      { value: '15+', label: 'years' },
-      { value: '2×', label: 'faster Canadarm3 software' },
-      { value: '10×', label: 'serialization throughput' },
-      { value: '~30', label: 'developers mentored' },
-    ]);
-    await expect(marketing.employers).toHaveText([
-      'MDA',
-      'Protiviti',
-      'RBC Ventures',
-      'AutoTrader.ca',
-      'Corus',
-    ]);
-  });
-
   // Traces to: L2-132 AC4
-  test('things I’m building lists the pinned projects, each linking to GitHub', async ({
+  test('what I’m building in the open lists the pinned projects, each linking to GitHub', async ({
     page,
   }) => {
     const marketing = new MarketingPage(page);
 
     await marketing.open();
 
-    await expect(marketing.buildingEyebrow).toBeVisible();
-    const search = (name: string) =>
-      `https://github.com/QuinntyneBrown?tab=repositories&q=${encodeURIComponent(name)}`;
+    await expect(marketing.building).toBeVisible();
     expect(await marketing.projectCards()).toEqual(
       [
-        ['Shelfie', 'TypeScript'],
-        ['Saturdaze', 'C#'],
-        ['TwinkleTune', 'TypeScript'],
-        ['Fullstack with Claude', 'HTML'],
-        ['Loupe', 'C#'],
-        ['Studio', 'C#'],
-      ].map(([name, language]) => ({ name, href: search(name), language, links: 1 })),
+        [
+          'Sweet Hand',
+          'sweet-hand',
+          'TypeScript · NestJS',
+          'Find the Caribbean home cooks and small-batch food makers of Toronto and the GTA.',
+        ],
+        [
+          'Shelfie',
+          'shelfie',
+          'TypeScript · .NET',
+          'A reading habit tracker for a young reader, with parent rewards.',
+        ],
+        ['Saturdaze', 'saturdaze', 'TypeScript · .NET', 'A weekend planner for a family of four.'],
+        [
+          'TwinkleTune',
+          'TwinkleTune',
+          'TypeScript · .NET',
+          'A singing buddy for kids. Every song is tuned to their voice.',
+        ],
+        [
+          'Fullstack with Claude',
+          'fullstack-with-claude',
+          'Python',
+          'A narrated video series on building a full-stack app with Claude.',
+        ],
+        [
+          'Loupe',
+          'loupe',
+          'C# · TypeScript',
+          'AI critiques for photographers, plus a library of the work that inspires them.',
+        ],
+        [
+          'Studio',
+          'quinntyne-brown-studio',
+          'C# · TypeScript · Azure',
+          'Photography studio platform: galleries, quotes, client albums, prints.',
+        ],
+      ].map(([name, repo, language, description]) => ({
+        name,
+        href: `https://github.com/QuinntyneBrown/${repo}`,
+        language,
+        description,
+        links: 1,
+      })),
     );
     await expect(marketing.allOnGitHub).toHaveAttribute(
       'href',
@@ -119,10 +131,8 @@ test.describe('Marketing page', () => {
     await marketing.open();
 
     await expect(marketing.sectionHeadings).toHaveText([
-      'Fifteen years shipping.',
-      'Things I’m building.',
-      'Why join',
-      'Ready to build with us?',
+      'What I’m building in the open. Jump in anywhere.',
+      'Let’s stay connected.',
     ]);
   });
 

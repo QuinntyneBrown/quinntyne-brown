@@ -3,7 +3,7 @@ import { MarketingPage } from '../../pages/marketing.page';
 
 // Traces to: L2-075 (docs/detailed-designs/marketing/landing-page).
 test.describe('Brochure video', () => {
-  test('waits for Play with a poster, controls and English captions turned on', async ({
+  test('waits for Play with a poster, controls and English captions available but off', async ({
     page,
     axe,
   }) => {
@@ -16,8 +16,8 @@ test.describe('Brochure video', () => {
     const state = await marketing.videoState();
     expect(state).toMatchObject({ paused: true, autoplay: false, controls: true });
     expect(state.poster).toMatch(/brochure-poster\.jpg$/);
-    expect(state.captions).toEqual([{ kind: 'captions', language: 'en', mode: 'showing' }]);
-    await expect(marketing.videoCaption).toContainText('captions on');
+    expect(state.captions).toEqual([{ kind: 'captions', language: 'en', mode: 'disabled' }]);
+    await expect(page.locator('figure figcaption')).toHaveCount(0);
     await axe.check();
   });
 
@@ -29,6 +29,18 @@ test.describe('Brochure video', () => {
     const seconds = await marketing.videoDuration();
     expect(seconds).toBeGreaterThan(0);
     expect(seconds).toBeLessThanOrEqual(30);
+  });
+
+  test('the captions carry the home-base narration', async ({ page }) => {
+    const marketing = new MarketingPage(page);
+    await marketing.open();
+
+    const captions = await marketing.captions();
+
+    expect(captions).toContain('Shelfie');
+    expect(captions).toContain('Sweet Hand');
+    expect(captions).toContain('Make a profile');
+    expect(captions).not.toContain('FaithTech');
   });
 
   test('offers no transcript; the captions carry the narration', async ({ page }) => {

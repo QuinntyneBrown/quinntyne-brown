@@ -8,18 +8,14 @@ export const MARKETING_URL = process.env['E2E_MARKETING_URL'] ?? 'http://localho
 /** The public marketing page at www.faithtech.community (docs/mocks/pages/marketing). */
 export class MarketingPage {
   readonly heading: Locator;
-  readonly eyebrow: Locator;
   readonly lead: Locator;
   readonly topBar: Locator;
   readonly topBarJoin: Locator;
   readonly topBarSignIn: Locator;
-  readonly benefitsHeading: Locator;
-  readonly benefits: Locator;
   readonly callToAction: Locator;
   readonly callToActionJoin: Locator;
   readonly footer: Locator;
   readonly video: Locator;
-  readonly videoCaption: Locator;
   readonly transcriptToggle: Locator;
   readonly videoUnavailable: Locator;
   readonly videoPoster: Locator;
@@ -50,12 +46,7 @@ export class MarketingPage {
   readonly linkedIn: Locator;
   readonly gitHub: Locator;
   readonly downloadResume: Locator;
-  readonly work: Locator;
-  readonly workEyebrow: Locator;
-  readonly figures: Locator;
-  readonly employers: Locator;
   readonly building: Locator;
-  readonly buildingEyebrow: Locator;
   readonly projects: Locator;
   readonly allOnGitHub: Locator;
   /** The level-2 headings of the sections under the hero, in page order. */
@@ -64,25 +55,21 @@ export class MarketingPage {
   constructor(private readonly page: Page) {
     this.heading = page.getByRole('heading', {
       level: 1,
-      name: 'Builds software. Builds community.',
+      name: 'Let’s build great products together. Welcome.',
     });
-    this.eyebrow = page.getByRole('main').getByText('Quinntyne Brown', { exact: true });
-    this.lead = page.getByText(/^I’m Quinntyne Brown: a Christian, a Chief Product Officer/);
+    this.lead = page.getByText(/^I’m Quinntyne Brown — a Christian, a founder who builds/);
     this.topBar = page.getByRole('banner');
-    this.topBarJoin = this.topBar.getByRole('button', { name: 'Join now' });
+    this.topBarJoin = this.topBar.getByRole('button', { name: 'Create a profile' });
     this.topBarSignIn = this.topBar.getByRole('button', { name: 'Sign in' });
-    this.benefitsHeading = page.getByRole('heading', { level: 2, name: 'Why join' });
-    this.benefits = page.getByRole('heading', { level: 3 });
-    this.callToAction = page.getByRole('region', { name: 'Ready to build with us?' });
-    this.callToActionJoin = this.callToAction.getByRole('button', { name: 'Join now' });
+    this.callToAction = page.getByRole('region', { name: 'Let’s stay connected.' });
+    this.callToActionJoin = this.callToAction.getByRole('button', { name: 'Create a profile' });
     this.footer = page.getByRole('contentinfo');
     this.video = page.locator('video');
-    this.videoCaption = page.locator('figure figcaption');
     this.transcriptToggle = page.getByText('Read the transcript');
     this.videoUnavailable = page.getByRole('status').filter({
       hasText: 'This video can’t play right now',
     });
-    this.videoPoster = page.getByRole('img', { name: /FaithTech builders/ });
+    this.videoPoster = page.getByRole('img', { name: /Quinntyne Brown/ });
     this.panel = page.locator('ft-card').filter({ has: page.getByRole('heading', { level: 2 }) });
     this.signInHeading = page.getByRole('heading', { level: 2, name: 'Sign in' });
     this.email = this.panel.getByLabel('Email');
@@ -96,8 +83,8 @@ export class MarketingPage {
     this.passwordError = fieldError(page, 'Password');
     this.resetPassword = this.panel.getByRole('link', { name: 'Reset password' });
     this.handOff = page.getByRole('heading', { level: 2, name: 'Signing you in…' });
-    this.joinHeading = page.getByRole('heading', { level: 2, name: 'Join Quinntyne Brown' });
-    this.panelJoin = this.panel.getByRole('button', { name: 'Join now' });
+    this.joinHeading = page.getByRole('heading', { level: 2, name: 'Create your profile' });
+    this.panelJoin = this.panel.getByRole('button', { name: 'Create a profile' });
     this.panelSignIn = this.panel.getByRole('button', { name: 'Sign in', exact: true });
     this.name = this.panel.getByLabel('Full name');
     this.createAccount = this.panel.getByRole('button', {
@@ -114,14 +101,9 @@ export class MarketingPage {
     this.linkedIn = main.getByRole('link', { name: 'LinkedIn', exact: true });
     this.gitHub = main.getByRole('link', { name: 'GitHub', exact: true });
     this.downloadResume = main.getByRole('link', { name: 'Download résumé' });
-    this.work = page.getByRole('region', { name: 'Fifteen years shipping.' });
-    this.workEyebrow = this.work.getByText('Work', { exact: true });
-    this.figures = this.work.getByRole('group');
-    this.employers = this.work
-      .getByRole('list', { name: 'Where I’ve worked' })
-      .getByRole('listitem');
-    this.building = page.getByRole('region', { name: 'Things I’m building.' });
-    this.buildingEyebrow = this.building.getByText('Pinned on GitHub', { exact: true });
+    this.building = page.getByRole('region', {
+      name: 'What I’m building in the open. Jump in anywhere.',
+    });
     this.projects = this.building.getByRole('listitem');
     this.allOnGitHub = this.building.getByRole('link', { name: 'All on GitHub' });
     this.sectionHeadings = main.locator('h2:not(ft-landing-hero h2)');
@@ -207,26 +189,26 @@ export class MarketingPage {
     );
   }
 
-  /** Each figure in the work section as the visitor reads it: its value, then its label. */
-  async figureTexts(): Promise<{ value: string; label: string }[]> {
-    return this.figures.evaluateAll((groups) =>
-      groups.map((g) => ({
-        value: g.querySelector('.ft-stat__value')?.textContent?.trim() ?? '',
-        label: g.querySelector('.ft-stat__label')?.textContent?.trim() ?? '',
-      })),
-    );
-  }
-
-  /** Each project card's one link (its name and where it goes) and its language. */
-  async projectCards(): Promise<{ name: string; href: string; language: string; links: number }[]> {
+  /** Each project card's one link (its name and where it goes), its language and description. */
+  async projectCards(): Promise<
+    { name: string; href: string; language: string; description: string; links: number }[]
+  > {
     return this.projects.evaluateAll((items) =>
       items.map((item) => ({
         name: item.querySelector('a')?.textContent?.trim() ?? '',
         href: item.querySelector('a')?.getAttribute('href') ?? '',
         language: item.querySelector('.project-card__language')?.textContent?.trim() ?? '',
+        description: item.querySelector('.project-card__description')?.textContent?.trim() ?? '',
         links: item.querySelectorAll('a').length,
       })),
     );
+  }
+
+  /** The English caption file the video's track points at, as the browser would fetch it. */
+  async captions(): Promise<string> {
+    const src = await this.video.locator('track').getAttribute('src');
+    const response = await this.page.request.get(new URL(src ?? '', this.page.url()).href);
+    return response.text();
   }
 
   async open(query = ''): Promise<void> {

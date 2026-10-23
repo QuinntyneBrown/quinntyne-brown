@@ -22,15 +22,12 @@ import {
 } from '@faithtech-community/api';
 import {
   AlertComponent,
-  BadgeComponent,
-  BenefitComponent,
   ButtonComponent,
   CardComponent,
   ClusterComponent,
   ContainerComponent,
   CtaBandComponent,
   EmptyStateComponent,
-  GridComponent,
   LandingHeroComponent,
   LandingSectionComponent,
   LinkComponent,
@@ -40,7 +37,6 @@ import {
   SignInFormFailure,
   SignUpDetails,
   SignUpFormComponent,
-  StatComponent,
   VideoPlayerComponent,
 } from '@faithtech-community/components';
 import { firstValueFrom } from 'rxjs';
@@ -50,28 +46,24 @@ import { COMMUNITY_ORIGIN } from '../community-origin';
 /**
  * The marketing page (L2-074), matching docs/mocks/pages/marketing. It collects credentials and
  * hands the session to the community app, which completes PKCE (ADR 0018). It also introduces
- * Quinntyne Brown: profile links, work figures and pinned projects, all static (L2-132).
+ * Quinntyne Brown: profile links and the projects he builds in the open, all static (L2-132).
  */
 @Component({
   selector: 'ft-landing-page',
   imports: [
     AlertComponent,
-    BadgeComponent,
-    BenefitComponent,
     ButtonComponent,
     CardComponent,
     ClusterComponent,
     ContainerComponent,
     CtaBandComponent,
     EmptyStateComponent,
-    GridComponent,
     LandingHeroComponent,
     LandingSectionComponent,
     LinkComponent,
     ProjectCardComponent,
     SignInFormComponent,
     SignUpFormComponent,
-    StatComponent,
     VideoPlayerComponent,
   ],
   templateUrl: './landing.page.html',
@@ -88,20 +80,57 @@ export class LandingPage implements OnInit {
   protected readonly gitHubUrl = 'https://github.com/QuinntyneBrown';
   /** Served from the marketing app's public/ folder. */
   protected readonly resumeUrl = '/resume/quinntyne-brown-resume.pdf';
-  protected readonly figures = [
-    { value: '15+', label: 'years' },
-    { value: '2×', label: 'faster Canadarm3 software' },
-    { value: '10×', label: 'serialization throughput' },
-    { value: '~30', label: 'developers mentored' },
-  ];
-  protected readonly employers = ['MDA', 'Protiviti', 'RBC Ventures', 'AutoTrader.ca', 'Corus'];
   protected readonly projects = [
-    { name: 'Shelfie', language: 'TypeScript' },
-    { name: 'Saturdaze', language: 'C#' },
-    { name: 'TwinkleTune', language: 'TypeScript' },
-    { name: 'Fullstack with Claude', language: 'HTML' },
-    { name: 'Loupe', language: 'C#' },
-    { name: 'Studio', language: 'C#' },
+    {
+      name: 'Sweet Hand',
+      repo: 'sweet-hand',
+      language: 'TypeScript · NestJS',
+      image: 'sweet-hand',
+      description:
+        'Find the Caribbean home cooks and small-batch food makers of Toronto and the GTA.',
+    },
+    {
+      name: 'Shelfie',
+      repo: 'shelfie',
+      language: 'TypeScript · .NET',
+      image: 'shelfie',
+      description: 'A reading habit tracker for a young reader, with parent rewards.',
+    },
+    {
+      name: 'Saturdaze',
+      repo: 'saturdaze',
+      language: 'TypeScript · .NET',
+      image: 'saturdaze',
+      description: 'A weekend planner for a family of four.',
+    },
+    {
+      name: 'TwinkleTune',
+      repo: 'TwinkleTune',
+      language: 'TypeScript · .NET',
+      image: 'twinkletune',
+      description: 'A singing buddy for kids. Every song is tuned to their voice.',
+    },
+    {
+      name: 'Fullstack with Claude',
+      repo: 'fullstack-with-claude',
+      language: 'Python',
+      image: 'fullstack-with-claude',
+      description: 'A narrated video series on building a full-stack app with Claude.',
+    },
+    {
+      name: 'Loupe',
+      repo: 'loupe',
+      language: 'C# · TypeScript',
+      image: 'loupe',
+      description: 'AI critiques for photographers, plus a library of the work that inspires them.',
+    },
+    {
+      name: 'Studio',
+      repo: 'quinntyne-brown-studio',
+      language: 'C# · TypeScript · Azure',
+      image: 'studio',
+      description: 'Photography studio platform: galleries, quotes, client albums, prints.',
+    },
   ];
 
   /** The community app page to land on after signing in (`?returnUrl=/events`). */
@@ -145,7 +174,7 @@ export class LandingPage implements OnInit {
       });
     });
     let first = true;
-    // Join now and Sign in switch the panel in place: take the visitor to its heading.
+    // Create a profile and Sign in switch the panel in place: take the visitor to its heading.
     effect(() => {
       this.joining();
       if (first) {
@@ -190,9 +219,9 @@ export class LandingPage implements OnInit {
     );
   }
 
-  /** The project in Quinntyne Brown's GitHub repositories, until each repository URL is confirmed. */
-  protected projectUrl(name: string): string {
-    return `${this.gitHubUrl}?tab=repositories&q=${encodeURIComponent(name)}`;
+  /** The project's GitHub repository. */
+  protected projectUrl(repo: string): string {
+    return `${this.gitHubUrl}/${repo}`;
   }
 
   protected verifyEmailLink(email: string): string {

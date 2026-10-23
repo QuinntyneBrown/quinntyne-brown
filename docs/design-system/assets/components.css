@@ -1082,6 +1082,7 @@ mark { background: var(--color-warning-bg); color: inherit; border-radius: var(-
 .project-card__name::after { content: ''; position: absolute; inset: 0; }
 .project-card__name:focus-visible { outline: none; }
 .project-card__language { font: var(--text-caption); color: var(--color-fg-muted); }
+.project-card__description { flex-basis: 100%; margin: 0; font: var(--text-caption); color: var(--color-fg-muted); }
 
 .benefit { display: flex; flex-direction: column; gap: var(--space-3); }
 .benefit__title { font: var(--text-h4); }

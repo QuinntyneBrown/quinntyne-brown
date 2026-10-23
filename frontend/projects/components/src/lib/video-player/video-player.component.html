@@ -20,7 +20,7 @@
         <source [src]="src()" [type]="type()" (error)="unavailable.set(true)" />
         <track
           kind="captions"
-          default
+          [default]="captionsOn()"
           [src]="captions()"
           [srclang]="captionsLanguage()"
           [label]="captionsLabel()"
