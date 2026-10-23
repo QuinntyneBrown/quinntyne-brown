@@ -16,6 +16,7 @@ import {
   INTEGRATIONS_SERVICE,
   IntegrationApp,
   IntegrationEvent,
+  RotatedSecret,
 } from '@faithtech-community/api';
 import {
   AlertComponent,
@@ -24,8 +25,10 @@ import {
   BreadcrumbItemComponent,
   ButtonComponent,
   CardComponent,
+  ClusterComponent,
   DescriptionListComponent,
   DescriptionListItemComponent,
+  DialogService,
   EmptyStateComponent,
   EventEntryComponent,
   IconComponent,
@@ -35,9 +38,12 @@ import {
   SecretFieldComponent,
   StackComponent,
   formatDay,
+  ToastService,
   formatTimestamp,
 } from '@faithtech-community/components';
 import { firstValueFrom } from 'rxjs';
+
+import { RevokeApplicationDialog, RotateSecretDialog } from '../../dialogs';
 
 type State = 'loading' | 'loaded' | 'error' | 'not-found';
 
@@ -70,6 +76,7 @@ const ENDPOINT = 'POST /api/webhooks/events';
     BreadcrumbItemComponent,
     ButtonComponent,
     CardComponent,
+    ClusterComponent,
     DescriptionListComponent,
     DescriptionListItemComponent,
     EmptyStateComponent,
@@ -89,6 +96,8 @@ export class ApplicationPage {
   readonly id = input.required<string>();
 
   private readonly integrations = inject(INTEGRATIONS_SERVICE);
+  private readonly dialogs = inject(DialogService);
+  private readonly toasts = inject(ToastService);
   private readonly injector = inject(Injector);
   private readonly entries = viewChildren(EventEntryComponent);
 
@@ -141,6 +150,24 @@ export class ApplicationPage {
         error instanceof HttpErrorResponse && error.status === 404 ? 'not-found' : 'error',
       );
     }
+  }
+
+  /** Opens Rotate secret; the page shows the new prefix afterwards (L2-159). */
+  protected async rotate(app: IntegrationApp): Promise<void> {
+    const ref = this.dialogs.open<RotatedSecret, IntegrationApp>(RotateSecretDialog, { data: app });
+    const rotated = await firstValueFrom(ref.closed);
+    if (rotated) this.app.set(rotated.app);
+  }
+
+  /** Opens the revoke confirmation; the page turns read-only and keeps the events (L2-160). */
+  protected async revoke(app: IntegrationApp): Promise<void> {
+    const ref = this.dialogs.open<IntegrationApp, IntegrationApp>(RevokeApplicationDialog, {
+      data: app,
+    });
+    const revoked = await firstValueFrom(ref.closed);
+    if (!revoked) return;
+    this.app.set(revoked);
+    this.toasts.show({ variant: 'success', heading: `${revoked.name} revoked` });
   }
 
   /** The next 25; focus moves to the first new entry. */

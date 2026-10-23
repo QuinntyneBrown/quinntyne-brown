@@ -32,9 +32,17 @@
         <ft-breadcrumb-item>{{ app.name }}</ft-breadcrumb-item>
       </ft-breadcrumb>
       <ft-page-header [title]="app.name" [subtitle]="subtitle()">
-        <ft-badge ftPageHeaderActions [variant]="app.status === 'Active' ? 'success' : 'danger'">{{
-          app.status
-        }}</ft-badge>
+        <ft-cluster ftPageHeaderActions gap="2">
+          <ft-badge [variant]="app.status === 'Active' ? 'success' : 'danger'">{{
+            app.status
+          }}</ft-badge>
+          @if (app.canManage && app.status === 'Active') {
+            <ft-button (click)="rotate(app)"><ft-icon name="refresh" /> Rotate secret</ft-button>
+            <ft-button variant="danger" (click)="revoke(app)">
+              <ft-icon name="revoke" /> Revoke
+            </ft-button>
+          }
+        </ft-cluster>
       </ft-page-header>
       <ft-stack>
         @if (app.status === 'Revoked') {
