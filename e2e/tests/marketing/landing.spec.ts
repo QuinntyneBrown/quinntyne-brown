@@ -1,6 +1,11 @@
 import { expect, test } from '../../fixtures/app';
 import { MarketingPage } from '../../pages/marketing.page';
-import { BREAKPOINTS, hasHorizontalScroll, undersizedTargets } from '../../pages/viewport';
+import {
+  BREAKPOINTS,
+  hasHorizontalScroll,
+  reachesSideEdges,
+  undersizedTargets,
+} from '../../pages/viewport';
 
 // Traces to: L2-074 (docs/detailed-designs/marketing/landing-page).
 test.describe('Marketing page', () => {
@@ -147,6 +152,8 @@ test.describe('Marketing page', () => {
 
         await expect(marketing.heading).toBeVisible();
         expect(await hasHorizontalScroll(page)).toBe(false);
+        expect(await reachesSideEdges(page, marketing.topBarCapsule)).toBe(false);
+        expect(await reachesSideEdges(page, marketing.topBarSignIn)).toBe(false);
         expect(await undersizedTargets(page)).toEqual([]);
         await axe.check();
       });

@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
 /** One width per design-system breakpoint (docs/design-system/foundations/layout.html). */
 export const BREAKPOINTS = {
@@ -14,6 +14,16 @@ export type BreakpointName = keyof typeof BREAKPOINTS;
 /** True when the page scrolls sideways, which no screen may do (L2-045 AC1). */
 export function hasHorizontalScroll(page: Page): Promise<boolean> {
   return page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+}
+
+/**
+ * True when the element touches or crosses the viewport's inline edges. Fixed bars add no
+ * scroll when they overflow, so this catches what hasHorizontalScroll cannot.
+ */
+export async function reachesSideEdges(page: Page, locator: Locator): Promise<boolean> {
+  const box = await locator.boundingBox();
+  const width = page.viewportSize()?.width ?? 0;
+  return !box || box.x <= 0 || box.x + box.width >= width;
 }
 
 /** Visible links and buttons smaller than 24x24 CSS pixels (WCAG 2.2 target size, L2-045 AC1). */
