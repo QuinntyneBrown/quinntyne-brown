@@ -1,3 +1,4 @@
+using QuinntyneBrown.Community.Api.Middleware;
 using QuinntyneBrown.Community.Api.Middleware.PrivatePreview;
 using QuinntyneBrown.Community.Application.Integrations;
 
@@ -11,13 +12,19 @@ public static class WebhookEndpoints
 {
     public const string Path = PrivatePreviewGateMiddleware.WebhookPath;
 
+    public const int MaxBodyBytes = 65_536;
+
     public const string UnauthenticatedDetail = "The request could not be authenticated.";
 
     public static IEndpointRouteBuilder MapWebhookEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost(Path, async (HttpRequest request, ReceiveEventHandler handler, CancellationToken cancellationToken) =>
         {
-            var body = await ReadBodyAsync(request, cancellationToken);
+            if (request.ContentLength > MaxBodyBytes || await ReadBodyAsync(request, cancellationToken) is not { } body)
+            {
+                return Results.StatusCode(StatusCodes.Status413PayloadTooLarge);
+            }
+
             var outcome = await handler.HandleAsync(
                 new WebhookDelivery(
                     request.Headers["X-Webhook-Source"].ToString(),
@@ -35,15 +42,28 @@ public static class WebhookEndpoints
             };
         })
         .AllowAnonymous()
-        .DisableAntiforgery();
+        .DisableAntiforgery()
+        .RequireRateLimiting(WebProtectionSetup.WebhookRateLimitPolicy);
 
         return app;
     }
 
-    private static async Task<ReadOnlyMemory<byte>> ReadBodyAsync(HttpRequest request, CancellationToken cancellationToken)
+    /// <summary>The raw body, or null as soon as it passes <see cref="MaxBodyBytes"/> (L2-162 AC2).</summary>
+    private static async Task<byte[]?> ReadBodyAsync(HttpRequest request, CancellationToken cancellationToken)
     {
         using var buffer = new MemoryStream();
-        await request.Body.CopyToAsync(buffer, cancellationToken);
+        var chunk = new byte[8192];
+        int read;
+        while ((read = await request.Body.ReadAsync(chunk, cancellationToken)) > 0)
+        {
+            if (buffer.Length + read > MaxBodyBytes)
+            {
+                return null;
+            }
+
+            buffer.Write(chunk, 0, read);
+        }
+
         return buffer.ToArray();
     }
 }

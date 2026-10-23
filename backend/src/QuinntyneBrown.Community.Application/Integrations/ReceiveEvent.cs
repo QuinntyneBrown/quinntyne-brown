@@ -65,14 +65,35 @@ public partial class ReceiveEventHandler(IApplicationDbContext db, ISecretProtec
             return Refuse("signature mismatch");
         }
 
+        if (!IsJson(delivery.ContentType))
+        {
+            return new WebhookOutcome(WebhookOutcomeKind.Invalid, Errors: new Dictionary<string, string[]> { ["contentType"] = ["Send Content-Type: application/json."] });
+        }
+
         var (envelope, errors) = WebhookEnvelopeParser.Parse(delivery.Body);
         if (envelope is null)
         {
             return new WebhookOutcome(WebhookOutcomeKind.Invalid, Errors: errors);
         }
 
-        db.IntegrationEvents.Add(new IntegrationEvent(app.Id, app.OrganizationId, envelope.EventId, envelope.EventType, envelope.OccurredAt, now, envelope.DataJson));
-        await db.SaveChangesAsync(cancellationToken);
+        if (await db.IntegrationEvents.AnyAsync(e => e.IntegrationAppId == app.Id && e.EventId == envelope.EventId, cancellationToken))
+        {
+            return new WebhookOutcome(WebhookOutcomeKind.Duplicate, envelope.EventId);
+        }
+
+        var stored = new IntegrationEvent(app.Id, app.OrganizationId, envelope.EventId, envelope.EventType, envelope.OccurredAt, now, envelope.DataJson);
+        db.IntegrationEvents.Add(stored);
+        try
+        {
+            await db.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            // A racing delivery of the same event won the unique key on (application, eventId) (L2-163).
+            db.IntegrationEvents.Entry(stored).State = EntityState.Detached;
+            return new WebhookOutcome(WebhookOutcomeKind.Duplicate, envelope.EventId);
+        }
+
         return new WebhookOutcome(WebhookOutcomeKind.Accepted, envelope.EventId);
     }
 
@@ -90,6 +111,10 @@ public partial class ReceiveEventHandler(IApplicationDbContext db, ISecretProtec
 
         return false;
     }
+
+    private static bool IsJson(string? contentType) =>
+        contentType is not null
+        && contentType.Split(';')[0].Trim().Equals("application/json", StringComparison.OrdinalIgnoreCase);
 
     private WebhookOutcome Refuse(string reason)
     {
