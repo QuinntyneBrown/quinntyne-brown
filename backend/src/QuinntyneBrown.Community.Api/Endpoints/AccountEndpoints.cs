@@ -94,17 +94,17 @@ public static class AccountEndpoints
         IOptions<WebAppOptions> webApp,
         IOptions<MarketingOptions> marketing,
         string? returnUrl,
-        bool? keepSignedIn)
+        bool? keepSignedIn,
+        string? from)
     {
-        var state = SignInCorrelation.NewSecret();
-        var nonce = SignInCorrelation.NewSecret();
-        var authorizationUrl = google.BuildAuthorizationUrl(state, nonce, GoogleRedirectUri(webApp.Value));
+        var pending = NewPending(returnUrl, keepSignedIn, from);
+        var authorizationUrl = google.BuildAuthorizationUrl(pending.State, pending.Secret, RedirectUri(webApp.Value, "google"));
         if (authorizationUrl is null)
         {
-            return Results.Redirect(GoogleOutcome(marketing.Value, "failed"));
+            return Results.Redirect(Outcome(webApp.Value, marketing.Value, "google", pending, "failed"));
         }
 
-        correlation.Write(context, new SignInCorrelation.Pending(state, nonce, AppPath(returnUrl), keepSignedIn ?? false));
+        correlation.Write(context, pending);
         return Results.Redirect(authorizationUrl);
     }
 
@@ -121,18 +121,17 @@ public static class AccountEndpoints
         var pending = correlation.ReadAndClear(context);
         if (pending is null || string.IsNullOrEmpty(code) || !SignInCorrelation.StateMatches(pending, state))
         {
-            return Results.Redirect(GoogleOutcome(marketing.Value, "failed"));
+            return Results.Redirect(Outcome(webApp.Value, marketing.Value, "google", pending, "failed"));
         }
 
-        var result = await handler.HandleAsync(new GoogleSignInCommand(code, GoogleRedirectUri(webApp.Value), pending.Secret), ct);
+        var result = await handler.HandleAsync(new GoogleSignInCommand(code, RedirectUri(webApp.Value, "google"), pending.Secret), ct);
         if (!result.Succeeded)
         {
-            return Results.Redirect(GoogleOutcome(marketing.Value, result.Error == GoogleSignInError.Suspended ? "suspended" : "failed"));
+            return Results.Redirect(Outcome(webApp.Value, marketing.Value, "google", pending, result.Error == GoogleSignInError.Suspended ? "suspended" : "failed"));
         }
 
         await StartSessionAsync(context, result.User!);
-        var keep = pending.KeepSignedIn ? "1" : "0";
-        return Results.Redirect($"{webApp.Value.Origin}/auth/continue?returnUrl={Uri.EscapeDataString(pending.ReturnUrl)}&keepSignedIn={keep}");
+        return Results.Redirect(Landing(webApp.Value, pending));
     }
 
     private static IResult StartGitHubSignIn(
@@ -142,17 +141,17 @@ public static class AccountEndpoints
         IOptions<WebAppOptions> webApp,
         IOptions<MarketingOptions> marketing,
         string? returnUrl,
-        bool? keepSignedIn)
+        bool? keepSignedIn,
+        string? from)
     {
-        var state = SignInCorrelation.NewSecret();
-        var codeVerifier = SignInCorrelation.NewSecret();
-        var authorizationUrl = github.BuildAuthorizationUrl(state, codeVerifier, GitHubRedirectUri(webApp.Value));
+        var pending = NewPending(returnUrl, keepSignedIn, from);
+        var authorizationUrl = github.BuildAuthorizationUrl(pending.State, pending.Secret, RedirectUri(webApp.Value, "github"));
         if (authorizationUrl is null)
         {
-            return Results.Redirect(GitHubOutcome(marketing.Value, "failed"));
+            return Results.Redirect(Outcome(webApp.Value, marketing.Value, "github", pending, "failed"));
         }
 
-        correlation.Write(context, new SignInCorrelation.Pending(state, codeVerifier, AppPath(returnUrl), keepSignedIn ?? false));
+        correlation.Write(context, pending);
         return Results.Redirect(authorizationUrl);
     }
 
@@ -169,28 +168,43 @@ public static class AccountEndpoints
         var pending = correlation.ReadAndClear(context);
         if (pending is null || string.IsNullOrEmpty(code) || !SignInCorrelation.StateMatches(pending, state))
         {
-            return Results.Redirect(GitHubOutcome(marketing.Value, "failed"));
+            return Results.Redirect(Outcome(webApp.Value, marketing.Value, "github", pending, "failed"));
         }
 
-        var result = await handler.HandleAsync(new GitHubSignInCommand(code, GitHubRedirectUri(webApp.Value), pending.Secret), ct);
+        var result = await handler.HandleAsync(new GitHubSignInCommand(code, RedirectUri(webApp.Value, "github"), pending.Secret), ct);
         if (!result.Succeeded)
         {
-            return Results.Redirect(GitHubOutcome(marketing.Value, result.Error == GitHubSignInError.Suspended ? "suspended" : "failed"));
+            return Results.Redirect(Outcome(webApp.Value, marketing.Value, "github", pending, result.Error == GitHubSignInError.Suspended ? "suspended" : "failed"));
         }
 
         await StartSessionAsync(context, result.User!);
-        var keep = pending.KeepSignedIn ? "1" : "0";
-        return Results.Redirect($"{webApp.Value.Origin}/auth/continue?returnUrl={Uri.EscapeDataString(pending.ReturnUrl)}&keepSignedIn={keep}");
+        return Results.Redirect(Landing(webApp.Value, pending));
     }
 
-    // The API sits behind the community app's origin, so Google returns there.
-    private static string GoogleRedirectUri(WebAppOptions webApp) => $"{webApp.Origin}/api/account/google/callback";
+    /// <summary>A new state and secret (Google's nonce, GitHub's code verifier) with where the sign-in started and lands.</summary>
+    private static SignInCorrelation.Pending NewPending(string? returnUrl, bool? keepSignedIn, string? from) =>
+        new(SignInCorrelation.NewSecret(), SignInCorrelation.NewSecret(), AppPath(returnUrl), keepSignedIn ?? false, from == "app");
 
-    private static string GoogleOutcome(MarketingOptions marketing, string outcome) => $"{marketing.Origin}/?google={outcome}";
+    // The API sits behind the community app's origin, so the provider returns there.
+    private static string RedirectUri(WebAppOptions webApp, string provider) => $"{webApp.Origin}/api/account/{provider}/callback";
 
-    private static string GitHubRedirectUri(WebAppOptions webApp) => $"{webApp.Origin}/api/account/github/callback";
+    /// <summary>
+    /// Where a failed external sign-in returns: the community app's sign-in page when it started there (L2-111), else
+    /// the marketing page. Without a readable cookie nobody knows where it started, so the marketing page.
+    /// </summary>
+    private static string Outcome(WebAppOptions webApp, MarketingOptions marketing, string provider, SignInCorrelation.Pending? pending, string outcome) =>
+        pending is { FromApp: true }
+            ? $"{webApp.Origin}/sign-in?{provider}={outcome}&returnUrl={Uri.EscapeDataString(pending.ReturnUrl)}"
+            : $"{marketing.Origin}/?{provider}={outcome}";
 
-    private static string GitHubOutcome(MarketingOptions marketing, string outcome) => $"{marketing.Origin}/?github={outcome}";
+    /// <summary>
+    /// Where a signed-in browser goes: an interrupted /connect/authorize request resumes, as after a password sign-in
+    /// (L2-111 AC2); anything else starts PKCE in the community app (ADR 0018).
+    /// </summary>
+    private static string Landing(WebAppOptions webApp, SignInCorrelation.Pending pending) =>
+        pending.ReturnUrl.StartsWith("/connect/", StringComparison.Ordinal)
+            ? $"{webApp.Origin}{pending.ReturnUrl}"
+            : $"{webApp.Origin}/auth/continue?returnUrl={Uri.EscapeDataString(pending.ReturnUrl)}&keepSignedIn={(pending.KeepSignedIn ? "1" : "0")}";
 
     /// <summary>Only a path inside the community app is kept; anything else lands on home.</summary>
     private static string AppPath(string? url) =>

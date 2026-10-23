@@ -16,7 +16,8 @@ public abstract class SignInCorrelation(IDataProtectionProvider dataProtection, 
     private readonly ITimeLimitedDataProtector _protector = dataProtection.CreateProtector(purpose).ToTimeLimitedDataProtector();
 
     /// <param name="Secret">Google's nonce, or GitHub's PKCE code verifier.</param>
-    public record Pending(string State, string Secret, string ReturnUrl, bool KeepSignedIn);
+    /// <param name="FromApp">True when the sign-in started on the community app's own pages, so outcomes return there.</param>
+    public record Pending(string State, string Secret, string ReturnUrl, bool KeepSignedIn, bool FromApp = false);
 
     public static string NewSecret() => Base64Url(RandomNumberGenerator.GetBytes(32));
 

@@ -1,4 +1,4 @@
-// Traces to: L2-110, L2-079
+// Traces to: L2-110, L2-079, L2-111
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -228,6 +228,54 @@ public class GitHubSignInTests(CommunityApiFactory factory) : IClassFixture<Comm
     }
 
     [Fact]
+    public async Task A_failure_started_on_the_community_app_returns_to_its_sign_in_page_with_the_return_url()
+    {
+        var landing = await SignInWithGitHubAsync(Identity(NewEmail(), verified: false), "/events", from: "app");
+
+        Assert.Equal($"{CommunityApiFactory.WebAppOrigin}/sign-in?github=failed&returnUrl=%2Fevents", landing);
+    }
+
+    [Fact]
+    public async Task A_suspended_account_started_on_the_community_app_returns_to_its_sign_in_page()
+    {
+        var email = await _flow.CreateAccountAsync();
+        await factory.WithDbAsync(async db =>
+        {
+            var profileId = await db.Users.Where(u => u.Email == email).Select(u => u.ProfileId).SingleAsync();
+            (await db.Profiles.SingleAsync(p => p.Id == profileId)).Suspend("Misuse", DateTime.UtcNow);
+            return await db.SaveChangesAsync();
+        });
+
+        var landing = await SignInWithGitHubAsync(Identity(email), from: "app");
+
+        Assert.Equal($"{CommunityApiFactory.WebAppOrigin}/sign-in?github=suspended&returnUrl=%2F", landing);
+    }
+
+    [Fact]
+    public async Task Without_configuration_the_community_app_button_returns_to_its_sign_in_page()
+    {
+        var unconfigured = new FakeGitHubIdentityProvider { Configured = false };
+        var client = factory.WithWebHostBuilder(b => b.ConfigureTestServices(s => s.AddSingleton<IGitHubIdentityProvider>(unconfigured)))
+            .CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false, BaseAddress = new Uri("https://localhost") });
+
+        var response = await client.GetAsync("/api/account/github/start?from=app&returnUrl=%2Fteam");
+
+        Assert.Equal($"{CommunityApiFactory.WebAppOrigin}/sign-in?github=failed&returnUrl=%2Fteam", response.Headers.Location!.ToString());
+    }
+
+    [Fact]
+    public async Task An_interrupted_authorization_request_resumes_after_signing_in_from_the_community_app()
+    {
+        var authorize = OidcFlow.AuthorizeUrl("challenge");
+
+        var landing = await SignInWithGitHubAsync(Identity(NewEmail()), authorize, from: "app");
+
+        Assert.Equal(new Uri($"{CommunityApiFactory.WebAppOrigin}{authorize}"), new Uri(landing));
+        var resumed = await _flow.Browser.GetAsync(authorize);
+        Assert.DoesNotContain("/sign-in", resumed.Headers.Location!.ToString());
+    }
+
+    [Fact]
     public async Task A_return_url_outside_the_community_app_lands_on_home()
     {
         var landing = await SignInWithGitHubAsync(Identity(NewEmail()), "https://evil.example/steal");
@@ -266,18 +314,19 @@ public class GitHubSignInTests(CommunityApiFactory factory) : IClassFixture<Comm
     private static GitHubIdentity Identity(string email, bool verified = true, string? name = "GitHub Person") =>
         new(Random.Shared.NextInt64(1, long.MaxValue).ToString(), email, verified, name);
 
-    private async Task<(string State, string CodeChallenge)> StartAsync(string? returnUrl = null, bool keepSignedIn = false)
+    private async Task<(string State, string CodeChallenge)> StartAsync(string? returnUrl = null, bool keepSignedIn = false, string? from = null)
     {
-        var query = $"keepSignedIn={(keepSignedIn ? "true" : "false")}" + (returnUrl is null ? string.Empty : $"&returnUrl={Uri.EscapeDataString(returnUrl)}");
+        var query = $"keepSignedIn={(keepSignedIn ? "true" : "false")}" + (returnUrl is null ? string.Empty : $"&returnUrl={Uri.EscapeDataString(returnUrl)}")
+            + (from is null ? string.Empty : $"&from={from}");
         var response = await _flow.Browser.GetAsync($"/api/account/github/start?{query}");
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         return FakeGitHubIdentityProvider.ReadAuthorizationUrl(response.Headers.Location!);
     }
 
     /// <summary>Start, authorize at "GitHub" and return to the callback; answers where the browser is sent.</summary>
-    private async Task<string> SignInWithGitHubAsync(GitHubIdentity identity, string? returnUrl = null, bool keepSignedIn = false)
+    private async Task<string> SignInWithGitHubAsync(GitHubIdentity identity, string? returnUrl = null, bool keepSignedIn = false, string? from = null)
     {
-        var (state, challenge) = await StartAsync(returnUrl, keepSignedIn);
+        var (state, challenge) = await StartAsync(returnUrl, keepSignedIn, from);
         var code = factory.GitHub.IssueCode(identity, challenge);
         var response = await _flow.Browser.GetAsync($"/api/account/github/callback?code={code}&state={Uri.EscapeDataString(state)}");
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
