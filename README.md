@@ -177,9 +177,9 @@ export GitHub__ClientId=<client id> GitHub__ClientSecret=<client secret>
 PYTHON=.cache/kokoro-venv/bin/python node eng/videos/brochure/build.mjs
 ```
 
-### Deploy behind the private-preview wall
+### Deploy
 
-`app.quinntynebrown.com` (community app) and `www.quinntynebrown.com` (marketing page) run as one Azure Container Apps app behind a server-side wall until private preview ends ([ADR 0026](docs/adr/0026-private-preview-wall-and-hosting.md)). The owner's steps, from DNS records to lifting the wall, are in the [runbook](docs/detailed-designs/platform/private-preview-wall/runbook.md).
+`app.quinntynebrown.com` (community app) and `www.quinntynebrown.com` (marketing page) run as one Azure Container Apps app ([ADR 0026](docs/adr/0026-private-preview-wall-and-hosting.md)). The private-preview wall is off in production; it can be put back with one variable. The owner's steps, from DNS records to the wall, are in the [runbook](docs/detailed-designs/platform/private-preview-wall/runbook.md).
 
 ```sh
 # Smoke-test the production images locally with the wall on (passphrase: "local smoke test passphrase")
