@@ -96,12 +96,27 @@ export class LandingPage implements OnInit {
   ];
   protected readonly employers = ['MDA', 'Protiviti', 'RBC Ventures', 'AutoTrader.ca', 'Corus'];
   protected readonly projects = [
-    { name: 'Shelfie', language: 'TypeScript' },
-    { name: 'Saturdaze', language: 'C#' },
-    { name: 'TwinkleTune', language: 'TypeScript' },
-    { name: 'Fullstack with Claude', language: 'HTML' },
-    { name: 'Loupe', language: 'C#' },
-    { name: 'Studio', language: 'C#' },
+    { name: 'Shelfie', repo: 'shelfie', language: 'TypeScript · .NET', image: 'shelfie' },
+    { name: 'Saturdaze', repo: 'saturdaze', language: 'TypeScript · .NET', image: 'saturdaze' },
+    {
+      name: 'TwinkleTune',
+      repo: 'TwinkleTune',
+      language: 'TypeScript · .NET',
+      image: 'twinkletune',
+    },
+    {
+      name: 'Fullstack with Claude',
+      repo: 'fullstack-with-claude',
+      language: 'Python',
+      image: 'fullstack-with-claude',
+    },
+    { name: 'Loupe', repo: 'loupe', language: 'C# · TypeScript', image: 'loupe' },
+    {
+      name: 'Studio',
+      repo: 'quinntyne-brown-studio',
+      language: 'C# · TypeScript · Azure',
+      image: 'studio',
+    },
   ];
 
   /** The community app page to land on after signing in (`?returnUrl=/events`). */
@@ -190,9 +205,9 @@ export class LandingPage implements OnInit {
     );
   }
 
-  /** The project in Quinntyne Brown's GitHub repositories, until each repository URL is confirmed. */
-  protected projectUrl(name: string): string {
-    return `${this.gitHubUrl}?tab=repositories&q=${encodeURIComponent(name)}`;
+  /** The project's GitHub repository. */
+  protected projectUrl(repo: string): string {
+    return `${this.gitHubUrl}/${repo}`;
   }
 
   protected verifyEmailLink(email: string): string {

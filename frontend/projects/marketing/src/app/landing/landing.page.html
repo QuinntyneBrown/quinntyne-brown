@@ -138,7 +138,8 @@
             <ft-project-card
               [name]="project.name"
               [language]="project.language"
-              [href]="projectUrl(project.name)"
+              [href]="projectUrl(project.repo)"
+              [image]="'/projects/' + project.image + '.webp'"
             />
           }
         </ul>

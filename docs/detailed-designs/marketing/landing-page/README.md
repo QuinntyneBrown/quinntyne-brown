@@ -40,8 +40,8 @@ Static content in `LandingPage`; nothing is fetched, so it renders for every vis
 - **Hero copy** — eyebrow "Quinntyne Brown", `<h1>` "Builds software. Builds community.", and a first-person lead that introduces Quinntyne Brown and invites the visitor to make a profile.
 - **Profile links** — a `ClusterComponent` in the hero's new `ftHeroActions` slot, under the lead: `ButtonComponent` links (`href`) "LinkedIn" (`https://www.linkedin.com/in/quinntynebrown`) and "GitHub" (`https://github.com/QuinntyneBrown`), both `target="_blank"` (the button adds `rel="noopener"`), and "Download résumé" pointing at `/resume/quinntyne-brown-resume.pdf` with the `download` attribute. `ButtonComponent` gains a `download` input, set on its `<a>`.
 - **Work** — a section labelled by its `<h2>` "Fifteen years shipping.", with the `.overline` eyebrow "Work"; four `StatComponent`s with the new `figure` variant (value above label in the accent colour; the label stays first in the DOM and names the group) in a `ClusterComponent`, then the employers as `role` `BadgeComponent`s in a labelled list.
-- **Things I’m building** — a section labelled by "Things I’m building.", eyebrow "Pinned on GitHub"; a `<ul>` grid of the new `ProjectCardComponent` (`listitem`): a decorative thumbnail (an image from `public/projects/` when one is given, else a tinted tile with the project's initial), the name as the card's only link (stretched over the card) and the language. Each project links to its GitHub repository search (`https://github.com/QuinntyneBrown?tab=repositories&q=<name>`) until the exact repository URLs are confirmed; "All on GitHub →" is an `ft-link` to the profile.
-- **Assets** — `public/resume/quinntyne-brown-resume.pdf` and optional `public/projects/<slug>.png` thumbnails, served from the marketing origin, so the CSP's `img-src 'self'` holds.
+- **Things I’m building** — a section labelled by "Things I’m building.", eyebrow "Pinned on GitHub"; a `<ul>` grid of the new `ProjectCardComponent` (`listitem`): a decorative thumbnail (an image from `public/projects/` when one is given, else a tinted tile with the project's initial), the name as the card's only link (stretched over the card) and the language. Each project shows its cover from `public/projects/<slug>.webp` and links to its GitHub repository (`https://github.com/QuinntyneBrown/<repo>`); "All on GitHub →" is an `ft-link` to the profile.
+- **Assets** — `public/resume/quinntyne-brown-resume.pdf` and `public/projects/<slug>.webp` project covers, served from the marketing origin, so the CSP's `img-src 'self'` holds.
 
 ### Community app
 
@@ -121,5 +121,5 @@ The session hint sends the member straight to the community app, which still val
 
 1. A session that is not kept lives in one tab's session storage, so the marketing page cannot see it and shows the page; the visitor signs in again (consistent with `L2-003` AC8).
 2. Hosting, DNS, certificates and the CSP header are deferred; the policy above is the requirement for whoever hosts it.
-3. The exact GitHub repository URLs for the pinned projects, their screenshots and the final résumé PDF are supplied by Quinntyne Brown; until then the cards link to a repository search and show initial tiles.
+3. The final résumé PDF is supplied by Quinntyne Brown.
 4. The Google button on the community app's own sign-in page, other providers, testimonials, pricing, analytics, cookie banners and further marketing pages are deferred.

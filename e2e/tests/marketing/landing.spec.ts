@@ -94,17 +94,20 @@ test.describe('Marketing page', () => {
     await marketing.open();
 
     await expect(marketing.buildingEyebrow).toBeVisible();
-    const search = (name: string) =>
-      `https://github.com/QuinntyneBrown?tab=repositories&q=${encodeURIComponent(name)}`;
     expect(await marketing.projectCards()).toEqual(
       [
-        ['Shelfie', 'TypeScript'],
-        ['Saturdaze', 'C#'],
-        ['TwinkleTune', 'TypeScript'],
-        ['Fullstack with Claude', 'HTML'],
-        ['Loupe', 'C#'],
-        ['Studio', 'C#'],
-      ].map(([name, language]) => ({ name, href: search(name), language, links: 1 })),
+        ['Shelfie', 'shelfie', 'TypeScript · .NET'],
+        ['Saturdaze', 'saturdaze', 'TypeScript · .NET'],
+        ['TwinkleTune', 'TwinkleTune', 'TypeScript · .NET'],
+        ['Fullstack with Claude', 'fullstack-with-claude', 'Python'],
+        ['Loupe', 'loupe', 'C# · TypeScript'],
+        ['Studio', 'quinntyne-brown-studio', 'C# · TypeScript · Azure'],
+      ].map(([name, repo, language]) => ({
+        name,
+        href: `https://github.com/QuinntyneBrown/${repo}`,
+        language,
+        links: 1,
+      })),
     );
     await expect(marketing.allOnGitHub).toHaveAttribute(
       'href',
