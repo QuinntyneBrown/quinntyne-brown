@@ -1,0 +1,28 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — GitHub sign-in in the Community API
+
+Container_Boundary(api, "Community API") {
+  Component(ep, "AccountEndpoints (github/start, github/callback)", "Minimal API, Api", "Anonymous by opt-in, auth rate limit; correlation cookie with state, code verifier, returnUrl")
+  Component(corr, "GitHubCorrelation : SignInCorrelation", "Api", "Data-protected ftc.github cookie, 10 minutes")
+  Component(h, "GitHubSignInHandler", "Application/Identity", "Verified primary email, suspension")
+  Component(accounts, "ExternalAccounts", "Application/Identity", "Find by login or verified email, link, create with no role (shared with Google)")
+  Component(status, "AccountStatus", "Application/Identity", "IsSuspendedAsync shared with every sign-in")
+  Component(port, "IGitHubIdentityProvider", "Application/Identity", "Authorization URL with S256 challenge; exchange code -> GitHubIdentity")
+  Component(prov, "GitHubIdentityProvider", "Infrastructure/Identity", "HttpClient: token endpoint, /user, /user/emails")
+  Component(contacts, "ContactSignedUpHandler", "Application/Contacts", "Matches private contacts on a verified email (L2-015)")
+}
+ContainerDb(db, "Community database", "PostgreSQL")
+System_Ext(github, "GitHub")
+Rel(ep, corr, "Writes and reads")
+Rel(ep, port, "AuthorizationUrl")
+Rel(ep, h, "GitHubSignInCommand")
+Rel(h, port, "ExchangeCodeAsync")
+Rel(h, accounts, "FindLinkOrCreateAsync")
+Rel(h, status, "IsSuspendedAsync")
+Rel(accounts, contacts, "EmailVerified")
+Rel(port, prov, "Implemented by")
+Rel(prov, github, "POST access_token; GET /user, /user/emails")
+Rel(accounts, db, "UserManager, Profiles")
+@enduml

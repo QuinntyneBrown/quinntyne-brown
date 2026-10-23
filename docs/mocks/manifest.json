@@ -12,7 +12,8 @@
         "L2-076",
         "L2-077",
         "L2-078",
-        "L2-079"
+        "L2-079",
+        "L2-110"
       ],
       "states": [
         "default",
@@ -30,13 +31,15 @@
         "sign-up-success",
         "google-busy",
         "google-failed",
+        "github-busy",
+        "github-failed",
         "video-unavailable",
         "reduced-motion"
       ],
       "not_applicable": {
         "loading": "A static page; the forms and video render without fetching anything.",
         "empty": "This screen has no collection that could be empty.",
-        "error": "Every request on the page is a form submission with its own error state (sign-in-unreachable, sign-up-error, google-failed)."
+        "error": "Every request on the page is a form submission with its own error state (sign-in-unreachable, sign-up-error, google-failed, github-failed)."
       }
     },
     {

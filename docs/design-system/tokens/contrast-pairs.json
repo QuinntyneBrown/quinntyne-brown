@@ -668,6 +668,18 @@
       "note": "Google sign-in button outline on a card"
     },
     {
+      "fg": "--color-social-github-fg",
+      "bg": "--color-social-github-bg",
+      "min": 4.5,
+      "note": "GitHub sign-in button label"
+    },
+    {
+      "fg": "--color-social-github-border",
+      "bg": "--color-bg-surface",
+      "min": 3,
+      "note": "GitHub sign-in button outline on a card"
+    },
+    {
       "fg": "--color-fg-accent",
       "bg": "--color-accent-subtle-hover",
       "min": 4.5,
