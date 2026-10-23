@@ -1,7 +1,7 @@
 # Estimates
 
-- Overall effort: 323 days
-- Complete: 97%
+- Overall effort: 376 days
+- Complete: 96%
 - Visual conformance: letter grade (F to A+) of the implemented UI against the HTML mocks and design system (margins, spacing, fonts, borders), from screenshots in `docs/videos/journeys/<journey>/screenshots/`. Subsystem grades are the rounded mean of their designs. The marketing page, Google sign-in and GitHub sign-in have no journey screenshots yet, so they are not graded (n/a).
 
 | Subsystem | Effort | Complete | Visual conformance |
@@ -23,12 +23,14 @@
 | [resources](resources.md) | 23 days | 99% | — |
 | [notes](notes.md) | 42 days | 98% | — |
 | [reports](reports.md) | 7 days | 100% | B |
+| [organizations](organizations.md) | 53 days | 93% | — |
 
 ## Roadmap
 
-1. platform: deploy behind the private-preview wall (the owner's runbook, `platform/private-preview-wall`)
-2. platform and identity: finish the remaining designs
-3. admin, search and agile: finish the remaining designs
-4. marketing page and Google sign-in, and resources: finish the remaining designs
-5. notes: block-editor (the mouse path into the Turn into submenu) and pages-and-list (measure the 500-block read and save latency)
-6. Deferred: notes co-editing, version history, purging archived pages and orphaned-image clean-up
+1. organizations: cross-org role create and narrow screens, the catalogue's indent and outdent and Member bundle, the Org Lead's Agents and Audit log tabs, and re-recorded journey videos
+2. platform: deploy behind the private-preview wall (the owner's runbook, `platform/private-preview-wall`)
+3. platform and identity: finish the remaining designs
+4. admin, search and agile: finish the remaining designs
+5. marketing page and Google sign-in, and resources: finish the remaining designs
+6. notes: block-editor (the mouse path into the Turn into submenu) and pages-and-list (measure the 500-block read and save latency)
+7. Deferred: notes co-editing, version history, purging archived pages and orphaned-image clean-up

@@ -45,5 +45,13 @@ Ordered by value to the user. Effort and completion come from [estimates](estima
 | 38 | Avoid duplicate contacts | The contact form warns a lead who already keeps a contact with the same email. | 2 | 100 |
 | 39 | Check in at the door | Leads check attendees in, add walk-ins and export the attendance. | 6 | 100 |
 | 40 | Read the reports | Staff and System Admins see city figures, charts and tables, filter them and export CSV. | 7 | 100 |
+| 41 | Switch organizations | People in several orgs switch between them, or combine them under All orgs, from the top bar. | 6 | 100 |
+| 42 | Join and manage an org's members | Org Leads add and remove members; someone with no org waits to be added. | 6 | 95 |
+| 43 | Brand an org and its public events | Org Leads set a display name, logo and accessible accent; public event pages carry it at the org's address. | 5 | 95 |
+| 44 | Run the portfolio | The Portfolio Lead creates and archives orgs, switches Org Type features and edits role catalogues. | 11 | 90 |
+| 45 | Assign cross-org roles | The Portfolio Lead gives Staff or Portfolio to someone, who then covers the role's orgs. | 5 | 85 |
+| 46 | Give agents scoped tokens | The Portfolio Lead creates agents and issues revocable tokens limited to chosen orgs, shown once. | 6 | 85 |
 
 Journeys 33 to 35 (Resources) are not yet recorded in [`videos/journeys/`](videos/journeys/README.md); record them with `pwsh eng/videos/Record-JourneyVideos.ps1` once the screens are built. The app shell tour needs re-recording too, because the shell gains the Resources nav item.
+
+Journeys 41 to 46 (organizations) have Playwright specs in `e2e/tests/organizations/` but no recorded videos yet, and the existing journeys need re-recording because the shell gains the org switcher, org addresses (`/o/{slug}/…`) and the Organization and Portfolio sections. Recording needs `speech.platform.bing.com` for the edge-tts narration; run `pwsh eng/videos/Record-JourneyVideos.ps1` where that host is reachable.

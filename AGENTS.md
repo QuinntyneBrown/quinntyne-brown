@@ -139,7 +139,7 @@ Rules (MUST be followed):
 
 ## Domain rules (do not break)
 
-The organization hierarchy (`docs/proposals/organization-hierarchy.md`) is agreed and replaces the global, fixed-role model. It is delivered in phases; until a phase lands, the code keeps the previous rule it replaces, and the slice that changes a rule also changes its tests and the e2e fake.
+The organization hierarchy (`docs/proposals/organization-hierarchy.md`) is agreed and replaces the global, fixed-role model. All four phases are implemented; a change to one of these rules also changes its tests and the e2e fake in the same slice.
 
 - Hierarchy: System Admin (platform) > Portfolio > Organization. System Admin, Portfolio Lead, Org Lead (in every org) and Member (an org member with no roles) are built in. Everything else is data: Org Types, their role catalogues and enabled features, Organizations, and cross-org roles.
 - Every record belongs to exactly one Organization; there is no boundary below the org. Profiles are the exception: one global profile per person, visible only to people who share an org with them or whose role covers one of their orgs.

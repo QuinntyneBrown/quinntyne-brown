@@ -55,7 +55,8 @@ Feature switching is in [feature flags](../feature-flags/README.md) and cross-or
 - **`OrganizationsPage`** (default, empty and archived views) and **`CreateOrganizationDialog`** (CDK Dialog).
 - **`OrganizationSettingsPage`** — name, slug, type (read-only after creation), archive and restore for the Portfolio Lead; the Org Lead sees only branding ([branding](../branding-and-public-pages/README.md)) and members.
 - **`OrgTypesPage`**, **`OrgTypePage`** and **`CreateOrgTypeDialog`** — the catalogue editor composes `components` parts: a role tree with keyboard reorder (move up, move down, indent, outdent buttons with labels), a permission checklist grouped by feature with disabled features hidden, a `CanGrant` checkbox group and the Member bundle. A `409` on remove opens a message listing the holders.
-- Routes sit under `/o/:orgSlug/portfolio/…` for the Portfolio Lead and `/o/:orgSlug/settings` for the Org Lead; services are `ORG_TYPES_SERVICE` and `ORGANIZATIONS_SERVICE` in `api`.
+- Routes sit under `/o/:orgSlug/portfolio/…` for the Portfolio Lead (`organizations`, `org-types`, `org-types/:id`, `org-types/:id/features`, `cross-org-roles`, `agents`) and `/o/:orgSlug/settings` (`general`, `branding`, `members`) for the Org Lead. One `PORTFOLIO_SERVICE` in `api` covers Org Types, catalogues, orgs, cross-org roles and agents; `ORGANIZATIONS_SERVICE` keeps members and branding.
+- As built, a catalogue role is added and edited in a CDK dialog (`RoleDefinitionDialog`) rather than the mock's side panel, because `AGENTS.md` allows no inline forms; the role list orders roles with labelled Up and Down buttons. Indent and outdent, the Member bundle and the Org Type's name have no screen yet (see `docs/estimates/organizations.md`).
 
 ## Requirements
 
