@@ -16,8 +16,8 @@
 
 ### Endpoints (Api, `AccountEndpoints`, group `/api/account`, auth rate limit, anonymous by explicit opt-in)
 
-- **`GET /api/account/github/start?returnUrl=&keepSignedIn=`** — when `GitHub:ClientId` or `GitHub:ClientSecret` is missing, redirects to `<Marketing:Origin>/?github=failed`. Otherwise creates a random `state` and code verifier, writes the correlation cookie (only an app-relative `returnUrl` is kept, otherwise `/`), and redirects to `IGitHubIdentityProvider.BuildAuthorizationUrl(state, codeVerifier, redirectUri)` with `redirectUri = <WebApp:Origin>/api/account/github/callback`.
-- **`GET /api/account/github/callback?code=&state=` (or `error=`)** — reads and deletes the correlation cookie, refuses a missing cookie, a missing code or a `state` that does not match (fixed-time comparison), sends `GitHubSignInCommand` and maps the result: success signs in `IdentityConstants.ApplicationScheme` and redirects to `<WebApp:Origin>/auth/continue?returnUrl=…&keepSignedIn=1|0`; `Suspended` redirects to `<Marketing:Origin>/?github=suspended`; anything else to `<Marketing:Origin>/?github=failed`.
+- **`GET /api/account/github/start?returnUrl=&keepSignedIn=&from=`** — `from=app` marks a sign-in started on the community app's own pages (L2-111); anything else is the marketing page. When `GitHub:ClientId` or `GitHub:ClientSecret` is missing, redirects to `<Marketing:Origin>/?github=failed`. Otherwise creates a random `state` and code verifier, writes the correlation cookie (only an app-relative `returnUrl` is kept, otherwise `/`), and redirects to `IGitHubIdentityProvider.BuildAuthorizationUrl(state, codeVerifier, redirectUri)` with `redirectUri = <WebApp:Origin>/api/account/github/callback`.
+- **`GET /api/account/github/callback?code=&state=` (or `error=`)** — reads and deletes the correlation cookie, refuses a missing cookie, a missing code or a `state` that does not match (fixed-time comparison), sends `GitHubSignInCommand` and maps the result: success signs in `IdentityConstants.ApplicationScheme` and redirects to `<WebApp:Origin>/auth/continue?returnUrl=…&keepSignedIn=1|0`, or, when `returnUrl` is an identity-server `/connect/…` path, straight to `<WebApp:Origin>{returnUrl}` to resume that authorization request. `Suspended` redirects to `<Marketing:Origin>/?github=suspended`, anything else to `<Marketing:Origin>/?github=failed`; for `from=app` these are `<WebApp:Origin>/sign-in?github=suspended|failed&returnUrl=…`. A callback without a readable cookie goes to the marketing page.
 
 ### Application (`Application/Identity/`)
 
@@ -40,6 +40,7 @@ No schema change; `AspNetUserLogins` already exists. No migration.
 - `ButtonComponent` gains `variant="github"` in `components`: GitHub's mark in the button's foreground colour on GitHub's dark fill (light theme) or light fill (dark theme), read from `--color-social-github-*`.
 - `SignInFormFailure` gains `github_failed`: "GitHub sign-in didn’t finish — We couldn’t confirm your GitHub account. Try again, or sign in with your email and password."
 - The marketing page shows "Sign in with GitHub" and "Sign up with GitHub" below the Google button; it is busy until the browser leaves and shows the failure or "This account is suspended" when it comes back with `?github=`.
+- The community app's `/sign-in` and `/sign-up` pages show the Google and GitHub buttons above their forms ("Sign in with …" / "Sign up with …", `divider="or"`) and call `signInWithGoogle`/`signInWithGitHub` with `from: 'app'`; `/sign-in` reads `?google=` and `?github=` and shows the failure or suspension alert (L2-111).
 - The e2e fake (`e2e/fixtures/mock-github.ts`) answers the start endpoint, routes `github.com` and the callback, and applies the same rules to a GitHub account the test arranges.
 
 ## Requirements
@@ -48,6 +49,7 @@ No schema change; `AspNetUserLogins` already exists. No migration.
 |-------|--------------|-------------|
 | `L2-110` | `L1-001` | GitHub sign-in: create, link, unverified, suspended, bad state or code, configuration. |
 | `L2-079` | `L1-015`, `L1-021` | Rate limit, no enumeration difference between the GitHub, Google and password paths. |
+| `L2-111` | `L1-001` | Google and GitHub buttons on the community app's sign-in and sign-up pages; outcomes return there. |
 
 ### Acceptance criteria
 
@@ -73,4 +75,4 @@ State and the code verifier are checked before any account is touched (`L2-110`)
 
 ## Open questions
 
-1. The GitHub button on the community app's own sign-in page, and unlinking a provider from Settings, are deferred.
+1. Unlinking a provider from Settings is deferred.

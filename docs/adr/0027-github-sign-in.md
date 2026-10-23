@@ -23,5 +23,13 @@ Google sign-in (ADR 0019) is the only external way in. Many builders already hav
 
 - An account may hold both a Google and a GitHub login; each is linked the first time it is used with the account's verified email.
 - A GitHub account whose primary email is unverified cannot sign in, even if a secondary email is verified; the person can verify it at GitHub or use another way in.
-- The GitHub button on the community app's own sign-in page, and unlinking a provider from Settings, are deferred, as they are for Google.
+- Unlinking a provider from Settings is deferred, as it is for Google. (The community app's own sign-in page gained the buttons in the addendum below.)
 - The e2e fake plays GitHub too (`github.com` is routed), so the suite never reaches the network.
+
+## Addendum: sign-in from the community app (L2-111)
+
+The community app's `/sign-in` and `/sign-up` pages offer both the Google and the GitHub button, lifting the deferral above and in ADR 0019.
+
+- **Where a failure returns.** Both start endpoints take `from=app`; the correlation cookie keeps it (`SignInCorrelation.Pending.FromApp`). A failed or suspended sign-in that started in the community app returns to `<WebApp:Origin>/sign-in?google=…` or `?github=…`, keeping the `returnUrl`; one that started on the marketing page still returns there. A callback with no readable cookie cannot say where it started, so it returns to the marketing page, as before.
+- **Resuming an authorization request.** When the identity server sent the visitor to `/sign-in?returnUrl=/connect/authorize…`, the community app's PKCE state is already stored, so success redirects to that `/connect/authorize` URL on the community origin, exactly as the sign-in page does after a password sign-in. Any other app path goes through `/auth/continue`. `returnUrl` is still only ever a path on the community origin.
+- No new endpoint, cookie or provider code; the community app uses the same `AuthService.signInWithGoogle` and `signInWithGitHub` with `from: 'app'`.

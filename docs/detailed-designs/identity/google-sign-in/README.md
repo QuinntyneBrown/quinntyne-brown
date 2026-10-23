@@ -14,7 +14,7 @@
 
 ### Endpoints (Api, `AccountEndpoints`, group `/api/account`, auth rate limit, anonymous by explicit opt-in)
 
-- **`GET /api/account/google/start?returnUrl=&keepSignedIn=`** — when `Google:ClientId` or `Google:ClientSecret` is missing, redirects to `<Marketing:Origin>/?google=failed`. Otherwise creates a 32-byte random `state` and nonce, writes the correlation cookie (only an app-relative `returnUrl` is kept, otherwise `/`), and redirects to `IGoogleIdentityProvider.BuildAuthorizationUrl(state, nonce, redirectUri)` with `redirectUri = <WebApp:Origin>/api/account/google/callback` (the API sits behind the community origin's proxy).
+- **`GET /api/account/google/start?returnUrl=&keepSignedIn=&from=`** — `from=app` marks a sign-in started on the community app's own pages (L2-111, ADR 0027 addendum); failures then return to `<WebApp:Origin>/sign-in?google=…&returnUrl=…` instead of the marketing page, and a `/connect/…` `returnUrl` is resumed directly on success. When `Google:ClientId` or `Google:ClientSecret` is missing, redirects to `<Marketing:Origin>/?google=failed`. Otherwise creates a 32-byte random `state` and nonce, writes the correlation cookie (only an app-relative `returnUrl` is kept, otherwise `/`), and redirects to `IGoogleIdentityProvider.BuildAuthorizationUrl(state, nonce, redirectUri)` with `redirectUri = <WebApp:Origin>/api/account/google/callback` (the API sits behind the community origin's proxy).
 - **`GET /api/account/google/callback?code=&state=` (or `error=`)** — reads and deletes the correlation cookie, refuses a missing cookie, a missing code or a `state` that does not match (fixed-time comparison), sends `GoogleSignInCommand` and maps the result: success signs in `IdentityConstants.ApplicationScheme` exactly as `POST /api/account/sign-in` does and redirects to `<WebApp:Origin>/auth/continue?returnUrl=…&keepSignedIn=1|0`; `Suspended` redirects to `<Marketing:Origin>/?google=suspended`; anything else to `<Marketing:Origin>/?google=failed`.
 
 ### Application (`Application/Identity/GoogleSignIn.cs`)
@@ -89,5 +89,5 @@ State and nonce are checked before any account is touched (`L2-078`).
 
 ## Open questions
 
-1. Microsoft and Apple sign-in, and the Google button on the community app's own sign-in page, are deferred.
+1. Microsoft and Apple sign-in are deferred. The community app's own sign-in and sign-up pages offer Google since L2-111.
 2. A member cannot yet unlink Google or add a password to a Google-created account from Settings; they can use "Forgot your password?" to set one.

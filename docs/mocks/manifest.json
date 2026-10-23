@@ -71,7 +71,10 @@
       "title": "Sign in",
       "route": "/sign-in",
       "requirements": [
-        "L2-003"
+        "L2-003",
+        "L2-078",
+        "L2-110",
+        "L2-111"
       ],
       "states": [
         "default",
@@ -79,7 +82,9 @@
         "busy",
         "locked",
         "error",
-        "suspended"
+        "suspended",
+        "google-failed",
+        "github-failed"
       ],
       "not_applicable": {
         "loading": "A static form; nothing is fetched before it renders.",
@@ -92,7 +97,10 @@
       "title": "Sign up",
       "route": "/sign-up",
       "requirements": [
-        "L2-001"
+        "L2-001",
+        "L2-078",
+        "L2-110",
+        "L2-111"
       ],
       "states": [
         "default",
