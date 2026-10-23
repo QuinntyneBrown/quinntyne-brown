@@ -16,11 +16,14 @@ export function hasHorizontalScroll(page: Page): Promise<boolean> {
   return page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
 }
 
-/** True when part of the element lies outside the viewport's inline edges (fixed bars add no scroll). */
-export async function spillsSideways(page: Page, locator: Locator): Promise<boolean> {
+/**
+ * True when the element touches or crosses the viewport's inline edges. Fixed bars add no
+ * scroll when they overflow, so this catches what hasHorizontalScroll cannot.
+ */
+export async function reachesSideEdges(page: Page, locator: Locator): Promise<boolean> {
   const box = await locator.boundingBox();
   const width = page.viewportSize()?.width ?? 0;
-  return !box || box.x < 0 || box.x + box.width > width;
+  return !box || box.x <= 0 || box.x + box.width >= width;
 }
 
 /** Visible links and buttons smaller than 24x24 CSS pixels (WCAG 2.2 target size, L2-045 AC1). */

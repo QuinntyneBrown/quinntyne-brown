@@ -10,6 +10,8 @@ export class MarketingPage {
   readonly heading: Locator;
   readonly lead: Locator;
   readonly topBar: Locator;
+  /** The floating capsule inside the banner's placeholder. */
+  readonly topBarCapsule: Locator;
   readonly topBarJoin: Locator;
   readonly topBarSignIn: Locator;
   readonly callToAction: Locator;
@@ -59,6 +61,7 @@ export class MarketingPage {
     });
     this.lead = page.getByText(/^I’m Quinntyne Brown — a Christian, a founder who builds/);
     this.topBar = page.getByRole('banner');
+    this.topBarCapsule = page.locator('header.top-bar');
     this.topBarJoin = this.topBar.getByRole('button', { name: 'Create a profile' });
     this.topBarSignIn = this.topBar.getByRole('button', { name: 'Sign in' });
     this.callToAction = page.getByRole('region', { name: 'Let’s stay connected.' });

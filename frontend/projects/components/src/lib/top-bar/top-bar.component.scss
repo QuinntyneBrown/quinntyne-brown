@@ -9,8 +9,8 @@
 
 .top-bar {
   position: fixed;
-  inset-block-start: var(--space-2);
-  inset-inline: 0;
+  // It floats --space-2 clear of the sides as of the top, so its rounded ends never meet the edge.
+  inset: var(--space-2) var(--space-2) auto;
   z-index: var(--z-sticky);
   margin-inline: auto;
   max-inline-size: var(--layout-container-max);

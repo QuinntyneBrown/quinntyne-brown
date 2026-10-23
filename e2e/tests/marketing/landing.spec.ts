@@ -3,7 +3,7 @@ import { MarketingPage } from '../../pages/marketing.page';
 import {
   BREAKPOINTS,
   hasHorizontalScroll,
-  spillsSideways,
+  reachesSideEdges,
   undersizedTargets,
 } from '../../pages/viewport';
 
@@ -152,8 +152,8 @@ test.describe('Marketing page', () => {
 
         await expect(marketing.heading).toBeVisible();
         expect(await hasHorizontalScroll(page)).toBe(false);
-        expect(await spillsSideways(page, marketing.topBarJoin)).toBe(false);
-        expect(await spillsSideways(page, marketing.topBarSignIn)).toBe(false);
+        expect(await reachesSideEdges(page, marketing.topBarCapsule)).toBe(false);
+        expect(await reachesSideEdges(page, marketing.topBarSignIn)).toBe(false);
         expect(await undersizedTargets(page)).toEqual([]);
         await axe.check();
       });
