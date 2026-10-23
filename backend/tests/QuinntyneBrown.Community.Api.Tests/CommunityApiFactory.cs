@@ -52,6 +52,8 @@ public class CommunityApiFactory : WebApplicationFactory<Program>, IAsyncLifetim
 
     public FakeGoogleIdentityProvider Google { get; } = new();
 
+    public FakeGitHubIdentityProvider GitHub { get; } = new();
+
     public async Task InitializeAsync()
     {
         await using var scope = Services.CreateAsyncScope();
@@ -91,6 +93,7 @@ public class CommunityApiFactory : WebApplicationFactory<Program>, IAsyncLifetim
             services.AddSingleton<IPokerBroadcaster>(Live);
             services.AddSingleton<IFullTextSearch, InMemoryFullTextSearch>();
             services.AddSingleton<IGoogleIdentityProvider>(Google);
+            services.AddSingleton<IGitHubIdentityProvider>(GitHub);
         });
     }
 

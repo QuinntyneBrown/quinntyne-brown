@@ -78,6 +78,13 @@
   --palette-google-dark-bg: #131314;
   --palette-google-dark-fg: #e3e3e3;
   --palette-google-dark-border: #8e918f;
+  /* GitHub sign-in button: GitHub's dark mark-on-fill in light, inverted in dark; used only by the social button. */
+  --palette-github-light-bg: #1f2328;
+  --palette-github-light-fg: #ffffff;
+  --palette-github-light-border: #1f2328;
+  --palette-github-dark-bg: #f6f8fa;
+  --palette-github-dark-fg: #1f2328;
+  --palette-github-dark-border: #d1d9e0;
 
   /* Pastel tints for avatars, event and partner accents. Always paired with --color-fg-on-cover (dark text) in both themes. */
   --palette-cover-sage: #cfe8d5;
@@ -193,6 +200,9 @@
   --color-social-google-bg: var(--palette-google-light-bg);
   --color-social-google-fg: var(--palette-google-light-fg);
   --color-social-google-border: var(--palette-google-light-border);
+  --color-social-github-bg: var(--palette-github-light-bg);
+  --color-social-github-fg: var(--palette-github-light-fg);
+  --color-social-github-border: var(--palette-github-light-border);
   --color-focus-ring-offset: var(--color-bg-surface);
 
   --color-info-bg: var(--palette-blue-50);
@@ -408,6 +418,9 @@
   --color-social-google-bg: var(--palette-google-light-bg);
   --color-social-google-fg: var(--palette-google-light-fg);
   --color-social-google-border: var(--palette-google-light-border);
+  --color-social-github-bg: var(--palette-github-light-bg);
+  --color-social-github-fg: var(--palette-github-light-fg);
+  --color-social-github-border: var(--palette-github-light-border);
   --color-info-bg: var(--palette-blue-50);
   --color-info-fg: var(--palette-blue-800);
   --color-info-border: var(--palette-blue-300);
@@ -486,6 +499,9 @@
   --color-social-google-bg: var(--palette-google-dark-bg);
   --color-social-google-fg: var(--palette-google-dark-fg);
   --color-social-google-border: var(--palette-google-dark-border);
+  --color-social-github-bg: var(--palette-github-dark-bg);
+  --color-social-github-fg: var(--palette-github-dark-fg);
+  --color-social-github-border: var(--palette-github-dark-border);
 
   --color-info-bg: var(--palette-blue-950);
   --color-info-fg: var(--palette-blue-200);
@@ -566,6 +582,9 @@
     --color-social-google-bg: var(--palette-google-dark-bg);
     --color-social-google-fg: var(--palette-google-dark-fg);
     --color-social-google-border: var(--palette-google-dark-border);
+    --color-social-github-bg: var(--palette-github-dark-bg);
+    --color-social-github-fg: var(--palette-github-dark-fg);
+    --color-social-github-border: var(--palette-github-dark-border);
     --color-info-bg: var(--palette-blue-950);
     --color-info-fg: var(--palette-blue-200);
     --color-info-border: var(--palette-blue-800);

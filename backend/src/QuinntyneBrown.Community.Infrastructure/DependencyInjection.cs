@@ -81,6 +81,9 @@ public static class DependencyInjection
                 new HttpDocumentRetriever { RequireHttps = true }));
         services.AddSingleton<GoogleIdTokenValidator>();
         services.AddHttpClient<IGoogleIdentityProvider, GoogleIdentityProvider>(client => client.Timeout = TimeSpan.FromSeconds(10));
+        // GitHub sign-in (ADR 0032): OAuth 2.0 with PKCE; the person is read from GitHub's API.
+        services.Configure<GitHubOptions>(configuration.GetSection(GitHubOptions.Section));
+        services.AddHttpClient<IGitHubIdentityProvider, GitHubIdentityProvider>(client => client.Timeout = TimeSpan.FromSeconds(10));
         services.AddScoped<IVerificationResendLog, VerificationResendLog>();
         services.AddScoped<ITokenRevocation, TokenRevocation>();
         services.Configure<SmtpOptions>(configuration.GetSection(SmtpOptions.Section));

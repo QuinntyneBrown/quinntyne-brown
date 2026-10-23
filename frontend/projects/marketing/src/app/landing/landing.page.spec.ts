@@ -1,4 +1,4 @@
-// Traces to: L2-074, L2-076
+// Traces to: L2-074, L2-076, L2-130
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AUTH_SERVICE, BROWSER_REDIRECT, SignInOutcome } from '@faithtech-community/api';
@@ -11,11 +11,13 @@ describe('LandingPage', () => {
   let redirects: string[];
   let outcome: Observable<SignInOutcome>;
   let google: [string | undefined, boolean | undefined][];
+  let github: [string | undefined, boolean | undefined][];
   let kept: boolean;
 
   beforeEach(() => {
     redirects = [];
     google = [];
+    github = [];
     kept = false;
     outcome = of({ succeeded: true, emailVerified: true });
     TestBed.configureTestingModule({
@@ -28,6 +30,7 @@ describe('LandingPage', () => {
           useValue: {
             signInWithPassword: () => outcome,
             signInWithGoogle: (url?: string, keep?: boolean) => google.push([url, keep]),
+            signInWithGitHub: (url?: string, keep?: boolean) => github.push([url, keep]),
             hasKeptSession: () => kept,
           },
         },
@@ -114,6 +117,43 @@ describe('LandingPage', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain(
       'This account is suspended',
     );
+  });
+
+  // Traces to: L2-130
+  it('starts GitHub sign-in with the page asked for and shows only its button busy', async () => {
+    const fixture = TestBed.createComponent(LandingPage);
+    fixture.componentRef.setInput('returnUrl', '/events');
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const button = (name: string) =>
+      [...el.querySelectorAll('button')].find((b) => b.textContent?.includes(name))!;
+
+    button('Sign in with GitHub').click();
+    await fixture.whenStable();
+
+    expect(github).toEqual([['/events', false]]);
+    expect(google).toEqual([]);
+    expect(button('Sign in with GitHub').getAttribute('aria-busy')).toBe('true');
+    expect(button('Sign in with Google').getAttribute('aria-busy')).toBeNull();
+  });
+
+  it('offers Sign up with GitHub on the join form', async () => {
+    const fixture = TestBed.createComponent(LandingPage);
+    fixture.componentRef.setInput('join', '');
+    await fixture.whenStable();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Sign up with GitHub');
+  });
+
+  it.each([
+    ['failed', 'GitHub sign-in didn’t finish'],
+    ['suspended', 'This account is suspended'],
+  ])('shows how GitHub sign-in ended (%s) when the visitor comes back', async (outcome, text) => {
+    const fixture = TestBed.createComponent(LandingPage);
+    fixture.componentRef.setInput('github', outcome);
+    await fixture.whenStable();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(text);
   });
 
   // Traces to: L2-074 AC6

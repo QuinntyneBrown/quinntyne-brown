@@ -10,6 +10,8 @@ export class SignInPage {
   readonly emailError: Locator;
   readonly passwordError: Locator;
   readonly forgotPassword: Locator;
+  readonly signInWithGoogle: Locator;
+  readonly signInWithGitHub: Locator;
 
   constructor(private readonly page: Page) {
     this.heading = page.getByRole('heading', {
@@ -21,12 +23,14 @@ export class SignInPage {
     this.keepSignedIn = page.getByRole('switch', {
       name: 'Keep me signed in on this device',
     });
-    this.submit = page.getByRole('button', { name: /Sign in|Signing in/ });
+    this.submit = page.getByRole('button', { name: /^(Sign in|Signing in…)$/ });
     // The form summary: role=alert for danger, role=status for warnings (design system, alert).
     this.alert = page.locator('ft-alert [role=alert], ft-alert [role=status]');
     this.emailError = fieldError(page, 'Email');
     this.passwordError = fieldError(page, 'Password');
     this.forgotPassword = page.getByRole('link', { name: 'Forgot your password?' });
+    this.signInWithGoogle = page.getByRole('button', { name: 'Sign in with Google' });
+    this.signInWithGitHub = page.getByRole('button', { name: 'Sign in with GitHub' });
   }
 
   /** Submits without filling anything in, so no request is made. */

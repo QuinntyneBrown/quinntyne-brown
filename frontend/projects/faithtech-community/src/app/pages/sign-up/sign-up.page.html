@@ -21,11 +21,31 @@
           Builders, leads, volunteers, partners and anyone curious about faith and technology.
         </p>
         <ft-sign-up-form
+          divider="or"
           [busy]="busy()"
           [unreachable]="unreachable()"
           [serverErrors]="serverErrors()"
           (submitted)="submit($event)"
-        />
+        >
+          <ft-button
+            ftAuthAlternatives
+            variant="google"
+            size="lg"
+            [block]="true"
+            [loading]="googleBusy()"
+            (click)="continueWithGoogle()"
+            >Sign up with Google</ft-button
+          >
+          <ft-button
+            ftAuthAlternatives
+            variant="github"
+            size="lg"
+            [block]="true"
+            [loading]="githubBusy()"
+            (click)="continueWithGitHub()"
+            >Sign up with GitHub</ft-button
+          >
+        </ft-sign-up-form>
       </ft-stack>
     </ft-card>
     <p class="text-caption text-center">

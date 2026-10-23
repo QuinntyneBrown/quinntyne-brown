@@ -37,6 +37,9 @@ param privatePreviewEnabled bool = true
 @description('Adds the Google sign-in secrets (google-client-id, google-client-secret) to the app.')
 param googleSignInEnabled bool = false
 
+@description('Adds the GitHub sign-in secrets (github-client-id, github-client-secret) to the app.')
+param githubSignInEnabled bool = false
+
 param smtpHost string = 'smtp.sendgrid.net'
 param smtpPort int = 587
 param smtpFrom string = 'FaithTech Community <no-reply@faithtech.community>'
@@ -196,7 +199,8 @@ var secretNames = concat(
     'wall-passphrase-hash'
     'wall-signing-key'
   ],
-  googleSignInEnabled ? ['google-client-id', 'google-client-secret'] : []
+  googleSignInEnabled ? ['google-client-id', 'google-client-secret'] : [],
+  githubSignInEnabled ? ['github-client-id', 'github-client-secret'] : []
 )
 
 var appSecrets = [for secret in secretNames: {
@@ -231,6 +235,12 @@ var appEnv = concat(
     ? [
         { name: 'Google__ClientId', secretRef: 'google-client-id' }
         { name: 'Google__ClientSecret', secretRef: 'google-client-secret' }
+      ]
+    : [],
+  githubSignInEnabled
+    ? [
+        { name: 'GitHub__ClientId', secretRef: 'github-client-id' }
+        { name: 'GitHub__ClientSecret', secretRef: 'github-client-secret' }
       ]
     : []
 )

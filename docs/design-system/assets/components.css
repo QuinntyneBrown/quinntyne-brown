@@ -108,7 +108,7 @@ a:hover, a[data-state="hover"] { color: var(--color-fg-link-hover); text-decorat
 /* The "or" line between a form and the other ways in; its text ("or", "Parents can also") is read, so it is not a separator role. */
 .divider { display: flex; align-items: center; gap: var(--space-3); margin: 0; color: var(--color-fg-muted); font: var(--text-body-sm); text-align: center; }
 .divider::before, .divider::after { content: ""; flex: 1; border-top: var(--border-width-hairline) solid var(--color-border-default); }
-/* Brand marks (Google, Facebook) are the only filled icons; their paths carry the brands' own colours. */
+/* Brand marks (Google, GitHub, Facebook) are the only filled icons; Google's paths carry its own colours, GitHub's mark takes the label colour. */
 .icon--brand { stroke: none; }
 .btn[aria-busy="true"] .icon--brand { visibility: hidden; }
 
@@ -1052,6 +1052,10 @@ mark { background: var(--color-warning-bg); color: inherit; border-radius: var(-
 .btn--google { --btn-bg: var(--color-social-google-bg); --btn-fg: var(--color-social-google-fg); --btn-border: var(--color-social-google-border); --btn-bg-hover: color-mix(in srgb, var(--color-social-google-fg) 8%, var(--color-social-google-bg)); --btn-bg-active: color-mix(in srgb, var(--color-social-google-fg) 12%, var(--color-social-google-bg)); font-weight: var(--font-weight-medium); }
 .btn--google .icon--brand { width: 1.125em; height: 1.125em; }
 .btn--google[aria-busy="true"]::after { border-color: var(--color-social-google-fg); border-right-color: transparent; }
+/* GitHub's "Sign in with GitHub" button: GitHub's dark fill in light, its light fill in dark; the mark takes the label colour. */
+.btn--github { --btn-bg: var(--color-social-github-bg); --btn-fg: var(--color-social-github-fg); --btn-border: var(--color-social-github-border); --btn-bg-hover: color-mix(in srgb, var(--color-social-github-fg) 8%, var(--color-social-github-bg)); --btn-bg-active: color-mix(in srgb, var(--color-social-github-fg) 12%, var(--color-social-github-bg)); font-weight: var(--font-weight-medium); }
+.btn--github .icon--brand { width: 1.125em; height: 1.125em; fill: currentColor; }
+.btn--github[aria-busy="true"]::after { border-color: var(--color-social-github-fg); border-right-color: transparent; }
 
 .benefit { display: flex; flex-direction: column; gap: var(--space-3); }
 .benefit__title { font: var(--text-h4); }

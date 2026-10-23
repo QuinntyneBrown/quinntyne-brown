@@ -1,0 +1,80 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — GitHub sign-in
+
+class GitHubSignInCommand {
+  +string Code
+  +string RedirectUri
+  +string CodeVerifier
+}
+class GitHubSignInHandler {
+  +const LoginProvider = "GitHub"
+  +HandleAsync(command): Task<GitHubSignInResult>
+}
+class GoogleSignInHandler {
+  +const LoginProvider = "Google"
+}
+class ExternalAccounts {
+  +FindLinkOrCreateAsync(provider, subject, email, name): Task<CommunityUser>
+}
+class GitHubSignInResult {
+  +CommunityUser? User
+  +GitHubSignInError? Error
+}
+enum GitHubSignInError {
+  InvalidToken
+  UnverifiedEmail
+  Suspended
+}
+interface IGitHubIdentityProvider {
+  +BuildAuthorizationUrl(state, codeVerifier, redirectUri): string?
+  +ExchangeCodeAsync(code, redirectUri, codeVerifier): Task<GitHubIdentity?>
+}
+class GitHubIdentity <<record>> {
+  +string Subject
+  +string Email
+  +bool EmailVerified
+  +string? Name
+}
+class GitHubOptions {
+  +string ClientId
+  +string ClientSecret
+}
+class GitHubIdentityProvider
+abstract class SignInCorrelation {
+  +Write(context, pending)
+  +ReadAndClear(context): Pending?
+}
+class GoogleCorrelation
+class GitHubCorrelation
+class AccountStatus <<static>> {
+  +IsSuspendedAsync(db, user): Task<bool>
+}
+class "IdentityUserLogin<Guid>" as Login {
+  +string LoginProvider = "GitHub"
+  +string ProviderKey = user id
+  +Guid UserId
+}
+GitHubSignInHandler ..> GitHubSignInCommand
+GitHubSignInHandler ..> GitHubSignInResult
+GitHubSignInResult --> GitHubSignInError
+GitHubSignInHandler --> IGitHubIdentityProvider
+GitHubSignInHandler --> ExternalAccounts
+GoogleSignInHandler --> ExternalAccounts
+GitHubSignInHandler ..> AccountStatus
+IGitHubIdentityProvider <|.. GitHubIdentityProvider
+GitHubIdentityProvider --> GitHubOptions
+IGitHubIdentityProvider ..> GitHubIdentity
+SignInCorrelation <|-- GoogleCorrelation
+SignInCorrelation <|-- GitHubCorrelation
+ExternalAccounts ..> Login
+@enduml

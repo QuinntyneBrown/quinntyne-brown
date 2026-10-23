@@ -49,6 +49,15 @@
                 (click)="continueWithGoogle()"
                 >Sign up with Google</ft-button
               >
+              <ft-button
+                ftAuthAlternatives
+                variant="github"
+                size="lg"
+                [block]="true"
+                [loading]="githubBusy()"
+                (click)="continueWithGitHub()"
+                >Sign up with GitHub</ft-button
+              >
             </ft-sign-up-form>
             <p class="text-center">
               Already a member?
@@ -71,6 +80,15 @@
                 [loading]="googleBusy()"
                 (click)="continueWithGoogle()"
                 >Sign in with Google</ft-button
+              >
+              <ft-button
+                ftAuthAlternatives
+                variant="github"
+                size="lg"
+                [block]="true"
+                [loading]="githubBusy()"
+                (click)="continueWithGitHub()"
+                >Sign in with GitHub</ft-button
               >
             </ft-sign-in-form>
             <p class="text-center">

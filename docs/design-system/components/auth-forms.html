@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sign-in and sign-up forms — QuinntyneBrown.Community design system</title>
-<meta name="description" content="The shared presentation of the sign-in and sign-up forms, used by the community app&#39;s /sign-in and /sign-up pages and by the marketing page&#39;s panel, with the Google social button above an "or" divider.">
+<meta name="description" content="The shared presentation of the sign-in and sign-up forms, used by the community app&#39;s /sign-in and /sign-up pages and by the marketing page&#39;s panel, with the Google and GitHub social buttons above an "or" divider.">
 <link rel="stylesheet" href="../tokens/tokens.css">
 <link rel="stylesheet" href="../assets/components.css">
 <link rel="stylesheet" href="../assets/ds.css">
@@ -101,7 +101,7 @@
     <header class="ds-header">
       <p class="ds-kicker">Component · Forms</p>
       <h1>Sign-in and sign-up forms</h1>
-      <p class="ds-lead">The shared presentation of the sign-in and sign-up forms, used by the community app&#39;s /sign-in and /sign-up pages and by the marketing page&#39;s panel, with the Google social button above an "or" divider.</p>
+      <p class="ds-lead">The shared presentation of the sign-in and sign-up forms, used by the community app&#39;s /sign-in and /sign-up pages and by the marketing page&#39;s panel, with the Google and GitHub social buttons above an "or" divider.</p>
       <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: new</span></div>
       <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#anatomy">Anatomy</a></li><li><a href="#variants">Variants</a></li><li><a href="#sizes">Sizes</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive behaviour</a></li><li><a href="#theming">Theming</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don&#39;t</a></li><li><a href="#tokens">Tokens</a></li><li><a href="#code">Code</a></li><li><a href="#sources">Sources</a></li></ul>
     </header>
@@ -111,11 +111,12 @@
     </section>
 
     <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
-      <ol><li><b>Alternatives</b> (optional): the Google button and an "or" divider.</li><li><b>Failure alert</b>: incorrect credentials, locked, suspended, unreachable, Google failed.</li><li><b>Fields</b>: email and password (sign-in) or name, email and password (sign-up).</li><li><b>Keep me signed in</b> switch (sign-in).</li><li><b>Submit</b>: block, large, busy while submitting.</li><li><b>Links</b>: forgot password; join or sign in.</li></ol>
+      <ol><li><b>Alternatives</b> (optional): the Google and GitHub buttons and an "or" divider.</li><li><b>Failure alert</b>: incorrect credentials, locked, suspended, unreachable, Google failed, GitHub failed.</li><li><b>Fields</b>: email and password (sign-in) or name, email and password (sign-up).</li><li><b>Keep me signed in</b> switch (sign-in).</li><li><b>Submit</b>: block, large, busy while submitting.</li><li><b>Links</b>: forgot password; join or sign in.</li></ol>
     </section>
 
     <section class="ds-section" id="variants"><h2><a href="#variants">Variants</a></h2>
-      <h3>Google button (<code>variant="google"</code> on <code>ft-button</code>)</h3><p>Follows Google&#39;s sign-in branding: the full-colour G mark at its own size, "Sign in with Google" or "Sign up with Google", Google&#39;s white fill and grey outline in light, dark fill in dark. The colours are the only brand tokens (<code>--color-social-google-*</code>).</p><div class="ds-themes"><div data-theme="light" style="padding: var(--space-4);"><section class="card stack landing-hero__panel" aria-label="Sign in example"><h3>Sign in</h3><button class="btn btn--google btn--lg btn--block" type="button"><img class="icon icon--brand" src="../../mocks/assets/google-g.svg" alt="" width="18" height="18">Sign in with Google</button><p class="divider">or</p><div class="field"><label class="field__label" for="ex-email-l">Email</label><input class="input" id="ex-email-l" type="email" value="grace.okonkwo@example.org"></div><button class="btn btn--primary btn--lg btn--block" type="button">Sign in</button></section></div><div data-theme="dark" style="padding: var(--space-4);"><section class="card stack landing-hero__panel" aria-label="Sign in example"><h3>Sign in</h3><button class="btn btn--google btn--lg btn--block" type="button"><img class="icon icon--brand" src="../../mocks/assets/google-g.svg" alt="" width="18" height="18">Sign in with Google</button><p class="divider">or</p><div class="field"><label class="field__label" for="ex-email-d">Email</label><input class="input" id="ex-email-d" type="email" value="grace.okonkwo@example.org"></div><button class="btn btn--primary btn--lg btn--block" type="button">Sign in</button></section></div></div>
+      <h3>Google button (<code>variant="google"</code> on <code>ft-button</code>)</h3><p>Follows Google&#39;s sign-in branding: the full-colour G mark at its own size, "Sign in with Google" or "Sign up with Google", Google&#39;s white fill and grey outline in light, dark fill in dark. The colours are the only brand tokens (<code>--color-social-google-*</code>).</p><div class="ds-themes"><div data-theme="light" style="padding: var(--space-4);"><section class="card stack landing-hero__panel" aria-label="Sign in example"><h3>Sign in</h3><button class="btn btn--google btn--lg btn--block" type="button"><img class="icon icon--brand" src="../../mocks/assets/google-g.svg" alt="" width="18" height="18">Sign in with Google</button><p class="divider">or</p><div class="field"><label class="field__label" for="ex-email-l">Email</label><input class="input" id="ex-email-l" type="email" value="grace.okonkwo@example.org"></div><button class="btn btn--primary btn--lg btn--block" type="button">Sign in</button>      <h3>GitHub button (<code>variant="github"</code> on <code>ft-button</code>)</h3><p>Sits below the Google button with the same size and spacing: GitHub&#39;s mark drawn in the label colour, "Sign in with GitHub" or "Sign up with GitHub", GitHub&#39;s dark fill in light and its light fill in dark (<code>--color-social-github-*</code>). The mark is decorative (<code>aria-hidden</code>); the label names the provider. While the browser leaves for GitHub the button is busy and inert.</p>
+    </section></div><div data-theme="dark" style="padding: var(--space-4);"><section class="card stack landing-hero__panel" aria-label="Sign in example"><h3>Sign in</h3><button class="btn btn--google btn--lg btn--block" type="button"><img class="icon icon--brand" src="../../mocks/assets/google-g.svg" alt="" width="18" height="18">Sign in with Google</button><p class="divider">or</p><div class="field"><label class="field__label" for="ex-email-d">Email</label><input class="input" id="ex-email-d" type="email" value="grace.okonkwo@example.org"></div><button class="btn btn--primary btn--lg btn--block" type="button">Sign in</button></section></div></div>
     </section>
 
     <section class="ds-section" id="sizes" data-na="The forms fill their card; the card is at most 26rem (auth layout) or 28rem (hero panel)."><h2><a href="#sizes">Sizes</a></h2>
@@ -123,7 +124,7 @@
     </section>
 
     <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
-      <p>Default, invalid (inline errors, summary for sign-up, focus moves to the first error), busy (submit or Google button busy and inert), incorrect credentials, locked, suspended, unreachable, Google failed and sign-up success (check your inbox). See the <a href="../../mocks/pages/marketing/default.html">marketing mocks</a> and <a href="../../mocks/pages/sign-in/default.html">sign-in mocks</a> for each state.</p>
+      <p>Default, invalid (inline errors, summary for sign-up, focus moves to the first error), busy (submit, Google or GitHub button busy and inert), incorrect credentials, locked, suspended, unreachable, Google failed, GitHub failed and sign-up success (check your inbox). See the <a href="../../mocks/pages/marketing/default.html">marketing mocks</a> and <a href="../../mocks/pages/sign-in/default.html">sign-in mocks</a> for each state.</p>
     </section>
 
     <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
@@ -131,7 +132,7 @@
     </section>
 
     <section class="ds-section" id="theming"><h2><a href="#theming">Theming</a></h2>
-      <p>Inherits the field, button and alert tokens; the Google button switches between Google&#39;s light and dark fills.</p>
+      <p>Inherits the field, button and alert tokens; the Google button switches between Google&#39;s light and dark fills, and the GitHub button between GitHub&#39;s dark and light fills.</p>
     </section>
 
     <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
@@ -147,12 +148,13 @@
     </section>
 
     <section class="ds-section" id="tokens"><h2><a href="#tokens">Tokens</a></h2>
-      <div class="ds-table-wrap"><table class="ds-table"><thead><tr><th scope="col">Part</th><th scope="col">Token</th></tr></thead><tbody><tr><td>Google fill</td><td><code>--color-social-google-bg</code></td></tr><tr><td>Google text</td><td><code>--color-social-google-fg</code></td></tr><tr><td>Google outline</td><td><code>--color-social-google-border</code></td></tr><tr><td>Divider</td><td><code>--color-border-default</code></td></tr><tr><td>Gap</td><td><code>--space-4</code></td></tr></tbody></table></div>
+      <div class="ds-table-wrap"><table class="ds-table"><thead><tr><th scope="col">Part</th><th scope="col">Token</th></tr></thead><tbody><tr><td>Google fill</td><td><code>--color-social-google-bg</code></td></tr><tr><td>Google text</td><td><code>--color-social-google-fg</code></td></tr><tr><td>Google outline</td><td><code>--color-social-google-border</code></td></tr><tr><td>GitHub fill</td><td><code>--color-social-github-bg</code></td></tr><tr><td>GitHub text and mark</td><td><code>--color-social-github-fg</code></td></tr><tr><td>GitHub outline</td><td><code>--color-social-github-border</code></td></tr><tr><td>Divider</td><td><code>--color-border-default</code></td></tr><tr><td>Gap</td><td><code>--space-4</code></td></tr></tbody></table></div>
     </section>
 
     <section class="ds-section" id="code"><h2><a href="#code">Code</a></h2>
       <pre><code>&lt;ft-sign-in-form divider="or" [busy]="busy()" [failure]="failure()" forgotPasswordHref="/forgot-password" (submitted)="signIn($event)"&gt;
   &lt;ft-button ftAuthAlternatives variant="google" [block]="true" size="lg" [loading]="googleBusy()" (click)="google()"&gt;Sign in with Google&lt;/ft-button&gt;
+  &lt;ft-button ftAuthAlternatives variant="github" [block]="true" size="lg" [loading]="githubBusy()" (click)="github()"&gt;Sign in with GitHub&lt;/ft-button&gt;
 &lt;/ft-sign-in-form&gt;</code></pre>
     </section>
 

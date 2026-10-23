@@ -56,16 +56,19 @@
     --btn-bg: var(--color-social-google-bg);
     --btn-fg: var(--color-social-google-fg);
     --btn-border: var(--color-social-google-border);
-    --btn-bg-hover: color-mix(
-      in srgb,
-      var(--color-social-google-fg) 8%,
-      var(--color-social-google-bg)
-    );
-    --btn-bg-active: color-mix(
-      in srgb,
-      var(--color-social-google-fg) 12%,
-      var(--color-social-google-bg)
-    );
+  }
+
+  &.ft-button--github {
+    --btn-bg: var(--color-social-github-bg);
+    --btn-fg: var(--color-social-github-fg);
+    --btn-border: var(--color-social-github-border);
+  }
+
+  // Social buttons keep their brand fill and darken or lighten it towards the label colour.
+  &.ft-button--google,
+  &.ft-button--github {
+    --btn-bg-hover: color-mix(in srgb, var(--btn-fg) 8%, var(--btn-bg));
+    --btn-bg-active: color-mix(in srgb, var(--btn-fg) 12%, var(--btn-bg));
   }
 
   &[aria-busy='true'] .ft-button__brand {

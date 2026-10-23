@@ -3,6 +3,7 @@ import { expect, test } from '../../fixtures/app';
 import { photoUrl } from '../../fixtures/mock-api';
 import { ConnectPage } from '../../pages/connect.page';
 import { ContactsPage } from '../../pages/contacts.page';
+import { SignInPage } from '../../pages/sign-in.page';
 import { VerifyEmailPage } from '../../pages/verify-email.page';
 
 test.describe('Connect page', () => {
@@ -174,9 +175,7 @@ test.describe('Connect page, signed in', () => {
     await connect.open(link.token);
 
     await connect.signInToConnect.click();
-    await page.getByLabel('Email').fill(jonah.email);
-    await page.getByLabel('Password', { exact: true }).fill(jonah.password);
-    await page.getByRole('button', { name: 'Sign in' }).click();
+    await new SignInPage(page).signIn(jonah.email, jonah.password);
 
     await expect(connect.heading).toHaveText('You’re connected');
     expect(api.contacts.contacts).toHaveLength(1);

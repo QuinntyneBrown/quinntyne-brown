@@ -37,7 +37,7 @@ profile.
 
 | Area | What it does |
 |---|---|
-| **Marketing page** | A public page at www.quinntynebrown.com with a 21-second captioned brochure video, where visitors sign in, sign up or continue with Google and land in the community app. |
+| **Marketing page** | A public page at www.quinntynebrown.com with a 21-second captioned brochure video, where visitors sign in, sign up or continue with Google or GitHub and land in the community app. |
 | **Profiles** | Every member has a profile with a name, bio and up to 10 photos (one featured, alt text required). Profiles are visible to signed-in members. |
 | **Events** | Members-only or public events with city, venue and an online/in-person flag. Public events get a shareable page with guest RSVP (no account needed) and an `.ics` download. Cancelling notifies everyone who RSVP'd. Hackathons are an event type. |
 | **Contacts** | Leads keep private contacts and notes, visible only to them and System Admin. When a contact signs up with the same verified email, the lead is notified and can link to the real profile while keeping their notes. Archive and restore. |
@@ -166,6 +166,10 @@ cd frontend && npm run start:marketing
 
 # Google sign-in reads its client from configuration, never the repository
 export Google__ClientId=<client id> Google__ClientSecret=<client secret>
+
+# GitHub sign-in reads its OAuth app from configuration, never the repository
+# (callback URL: <WebApp:Origin>/api/account/github/callback)
+export GitHub__ClientId=<client id> GitHub__ClientSecret=<client secret>
 
 # Re-render the marketing page's brochure video (Kokoro-82M from Hugging Face; needs Python 3.10+
 # with `pip install kokoro soundfile`; --engine edge or --engine espeak are the alternatives)

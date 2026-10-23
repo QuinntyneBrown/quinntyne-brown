@@ -21,7 +21,7 @@ import { ButtonComponent } from './button.component';
   >`,
 })
 class HostComponent {
-  variant = signal<'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'google'>(
+  variant = signal<'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'google' | 'github'>(
     'secondary',
   );
   size = signal<'sm' | 'md' | 'lg'>('md');
@@ -204,6 +204,23 @@ describe('ButtonComponent', () => {
     const button = q<HTMLButtonElement>('button');
     expect(button.classList).toContain('ft-button--google');
     expect(q('img')?.getAttribute('alt')).toBe('');
+    expect(button.textContent?.trim()).toBe('Publish event');
+  });
+
+  // Traces to: L2-130
+  it("shows GitHub's mark in the label colour on the GitHub variant, decorative to screen readers", () => {
+    const { fixture, cmp, q } = setup();
+    expect(q('svg.ft-button__brand')).toBeNull();
+
+    cmp.variant.set('github');
+    fixture.detectChanges();
+
+    const button = q<HTMLButtonElement>('button');
+    expect(button.classList).toContain('ft-button--github');
+    const mark = q('svg.ft-button__brand')!;
+    expect(mark.getAttribute('aria-hidden')).toBe('true');
+    expect(mark.getAttribute('fill')).toBe('currentColor');
+    expect(q('img')).toBeNull();
     expect(button.textContent?.trim()).toBe('Publish event');
   });
 });

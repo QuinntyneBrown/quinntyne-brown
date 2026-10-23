@@ -1,0 +1,51 @@
+@startuml
+title UML sequence behaviour — continue with GitHub
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Visitor" as actor
+box "Marketing app" #FEF3C7
+  participant "LandingPage" as page
+end box
+box "Community API" #D1FADF
+  participant "AccountEndpoints" as ep
+  participant "GitHubSignInHandler" as h
+  participant "GitHubIdentityProvider" as prov
+  participant "ExternalAccounts" as acc
+end box
+participant "GitHub" as github
+box "Community app" #E0F2FE
+  participant "AuthContinuePage" as cont
+end box
+actor -> page : Sign in with GitHub
+page -> ep : GET /api/account/github/start?returnUrl&keepSignedIn
+ep -> ep : state, code verifier -> ftc.github cookie (protected, 10 min)
+ep --> github : 302 authorize (client_id, redirect_uri, scope read:user user:email, state, S256 code_challenge)
+actor -> github : Authorize the app
+github --> ep : 302 /api/account/github/callback?code&state
+ep -> ep : Delete cookie; state must match (L2-130 AC6)
+ep -> h : GitHubSignInCommand(code, redirectUri, codeVerifier)
+h -> prov : ExchangeCodeAsync
+prov -> github : POST /login/oauth/access_token (client secret, code_verifier)
+prov -> github : GET /user, GET /user/emails (bearer token, not stored)
+alt code refused
+  h --> ep : InvalidToken
+  ep --> page : 302 /?github=failed
+else primary email not verified
+  h --> ep : UnverifiedEmail (L2-130 AC4)
+  ep --> page : 302 /?github=failed
+else
+  h -> acc : FindLinkOrCreateAsync("GitHub", id, email, name)
+  acc -> acc : Find by login; else link by verified email, confirm, drop unproven password; else create with no role (AC1-AC3)
+  alt suspended
+    h --> ep : Suspended (AC5)
+    ep --> page : 302 /?github=suspended
+  else
+    h --> ep : User
+    ep -> ep : Sign in ftc.session cookie
+    ep --> cont : 302 /auth/continue?returnUrl&keepSignedIn
+    cont --> actor : PKCE, then home (ADR 0018)
+  end
+end
+@enduml

@@ -88,7 +88,7 @@ The mocks were styled with the Shelfie design system unchanged plus FaithTech ad
 | [Error page](components/error-page.html) | 404, 403, 500, offline. |
 | [Landing hero](components/landing-hero.html) | Split hero for the marketing page. |
 | [Video player](components/video-player.html) | Self-hosted video with captions. |
-| [Sign-in and sign-up forms](components/auth-forms.html) | Shared sign-in and sign-up forms, Google button. |
+| [Sign-in and sign-up forms](components/auth-forms.html) | Shared sign-in and sign-up forms, Google and GitHub buttons. |
 | [Site footer](components/site-footer.html) | Marketing page footer. |
 
 Each component page documents variants, sizes and the full state matrix in both themes, and its Sources section lists the mocks it came from.

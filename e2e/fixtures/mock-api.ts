@@ -6,6 +6,7 @@ import { MockConnect } from './mock-connect';
 import { MockContacts } from './mock-contacts';
 import { MockPartners } from './mock-partners';
 import { MockEvents } from './mock-events';
+import { MockGitHub } from './mock-github';
 import { MockGoogle } from './mock-google';
 import { MockNotification, MockNotifications } from './mock-notifications';
 import { MockReports } from './mock-reports';
@@ -183,6 +184,8 @@ export class MockApi {
   readonly search = new MockSearch(this);
   /** Google sign-in: Google itself and the API's Google endpoints (L2-078). */
   readonly google = new MockGoogle(this, (account) => (this.session = account));
+  /** GitHub sign-in: GitHub itself and the API's GitHub endpoints (L2-130). */
+  readonly github = new MockGitHub(this, (account) => (this.session = account));
   /** The private-preview wall on both hosts (ADR 0026); open unless a test calls wall.lock(). */
   readonly wall: MockWall;
 
@@ -297,7 +300,7 @@ export class MockApi {
     await this.page.goto(`/sign-in?returnUrl=${encodeURIComponent(path)}`);
     await this.page.getByLabel('Email').fill(account.email);
     await this.page.getByLabel('Password', { exact: true }).fill(account.password);
-    await this.page.getByRole('button', { name: 'Sign in' }).click();
+    await this.page.getByRole('button', { name: 'Sign in', exact: true }).click();
     await this.page.waitForURL((url) => url.pathname === path);
   }
 
@@ -308,6 +311,7 @@ export class MockApi {
   async install(): Promise<void> {
     await this.page.route(/\/(api|connect)\//, (route) => this.handle(route));
     await this.page.route('https://accounts.google.com/**', (route) => this.google.consent(route));
+    await this.page.route('https://github.com/**', (route) => this.github.authorize(route));
     await this.page.route(/\/hubs\/agile\/negotiate/, (route) => this.agile.negotiate(route));
     await this.page.routeWebSocket(/\/hubs\/agile/, (ws) => this.agile.hub(ws));
   }
@@ -422,6 +426,10 @@ export class MockApi {
         return this.google.start(route, url);
       case 'GET /api/account/google/callback':
         return this.google.callback(route, url);
+      case 'GET /api/account/github/start':
+        return this.github.start(route, url);
+      case 'GET /api/account/github/callback':
+        return this.github.callback(route, url);
       case 'GET /connect/authorize':
         return this.authorize(route, url);
       case 'POST /connect/token':

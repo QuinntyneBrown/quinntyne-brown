@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { AUTH_SERVICE, SignUpFieldErrors, signUpFieldErrors } from '@faithtech-community/api';
 import {
   AuthLayoutComponent,
+  ButtonComponent,
   CardComponent,
   LinkComponent,
   SignUpDetails,
@@ -10,10 +11,17 @@ import {
 } from '@faithtech-community/components';
 import { firstValueFrom } from 'rxjs';
 
-/** Create an account (L2-001), matching docs/mocks/pages/sign-up. */
+/** Create an account (L2-001), or continue with Google or GitHub (L2-131), matching docs/mocks/pages/sign-up. */
 @Component({
   selector: 'ft-sign-up-page',
-  imports: [AuthLayoutComponent, CardComponent, StackComponent, SignUpFormComponent, LinkComponent],
+  imports: [
+    AuthLayoutComponent,
+    ButtonComponent,
+    CardComponent,
+    StackComponent,
+    SignUpFormComponent,
+    LinkComponent,
+  ],
   templateUrl: './sign-up.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -24,6 +32,22 @@ export class SignUpPage {
   protected readonly unreachable = signal(false);
   protected readonly serverErrors = signal<SignUpFieldErrors>({});
   protected readonly sentTo = signal<string | null>(null);
+  protected readonly googleBusy = signal(false);
+  protected readonly githubBusy = signal(false);
+
+  /** One flow for signing up and signing in with Google: the browser leaves for Google. */
+  protected continueWithGoogle(): void {
+    if (this.googleBusy()) return;
+    this.googleBusy.set(true);
+    this.auth.signInWithGoogle('/', false, 'app');
+  }
+
+  /** One flow for signing up and signing in with GitHub: the browser leaves for GitHub. */
+  protected continueWithGitHub(): void {
+    if (this.githubBusy()) return;
+    this.githubBusy.set(true);
+    this.auth.signInWithGitHub('/', false, 'app');
+  }
 
   protected verifyEmailLink(email: string): string {
     return `/verify-email?email=${encodeURIComponent(email)}`;

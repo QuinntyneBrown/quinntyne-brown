@@ -23,7 +23,12 @@ import { TextFieldComponent } from '../text-field/text-field.component';
 
 /** Why the last sign-in did not go through; the page maps the API's answer onto one of these. */
 export type SignInFormFailure =
-  'invalid_credentials' | 'locked_out' | 'suspended' | 'unreachable' | 'google_failed';
+  | 'invalid_credentials'
+  | 'locked_out'
+  | 'suspended'
+  | 'unreachable'
+  | 'google_failed'
+  | 'github_failed';
 
 export interface SignInCredentials {
   email: string;
@@ -34,7 +39,7 @@ export interface SignInCredentials {
 /**
  * The sign-in form shared by the community app's /sign-in page and the marketing page
  * (docs/design-system/components/auth-forms.html). Presentation only: the page signs in and passes
- * `busy` and `failure` back. Project other ways in (the Google button) with `ftAuthAlternatives`.
+ * `busy` and `failure` back. Project other ways in (the Google and GitHub buttons) with `ftAuthAlternatives`.
  */
 @Component({
   selector: 'ft-sign-in-form',
@@ -78,7 +83,7 @@ export class SignInFormComponent {
     });
   }
 
-  /** Whether "Keep me signed in on this device" is ticked, for the other ways in (Google). */
+  /** Whether "Keep me signed in on this device" is ticked, for the other ways in (Google, GitHub). */
   keepSignedIn(): boolean {
     return this.form.controls.keepSignedIn.value;
   }

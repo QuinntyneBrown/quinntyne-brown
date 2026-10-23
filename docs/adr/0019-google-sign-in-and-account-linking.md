@@ -23,5 +23,5 @@ The marketing page offers "Sign in with Google" as one button for both sign-in a
 ## Consequences
 
 - Microsoft and Apple sign-in are deferred; a second provider would add its own `IExternalIdentityProvider` without changing the handler's linking rule.
-- The Google button on the community app's own sign-in page is deferred.
+- The Google button on the community app's own sign-in page is deferred. (Lifted by ADR 0032's addendum, L2-131.)
 - The e2e fake plays Google too (`accounts.google.com` is routed), so the suite never reaches the network.
