@@ -100,6 +100,36 @@ public class CommunitySeeder(IOpenIddictApplicationManager applications, Communi
         await db.SaveChangesAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Creates a verified System Admin with the given password for local development only, so there is always an
+    /// account to sign in with. Idempotent: an existing account with the email is left as it is.
+    /// </summary>
+    public async Task SeedDevAccountAsync(string email, string password, CancellationToken cancellationToken = default)
+    {
+        var normalized = email.Trim().ToUpperInvariant();
+        if (!await db.Users.AnyAsync(u => u.NormalizedEmail == normalized, cancellationToken))
+        {
+            var profile = new Profile("Quinntyne Brown", time.GetUtcNow().UtcDateTime);
+            var user = new CommunityUser
+            {
+                Id = Guid.NewGuid(),
+                UserName = email.Trim(),
+                NormalizedUserName = normalized,
+                Email = email.Trim(),
+                NormalizedEmail = normalized,
+                EmailConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString("N"),
+                ProfileId = profile.Id,
+            };
+            user.PasswordHash = new PasswordHasher<CommunityUser>().HashPassword(user, password);
+            db.Profiles.Add(profile);
+            db.Users.Add(user);
+            await db.SaveChangesAsync(cancellationToken);
+        }
+
+        await GrantSystemAdminAsync(email, cancellationToken);
+    }
+
     public const int MaxLoadTestUsers = 1000;
 
     /// <summary>A reserved top-level domain (RFC 2606): mail to it can never reach a real person.</summary>

@@ -150,6 +150,7 @@ docker compose -f backend/deploy/compose.yaml up -d postgres azurite
 dotnet run --project backend/src/QuinntyneBrown.Community.Cli -- migrate
 dotnet run --project backend/src/QuinntyneBrown.Community.Cli -- seed
 
+# Locally (Development), seed also creates the System Admin in Cli/appsettings.Development.json
 # Make an account that has signed up the first System Admin (idempotent, audited)
 dotnet run --project backend/src/QuinntyneBrown.Community.Cli -- grant-admin you@example.org
 
