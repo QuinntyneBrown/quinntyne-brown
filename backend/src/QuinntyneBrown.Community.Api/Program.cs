@@ -52,6 +52,8 @@ app.UseSerilogRequestLogging(options =>
     // This host's logger rather than the static one, which another host in the process may have replaced.
     options.Logger = app.Services.GetRequiredService<Serilog.ILogger>();
 });
+// The apex domain goes to the marketing page before anything else answers (L2-133).
+app.UseMiddleware<ApexRedirectMiddleware>();
 // The wall sits before the exception handler, status code pages and routing, so a locked request reaches nothing.
 app.UsePrivatePreview();
 app.UseExceptionHandler();

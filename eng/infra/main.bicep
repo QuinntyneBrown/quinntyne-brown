@@ -1,6 +1,6 @@
 // FaithTech Community on Azure Container Apps (ADR 0026, docs/detailed-designs/platform/private-preview-wall).
-// One container app serves app.quinntynebrown.com (community app, API, identity server) and
-// www.quinntynebrown.com (marketing page) behind the private-preview wall. Every secret lives in Key Vault; this
+// One container app serves app.quinntynebrown.com (community app, API, identity server),
+// www.quinntynebrown.com (marketing page) and the apex quinntynebrown.com (redirected to www) behind the private-preview wall. Every secret lives in Key Vault; this
 // template holds none. Runbook: docs/detailed-designs/platform/private-preview-wall/runbook.md.
 
 targetScope = 'resourceGroup'
@@ -17,6 +17,9 @@ param appHost string = 'app.quinntynebrown.com'
 
 @description('Host of the marketing page.')
 param wwwHost string = 'www.quinntynebrown.com'
+
+@description('The apex domain, redirected to the marketing page (L2-133). Empty leaves the apex out of the custom domains.')
+param apexHost string = 'quinntynebrown.com'
 
 @description('Parent domain for the unlock cookie, so one unlock covers both hosts.')
 param cookieDomain string = 'quinntynebrown.com'
@@ -53,7 +56,7 @@ param postgresAdminPassword string
 var suffix = uniqueString(resourceGroup().id)
 var appOrigin = 'https://${appHost}'
 var wwwOrigin = 'https://${wwwHost}'
-var hosts = [appHost, wwwHost]
+var hosts = empty(apexHost) ? [appHost, wwwHost] : [appHost, wwwHost, apexHost]
 // The deploy runs migrations before the API rolls out: the jobs are deployed when a Cli image is given, the app when an
 // API image is given (eng/deploy.sh).
 var deployJobs = !empty(cliImage)
@@ -215,6 +218,7 @@ var appEnv = concat(
     { name: 'ASPNETCORE_FORWARDEDHEADERS_ENABLED', value: 'true' }
     { name: 'WebApp__Origin', value: appOrigin }
     { name: 'Marketing__Origin', value: wwwOrigin }
+    { name: 'Marketing__ApexHost', value: apexHost }
     { name: 'StaticSites__ImageOrigins', value: take(storage.properties.primaryEndpoints.blob, length(storage.properties.primaryEndpoints.blob) - 1) }
     { name: 'PrivatePreview__Enabled', value: string(privatePreviewEnabled) }
     { name: 'PrivatePreview__CookieDomain', value: cookieDomain }
@@ -272,7 +276,8 @@ resource certificates 'Microsoft.App/managedEnvironments/managedCertificates@202
   dependsOn: [appUnbound]
   properties: {
     subjectName: host
-    domainControlValidation: 'CNAME'
+    // Subdomains are CNAMEs to the app; the apex is an A record to the environment's IP, validated over HTTP.
+    domainControlValidation: host == apexHost ? 'HTTP' : 'CNAME'
   }
 }]
 
@@ -355,7 +360,9 @@ output registryName string = registry.name
 output keyVaultName string = vault.name
 output appName string = appName
 output appFqdn string = deployApp ? (customDomainsStage == 'none' || customDomainsStage == 'issue' ? appUnbound!.outputs.fqdn : appBound!.outputs.fqdn) : ''
-@description('Value of the asuid TXT records for both hosts.')
+@description('Value of the asuid TXT records for every host.')
 output customDomainVerificationId string = environment.properties.customDomainConfiguration.customDomainVerificationId
+@description('The environment\'s inbound IP: the apex A record points here.')
+output staticIp string = environment.properties.staticIp
 output migrateJobName string = '${namePrefix}-migrate'
 output seedJobName string = '${namePrefix}-seed'

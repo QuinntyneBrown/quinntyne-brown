@@ -37,3 +37,7 @@ The site is deployed as `app.quinntynebrown.com` (community app, API, identity s
 ## Addendum (2026-10-23): private preview ended
 
 The wall is lifted: `eng/deploy.sh`, `eng/infra/main.bicepparam` and `.github/workflows/deploy.yml` default `PRIVATE_PREVIEW_ENABLED` to `false`, so `www.quinntynebrown.com` and `app.quinntynebrown.com` are open to everyone. The middleware, its tests and the Key Vault secrets stay in place; the GitHub variable `PRIVATE_PREVIEW_ENABLED=true` puts the wall back without a code change. The API's own default (`PrivatePreview:Enabled` = `true` outside Development) is unchanged, so a container started without the variable still refuses to serve until it is told otherwise.
+
+## Addendum (2026-10-23): the apex redirects to www
+
+`quinntynebrown.com` is the container app's third custom domain, on an `A` record to the environment's static IP and an HTTP-validated managed certificate, and `ApexRedirectMiddleware` answers every request on it with `301` to `https://www.quinntynebrown.com` plus the path and query, ahead of the wall and routing (`Marketing:ApexHost`, L2-133). One canonical host keeps the unlock cookie, the session hint and the OAuth callbacks exactly as they were.
