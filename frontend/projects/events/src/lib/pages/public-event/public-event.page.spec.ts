@@ -115,7 +115,7 @@ describe('PublicEventPage', () => {
     expect(page.host.textContent).toContain('You’re on the list, Abby');
     expect(page.host.textContent).toContain('We sent a confirmation to abby.brooks@example.org.');
     expect(page.host.querySelector('a[href="/sign-up"]')!.textContent).toContain(
-      'Create a FaithTech account',
+      'Create a Quinntyne Brown account',
     );
   });
 

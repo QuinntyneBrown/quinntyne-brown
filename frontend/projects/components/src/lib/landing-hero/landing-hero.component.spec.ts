@@ -8,7 +8,7 @@ import { LandingHeroComponent } from './landing-hero.component';
 @Component({
   imports: [LandingHeroComponent, BenefitComponent, CtaBandComponent],
   template: `
-    <ft-landing-hero eyebrow="FaithTech Community" heading="Build together" lead="Meet builders.">
+    <ft-landing-hero eyebrow="Quinntyne Brown" heading="Build together" lead="Meet builders.">
       <section ftHeroPanel><h2>Sign in</h2></section>
       <figure ftHeroMedia>Video</figure>
     </ft-landing-hero>
@@ -31,7 +31,7 @@ describe('Landing hero, benefit and call to action', () => {
     const hero = setup().querySelector('ft-landing-hero')!;
 
     expect(hero.querySelector('h1')?.textContent).toBe('Build together');
-    expect(hero.querySelector('.landing-hero__eyebrow')?.textContent).toBe('FaithTech Community');
+    expect(hero.querySelector('.landing-hero__eyebrow')?.textContent).toBe('Quinntyne Brown');
     expect(hero.querySelector('.landing-hero__lead')?.textContent).toBe('Meet builders.');
     const order = [...hero.children].map((c) => c.className);
     expect(order).toEqual(['landing-hero__copy', 'landing-hero__panel', 'landing-hero__media']);

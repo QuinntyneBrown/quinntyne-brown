@@ -10,8 +10,8 @@ import { VideoPlayerComponent } from './video-player.component';
     poster="/brochure/brochure-poster.jpg"
     posterAlt="Builders at a hackathon"
     captions="/brochure/brochure.en.vtt"
-    label="FaithTech Community in 21 seconds"
-    caption="FaithTech Community in 21 seconds · captions on"
+    label="Quinntyne Brown in 21 seconds"
+    caption="Quinntyne Brown in 21 seconds · captions on"
   />`,
 })
 class HostComponent {}
@@ -31,7 +31,7 @@ describe('VideoPlayerComponent', () => {
     expect(video.autoplay).toBe(false);
     expect(video.getAttribute('preload')).toBe('none');
     expect(video.getAttribute('poster')).toBe('/brochure/brochure-poster.jpg');
-    expect(video.getAttribute('aria-label')).toBe('FaithTech Community in 21 seconds');
+    expect(video.getAttribute('aria-label')).toBe('Quinntyne Brown in 21 seconds');
     expect(track.kind).toBe('captions');
     expect(track.default).toBe(true);
     expect(track.srclang).toBe('en');

@@ -5,5 +5,5 @@ export function createRefusal(error: unknown): string {
   if (error instanceof HttpErrorResponse && error.status === 403 && error.error?.detail) {
     return String(error.error.detail);
   }
-  return 'We couldn’t reach FaithTech. Try again.';
+  return 'We couldn’t reach Quinntyne Brown. Try again.';
 }

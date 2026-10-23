@@ -24,7 +24,7 @@ describe('HttpActivityService', () => {
       {
         id: 'n1',
         kind: 'ContactSignedUp',
-        text: 'Tomás Ortega just joined FaithTech',
+        text: 'Tomás Ortega just joined Quinntyne Brown',
         linkPath: '/contacts/c1',
         occurredAt: '2026-10-21T15:42:00Z',
       },

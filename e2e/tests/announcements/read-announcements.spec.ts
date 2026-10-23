@@ -27,7 +27,7 @@ test.describe('Read announcements and opt out', () => {
         recipientIds,
         sentAt,
       });
-    sent('Welcome to the new FaithTech community site', '2026-10-06T15:00:00Z');
+    sent('Welcome to the new Quinntyne Brown community site', '2026-10-06T15:00:00Z');
     sent('Builders Night moves to Kestrel Labs', '2026-10-17T15:00:00Z');
     sent('Not for Ruth', '2026-10-18T15:00:00Z', []);
     const announcements = new AnnouncementsPage(page);
@@ -38,7 +38,7 @@ test.describe('Read announcements and opt out', () => {
     await expect(announcements.items).toHaveCount(2);
     expect(await announcements.subjects()).toEqual([
       'Builders Night moves to Kestrel Labs',
-      'Welcome to the new FaithTech community site',
+      'Welcome to the new Quinntyne Brown community site',
     ]);
     await expect(announcements.item('Builders Night')).toContainText(
       'About Builders Night moves to Kestrel Labs.',

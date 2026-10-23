@@ -16,7 +16,7 @@ namespace QuinntyneBrown.Community.Infrastructure.Email;
 /// </remarks>
 public static partial class EmailTemplateRenderer
 {
-    public const string ActionLabel = "Open in FaithTech";
+    public const string ActionLabel = "Open in Quinntyne Brown";
 
     private static readonly Lazy<IReadOnlyDictionary<string, string>> Tokens = new(LoadTokens);
 
@@ -49,7 +49,7 @@ public static partial class EmailTemplateRenderer
             }
         }
 
-        html.Append($"<p class=\"email__footer\" style=\"{footer}\">FaithTech Community</p></div></body></html>");
+        html.Append($"<p class=\"email__footer\" style=\"{footer}\">Quinntyne Brown</p></div></body></html>");
         return html.ToString();
     }
 

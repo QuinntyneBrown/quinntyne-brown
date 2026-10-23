@@ -159,7 +159,7 @@ describe('ContactsPage', () => {
   it('points the lead to a contact who just joined', async () => {
     const { host, text } = await setup(() => of([abby, tomas]));
 
-    expect(text()).toContain('Tomás Ortega just joined FaithTech');
+    expect(text()).toContain('Tomás Ortega just joined Quinntyne Brown');
     expect(host.querySelector('ft-alert a[href="/contacts/c2"]')!.textContent).toContain('Review');
   });
 

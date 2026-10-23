@@ -292,7 +292,7 @@ export class PlanningPokerPage {
       this.toasts.show({
         variant: 'danger',
         heading: 'That didn’t work',
-        text: 'We couldn’t reach FaithTech. Try again.',
+        text: 'We couldn’t reach Quinntyne Brown. Try again.',
       });
       await this.refresh();
       return false;

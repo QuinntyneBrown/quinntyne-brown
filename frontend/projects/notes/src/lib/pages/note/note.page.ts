@@ -292,7 +292,7 @@ export class NotePage {
       this.toasts.show({
         variant: 'danger',
         heading: `${title} wasn’t restored`,
-        text: 'We couldn’t reach FaithTech. It’s still archived.',
+        text: 'We couldn’t reach Quinntyne Brown. It’s still archived.',
       });
     }
   }

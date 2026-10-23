@@ -10,7 +10,7 @@ function notification(overrides: Partial<NotificationDto>): NotificationDto {
   return {
     id: 'n1',
     kind: 'ContactSignedUp',
-    title: 'Tomás Ortega just joined FaithTech',
+    title: 'Tomás Ortega just joined Quinntyne Brown',
     linkPath: '/contacts/c1',
     createdAt: new Date().toISOString(),
     readAt: null,

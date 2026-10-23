@@ -93,7 +93,7 @@ export function ics(event: MockEvent, isPublic = false): string {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//FaithTech Community//Events//EN',
+    'PRODID:-//Quinntyne Brown//Events//EN',
     'BEGIN:VEVENT',
     `UID:${event.id}@faithtech.community`,
     `DTSTART:${utc(event.startsAt)}`,

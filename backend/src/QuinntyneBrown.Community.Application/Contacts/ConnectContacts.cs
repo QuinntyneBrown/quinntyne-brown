@@ -96,7 +96,7 @@ public class ContactConnector(IApplicationDbContext db, IEmailQueue emails, IOpt
             emails.Enqueue(new EmailMessage(
                 address,
                 title,
-                $"{person.Name} used your QR code and joined FaithTech Community. They’re now in your private contacts, " +
+                $"{person.Name} used your QR code and joined Quinntyne Brown. They’re now in your private contacts, " +
                 $"linked to their profile, so you can add notes and follow up:\n\n{webApp.Value.Origin}/contacts/{contact.Id}\n\n" +
                 "Your notes stay private to you."));
         }

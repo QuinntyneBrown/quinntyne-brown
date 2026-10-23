@@ -30,7 +30,7 @@ public class LinkContactTests(CommunityApiFactory factory) : IClassFixture<Commu
 
         var notification = Assert.Single(await NotificationsForAsync(grace));
         Assert.Equal(
-            (NotificationKind.ContactSignedUp, "Tomás Ortega just joined FaithTech", $"/contacts/{contact.Id}"),
+            (NotificationKind.ContactSignedUp, "Tomás Ortega just joined Quinntyne Brown", $"/contacts/{contact.Id}"),
             (notification.Kind, notification.Title, notification.LinkPath));
         var message = Assert.Single(await factory.QueuedEmailsToAsync(await EmailOfAsync(grace)));
         Assert.Contains($"{CommunityApiFactory.WebAppOrigin}/contacts/{contact.Id}", message.Body);

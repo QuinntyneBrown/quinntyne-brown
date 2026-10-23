@@ -46,7 +46,7 @@ const COPY: Record<
 > = {
   profile: {
     empty: 'No photos yet. Add one so people recognise you at events.',
-    note: 'JPEG, PNG or WebP up to 5 MB. Your featured photo is your picture everywhere on FaithTech.',
+    note: 'JPEG, PNG or WebP up to 5 MB. Your featured photo is your picture everywhere on Quinntyne Brown.',
     missingAlt: 'Describe what’s in the photo for people using screen readers.',
     pending: 'Not saved yet. It uploads when you save your profile.',
     storing: 'Saved. It shows on your profile once it finishes storing.',

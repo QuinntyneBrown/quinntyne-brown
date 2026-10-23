@@ -138,7 +138,7 @@ export class PartnersPage {
       this.toasts.show({
         variant: 'danger',
         heading: 'Partner not moved',
-        text: 'We couldn’t reach FaithTech, so the partner stays where it was. Try again.',
+        text: 'We couldn’t reach Quinntyne Brown, so the partner stays where it was. Try again.',
       });
     }
   }

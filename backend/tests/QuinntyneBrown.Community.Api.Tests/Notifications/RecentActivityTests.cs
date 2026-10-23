@@ -27,13 +27,13 @@ public class RecentActivityTests(CommunityApiFactory factory) : IClassFixture<Co
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         await AddNotificationAsync(grace, NotificationKind.InviteAccepted, "Ruth Alvarez accepted your invite", "/people/ruth", Noon.AddDays(-3));
-        await AddNotificationAsync(grace, NotificationKind.ContactSignedUp, "Tomás Ortega just joined FaithTech", "/contacts/tomas", Noon);
+        await AddNotificationAsync(grace, NotificationKind.ContactSignedUp, "Tomás Ortega just joined Quinntyne Brown", "/contacts/tomas", Noon);
         await AddNotificationAsync(grace, NotificationKind.EventChanged, "Toronto Builders Night changed. Check the new details.", "/events/builders", Noon.AddDays(-1));
 
         var feed = await factory.ClientFor(grace, Role.CityLead).GetFromJsonAsync<List<ActivityItem>>("/api/activity");
 
         Assert.Equal(
-            ["Tomás Ortega just joined FaithTech", "Toronto Builders Night changed. Check the new details.", "Ruth Alvarez accepted your invite"],
+            ["Tomás Ortega just joined Quinntyne Brown", "Toronto Builders Night changed. Check the new details.", "Ruth Alvarez accepted your invite"],
             feed!.Select(i => i.Text));
         Assert.Equal(["/contacts/tomas", "/events/builders", "/people/ruth"], feed!.Select(i => i.LinkPath));
         Assert.Equal("ContactSignedUp", feed![0].Kind);
@@ -63,7 +63,7 @@ public class RecentActivityTests(CommunityApiFactory factory) : IClassFixture<Co
         var lead = await factory.AddMemberAsync("Marcus Lee");
         var staff = await factory.AddMemberAsync("Daniel Brooks");
         var volunteer = await factory.AddMemberAsync("Ruth Alvarez");
-        await AddNotificationAsync(lead, NotificationKind.ContactSignedUp, "Private Person just joined FaithTech", "/contacts/private", Noon);
+        await AddNotificationAsync(lead, NotificationKind.ContactSignedUp, "Private Person just joined Quinntyne Brown", "/contacts/private", Noon);
 
         var staffFeed = await factory.ClientFor(staff, Role.Staff).GetFromJsonAsync<List<ActivityItem>>("/api/activity");
         var volunteerFeed = await factory.ClientFor(volunteer, Role.Volunteer).GetFromJsonAsync<List<ActivityItem>>("/api/activity");

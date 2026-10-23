@@ -21,7 +21,7 @@ test.describe('Marketing page', () => {
       'Build what matters',
     ]);
     await expect(marketing.callToActionJoin).toBeVisible();
-    await expect(marketing.footer).toContainText('© 2026 FaithTech');
+    await expect(marketing.footer).toContainText('© 2026 Quinntyne Brown');
     await axe.check();
   });
 

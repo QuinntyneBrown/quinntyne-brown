@@ -26,7 +26,7 @@ public class RoleChangeNotifier(IApplicationDbContext db, IEmailQueue emails, IO
 
         emails.Enqueue(new EmailMessage(
             address,
-            "Your FaithTech Community roles changed",
+            "Your Quinntyne Brown roles changed",
             $"{title}.\n\nSee your profile: {webApp.Value.Origin}/people/me"));
     }
 }

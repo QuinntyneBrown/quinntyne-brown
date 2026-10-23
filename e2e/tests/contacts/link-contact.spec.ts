@@ -21,7 +21,7 @@ test.describe('Link a contact on sign-up', () => {
     });
     const contacts = new ContactsPage(page);
     await api.signInAs(grace, '/contacts');
-    await expect(contacts.joinedAlert).toContainText('Tomás Ortega just joined FaithTech');
+    await expect(contacts.joinedAlert).toContainText('Tomás Ortega just joined Quinntyne Brown');
     await expect(contacts.item('Tomás Ortega')).toContainText('Signed up');
 
     await page.goto(`/contacts/${tomas.id}`);

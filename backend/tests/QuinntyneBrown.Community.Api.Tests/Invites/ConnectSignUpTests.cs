@@ -87,7 +87,7 @@ public class ConnectSignUpTests(CommunityApiFactory factory) : IClassFixture<Com
         await factory.VerifyAsync(await factory.SignUpThroughAsync(token, email));
 
         var notice = Assert.Single(await NotificationsForAsync(marcus));
-        Assert.Equal(("Tomás Ortega just joined FaithTech", $"/contacts/{theirs.Id}"), (notice.Title, notice.LinkPath));
+        Assert.Equal(("Tomás Ortega just joined Quinntyne Brown", $"/contacts/{theirs.Id}"), (notice.Title, notice.LinkPath));
         Assert.Null((await factory.WithDbAsync(db => db.Contacts.AsNoTracking().SingleAsync(c => c.Id == theirs.Id))).LinkedProfileId);
     }
 

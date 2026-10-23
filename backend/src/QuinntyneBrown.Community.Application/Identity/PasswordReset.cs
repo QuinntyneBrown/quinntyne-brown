@@ -33,7 +33,7 @@ public class RequestPasswordResetHandler(UserManager<CommunityUser> users, IEmai
         var link = $"{webApp.Value.Origin}/reset-password?userId={user.Id}&token={Uri.EscapeDataString(token)}";
         await email.SendAsync(new EmailMessage(
             user.Email!,
-            "Reset your FaithTech Community password",
+            "Reset your Quinntyne Brown password",
             $"Choose a new password for your account:\n\n{link}\n\nThis link expires in 1 hour. If you did not ask for it, you can ignore this email."),
             cancellationToken);
         return Result.Ok();

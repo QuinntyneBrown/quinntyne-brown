@@ -25,7 +25,7 @@ for (const name of Object.keys(BREAKPOINTS) as BreakpointName[]) {
     });
     api.notifications.add({
       recipientId: hannah.profileId,
-      title: 'Tomás Ortega just joined FaithTech, and he is one of your contacts',
+      title: 'Tomás Ortega just joined Quinntyne Brown, and he is one of your contacts',
       actorName: 'Tomás Ortega',
     });
     api.announcements.add({

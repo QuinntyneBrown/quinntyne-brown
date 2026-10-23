@@ -146,7 +146,7 @@ test.describe('Sign in from the marketing page', () => {
     await marketing.password.fill('a-long-enough-passphrase');
     await marketing.signInButton.click();
 
-    await expect(marketing.alert).toContainText('We couldn’t reach FaithTech');
+    await expect(marketing.alert).toContainText('We couldn’t reach Quinntyne Brown');
     await expect(marketing.email).toHaveValue('grace@example.org');
   });
 

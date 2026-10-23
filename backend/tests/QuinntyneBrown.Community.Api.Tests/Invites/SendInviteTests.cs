@@ -24,7 +24,7 @@ public class SendInviteTests(CommunityApiFactory factory) : IClassFixture<Commun
         var dto = (await response.Content.ReadFromJsonAsync<InviteDto>())!;
         Assert.Equal(("Pending", "ProductEngineer", "Grace Okonkwo"), (dto.Status, dto.PreassignedRole, dto.InvitedByName));
         var message = Assert.Single(await factory.QueuedEmailsToAsync(email));
-        Assert.Contains("Grace Okonkwo invited you to join FaithTech Community as a Product Engineer", message.Body);
+        Assert.Contains("Grace Okonkwo invited you to join Quinntyne Brown as a Product Engineer", message.Body);
         Assert.Contains("Loved your demo at Builders Night!", message.Body);
         Assert.Contains($"{CommunityApiFactory.WebAppOrigin}/accept-invite/", message.Body);
         var token = InviteClients.TokenFrom(message.Body);
