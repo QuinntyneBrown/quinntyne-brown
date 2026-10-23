@@ -19,7 +19,7 @@ Where it lives today:
 
 - Backend: `backend/src/QuinntyneBrown.Community.Domain/Team/TeamRoles.cs` only. Application, Infrastructure and Api
   have no team code. Reuse the finished `Profiles` feature for profile and photo data.
-- Frontend: `frontend/projects/team/` (placeholder with `SCAFFOLD.md`), plus `api` and `components`.
+- Frontend: `frontend/projects/team/`, plus `api` and `components`.
 - Mocks: `docs/mocks/pages/team/` and `docs/mocks/pages/team-board/`.
 - Estimate: `docs/estimates/team.md` (team-list, 2 days, 0%).
 
@@ -88,14 +88,14 @@ For each slice:
 - Do not start the next slice until the checks pass.
 
 After all slices: update `docs/estimates/team.md` and the README roll-up to true percent complete (skill
-`estimating-designs`); delete `frontend/projects/team/SCAFFOLD.md` once the project is real; keep mocks, design
+`estimating-designs`); keep mocks, design
 system, screen composition and the design aligned with what was built.
 
 ## Done means
 
 - L2-019 works end to end, enforced on the server.
 - All new and existing backend, frontend unit and Playwright tests pass; lint, format and build are clean.
-- The documentation agrees with the code; no `SCAFFOLD.md` remains in `team`.
+- The documentation agrees with the code.
 - The work is on a branch with a pull request to `main`, and its checks are green. Fetch and rebase first.
 - Only then end the run, with a short summary of what was built, decisions made (with ADR links) and anything
   deferred.

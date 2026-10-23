@@ -29,8 +29,7 @@ Where it lives today (placeholders or partial):
 - Backend: Domain `Notifications/` (Notification, NotificationKind), `Announcements/` (Announcement,
   AnnouncementAudience, AnnouncementRecipient, AudienceKind). Application, Infrastructure and Api have no code
   for these yet. Email, search and queue pieces belong in Infrastructure.
-- Frontend: `frontend/projects/{notifications,announcements,search}/` (each has a `SCAFFOLD.md`), plus `api`
-  and `components`. The announcements library also covers the read page and opt-out settings.
+- Frontend: `frontend/projects/{notifications,announcements,search}/`, plus `api` and `components`. The announcements library also covers the read page and opt-out settings.
 - Mocks: `docs/mocks/pages/{notifications,announcements,search,compose-announcement}`, `docs/mocks/notifications/{bell,toast}`.
 - Estimates: `docs/estimates/{notifications,announcements,search}.md`, all 0%.
 
@@ -119,7 +118,7 @@ For each slice:
 - Do not start the next slice until the checks pass.
 
 After all slices: update the three estimate files and the README roll-up to true percent complete (skill
-`estimating-designs`); delete the three `SCAFFOLD.md` files once their projects are real; keep mocks, design
+`estimating-designs`); keep mocks, design
 system, screen composition and designs aligned with what was built.
 
 ## Done means
@@ -127,7 +126,7 @@ system, screen composition and designs aligned with what was built.
 - L2-026, L2-027, L2-028, L2-029 and L2-030 work end to end, enforced on the server, with search results filtered
   by permission and proven by tests.
 - All new and existing backend, frontend unit and Playwright tests pass; lint, format and build are clean.
-- The documentation agrees with the code; no `SCAFFOLD.md` remains in `notifications`, `announcements` or `search`.
+- The documentation agrees with the code.
 - The work is on a branch with a pull request to `main`, and its checks are green. Fetch and rebase first.
 - Only then end the run, with a short summary of what was built, decisions made (with ADR links), triggers and
   searchable types left unwired, and anything else deferred.

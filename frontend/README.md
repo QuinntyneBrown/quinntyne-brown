@@ -1,6 +1,6 @@
 # FaithTech Community frontend
 
-Angular workspace for FaithTech Community. See [`AGENTS.md`](../AGENTS.md) for the architecture rules and [`SCAFFOLD.md`](SCAFFOLD.md) for the state of this workspace: it is currently a scaffold to be overwritten with the implementation.
+Angular workspace for FaithTech Community. See [`AGENTS.md`](../AGENTS.md) for the architecture rules.
 
 ## Commands
 

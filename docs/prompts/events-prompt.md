@@ -28,7 +28,7 @@ Where it lives today (placeholders or partial):
 
 - Backend: Domain `Events/` (Event, EventFormat, EventType, EventVisibility, Rsvp). Application, Infrastructure
   and Api have no event code yet. `.ics` generation belongs in Infrastructure.
-- Frontend: `frontend/projects/events/` (with `SCAFFOLD.md`), plus `api` and `components`.
+- Frontend: `frontend/projects/events/`, plus `api` and `components`.
 - Mocks: `docs/mocks/pages/{events,event,event-form,public-event}`, `docs/mocks/dialogs/{cancel-event,cancel-rsvp}`.
 - Estimates: `docs/estimates/events.md` (six designs, all 0%).
 
@@ -100,14 +100,14 @@ For each slice:
 - Do not start the next slice until the checks pass.
 
 After all slices: update `docs/estimates/events.md` and the README roll-up to true percent complete (skill
-`estimating-designs`); delete `frontend/projects/events/SCAFFOLD.md` once the project is real; keep mocks, design
+`estimating-designs`); keep mocks, design
 system, screen composition and designs aligned with what was built.
 
 ## Done means
 
 - L2-020 to L2-025 work end to end, enforced on the server, with anonymous access limited to public events.
 - All new and existing backend, frontend unit and Playwright tests pass; lint, format and build are clean.
-- The documentation agrees with the code; no `SCAFFOLD.md` remains in `events`.
+- The documentation agrees with the code.
 - The work is on a branch with a pull request to `main`, and its checks are green. Fetch and rebase first.
 - Only then end the run, with a short summary of what was built, decisions made (with ADR links) and anything
   deferred.

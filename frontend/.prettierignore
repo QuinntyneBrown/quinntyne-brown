@@ -1,4 +1,3 @@
-# SCAFFOLD: generated from AGENTS.md. Prettier owns formatting; CI runs format:check.
 dist
 coverage
 node_modules
