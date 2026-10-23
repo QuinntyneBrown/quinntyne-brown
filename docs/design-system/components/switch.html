@@ -100,6 +100,7 @@
       <li><a href="../components/empty-state.html">Empty state</a></li>
       <li><a href="../components/error-page.html">Error page</a></li>
       <li><a href="../components/landing-hero.html">Landing hero</a></li>
+      <li><a href="../components/wizard.html">Wizard</a></li>
       <li><a href="../components/video-player.html">Video player</a></li>
       <li><a href="../components/auth-forms.html">Sign-in and sign-up forms</a></li>
       <li><a href="../components/site-footer.html">Site footer</a></li>
@@ -207,6 +208,11 @@
         <li><b>Save on toggle</b>: the switch moves at once. On success the row and a success toast confirm it (with Undo); on failure the switch reverts to its previous position and a danger toast explains. Never leave the switch showing a value that was not saved.</li>
         <li>There is no invalid state: either position is a valid answer.</li>
       </ul>
+    </section>
+
+    <section class="ds-section" id="settings-list"><h2><a href="#settings-list">Settings list</a></h2>
+      <p>Admin settings stack switches in a <code>card.stack.form-width--md</code> under an <code>h2.card__title</code>, with one Save button in <code>.form-actions</code>. Saving shows a success <a href="alert.html">alert</a> (<code>role="status"</code>) at the top of the card. Label each switch with the question it controls ("Ask “How far along is it?”").</p>
+      <div class="ds-example"><div class="ds-example__canvas ds-example__canvas--stack"><form class="card stack form-width--md" action="#settings-list" aria-labelledby="sl-h"><h2 class="card__title" id="sl-h">Optional steps</h2><label class="switch"><input type="checkbox" checked><span class="switch__text">Ask “How far along is it?”</span></label><label class="switch"><input type="checkbox" checked><span class="switch__text">Ask “Who do you need?”</span></label><div class="form-actions cluster"><button class="btn btn--primary" type="submit">Save</button></div></form></div><div class="ds-example__caption"><span>From <a href="../../mocks/pages/idea-settings/default.html">pages/idea-settings</a> (and <a href="../../mocks/pages/idea-settings/saved.html">saved</a>).</span></div></div>
     </section>
 
     <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>

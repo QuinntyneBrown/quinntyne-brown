@@ -770,18 +770,40 @@
       "requirements": [],
       "states": [
         "default",
+        "signed-in",
         "invalid",
         "idea",
+        "idea-signed-in",
         "shape",
+        "shape-signed-in",
         "people",
+        "people-signed-in",
         "review",
+        "review-signed-in",
         "busy",
         "error",
         "success"
       ],
       "not_applicable": {
-        "loading": "The wizard needs no data before it renders; resuming a saved draft is not drawn yet.",
+        "loading": "The wizard needs no data before it renders.",
         "empty": "A form, not a collection."
+      }
+    },
+    {
+      "id": "idea-settings",
+      "kind": "page",
+      "title": "Idea form",
+      "route": "/admin/ideas",
+      "requirements": [],
+      "states": [
+        "default",
+        "saved"
+      ],
+      "not_applicable": {
+        "loading": "A two-switch form.",
+        "empty": "A form, not a collection.",
+        "error": "Saving two switches has no failure state drawn.",
+        "forbidden": "Only System Admin reaches it; others get the standard forbidden page."
       }
     },
     {
