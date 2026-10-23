@@ -50,4 +50,13 @@ export class TopBarComponent {
     const field = form.elements.namedItem('q') as HTMLInputElement | null;
     this.searchSubmit.emit((field?.value ?? '').trim());
   }
+
+  /** A mouse wheel scrolls an overflowing nav sideways until it reaches an end. */
+  protected onNavWheel(event: WheelEvent): void {
+    const nav = event.currentTarget as HTMLElement;
+    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+    const before = nav.scrollLeft;
+    nav.scrollLeft += event.deltaY;
+    if (nav.scrollLeft !== before) event.preventDefault();
+  }
 }

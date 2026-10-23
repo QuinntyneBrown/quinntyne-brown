@@ -4,7 +4,7 @@
     <span>Quinntyne Brown</span>
   </a>
   @if (!anonymous()) {
-    <nav class="top-bar__nav" [attr.aria-label]="navLabel()">
+    <nav class="top-bar__nav" [attr.aria-label]="navLabel()" (wheel)="onNavWheel($event)">
       @for (link of links(); track link.href) {
         <a
           class="top-bar__link"
