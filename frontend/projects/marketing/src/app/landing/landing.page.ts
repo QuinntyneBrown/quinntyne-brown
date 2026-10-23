@@ -82,6 +82,14 @@ export class LandingPage implements OnInit {
   protected readonly resumeUrl = '/resume/quinntyne-brown-resume.pdf';
   protected readonly projects = [
     {
+      name: 'Sweet Hand',
+      repo: 'sweet-hand',
+      language: 'TypeScript · NestJS',
+      image: 'sweet-hand',
+      description:
+        'Find the Caribbean home cooks and small-batch food makers of Toronto and the GTA.',
+    },
+    {
       name: 'Shelfie',
       repo: 'shelfie',
       language: 'TypeScript · .NET',

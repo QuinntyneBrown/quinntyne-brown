@@ -74,6 +74,12 @@ test.describe('Marketing page', () => {
     expect(await marketing.projectCards()).toEqual(
       [
         [
+          'Sweet Hand',
+          'sweet-hand',
+          'TypeScript · NestJS',
+          'Find the Caribbean home cooks and small-batch food makers of Toronto and the GTA.',
+        ],
+        [
           'Shelfie',
           'shelfie',
           'TypeScript · .NET',
