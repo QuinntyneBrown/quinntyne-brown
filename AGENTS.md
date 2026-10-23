@@ -43,7 +43,8 @@ quinntyne-brown/
 │   │   │                                        # checks; one folder per feature (Identity/,
 │   │   │                                        # Profiles/, Contacts/, Partners/, Team/, Events/, Search/,
 │   │   │                                        # Notifications/, Announcements/, Invites/, Admin/,
-│   │   │                                        # Resources/, Notes/, Agile/, PrivatePreview/, Reports/)
+│   │   │                                        # Resources/, Notes/, Agile/, PrivatePreview/, Reports/,
+│   │   │                                        # Organizations/)
 │   │   ├── QuinntyneBrown.Community.Infrastructure/  # DbContext, EF migrations, Postgres full-text
 │   │   │                                        # search, Azure Blob, email, .ics, CSV, image resizing,
 │   │   │                                        # OpenIddict stores, audit log, seeder, private-preview
@@ -83,8 +84,10 @@ quinntyne-brown/
 │       │                             # archived view, share/settings/move/archive/image/link dialogs
 │       ├── agile/                    # Feature library: workspaces, backlog, board, sprints,
 │       │                             # work items, Planning Poker
-│       └── reports/                  # Feature library: the fixed, read-only Reports page for Staff
-│                                     # and System Admin (filters, figures, charts, tables, CSV export)
+│       ├── reports/                  # Feature library: the fixed, read-only Reports page for Staff
+│       │                             # and System Admin (filters, figures, charts, tables, CSV export)
+│       └── organizations/            # Feature library: portfolio, org types, role catalogue editor,
+│                                     # feature flags, cross-org roles, memberships, org branding, agents
 ├── e2e/                              # Playwright suite (Chromium only)
 │   ├── playwright.config.ts
 │   ├── pages/                        # Page objects: one per screen, owning selectors
@@ -112,7 +115,7 @@ quinntyne-brown/
 
 Rules (MUST be followed):
 
-- Every feature uses the same name in `Application/`, `frontend/projects/`, `docs/specs/` and `docs/detailed-designs/`. The Agile workspaces subsystem is named `agile` (`Domain/Agile/`, `Application/Agile/`, `frontend/projects/agile/`, `docs/detailed-designs/agile/`; ADR 0010). Reports is named `reports` (`Application/Reports/`, `frontend/projects/reports/`, `docs/detailed-designs/reports/`, `docs/estimates/reports.md`, `e2e/tests/reports/`; ADR 0031); it reads other features' entities and needs no `Domain/Reports/`.
+- Every feature uses the same name in `Application/`, `frontend/projects/`, `docs/specs/` and `docs/detailed-designs/`. The Agile workspaces subsystem is named `agile` (`Domain/Agile/`, `Application/Agile/`, `frontend/projects/agile/`, `docs/detailed-designs/agile/`; ADR 0010). Reports is named `reports` (`Application/Reports/`, `frontend/projects/reports/`, `docs/detailed-designs/reports/`, `docs/estimates/reports.md`, `e2e/tests/reports/`; ADR 0031); it reads other features' entities and needs no `Domain/Reports/`. The organization hierarchy is named `organizations` (`Domain/Organizations/`, `Application/Organizations/`, `frontend/projects/organizations/`, `docs/specs/`, `docs/detailed-designs/organizations/`, `docs/estimates/organizations.md`, `e2e/tests/organizations/`; `docs/proposals/organization-hierarchy.md`). The org switcher is a component in `components`.
 - EF Core migrations live only in `Infrastructure/Persistence/Migrations/` and are applied by the Cli project, never by the API.
 - .NET tests live only under `backend/tests/`. Angular unit tests (`*.spec.ts`) sit next to the code they test. Playwright tests live only in `e2e/`.
 - Each frontend feature is its own library project under `frontend/projects/<feature>/`, exposing its routes, pages and dialogs through its public API (`public-api.ts`). The app lazy-loads it from the shell.
@@ -136,12 +139,18 @@ Rules (MUST be followed):
 
 ## Domain rules (do not break)
 
-- Data is global with no city boundary. **Exception:** private contacts and their notes are visible only to the lead who created them and to System Admin.
-- A profile can hold several global roles. New users start with no role.
-- City Leads may add/remove Lead, Volunteer, Product Engineer and Attendee roles. Only System Admin grants or removes City Lead, Staff and System Admin.
-- Staff is read-only across everything except private contacts and the resources and note pages Staff own: Staff may add resources and note pages and edit, share, archive and restore their own; every other Staff write is refused.
-- System Admin can override anything; every admin action goes to the audit log.
-- Profiles are visible to signed-in members only. Public events are the only content anonymous visitors see (shareable page, guest RSVP, `.ics`).
+The organization hierarchy (`docs/proposals/organization-hierarchy.md`) is agreed and replaces the global, fixed-role model. It is delivered in phases; until a phase lands, the code keeps the previous rule it replaces, and the slice that changes a rule also changes its tests and the e2e fake.
+
+- Hierarchy: System Admin (platform) > Portfolio > Organization. System Admin, Portfolio Lead, Org Lead (in every org) and Member (an org member with no roles) are built in. Everything else is data: Org Types, their role catalogues and enabled features, Organizations, and cross-org roles.
+- Every record belongs to exactly one Organization; there is no boundary below the org. Profiles are the exception: one global profile per person, visible only to people who share an org with them or whose role covers one of their orgs.
+- The server checks permission codes defined in code, never role names. A catalogue role is a data bundle of permissions plus an explicit list of roles it may grant; it inherits nothing from its parent. Several roles = the union of their permissions.
+- Grants: System Admin grants System Admin and Portfolio Lead; Portfolio Lead grants Org Lead, cross-org roles and any role in its orgs, and is the only one (with System Admin) who edits Org Types and catalogues; Org Lead grants any catalogue role in its org; a catalogue role grants only its `CanGrant` list in its own org.
+- Cross-org roles (for example Portfolio and Staff) apply a permission bundle across a set of orgs, all orgs of a type, or the whole portfolio. Staff is read-only except the resources and note pages Staff own, and never sees private contacts.
+- Private contacts and their notes, and private resources and note pages, are visible only to their owner and to System Admin. Portfolio Lead, Org Lead and cross-org roles never see them.
+- System Admin can override anything; overrides by System Admin, Portfolio Lead and Org Lead on other people's items go to the audit log.
+- People join an org only through that org's invite or connect link, or by being added by its Org Lead or Portfolio Lead. Agents are profiles of kind Agent that sign in with scoped, revocable tokens and hold roles like people.
+- A feature disabled for an Org Type returns 404 in its orgs. Anything outside the caller's coverage returns 404.
+- Public events are the only content anonymous visitors see (shareable page, guest RSVP, `.ics`), addressed by org.
 - Every query, search result and endpoint must enforce these permissions on the server. Never rely on the UI to hide data.
 
 v1 features: profiles and photos (max 10, one featured, alt text required), invites (expire after 14 days), connect links (a City Lead's reusable QR code that never expires and can be replaced; not an invite), contacts (soft-delete archive and restore, linked when the person signs up), partner Kanban (Lead -> In Funnel -> Confirmed), team, events (hackathon is an event type), global search, notifications (in-app + email), announcements (with email opt-out), resources (uploads and https links, type and tags, private/shared/global visibility, archive with 30-day purge), docs & notes (block-based pages with formatting, drag-and-drop and keyboard reorder, page links, backlinks and nesting; private/shared/global visibility, default private; archive and restore). Hackathon teams, projects and judging are v2. Do not build them yet.

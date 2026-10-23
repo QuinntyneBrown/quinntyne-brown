@@ -1,0 +1,258 @@
+ROLES, WORKSPACES AND PERMISSIONS
+=================================
+A plain-language guide to who can see and do what.
+Source of truth: the server (Application/*Access.cs and docs/adr/). The app only
+hides buttons; the API refuses anything a role may not do.
+
+
+1. THE BASICS
+-------------
+- Everyone signs in with one profile.
+- A new member starts with NO role.
+- A profile can hold SEVERAL roles at once (e.g. City Lead + Event Lead).
+- Data is global. There is no "my city only" boundary.
+  Exception: private contacts belong only to the lead who made them.
+
+
+2. THE ROLES (HIERARCHY)
+------------------------
+
+                       +------------------+
+                       |   SYSTEM ADMIN   |   can do anything, anywhere
+                       +------------------+   (every override is audit-logged) - Me 
+                                |
+                       +------------------+
+                       |    PORTFOLIO LEAD |  (Me) can do anything in portfolio, grants roles, own's worspaces, connect link
+                       +------------------+   
+                                |
+                       +------------------+
+                       |    PORTFOLIO     |  Portfolio Level Visibility. A person that can look at boards, resources and data across one or more organizations by configuration. My Wife might be configured to see all data be assigned work spanning orgs. Agents as well.
+                       +------------------+   
+                                
+                                |
+                       +------------------+
+                       |    Organization LEAD     |   One or more Orgs under Portfolio. Data Driven Org Type. Org structure is by configuration
+                       +------------------+   	      One type of Org is FaithTech. It's database entry. The whole City Lead, everything is configuration driven
+						      Another Org might one of my start ups (Sweet Hand, Shelfie, etc...) They might not have the elaborate hierchy like FaitTech Org
+
+
+
+                                |
+                       +------------------+
+                       |    CITY LEAD     |   runs the city: grants roles,
+                       +------------------+   owns workspaces, connect link
+                                |
+         +----------------------+----------------------+
+         |                      |                      |
+  +-------------+      +---------------+     +---------------------+
+  | EVENT LEAD  |      |  CREATE LEAD  |     | COMMUNICATIONS LEAD |
+  +-------------+      +---------------+     +---------------------+
+   runs events          (lead powers)         sends announcements
+         |                      |                      |
+         +----------------------+----------------------+
+                                |
+                 +--------------+--------------+
+                 |                             |
+          +-------------+              +------------------+
+          |  VOLUNTEER  |              | PRODUCT ENGINEER |
+          +-------------+              +------------------+
+                 |                             |
+                 +--------------+--------------+
+                                |
+                         +-------------+
+                         |  ATTENDEE   |
+                         +-------------+
+                                |
+                         +-------------+
+                         |   NO ROLE   |   any signed-in member
+                         +-------------+
+
+  Off to the side:
+
+         +-------------+
+         |    STAFF    |   FaithTech staff. Sees almost everything,
+         +-------------+   changes almost nothing (read-only).
+
+  "Leads" (the 4 lead roles) = City Lead, Event Lead, Create Lead,
+  Communications Lead. Many rules say "any lead" and mean these four.
+
+  The "team" = the 4 lead roles + Volunteer. Only team members can be
+  added to a workspace.
+
+
+3. WHO GIVES OUT ROLES
+----------------------
+
+  SYSTEM ADMIN  --> can grant/remove ANY role
+                    (incl. City Lead, Staff, System Admin)
+
+  CITY LEAD     --> can grant/remove only:
+                    Event Lead, Create Lead, Communications Lead,
+                    Volunteer, Product Engineer, Attendee
+
+  Everyone else --> cannot change roles
+
+  - Only System Admin makes someone a City Lead, Staff or System Admin.
+  - When a City Lead changes your roles, you are notified.
+  - When a System Admin does it, it goes in the audit log.
+  - An invite can come with a role pre-assigned (same limits apply).
+
+
+4. WHAT LEADS HAVE ACCESS TO
+---------------------------
+
+  ALL LEADS (City, Event, Create, Communications) can:
+  - Send invites (expire after 14 days; max 50 per day)
+  - Keep PRIVATE CONTACTS: list, add, add notes, archive, restore, link
+    -> only they (and System Admin) can ever see their own contacts
+  - Read AND change the PARTNER pipeline (Lead -> In Funnel -> Confirmed)
+  - See who RSVP'd to events, incl. guest emails; export RSVPs as CSV
+  - Check attendees in at events, add walk-ins
+  - Add RESOURCES (files and links) and own/share/archive them
+  - Open WORKSPACES they own or were added to
+
+  CITY LEAD also can:
+  - Grant/remove the 6 non-admin roles (see section 3)
+  - See the People page (everyone's profile and roles)
+  - CREATE WORKSPACES and own them (can own several)
+  - Have a CONNECT LINK: a reusable QR code that never expires
+  - Create, edit and cancel events
+
+  EVENT LEAD also can:
+  - Create, edit and cancel events
+
+  COMMUNICATIONS LEAD also can:
+  - Send announcements (members can opt out of the email)
+
+  CREATE LEAD:
+  - Everything in "all leads"; no extra special powers today
+
+  What leads CANNOT do:
+  - See another lead's private contacts
+  - Edit someone else's profile, resource or note page
+  - Open a workspace they are not a member of
+  - Grant City Lead, Staff or System Admin (City Lead included)
+  - See Reports or the Admin area / audit log
+
+
+5. WORKSPACES (AGILE)
+---------------------
+  A workspace is a project space with a backlog, board, sprints,
+  work items and Planning Poker. Kanban or Scrum.
+
+  Who creates one?     City Lead or System Admin. The creator is OWNER.
+  Who can be added?    Team members only (any lead or Volunteer),
+                       not suspended. Added by the owner.
+
+  Your level inside one workspace:
+
+     OWNER  ......... the City Lead who created it (or was given it)
+       |
+     ADMIN  ......... any System Admin (not the owner)
+       |
+     MEMBER ......... someone the owner added
+       |
+     STAFF  ......... any Staff, read-only
+       |
+     OUTSIDER ....... everyone else: cannot even see it exists (404)
+
+                             Owner  Admin  Member  Staff  Outsider
+  See the workspace           yes    yes    yes     yes     no
+  Stories, tasks, comments,   yes    yes    yes     no      no
+   move cards, sprint
+   planning, Planning Poker
+  Initiatives & epics,        yes    yes    no      no      no
+   rename, members, sprints,
+   switch Kanban/Scrum,
+   archive & restore
+  Reassign the owner          no     yes    no      no      no
+
+  Notes:
+  - Leads and Volunteers see ONLY the workspaces they own or belong to.
+    Being a lead does not open other people's workspaces.
+  - Staff and System Admin can see every workspace.
+  - Archived workspaces vanish for members and Staff; owner and
+    System Admin still see them and can restore them.
+  - If an owner loses City Lead, System Admins are told the workspace
+    "needs a new owner", and a System Admin reassigns it to another
+    City Lead. The old owner stays on as a member.
+  - Every System Admin change in someone else's workspace is audited.
+
+
+6. QUICK MATRIX: WHO SEES WHAT
+------------------------------
+  Key:  RW = read & change   R = read only   own = only their own
+        -  = no access
+
+  Area                City   Other   Volun-  Prod.  Attendee/  Staff   System
+                      Lead   Leads   teer    Eng.   No role            Admin
+  ------------------  -----  ------  ------  -----  ---------  ------  ------
+  Profiles (view)     R      R       R       R      R          R       RW
+  Own profile         RW     RW      RW      RW     RW         RW      RW
+  People page         R      -       -       -      -          R       R
+  Private contacts    own    own     -       -      -          -       RW*
+  Partners            RW     RW      -       -      -          R       RW
+  Events (view/RSVP)  R      R       R       R      R          R       RW
+  Events (manage)     RW     Event   -       -      -          -       RW
+                             Lead
+  RSVP list           R      R       count   count  count      R (no   R
+                                                               emails)
+  Check-in            RW     RW      -       -      -          R       RW
+  Invites (send)      yes    yes     -       -      -          -       yes
+  Connect link (QR)   yes    -       -       -      -          -       yes
+  Announcements read  R      R       R       R      R          R       R
+  Announcements send  -      Comms   -       -      -          -       yes
+                             Lead
+  Resources (add)     yes    yes     -       -      -          yes     yes
+  Notes pages (add)   yes    yes     yes     yes    yes        yes     yes
+  Workspaces          own/   member  member  -      -          R all   RW all
+                      member
+  Create workspace    yes    -       -       -      -          -       yes
+  Reports             -      -       -       -      -          R       R
+  Admin + audit log   -      -       -       -      -          -       RW
+  Change roles        6 non- -       -       -      -          -       all
+                      admin
+
+  * System Admin opening someone else's contact is audit-logged.
+  Notes pages: any member with a verified email can create them.
+
+
+7. RESOURCES AND NOTE PAGES (VISIBILITY)
+----------------------------------------
+  Each resource or note page has one of three settings:
+
+    PRIVATE  -> only the owner
+    SHARED   -> owner + named people and/or everyone holding a named role
+    GLOBAL   -> every signed-in member
+
+  - New resources default to GLOBAL. New note pages default to PRIVATE.
+  - Only the OWNER edits, shares, archives or restores. No exceptions
+    for City Leads or other leads.
+  - System Admin can do anything (audited).
+  - Shared-by-role is live: gain the role, you see it; lose it, you don't.
+  - Archived resources are purged after 30 days. Archived note pages stay.
+
+
+8. STAFF IN ONE SENTENCE
+------------------------
+  Staff can READ nearly everything (partners, people, events, every
+  workspace, reports) but can only CHANGE their own resources and note
+  pages. They never see private contacts.
+
+
+9. ANONYMOUS VISITORS (NOT SIGNED IN)
+-------------------------------------
+  - Can see PUBLIC event pages only
+  - Can RSVP as a guest and download the calendar (.ics) file
+  - Cannot see any profile or anything else
+
+
+10. GOLDEN RULES
+----------------
+  - More roles = the union of their powers.
+  - System Admin can override anything; it is always audit-logged.
+  - Being a lead gives power over city data (contacts, partners, events,
+    invites), NOT over other people's personal work (their profile,
+    pages, resources, or workspaces they don't belong to).
+  - If you can't see something, the server says "not found" (404),
+    so nobody learns it exists.
