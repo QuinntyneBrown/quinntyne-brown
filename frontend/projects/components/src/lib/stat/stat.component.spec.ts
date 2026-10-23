@@ -110,4 +110,19 @@ describe('StatComponent', () => {
   it('has no context line by default', () => {
     expect(setup().querySelector('.ft-stat__context')).toBeNull();
   });
+
+  // Traces to: L2-132 AC3
+  // Given a headline figure (15+ over "years"), when it renders, then the value shows above its
+  // label through the figure variant, while the label stays first in the DOM and names the group.
+  it('shows a figure value above its label, keeping the label first in the DOM', () => {
+    const fixture = TestBed.createComponent(StatComponent);
+    fixture.componentRef.setInput('label', 'years');
+    fixture.componentRef.setInput('value', '15+');
+    fixture.componentRef.setInput('variant', 'figure');
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.classList.contains('ft-stat--figure')).toBe(true);
+    expect(el.firstElementChild?.classList.contains('ft-stat__label')).toBe(true);
+    expect(el.querySelector('.ft-stat__value')?.textContent?.trim()).toBe('15+');
+  });
 });

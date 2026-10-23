@@ -1,0 +1,13 @@
+<span class="project-card__thumb" aria-hidden="true">
+  @if (image(); as src) {
+    <img [src]="src" alt="" />
+  } @else {
+    {{ initial() }}
+  }
+</span>
+<div class="project-card__body">
+  <a class="project-card__name" [attr.href]="href()">{{ name() }}</a>
+  @if (language(); as text) {
+    <span class="project-card__language">{{ text }}</span>
+  }
+</div>

@@ -14,6 +14,15 @@
   color: var(--color-fg-default);
 }
 
+:host(.ft-stat--figure) {
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+
+  .ft-stat__value {
+    color: var(--color-fg-accent);
+  }
+}
+
 .ft-stat__value--text {
   font: var(--text-h4);
 }

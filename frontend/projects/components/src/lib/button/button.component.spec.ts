@@ -15,6 +15,7 @@ import { ButtonComponent } from './button.component';
     [label]="label()"
     [href]="href()"
     [target]="target()"
+    [download]="download()"
     [object]="object()"
     [initialFocus]="initialFocus()"
     >Publish event</ft-button
@@ -33,6 +34,7 @@ class HostComponent {
   label = signal<string | null>(null);
   href = signal<string | null>(null);
   target = signal<string | null>(null);
+  download = signal<string | null>(null);
   object = signal<string | null>(null);
   initialFocus = signal(false);
 }
@@ -155,6 +157,17 @@ describe('ButtonComponent', () => {
     expect(a.getAttribute('href')).toBe('/events');
     expect(a.textContent).toContain('Publish event');
     expect(a.classList.contains('ft-button')).toBe(true);
+  });
+
+  // Traces to: L2-132 AC2
+  it('asks the browser to download a link’s file when download is set', () => {
+    const { fixture, cmp, q } = setup();
+    cmp.href.set('/resume/quinntyne-brown-resume.pdf');
+    fixture.detectChanges();
+    expect(q('a').hasAttribute('download')).toBe(false);
+    cmp.download.set('');
+    fixture.detectChanges();
+    expect(q('a').getAttribute('download')).toBe('');
   });
 
   it('keeps a disabled link out of the tab order and marks it aria-disabled', () => {

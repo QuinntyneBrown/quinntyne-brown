@@ -6,6 +6,7 @@
   @if (lead(); as text) {
     <p class="landing-hero__lead">{{ text }}</p>
   }
+  <div class="landing-hero__actions"><ng-content select="[ftHeroActions]" /></div>
 </div>
 <div class="landing-hero__panel"><ng-content select="[ftHeroPanel]" /></div>
 <div class="landing-hero__media"><ng-content select="[ftHeroMedia]" /></div>
