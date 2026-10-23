@@ -19,6 +19,7 @@ public class PrivatePreviewGateMiddleware(
 {
     public const string UnlockPath = "/__wall/unlock";
     public const string UnlockCookie = "__Secure-unlock";
+    public const string WebhookPath = "/api/webhooks/events";
 
     private const int MaxFormBytes = 4096;
 
@@ -39,7 +40,9 @@ public class PrivatePreviewGateMiddleware(
             return;
         }
 
+        // Exact method and path only: the liveness probe, and the inbound webhook, which its signature authenticates (ADR 0042).
         if ((readOnly && request.Path == "/health/live")
+            || (HttpMethods.IsPost(request.Method) && request.Path == WebhookPath)
             || context.RequestServices.GetRequiredService<IUnlockTokens>().IsValid(request.Cookies[UnlockCookie]))
         {
             await next(context);

@@ -94,6 +94,7 @@ app.MapSearchEndpoints();
 app.MapResourcesEndpoints();
 app.MapReportsEndpoints();
 app.MapIntegrationsEndpoints();
+app.MapWebhookEndpoints();
 app.MapNotesEndpoints();
 app.MapAccountEndpoints();
 app.MapAuthorizationEndpoints();

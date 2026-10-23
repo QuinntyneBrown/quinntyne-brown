@@ -3,6 +3,10 @@ using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text;
 using QuinntyneBrown.Community.Api.Tests.Profiles;
+using QuinntyneBrown.Community.Application.Integrations;
+using QuinntyneBrown.Community.Domain.Integrations;
+using QuinntyneBrown.Community.Infrastructure.Persistence;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace QuinntyneBrown.Community.Api.Tests.Integrations;
 
@@ -35,6 +39,20 @@ public static class IntegrationClients
         }
 
         return (await response.Content.ReadFromJsonAsync<Registered>())!;
+    }
+
+    /// <summary>An active application in the org, written straight to the database with a secret protected by the API's own protector.</summary>
+    public static async Task<(Guid Id, string SourceId, string Secret)> SeedAppAsync(this CommunityApiFactory factory, Guid? orgId = null, string name = "Seeded site")
+    {
+        await using var scope = factory.Services.CreateAsyncScope();
+        var protector = scope.ServiceProvider.GetRequiredService<ISecretProtector>();
+        var db = scope.ServiceProvider.GetRequiredService<CommunityDbContext>();
+        var secret = WebhookCredentials.NewSecret();
+        var app = new IntegrationApp(
+            orgId ?? HierarchySeed.TorontoId, name, WebhookCredentials.NewSourceId(), protector.Protect(secret), WebhookCredentials.Prefix(secret), Guid.Empty, factory.Time.GetUtcNow());
+        db.IntegrationApps.Add(app);
+        await db.SaveChangesAsync();
+        return (app.Id, app.SourceId, secret);
     }
 
     /// <summary>A <c>contact-request.created</c> envelope with a new event id unless one is given.</summary>
