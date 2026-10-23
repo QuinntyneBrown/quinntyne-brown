@@ -38,11 +38,8 @@
               </p>
             </ft-empty-state>
           } @else if (joining()) {
-            <h2 #panelHeading tabindex="-1">Join Quinntyne Brown</h2>
-            <p class="text-muted">
-              Free for builders, leads, volunteers, partners and anyone curious about faith and
-              technology.
-            </p>
+            <h2 #panelHeading tabindex="-1">Create your profile</h2>
+            <p class="text-muted">So we can stay connected on what we’re building together.</p>
             <ft-sign-up-form
               divider="or"
               [busy]="busy()"
@@ -102,8 +99,10 @@
               >
             </ft-sign-in-form>
             <p class="text-center">
-              New to Quinntyne Brown?
-              <ft-button variant="ghost" size="sm" (click)="show('join')">Join now</ft-button>
+              First time here?
+              <ft-button variant="ghost" size="sm" (click)="show('join')"
+                >Create a profile</ft-button
+              >
             </p>
           }
         </ft-card>
@@ -130,8 +129,11 @@
         </ul>
         <p><ft-link [href]="gitHubUrl">All on GitHub →</ft-link></p>
       </ft-landing-section>
-      <ft-cta-band heading="Ready to build with us?" text="It’s free, and it takes a minute.">
-        <ft-button variant="primary" size="lg" (click)="show('join')">Join now</ft-button>
+      <ft-cta-band
+        heading="Let’s stay connected."
+        text="Make a profile so we can keep building together."
+      >
+        <ft-button variant="primary" size="lg" (click)="show('join')">Create a profile</ft-button>
       </ft-cta-band>
     </div>
   </ft-container>

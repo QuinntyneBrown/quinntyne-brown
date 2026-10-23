@@ -13,6 +13,11 @@ test.describe('Marketing page', () => {
     await expect(marketing.lead).toBeVisible();
     await expect(marketing.topBarJoin).toBeVisible();
     await expect(marketing.topBarSignIn).toBeVisible();
+    await expect(marketing.panel).toContainText('First time here?');
+    await expect(marketing.panelJoin).toBeVisible();
+    await expect(marketing.callToAction).toContainText(
+      'Make a profile so we can keep building together.',
+    );
     await expect(marketing.callToActionJoin).toBeVisible();
     await expect(marketing.footer).toContainText('© 2026 Quinntyne Brown');
     await axe.check();
@@ -119,7 +124,7 @@ test.describe('Marketing page', () => {
 
     await expect(marketing.sectionHeadings).toHaveText([
       'What I’m building in the open. Jump in anywhere.',
-      'Ready to build with us?',
+      'Let’s stay connected.',
     ]);
   });
 

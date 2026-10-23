@@ -59,10 +59,10 @@ export class MarketingPage {
     });
     this.lead = page.getByText(/^I’m Quinntyne Brown — a Christian, a founder who builds/);
     this.topBar = page.getByRole('banner');
-    this.topBarJoin = this.topBar.getByRole('button', { name: 'Join now' });
+    this.topBarJoin = this.topBar.getByRole('button', { name: 'Create a profile' });
     this.topBarSignIn = this.topBar.getByRole('button', { name: 'Sign in' });
-    this.callToAction = page.getByRole('region', { name: 'Ready to build with us?' });
-    this.callToActionJoin = this.callToAction.getByRole('button', { name: 'Join now' });
+    this.callToAction = page.getByRole('region', { name: 'Let’s stay connected.' });
+    this.callToActionJoin = this.callToAction.getByRole('button', { name: 'Create a profile' });
     this.footer = page.getByRole('contentinfo');
     this.video = page.locator('video');
     this.transcriptToggle = page.getByText('Read the transcript');
@@ -83,8 +83,8 @@ export class MarketingPage {
     this.passwordError = fieldError(page, 'Password');
     this.resetPassword = this.panel.getByRole('link', { name: 'Reset password' });
     this.handOff = page.getByRole('heading', { level: 2, name: 'Signing you in…' });
-    this.joinHeading = page.getByRole('heading', { level: 2, name: 'Join Quinntyne Brown' });
-    this.panelJoin = this.panel.getByRole('button', { name: 'Join now' });
+    this.joinHeading = page.getByRole('heading', { level: 2, name: 'Create your profile' });
+    this.panelJoin = this.panel.getByRole('button', { name: 'Create a profile' });
     this.panelSignIn = this.panel.getByRole('button', { name: 'Sign in', exact: true });
     this.name = this.panel.getByLabel('Full name');
     this.createAccount = this.panel.getByRole('button', {

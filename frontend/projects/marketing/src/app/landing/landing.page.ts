@@ -166,7 +166,7 @@ export class LandingPage implements OnInit {
       });
     });
     let first = true;
-    // Join now and Sign in switch the panel in place: take the visitor to its heading.
+    // Create a profile and Sign in switch the panel in place: take the visitor to its heading.
     effect(() => {
       this.joining();
       if (first) {

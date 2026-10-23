@@ -3,7 +3,7 @@ import { MarketingPage } from '../../pages/marketing.page';
 
 // Traces to: L2-077, L2-074 AC5 (docs/detailed-designs/marketing/landing-page). Each outcome of L2-001.
 test.describe('Sign up from the marketing page', () => {
-  test('Join now shows the join form without leaving the page, and Sign in switches back', async ({
+  test('Create a profile shows the join form without leaving the page, and Sign in switches back', async ({
     page,
     axe,
   }) => {
@@ -13,6 +13,9 @@ test.describe('Sign up from the marketing page', () => {
     await marketing.topBarJoin.click();
 
     await expect(marketing.joinHeading).toBeVisible();
+    await expect(marketing.panel).toContainText(
+      'So we can stay connected on what we’re building together.',
+    );
     await expect(page).toHaveURL(/^http:\/\/localhost:4300\/\?join/);
     await axe.check();
     await marketing.panelSignIn.click();

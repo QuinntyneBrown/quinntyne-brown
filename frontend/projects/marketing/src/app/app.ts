@@ -9,7 +9,7 @@ import {
 
 /**
  * The marketing page's shell (docs/detailed-designs/marketing/landing-page): skip link, the
- * anonymous top bar with Join now and Sign in, the page and the footer.
+ * anonymous top bar with Create a profile and Sign in, the page and the footer.
  */
 @Component({
   selector: 'ft-marketing-root',
