@@ -7,8 +7,8 @@
 <meta name="mock:kind" content="page">
 <meta name="mock:screen" content="marketing">
 <meta name="mock:state" content="default">
-<meta name="mock:requirements" content="L2-074 L2-075 L2-076 L2-077 L2-078 L2-079 L2-130">
-<meta name="description" content="Marketing landing page: split hero with the brochure video and the sign-in panel, benefits and footer.">
+<meta name="mock:requirements" content="L2-074 L2-075 L2-076 L2-077 L2-078 L2-079 L2-130 L2-132">
+<meta name="description" content="Marketing landing page: split hero with Quinntyne Brown’s introduction, profile links, the brochure video and the sign-in panel, work figures, pinned projects, benefits and footer.">
 <link rel="stylesheet" href="../../../design-system/tokens/tokens.css">
 <link rel="stylesheet" href="../../../design-system/assets/components.css">
 <link rel="stylesheet" href="../../assets/mock.css">
@@ -19,9 +19,14 @@
 <main id="main" class="container landing">
   <div class="landing-hero">
     <div class="landing-hero__copy">
-      <p class="landing-hero__eyebrow">QuinntyneBrown.Community</p>
-      <h1 class="landing-hero__title">Build with people who share your faith</h1>
-      <p class="landing-hero__lead">Meet the builders, leads and volunteers in your city, show up to events and hackathons together, and work on projects that serve your neighbours.</p>
+      <p class="landing-hero__eyebrow">Quinntyne Brown</p>
+      <h1 class="landing-hero__title">Builds software. Builds community.</h1>
+      <p class="landing-hero__lead">I’m Quinntyne Brown: a Christian, a Chief Product Officer and founder, and City Lead for FaithTech Toronto. This is home for the builders, leads, volunteers and partners I work with. Make a profile, meet the community and build with us.</p>
+      <div class="landing-hero__actions">
+        <a class="btn btn--outline btn--sm" href="https://www.linkedin.com/in/quinntynebrown" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="btn btn--outline btn--sm" href="https://github.com/QuinntyneBrown" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn btn--primary btn--sm" href="../../assets/quinntyne-brown-resume.pdf" download>Download résumé</a>
+      </div>
     </div>
     <section class="card stack landing-hero__panel" aria-labelledby="panel-title">
       <h2 id="panel-title">Sign in</h2>
@@ -43,6 +48,36 @@
           <figcaption class="video-player__caption"><span>QuinntyneBrown.Community in 21 seconds · captions on</span></figcaption>
         </figure></div>
   </div>
+  <section class="landing-section" aria-labelledby="work">
+    <p class="landing-section__eyebrow">Work</p>
+    <h2 class="landing-section__title" id="work">Fifteen years shipping.</h2>
+    <div class="figure-row">
+      <div class="stat stat--figure" role="group" aria-labelledby="fig-0"><span class="stat__label" id="fig-0">years</span><span class="stat__value">15+</span></div>
+      <div class="stat stat--figure" role="group" aria-labelledby="fig-1"><span class="stat__label" id="fig-1">faster Canadarm3 software</span><span class="stat__value">2×</span></div>
+      <div class="stat stat--figure" role="group" aria-labelledby="fig-2"><span class="stat__label" id="fig-2">serialization throughput</span><span class="stat__value">10×</span></div>
+      <div class="stat stat--figure" role="group" aria-labelledby="fig-3"><span class="stat__label" id="fig-3">developers mentored</span><span class="stat__value">~30</span></div>
+    </div>
+    <ul class="cluster cluster--snug" aria-label="Where I’ve worked" style="list-style: none; margin: 0; padding: 0;">
+      <li><span class="badge badge--role">MDA</span></li>
+      <li><span class="badge badge--role">Protiviti</span></li>
+      <li><span class="badge badge--role">RBC Ventures</span></li>
+      <li><span class="badge badge--role">AutoTrader.ca</span></li>
+      <li><span class="badge badge--role">Corus</span></li>
+    </ul>
+  </section>
+  <section class="landing-section" aria-labelledby="building">
+    <p class="landing-section__eyebrow">Pinned on GitHub</p>
+    <h2 class="landing-section__title" id="building">Things I’m building.</h2>
+    <ul class="project-grid">
+      <li><article class="project-card"><span class="project-card__thumb" aria-hidden="true">S</span><div class="project-card__body"><a class="project-card__name" href="https://github.com/QuinntyneBrown?tab=repositories&amp;q=Shelfie">Shelfie</a><span class="project-card__language">TypeScript</span></div></article></li>
+      <li><article class="project-card"><span class="project-card__thumb" aria-hidden="true">S</span><div class="project-card__body"><a class="project-card__name" href="https://github.com/QuinntyneBrown?tab=repositories&amp;q=Saturdaze">Saturdaze</a><span class="project-card__language">C#</span></div></article></li>
+      <li><article class="project-card"><span class="project-card__thumb" aria-hidden="true">T</span><div class="project-card__body"><a class="project-card__name" href="https://github.com/QuinntyneBrown?tab=repositories&amp;q=TwinkleTune">TwinkleTune</a><span class="project-card__language">TypeScript</span></div></article></li>
+      <li><article class="project-card"><span class="project-card__thumb" aria-hidden="true">F</span><div class="project-card__body"><a class="project-card__name" href="https://github.com/QuinntyneBrown?tab=repositories&amp;q=Fullstack+with+Claude">Fullstack with Claude</a><span class="project-card__language">HTML</span></div></article></li>
+      <li><article class="project-card"><span class="project-card__thumb" aria-hidden="true">L</span><div class="project-card__body"><a class="project-card__name" href="https://github.com/QuinntyneBrown?tab=repositories&amp;q=Loupe">Loupe</a><span class="project-card__language">C#</span></div></article></li>
+      <li><article class="project-card"><span class="project-card__thumb" aria-hidden="true">S</span><div class="project-card__body"><a class="project-card__name" href="https://github.com/QuinntyneBrown?tab=repositories&amp;q=Studio">Studio</a><span class="project-card__language">C#</span></div></article></li>
+    </ul>
+    <p><a href="https://github.com/QuinntyneBrown">All on GitHub →</a></p>
+  </section>
   <section class="stack" aria-labelledby="why">
     <h2 id="why">Why join</h2>
     <div class="grid grid--auto">

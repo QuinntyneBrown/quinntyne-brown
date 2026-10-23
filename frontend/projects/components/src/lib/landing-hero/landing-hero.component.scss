@@ -35,6 +35,10 @@
   max-width: var(--layout-measure);
 }
 
+.landing-hero__actions:empty {
+  display: none;
+}
+
 .landing-hero__panel {
   grid-area: panel;
   width: 100%;

@@ -24,6 +24,7 @@
     [class]="classes()"
     [attr.href]="inert() ? null : url"
     [attr.target]="target()"
+    [attr.download]="download()"
     [attr.rel]="target() === '_blank' ? 'noopener' : null"
     [attr.aria-label]="label()"
     [attr.aria-describedby]="describedBy()"

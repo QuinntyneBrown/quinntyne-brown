@@ -61,6 +61,8 @@ export class ButtonComponent {
   readonly href = input<string | null>(null);
   /** With `href`, "_blank" opens a new tab, always with rel="noopener" (L2-058 AC4). */
   readonly target = input<string | null>(null);
+  /** With `href`, asks the browser to download the file; the value names it ('' keeps its own name). */
+  readonly download = input<string | null>(null);
   /**
    * Visually hidden object appended to the accessible name where row actions repeat,
    * for example "Suspend" + " Grace Okonkwo". Prefer it to `label` when the button has visible text.

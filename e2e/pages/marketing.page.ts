@@ -47,14 +47,27 @@ export class MarketingPage {
   readonly signUpWithGoogle: Locator;
   readonly signInWithGitHub: Locator;
   readonly signUpWithGitHub: Locator;
+  readonly linkedIn: Locator;
+  readonly gitHub: Locator;
+  readonly downloadResume: Locator;
+  readonly work: Locator;
+  readonly workEyebrow: Locator;
+  readonly figures: Locator;
+  readonly employers: Locator;
+  readonly building: Locator;
+  readonly buildingEyebrow: Locator;
+  readonly projects: Locator;
+  readonly allOnGitHub: Locator;
+  /** The level-2 headings of the sections under the hero, in page order. */
+  readonly sectionHeadings: Locator;
 
   constructor(private readonly page: Page) {
     this.heading = page.getByRole('heading', {
       level: 1,
-      name: 'Build with people who share your faith',
+      name: 'Builds software. Builds community.',
     });
     this.eyebrow = page.getByRole('main').getByText('Quinntyne Brown', { exact: true });
-    this.lead = page.getByText(/^Meet the builders, leads and volunteers in your city/);
+    this.lead = page.getByText(/^I’m Quinntyne Brown: a Christian, a Chief Product Officer/);
     this.topBar = page.getByRole('banner');
     this.topBarJoin = this.topBar.getByRole('button', { name: 'Join now' });
     this.topBarSignIn = this.topBar.getByRole('button', { name: 'Sign in' });
@@ -97,6 +110,21 @@ export class MarketingPage {
     this.signUpWithGoogle = this.panel.getByRole('button', { name: 'Sign up with Google' });
     this.signInWithGitHub = this.panel.getByRole('button', { name: 'Sign in with GitHub' });
     this.signUpWithGitHub = this.panel.getByRole('button', { name: 'Sign up with GitHub' });
+    const main = page.getByRole('main');
+    this.linkedIn = main.getByRole('link', { name: 'LinkedIn', exact: true });
+    this.gitHub = main.getByRole('link', { name: 'GitHub', exact: true });
+    this.downloadResume = main.getByRole('link', { name: 'Download résumé' });
+    this.work = page.getByRole('region', { name: 'Fifteen years shipping.' });
+    this.workEyebrow = this.work.getByText('Work', { exact: true });
+    this.figures = this.work.getByRole('group');
+    this.employers = this.work
+      .getByRole('list', { name: 'Where I’ve worked' })
+      .getByRole('listitem');
+    this.building = page.getByRole('region', { name: 'Things I’m building.' });
+    this.buildingEyebrow = this.building.getByText('Pinned on GitHub', { exact: true });
+    this.projects = this.building.getByRole('listitem');
+    this.allOnGitHub = this.building.getByRole('link', { name: 'All on GitHub' });
+    this.sectionHeadings = main.locator('h2:not(ft-landing-hero h2)');
   }
 
   /** Signs in from the hero panel and waits for the API's answer. */
@@ -176,6 +204,28 @@ export class MarketingPage {
   runningAnimations(): Promise<number> {
     return this.page.evaluate(
       () => document.getAnimations().filter((a) => a.playState === 'running').length,
+    );
+  }
+
+  /** Each figure in the work section as the visitor reads it: its value, then its label. */
+  async figureTexts(): Promise<{ value: string; label: string }[]> {
+    return this.figures.evaluateAll((groups) =>
+      groups.map((g) => ({
+        value: g.querySelector('.ft-stat__value')?.textContent?.trim() ?? '',
+        label: g.querySelector('.ft-stat__label')?.textContent?.trim() ?? '',
+      })),
+    );
+  }
+
+  /** Each project card's one link (its name and where it goes) and its language. */
+  async projectCards(): Promise<{ name: string; href: string; language: string; links: number }[]> {
+    return this.projects.evaluateAll((items) =>
+      items.map((item) => ({
+        name: item.querySelector('a')?.textContent?.trim() ?? '',
+        href: item.querySelector('a')?.getAttribute('href') ?? '',
+        language: item.querySelector('.project-card__language')?.textContent?.trim() ?? '',
+        links: item.querySelectorAll('a').length,
+      })),
     );
   }
 

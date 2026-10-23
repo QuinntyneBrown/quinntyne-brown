@@ -9,6 +9,7 @@ import { LandingHeroComponent } from './landing-hero.component';
   imports: [LandingHeroComponent, BenefitComponent, CtaBandComponent],
   template: `
     <ft-landing-hero eyebrow="Quinntyne Brown" heading="Build together" lead="Meet builders.">
+      <div ftHeroActions><a href="https://github.com/QuinntyneBrown">GitHub</a></div>
       <section ftHeroPanel><h2>Sign in</h2></section>
       <figure ftHeroMedia>Video</figure>
     </ft-landing-hero>
@@ -37,6 +38,20 @@ describe('Landing hero, benefit and call to action', () => {
     expect(order).toEqual(['landing-hero__copy', 'landing-hero__panel', 'landing-hero__media']);
     expect(hero.querySelector('.landing-hero__panel h2')?.textContent).toBe('Sign in');
     expect(hero.querySelector('.landing-hero__media figure')).not.toBeNull();
+  });
+
+  // Traces to: L2-132 AC2
+  it('shows the hero actions in the copy, under the lead', () => {
+    const copy = setup().querySelector('.landing-hero__copy')!;
+
+    const parts = [...copy.children].map((c) => c.className);
+    expect(parts).toEqual([
+      'landing-hero__eyebrow',
+      'landing-hero__title',
+      'landing-hero__lead',
+      'landing-hero__actions',
+    ]);
+    expect(copy.querySelector('.landing-hero__actions a')?.textContent).toBe('GitHub');
   });
 
   it('gives a benefit a level-3 heading and a decorative icon', () => {

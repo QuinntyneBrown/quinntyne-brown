@@ -10,6 +10,31 @@ main {
   padding-block: var(--space-8) var(--space-12);
 }
 
+.landing__figures {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+}
+
+.landing__employers,
+.landing__projects {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing__employers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.landing__projects {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr));
+}
+
 .landing__section {
   display: flex;
   flex-direction: column;

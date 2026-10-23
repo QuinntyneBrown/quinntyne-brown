@@ -1,4 +1,4 @@
-// Traces to: L2-074, L2-076, L2-130
+// Traces to: L2-074, L2-076, L2-130, L2-132
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AUTH_SERVICE, BROWSER_REDIRECT, SignInOutcome } from '@faithtech-community/api';
@@ -64,7 +64,7 @@ describe('LandingPage', () => {
     await fixture.whenStable();
 
     const heading = (fixture.nativeElement as HTMLElement).querySelector('h1');
-    expect(heading?.textContent?.trim()).toBe('Build with people who share your faith');
+    expect(heading?.textContent?.trim()).toBe('Builds software. Builds community.');
   });
 
   it('hands a signed-in visitor to the community app with the page they asked for', async () => {

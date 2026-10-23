@@ -3,8 +3,11 @@ import { SkeletonComponent } from '../skeleton/skeleton.component';
 
 let nextId = 0;
 
-/** `number` (default) for counts; `text` for a value in words, such as a sprint goal or end date. */
-export type StatVariant = 'number' | 'text';
+/**
+ * `number` (default) for counts; `text` for a value in words, such as a sprint goal or end date;
+ * `figure` for a headline figure shown above its label in the accent colour (15+ / years).
+ */
+export type StatVariant = 'number' | 'text' | 'figure';
 
 /**
  * A label over a large number or short value, such as "Lead" over "4". Values in words take
@@ -21,6 +24,7 @@ export type StatVariant = 'number' | 'text';
     role: 'group',
     '[attr.aria-labelledby]': 'labelId',
     '[attr.aria-busy]': 'loading() ? "true" : null',
+    '[class.ft-stat--figure]': 'variant() === "figure"',
   },
 })
 export class StatComponent {
