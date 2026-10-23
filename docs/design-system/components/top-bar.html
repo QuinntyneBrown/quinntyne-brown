@@ -100,6 +100,7 @@
       <li><a href="../components/empty-state.html">Empty state</a></li>
       <li><a href="../components/error-page.html">Error page</a></li>
       <li><a href="../components/landing-hero.html">Landing hero</a></li>
+      <li><a href="../components/wizard.html">Wizard</a></li>
       <li><a href="../components/video-player.html">Video player</a></li>
       <li><a href="../components/auth-forms.html">Sign-in and sign-up forms</a></li>
       <li><a href="../components/site-footer.html">Site footer</a></li>
@@ -270,6 +271,11 @@
         <li><b>Bell open</b>: <code>aria-expanded="true"</code> and <code>aria-controls</code> naming the <code>.bell-panel</code> while it shows below it (see <a href="../../mocks/notifications/bell/unread.html">notifications/bell/unread</a>).</li>
         <li><b>Count badge</b> disappears when nothing is unread; it never shows "0". The bell's name drops the count too.</li>
       </ul>
+    </section>
+
+    <section class="ds-section" id="public"><h2><a href="#public">Public (signed out)</a></h2>
+      <p>Pages anyone can open, such as Submit an idea, show only the brand and a small Sign in button: no primary nav, search, bell, account menu or phone tab bar. The brand links to the page itself.</p>
+      <div class="ds-example"><div class="ds-example__canvas ds-example__canvas--stack" style="padding:0"><header class="topbar" style="position:static"><a class="topbar__brand" href="#public"><img class="topbar__mark" src="../../mocks/assets/logo.svg" alt="" width="32" height="32"> Quinntyne Brown</a><span class="topbar__spacer"></span><a class="btn btn--sm" href="#public">Sign in</a></header></div><div class="ds-example__caption"><span>From <a href="../../mocks/pages/submit-idea/default.html">pages/submit-idea/default</a>; the signed-in states use the full bar.</span></div></div>
     </section>
 
     <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>

@@ -100,6 +100,7 @@
       <li><a href="../components/empty-state.html">Empty state</a></li>
       <li><a href="../components/error-page.html">Error page</a></li>
       <li><a href="../components/landing-hero.html">Landing hero</a></li>
+      <li><a href="../components/wizard.html">Wizard</a></li>
       <li><a href="../components/video-player.html">Video player</a></li>
       <li><a href="../components/auth-forms.html">Sign-in and sign-up forms</a></li>
       <li><a href="../components/site-footer.html">Site footer</a></li>
@@ -229,6 +230,11 @@
         <li>Most groups have a default checked; only "Role" in add role starts empty, because there is no safe default.</li>
       </ul>
       <fieldset class="stack" aria-describedby="ri-error"><legend class="field__label">Role</legend><label class="choice"><input type="radio" name="ri" aria-invalid="true"><span class="choice__text">Volunteer<small>Joins the city team</small></span></label><label class="choice"><input type="radio" name="ri" aria-invalid="true"><span class="choice__text">Attendee<small>Comes to events</small></span></label></fieldset><div class="field__error" id="ri-error">Choose a role to add.</div>
+    </section>
+
+    <section class="ds-section" id="tiles"><h2><a href="#tiles">Choice tiles</a></h2>
+      <p>For a short list of equal options that deserve more weight than a radio row (Submit an idea: "Who feels this most?"), wrap each radio in <code>label.choice.choice--tile</code> inside <code>.choice-tiles</code>. Add <code>--pair</code> for two columns from 640px. The selected tile takes <code>--color-accent-subtle</code> and an accent border; invalid takes <code>--color-danger-border</code>; focus rings the whole tile.</p>
+      <div class="ds-example"><div class="ds-example__canvas ds-example__canvas--stack"><fieldset class="stack"><legend class="field__label">Who feels this most?</legend><div class="choice-tiles choice-tiles--pair"><label class="choice choice--tile"><input type="radio" name="tile-demo" value="churches" checked><span class="choice__text">Churches and ministries</span></label><label class="choice choice--tile"><input type="radio" name="tile-demo" value="families"><span class="choice__text">Families</span></label></div></fieldset></div><div class="ds-example__caption"><span>From <a href="../../mocks/pages/submit-idea/default.html">pages/submit-idea</a>. Keep the fieldset and legend; the tile is the label.</span></div></div>
     </section>
 
     <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
