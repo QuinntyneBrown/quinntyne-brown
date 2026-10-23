@@ -52,7 +52,7 @@ Static content in `LandingPage`; nothing is fetched, so it renders for every vis
 
 - Source in `eng/videos/brochure/`: `script.md` (the narration, 16 seconds: Shelfie and Sweet Hand, "make a profile"), `deck.html` (a timed slide deck using the design-system tokens, mock photos and the project covers) and `build.mjs` (narration by Kokoro-82M `af_heart`, or edge-tts `en-US-AndrewMultilingualNeural` with `--engine edge` as in the current render, WebVTT captions, Playwright frame capture, ffmpeg mux) (ADR 0020). `node eng/videos/brochure/build.mjs` fails when the result is longer than 30 seconds.
 - Shipped assets: `frontend/projects/marketing/public/brochure/brochure.webm`, `brochure-poster.jpg` and `brochure.en.vtt`. The captions are the script; the page shows no transcript.
-- `VideoPlayerComponent` renders `<video controls preload="none" poster>` with a default English captions track and no `autoplay`; on the media `error` event it swaps to the poster image with a warning alert.
+- `VideoPlayerComponent` renders `<video controls preload="none" poster>` with an English captions track that is off until the visitor turns it on (`captionsOn` defaults to false) and no `autoplay`; on the media `error` event it swaps to the poster image with a warning alert.
 
 ### Security and privacy
 

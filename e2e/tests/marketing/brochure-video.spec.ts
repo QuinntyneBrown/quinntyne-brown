@@ -3,7 +3,7 @@ import { MarketingPage } from '../../pages/marketing.page';
 
 // Traces to: L2-075 (docs/detailed-designs/marketing/landing-page).
 test.describe('Brochure video', () => {
-  test('waits for Play with a poster, controls and English captions turned on', async ({
+  test('waits for Play with a poster, controls and English captions available but off', async ({
     page,
     axe,
   }) => {
@@ -16,7 +16,7 @@ test.describe('Brochure video', () => {
     const state = await marketing.videoState();
     expect(state).toMatchObject({ paused: true, autoplay: false, controls: true });
     expect(state.poster).toMatch(/brochure-poster\.jpg$/);
-    expect(state.captions).toEqual([{ kind: 'captions', language: 'en', mode: 'showing' }]);
+    expect(state.captions).toEqual([{ kind: 'captions', language: 'en', mode: 'disabled' }]);
     await expect(page.locator('figure figcaption')).toHaveCount(0);
     await axe.check();
   });

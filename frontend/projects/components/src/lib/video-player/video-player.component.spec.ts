@@ -23,7 +23,7 @@ describe('VideoPlayerComponent', () => {
     return { fixture, el: fixture.nativeElement as HTMLElement };
   }
 
-  it('shows controls, the poster and default captions, and never autoplays', () => {
+  it('shows controls, the poster and a captions track that is off, and never autoplays', () => {
     const video = setup().el.querySelector('video')!;
     const track = video.querySelector('track')!;
 
@@ -33,7 +33,7 @@ describe('VideoPlayerComponent', () => {
     expect(video.getAttribute('poster')).toBe('/brochure/brochure-poster.jpg');
     expect(video.getAttribute('aria-label')).toBe('Quinntyne Brown in 21 seconds');
     expect(track.kind).toBe('captions');
-    expect(track.default).toBe(true);
+    expect(track.default).toBe(false);
     expect(track.srclang).toBe('en');
   });
 
