@@ -59,7 +59,7 @@ test('reports-dashboard', async ({ page, api }) => {
     await reports.period.selectOption({ label: 'Last 90 days' });
     await page.waitForTimeout(600);
     await reports.apply.click();
-    await expect(page).toHaveURL('/reports?city=Toronto&period=last-90-days');
+    await expect(page).toHaveURL('/o/faithtech-toronto/reports?city=Toronto&period=last-90-days');
     await expect(reports.subtitle).toContainText('Toronto · Last 90 days');
     await expect(reports.figure('Members')).toContainText('3');
   });

@@ -34,7 +34,7 @@ test('send-invite', async ({ page, api }) => {
   await show.card(
     'opening',
     'opening',
-    ['Invite someone to FaithTech', 'Recorded against a local fake API · synthetic people'],
+    ['Invite someone to Quinntyne Brown Community', 'Recorded against a local fake API · synthetic people'],
     () => api.signInAs(grace, '/invites'),
   );
 

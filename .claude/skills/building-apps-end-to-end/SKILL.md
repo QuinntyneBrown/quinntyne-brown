@@ -174,7 +174,7 @@ code. If the document is wrong, fix the document in the same slice and log why.
 
 ### Step 14: demo videos
 
-Only if the plan said yes. Run `recording-demo-videos`. Otherwise record that it was skipped.
+Only if the plan said yes. Run `recording-demo-videos` (videos have no captions unless the user explicitly asks). Otherwise record that it was skipped.
 
 ## Finish
 

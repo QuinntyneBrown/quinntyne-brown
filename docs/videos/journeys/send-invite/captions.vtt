@@ -12,13 +12,13 @@ An invite expires after fourteen days. Choose Resend on an expired one and it go
 00:00:29.000 --> 00:00:36.000
 To invite someone new, choose Invite someone. A dialog opens with the cursor already in the Email field.
 
-00:00:36.000 --> 00:00:43.000
+00:00:36.000 --> 00:00:42.000
 If the address is not complete, the dialog tells you what to fix before anything is sent.
 
-00:00:43.000 --> 00:00:51.000
+00:00:42.000 --> 00:00:50.000
 Enter their email, choose a role they will join with, from the ones you are allowed to grant, and add a short personal note.
 
-00:00:51.000 --> 00:01:00.000
+00:00:50.000 --> 00:01:00.000
 Choose Send invite. The dialog closes, a confirmation appears, and the new invite shows at the top of the list, waiting for them.
 
 00:01:00.000 --> 00:01:08.000

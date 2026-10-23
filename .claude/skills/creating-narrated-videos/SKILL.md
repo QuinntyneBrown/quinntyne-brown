@@ -12,6 +12,10 @@ description: >-
 
 # Creating narrated videos
 
+## No captions by default (MANDATORY)
+
+Videos are produced WITHOUT captions or subtitles unless the user explicitly asks for them in that request. Do not burn captions into the video, do not draw an on-screen caption overlay, and do not generate `.vtt`/`.srt` files or a `<track>` element by default. Narration audio and the script/narration text stay. Where this skill's instructions below mention captions, treat them as applying only when captions were explicitly requested.
+
 A video is **narration audio + a slide deck timed to it + captions**, all generated from text files checked into one folder. You author three text files; tooling turns them into media.
 
 ```

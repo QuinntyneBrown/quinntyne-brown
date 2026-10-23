@@ -13,14 +13,14 @@ test('accept-invite', async ({ page, api }) => {
   const invite = api.addInvite({
     email: 'ruth.alvarez@example.org',
     invitedBy: grace.profileId,
-    preassignedRole: 'Volunteer',
+    preassignedRole: 'volunteer',
   });
   const expired = api.addInvite({ email: 'felix.wu@example.org', invitedBy: grace.profileId }, 20);
 
   await show.card(
     'opening',
     'opening',
-    ['Join FaithTech from an invite', 'Recorded against a local fake API · synthetic people'],
+    ['Join Quinntyne Brown Community from an invite', 'Recorded against a local fake API · synthetic people'],
     () => accept.open(invite.token),
   );
 

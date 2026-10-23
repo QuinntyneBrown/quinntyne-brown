@@ -11,7 +11,7 @@ const PHONE = { width: 390, height: 720 };
 test('app-shell-tour', async ({ page, api }) => {
   const show = await Presenter.start(page, 'app-shell-tour');
   const shell = new AppShell(page);
-  const account = api.addAccount({ name: 'Grace Okonkwo', email: 'grace@example.org' });
+  const account = api.addAccount({ name: 'Grace Okonkwo', email: 'grace@example.org', roles: ['CityLead'] });
 
   await show.card(
     'opening',
@@ -80,7 +80,10 @@ test('app-shell-tour', async ({ page, api }) => {
   });
 
   await show.step('keyboard', async () => {
-    await page.mouse.click(DESKTOP.width / 2, DESKTOP.height / 2);
+    await page.evaluate(() => {
+      (document.activeElement as HTMLElement | null)?.blur();
+      window.scrollTo(0, 0);
+    });
     await page.keyboard.press('Tab');
     await expect(shell.skipLink).toBeFocused();
     await page.waitForTimeout(1500);
