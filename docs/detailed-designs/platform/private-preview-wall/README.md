@@ -55,6 +55,10 @@ The pipeline in `Program.cs` runs, in order: `CorrelationIdMiddleware`, `Securit
 
 - **`StaticSitesSetup.UseStaticSites()`** — when `StaticSites:AppRoot` and `StaticSites:MarketingRoot` are set (the container sets them to `/app/sites/app` and `/app/sites/www`), a request whose host is the host of `WebApp:Origin` or `Marketing:Origin` and whose path is not `/api`, `/connect`, `/.well-known`, `/hubs` or `/health` is served from that build. A path with no file falls back to `index.html`, the SPA route. Hashed files are `Cache-Control: private, max-age=31536000, immutable`; `index.html` is `no-cache`. HTML gets the app CSP: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: <StaticSites:ImageOrigins>; media-src 'self' blob:; font-src 'self' data:; connect-src 'self' <WebApp:Origin> <wss WebApp:Origin>; frame-ancestors 'none'; base-uri 'self'; form-action 'self' <WebApp:Origin>; object-src 'none'`. Photos load from the Blob storage origin (ADR 0002), so `StaticSites:ImageOrigins` names it. In development and in the tests nothing is configured and the Angular dev servers serve the apps as before (`L2-108`).
 
+### Api — apex redirect
+
+- **`ApexRedirectMiddleware`** — when `Marketing:ApexHost` is set (the container sets `quinntynebrown.com`), a request whose host equals it is answered `301 Moved Permanently` to `Marketing:Origin` plus the request's path and query, before the wall, the exception handler and routing, so nothing else runs on the apex. Unset (development, the tests) it is a no-op (`L2-133`).
+
 ### Cli
 
 - **`wall-hash`** — reads one line from standard input, refuses fewer than 16 characters, prints the PBKDF2 string. The passphrase is never echoed, logged or written anywhere (`L2-105` AC2).
@@ -80,7 +84,7 @@ Set the GitHub variable `PRIVATE_PREVIEW_ENABLED` to `false` (the `privatePrevie
 ### Open questions and deferred
 
 - Data Protection keys are not persisted, so with the in-memory key ring a restart invalidates outstanding email verification, reset and unsubscribe tokens. One replica keeps them consistent between restarts; persisting the key ring (Blob storage plus Key Vault) is deferred.
-- The apex `faithtech.community` and any redirect from it are deferred.
+- The apex `quinntynebrown.com` redirects to `www` (`L2-133`); it is the third custom domain, on an `A` record and an HTTP-validated managed certificate.
 - Multiple wall users, invitations to the preview, magic links and SSO at the wall are out of scope (prompt "Deferred").
 - Provisioning Azure, creating DNS records and setting the real passphrase are the owner's steps (`runbook.md`).
 
@@ -100,6 +104,7 @@ The feature realizes the following level-2 (L2) requirements. Each L2 requiremen
 | `L2-107` | `L1-023` | Lifting the wall |
 | `L2-108` | `L1-023` | Serving both apps behind the wall |
 | `L2-109` | `L1-023` | Deployment over HTTPS |
+| `L2-133` | `L1-023` | The apex domain redirects to the marketing page |
 
 The acceptance criteria are in `docs/specs/L2.md`.
 

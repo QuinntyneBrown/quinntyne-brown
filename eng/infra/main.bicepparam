@@ -5,6 +5,7 @@ using './main.bicep'
 param namePrefix = 'ftc'
 param appHost = 'app.quinntynebrown.com'
 param wwwHost = 'www.quinntynebrown.com'
+param apexHost = 'quinntynebrown.com'
 param cookieDomain = 'quinntynebrown.com'
 param apiImage = readEnvironmentVariable('API_IMAGE', '')
 param cliImage = readEnvironmentVariable('CLI_IMAGE', '')

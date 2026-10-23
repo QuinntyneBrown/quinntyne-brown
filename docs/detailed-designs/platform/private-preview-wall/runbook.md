@@ -104,10 +104,12 @@ At the DNS provider for `quinntynebrown.com` (Namecheap, **Domain List → Manag
 |------|------|-------|
 | CNAME | `app` | the container app address from step 5 |
 | CNAME | `www` | the container app address from step 5 |
+| A | `@` | the environment IP from step 5 (replace any other `@` A records) |
 | TXT | `asuid.app` | the DNS verification ID from step 5 |
 | TXT | `asuid.www` | the DNS verification ID from step 5 |
+| TXT | `asuid` | the DNS verification ID from step 5 |
 
-When the records resolve (`dig +short CNAME app.quinntynebrown.com`), set the GitHub variable `CUSTOM_DOMAINS_STAGE` = `issue` and run **Deploy**: it adds both hosts, has Azure issue a managed certificate for each, and binds them. Then set `CUSTOM_DOMAINS_STAGE` = `bound` and leave it there. HTTP is redirected to HTTPS and every response carries HSTS.
+When the records resolve (`dig +short CNAME app.quinntynebrown.com`), set the GitHub variable `CUSTOM_DOMAINS_STAGE` = `issue` and run **Deploy**: it adds all three hosts, has Azure issue a managed certificate for each (CNAME-validated for `app` and `www`, HTTP-validated for the apex), and binds them. Adding a host later (the apex was added after the first two) is the same: set `issue`, deploy, set `bound`. Then set `CUSTOM_DOMAINS_STAGE` = `bound` and leave it there. HTTP is redirected to HTTPS and every response carries HSTS.
 
 ## 7. Check, then deploy on every push
 
@@ -156,4 +158,4 @@ The Deploy workflow, `eng/deploy.sh` and `main.bicepparam` default `PRIVATE_PREV
 ## Known limits
 
 - One replica: lockouts and the Data Protection key ring are in memory, so a restart clears lockouts and invalidates outstanding verification, reset and unsubscribe links (ADR 0026; persisting the key ring is deferred).
-- The apex `quinntynebrown.com` is not served or redirected (deferred).
+- The apex `quinntynebrown.com` answers only with a `301` to `www` (L2-133).
