@@ -25,6 +25,7 @@ export const ORG_SECTIONS = [
   'reports',
   'notes',
   'invites',
+  'my-work',
 ];
 
 /** Loads the caller's access before any member page, so navigation knows what to show. */
@@ -49,7 +50,11 @@ export const orgGuard: CanActivateFn = async (route, state) => {
   await access.load();
   const slug = route.paramMap.get('orgSlug') ?? '';
   const orgs = access.orgs();
-  if (slug === ALL_ORGS ? orgs.length > 0 : orgs.some((o) => o.slug === slug)) {
+  // "All orgs" combines several orgs; someone who covers one is sent to it (L2-145 AC4).
+  if (slug === ALL_ORGS && orgs.length === 1) {
+    return router.parseUrl(state.url.replace(`/o/${ALL_ORGS}`, `/o/${orgs[0].slug}`));
+  }
+  if (slug === ALL_ORGS ? orgs.length > 1 : orgs.some((o) => o.slug === slug)) {
     access.setActive(slug);
     if (slug !== ALL_ORGS) remember(slug);
     return true;
@@ -95,7 +100,8 @@ export const orgRedirectGuard: CanActivateFn = async (_route, state) => {
       : last && slugs.includes(last)
         ? last
         : slugs[0];
-  if (!slug) return notFound(router);
+  // Someone who covers no org waits to be added (L2-142 AC2).
+  if (!slug) return router.parseUrl('/waiting');
   // Keep what the link passed along (a page's router state, replaceUrl), so features that still
   // link to old addresses behave as before.
   const extras = router.currentNavigation()?.extras;

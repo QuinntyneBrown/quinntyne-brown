@@ -94,6 +94,7 @@ test.describe('App shell', () => {
       tabs: ['Home', 'Events', 'Search', 'Contacts'],
     },
     {
+      // A System Admin covers every org, so My work and the org's settings are theirs too (L2-155 AC3).
       roles: ['SystemAdmin'],
       nav: [
         'Home',
@@ -101,12 +102,14 @@ test.describe('App shell', () => {
         'Contacts',
         'Partners',
         'Workspaces',
+        'My work',
         'Team',
         'Announcements',
         'Resources',
         'Notes',
         'People',
         'Reports',
+        'Organization',
         'Admin',
       ],
       tabs: ['Home', 'Events', 'Search', 'Contacts'],

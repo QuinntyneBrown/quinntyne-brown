@@ -24,6 +24,7 @@ import {
   WorkspaceDto,
   WorkspaceMethod,
   WorkspaceSummaryDto,
+  MyWorkItemDto,
 } from './agile.service';
 
 @Injectable()
@@ -33,6 +34,10 @@ export class HttpAgileService implements AgileService {
 
   listWorkspaces(): Observable<WorkspaceSummaryDto[]> {
     return this.http.get<WorkspaceSummaryDto[]>(`${this.base}/workspaces`);
+  }
+
+  myWork(): Observable<MyWorkItemDto[]> {
+    return this.http.get<MyWorkItemDto[]>(`${this.base}/work/mine`);
   }
 
   createWorkspace(request: CreateWorkspaceRequest): Observable<WorkspaceDto> {

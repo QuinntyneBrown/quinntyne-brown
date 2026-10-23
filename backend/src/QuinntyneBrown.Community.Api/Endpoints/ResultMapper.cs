@@ -8,7 +8,9 @@ public static class ResultMapper
     {
         ResultStatus.Ok => onOk(),
         ResultStatus.Invalid => Results.ValidationProblem(result.Errors!.ToDictionary()),
-        ResultStatus.NotFound => Results.NotFound(),
+        ResultStatus.NotFound => result.Detail is null
+            ? Results.NotFound()
+            : Results.Problem(result.Detail, statusCode: StatusCodes.Status404NotFound),
         ResultStatus.Forbidden when result.Detail is null => Results.Forbid(),
         ResultStatus.Forbidden => Results.Problem(result.Detail, statusCode: StatusCodes.Status403Forbidden),
         ResultStatus.Conflict => Results.Problem(result.Detail, statusCode: StatusCodes.Status409Conflict, extensions: result.Extensions),

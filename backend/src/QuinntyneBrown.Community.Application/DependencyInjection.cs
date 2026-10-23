@@ -60,6 +60,7 @@ public static class DependencyInjection
         services.AddScoped<GetMyAccessHandler>();
         services.AddScoped<ResolveOrgSlugHandler>();
         services.AddScoped<MyWorkHandler>();
+        services.AddScoped<MembersHandler>();
         services.AddScoped<ProfileRoles>();
         services.AddScoped<PermissionHolders>();
         services.AddScoped<WorkEligibility>();

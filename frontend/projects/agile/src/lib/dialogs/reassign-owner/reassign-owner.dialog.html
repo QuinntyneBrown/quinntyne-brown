@@ -12,8 +12,12 @@
           We couldn’t reach Quinntyne Brown. Nothing was changed — try again.
         </ft-alert>
       }
-      <ft-form-field label="New owner (City Leads only)" [error]="ownerError()">
-        <ft-select [formControl]="owner" [options]="options()" placeholder="Choose a City Lead" />
+      <ft-form-field
+        label="New owner"
+        help="People who can create workspaces in this organization, and its Org Leads."
+        [error]="ownerError()"
+      >
+        <ft-select [formControl]="owner" [options]="options()" placeholder="Choose a new owner" />
       </ft-form-field>
     </ft-stack>
   </form>

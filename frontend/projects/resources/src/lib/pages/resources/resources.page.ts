@@ -12,6 +12,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   ACCESS_SERVICE,
+  ALL_ORGS,
   Permission,
   RESOURCE_TYPES,
   RESOURCES_SERVICE,
@@ -39,6 +40,7 @@ import {
   SelectOption,
   TextFieldComponent,
   ToastService,
+  OrgLabelComponent,
 } from '@faithtech-community/components';
 import { debounceTime, distinctUntilChanged, firstValueFrom } from 'rxjs';
 
@@ -62,6 +64,7 @@ type State = 'loading' | 'loaded' | 'error';
 @Component({
   selector: 'ft-resources-page',
   imports: [
+    OrgLabelComponent,
     ReactiveFormsModule,
     BadgeComponent,
     ButtonComponent,
@@ -112,7 +115,12 @@ export class ResourcesPage {
   protected readonly page = signal(1);
   protected readonly loadingMore = signal(false);
 
-  protected readonly canAdd = computed(() => this.access.can(Permission.ResourcesCreate));
+  /** Rows are labelled with their org under "All orgs" (L2-145). */
+  protected readonly allOrgs = computed(() => this.access.activeSlug() === ALL_ORGS);
+  /** Nothing is added under "All orgs", which has no org to put it in (L2-145 AC2). */
+  protected readonly canAdd = computed(
+    () => !this.allOrgs() && this.access.can(Permission.ResourcesCreate),
+  );
   protected readonly filtered = computed(
     () => !!this.type() || !!this.tagChoice() || !!this.term(),
   );

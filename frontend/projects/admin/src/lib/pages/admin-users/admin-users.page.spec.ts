@@ -200,7 +200,7 @@ describe('AdminUsersPage', () => {
     expect(alerts.length).toBe(1);
     expect(alerts[0].textContent).toContain('A workspace needs a new owner');
     expect(alerts[0].textContent).toContain(
-      'Grace Okonkwo no longer holds the City Lead role but owns Toronto team.',
+      'Grace Okonkwo can no longer own workspaces but owns Toronto team.',
     );
     expect(alerts[0].querySelector('a')?.getAttribute('href')).toBe('/workspaces/w1/settings');
   });

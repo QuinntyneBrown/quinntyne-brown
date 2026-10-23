@@ -190,7 +190,13 @@ export class MockApi {
   /** Requests the fake does not implement. The fixture fails the test if any arrive (AGENTS.md). */
   readonly unrecognised: string[] = [];
   /** The Agile workspaces API: add workspaces, items and sprints through it. */
-  readonly agile = new MockAgile(this.profiles, this.unrecognised, () => this.signedIn);
+  readonly agile = new MockAgile(
+    this.profiles,
+    this.unrecognised,
+    () => this.signedIn,
+    () => this.organizations,
+    () => [...this.accounts.values()],
+  );
   private readonly overrides = new Map<string, Handler>();
   private session: MockAccount | null = null;
   private signedIn: MockAccount | null = null;
@@ -349,7 +355,8 @@ export class MockApi {
     const section = path.split('/')[1] ?? '';
     if (path.startsWith('/o/') || !ORG_SECTIONS.includes(section)) return path;
     const org = this.organizations.covered(account)[0]?.org.slug;
-    if (!org) return path;
+    // Someone who covers no org waits to be added (L2-142).
+    if (!org) return '/waiting';
     return `/o/${org}${path === '/' ? '' : path}`;
   }
 
@@ -471,6 +478,10 @@ export class MockApi {
       return this.roles(route, method, roleRoute[1], roleRoute[2], body, authorization);
     const suspension = /^\/api\/admin\/users\/([^/]+)\/suspension$/.exec(url.pathname);
     if (suspension) return this.suspension(route, method, suspension[1], body, authorization);
+    const members = /^\/api\/organizations\/([^/]+)\/members(?:\/([^/]+))?(\/org-lead)?$/.exec(
+      url.pathname,
+    );
+    if (members) return this.members(route, method, url, members, body, authorization);
     const inviteAction = /^\/api\/invites\/([^/]+)\/(resend|revoke)$/.exec(url.pathname);
     if (method === 'POST' && inviteAction) {
       return this.inviteAction(route, inviteAction[1], inviteAction[2], authorization);
@@ -841,6 +852,103 @@ export class MockApi {
       if (account.profileId === profile.id) account.roles = profile.roles;
     }
     return route.fulfill({ status: 200, json: this.roleRefs(profile) });
+  }
+
+  /**
+   * MembersHandler: an org's Org Lead, its Portfolio Lead or a System Admin lists, adds and
+   * removes members (L2-143); anyone else 403, an uncovered org 404.
+   */
+  private members(
+    route: Route,
+    method: string,
+    url: URL,
+    [, orgId, profileId, orgLead]: RegExpExecArray,
+    body: Record<string, unknown>,
+    authorization: string | undefined,
+  ) {
+    const caller = this.caller(authorization);
+    if (!caller) return route.fulfill({ status: 401 });
+    const covered = this.organizations.covered(caller).find((c) => c.org.id === orgId);
+    if (!covered) return route.fulfill({ status: 404 });
+    const org = covered.org;
+    const admin = caller.roles.includes('SystemAdmin');
+    const tier = admin || covered.isPortfolioLead;
+    if (!tier && !covered.isOrgLead) return route.fulfill({ status: 403 });
+    const memberOf = (a: MockAccount) => this.organizations.memberships(a).includes(org.slug);
+    const leads = () =>
+      [...this.accounts.values()].filter(
+        (a) => memberOf(a) && (a.orgLead ?? []).includes(org.slug),
+      );
+    const dto = (a: MockAccount) => ({
+      profileId: a.profileId,
+      name: this.profiles.get(a.profileId)?.name ?? a.name,
+      photoUrl: null,
+      kind: 'Person',
+      isOrgLead: (a.orgLead ?? []).includes(org.slug),
+      roles: this.organizations
+        .roleRefs(a)
+        .filter((r) => r.kind !== 'crossOrg' && r.organizationId === org.id),
+      joinedAt: this.now.toISOString(),
+      joinedVia: 'Invite',
+    });
+    if (orgLead) {
+      if (!tier) return route.fulfill({ status: 403 });
+      const account = [...this.accounts.values()].find((a) => a.profileId === profileId);
+      if (!account || !memberOf(account)) return route.fulfill({ status: 404 });
+      account.orgLead =
+        method === 'PUT'
+          ? [...new Set([...(account.orgLead ?? []), org.slug])]
+          : (account.orgLead ?? []).filter((s) => s !== org.slug);
+      return route.fulfill({ status: 204 });
+    }
+    if (method === 'GET' && !profileId) {
+      const q = (url.searchParams.get('q') ?? '').trim().toLowerCase();
+      const list = [...this.accounts.values()]
+        .filter((a) => memberOf(a) && (!q || a.name.toLowerCase().includes(q)))
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(dto);
+      return route.fulfill({ status: 200, json: list });
+    }
+    if (method === 'POST' && !profileId) {
+      const email = String(body['email'] ?? '')
+        .trim()
+        .toLowerCase();
+      const account = this.accounts.get(email);
+      if (!account || !account.verified) {
+        return problemDetail(route, 404, 'No account uses that email. Send an invite instead.');
+      }
+      if (memberOf(account))
+        return conflict(route, 'They’re already a member of this organization.');
+      account.orgs = [...this.organizations.memberships(account), org.slug];
+      this.addNotification({
+        recipientId: account.profileId,
+        kind: 'AddedToOrg',
+        title: `${caller.name} added you to ${org.name}`,
+        linkPath: `/o/${org.slug}`,
+      });
+      return route.fulfill({ status: 201, json: dto(account) });
+    }
+    if (method === 'DELETE' && profileId) {
+      const account = [...this.accounts.values()].find((a) => a.profileId === profileId);
+      if (!account || !memberOf(account)) return route.fulfill({ status: 404 });
+      const isLead = (account.orgLead ?? []).includes(org.slug);
+      if (isLead && leads().length <= 1 && !tier) {
+        return conflict(route, 'Every organization needs an Org Lead.');
+      }
+      const first = this.organizations.memberships(account)[0] === org.slug;
+      account.orgs = this.organizations.memberships(account).filter((s) => s !== org.slug);
+      account.orgLead = (account.orgLead ?? []).filter((s) => s !== org.slug);
+      if (account.orgRoles) delete account.orgRoles[org.slug];
+      // Old role names are the roles held in the first org; they go with it.
+      if (first) {
+        account.roles = account.roles.filter((r) => r === 'SystemAdmin' || r === 'Staff');
+        const profile = this.profiles.get(account.profileId);
+        if (profile) profile.roles = account.roles;
+      }
+      return route.fulfill({ status: 204 });
+    }
+    this.unrecognised.push(`${method} ${url.pathname}`);
+    return route.abort('failed');
   }
 
   /** AdminUsersEndpoints: GET /api/admin/users, System Admin only, 25 per page by name. */

@@ -20,6 +20,7 @@ import {
   SignInPage,
   SignUpPage,
   VerifyEmailPage,
+  WaitingPage,
 } from './pages';
 import { AppShellComponent, PublicShellComponent } from './shell';
 
@@ -80,6 +81,16 @@ const ORG_ROUTES: Routes = [
     loadChildren: () => import('@faithtech-community/notes').then((m) => m.NOTES_ROUTES),
   },
   {
+    path: 'my-work',
+    canActivate: [featureGuard('agile')],
+    loadChildren: () => import('@faithtech-community/agile').then((m) => m.MY_WORK_ROUTES),
+  },
+  {
+    path: 'settings',
+    loadChildren: () =>
+      import('@faithtech-community/organizations').then((m) => m.ORG_SETTINGS_ROUTES),
+  },
+  {
     path: 'invites',
     canActivate: [featureGuard('invites')],
     loadChildren: () => import('@faithtech-community/invites').then((m) => m.INVITES_ROUTES),
@@ -118,6 +129,8 @@ export const routes: Routes = [
   { path: 'forbidden', component: ForbiddenPage },
   { path: 'error', component: ServerErrorPage },
   { path: 'not-found', component: NotFoundPage },
+  // Someone who belongs to no org waits to be added (L2-142).
+  { path: 'waiting', component: WaitingPage, canActivate: [authGuard, accessGuard] },
   {
     path: '',
     component: AppShellComponent,
@@ -127,6 +140,11 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', canActivate: [orgRedirectGuard], children: [] },
       { matcher: legacySection, canActivate: [orgRedirectGuard], children: [] },
       { path: 'o/:orgSlug', canActivate: [orgGuard], children: ORG_ROUTES },
+      // A person's own profile works without an org, for someone waiting to be added (L2-140 AC4).
+      {
+        path: 'profile',
+        loadChildren: () => import('@faithtech-community/profiles').then((m) => m.PROFILES_ROUTES),
+      },
       {
         path: 'notifications',
         loadChildren: () =>

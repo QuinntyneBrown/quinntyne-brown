@@ -50,7 +50,8 @@ export class AddWorkspaceMembersDialog {
   }
 
   protected roles(candidate: MemberCandidateDto): string {
-    return candidate.roles.join(', ');
+    // Cross-org people are marked, since they are not members of the org (L2-146 AC2).
+    return [...candidate.roles, ...(candidate.isCrossOrg ? ['Cross-org'] : [])].join(', ');
   }
 
   protected async add(): Promise<void> {

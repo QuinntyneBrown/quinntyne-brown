@@ -18,6 +18,7 @@ import {
   HttpPeopleService,
 } from './profiles';
 import { CONTACTS_SERVICE, HttpContactsService } from './contacts';
+import { HttpOrganizationsService, ORGANIZATIONS_SERVICE } from './organizations';
 import { PARTNERS_SERVICE, HttpPartnersService } from './partners';
 import { TEAM_SERVICE, HttpTeamService } from './team';
 import { ACTIVITY_SERVICE, HttpActivityService } from './activity';
@@ -81,6 +82,7 @@ export function provideApi(baseUrl: string, auth: Partial<AuthConfig> = {}): Env
     { provide: ADMIN_USERS_SERVICE, useClass: HttpAdminUsersService },
     { provide: AUDIT_LOG_SERVICE, useClass: HttpAuditLogService },
     { provide: ROLES_SERVICE, useClass: HttpRolesService },
+    { provide: ORGANIZATIONS_SERVICE, useClass: HttpOrganizationsService },
     { provide: AGILE_SERVICE, useClass: HttpAgileService },
     { provide: AGILE_LIVE_SERVICE, useClass: SignalRAgileLiveService },
   ];

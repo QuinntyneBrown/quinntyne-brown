@@ -39,6 +39,7 @@ export * from './list';
 export * from './logo-mark';
 export * from './menu';
 export * from './nav-drawer';
+export * from './org-label';
 export * from './org-switcher';
 export * from './note';
 export * from './notice-list';

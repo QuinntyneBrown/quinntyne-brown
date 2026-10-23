@@ -1,0 +1,35 @@
+<ft-skip-link />
+<main id="main" tabindex="-1">
+  <ft-container>
+    <ft-stack>
+      <ft-page-header
+        title="Waiting to be added"
+        [subtitle]="
+          greeting() +
+          ' You’ll see an organization here as soon as its Org Lead adds you, or when you open an invite or a connect QR code from someone in it.'
+        "
+      >
+        <ft-button ftPageHeaderActions [loading]="checking()" (click)="checkAgain()">
+          Check again
+        </ft-button>
+      </ft-page-header>
+      <ft-grid [auto]="true">
+        <ft-card heading="Your profile">
+          <ft-stack gap="3">
+            <p>Add a photo and a short bio so people recognise you.</p>
+            <ft-link href="/profile/me">Your profile</ft-link>
+          </ft-stack>
+        </ft-card>
+        <ft-card heading="Have an invite?">
+          <p>Open the link in the email. It adds you to its organization.</p>
+        </ft-card>
+        <ft-card heading="Sign out">
+          <ft-stack gap="3">
+            <p>Signed in as {{ user()?.email }}</p>
+            <ft-button (click)="signOut()">Sign out</ft-button>
+          </ft-stack>
+        </ft-card>
+      </ft-grid>
+    </ft-stack>
+  </ft-container>
+</main>

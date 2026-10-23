@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import {
   AGILE_SERVICE,
   ACCESS_SERVICE,
+  ALL_ORGS,
   Permission,
   WorkspaceDto,
   WorkspaceSummaryDto,
@@ -19,6 +20,7 @@ import {
   ListSkeletonComponent,
   PageHeaderComponent,
   IconTileComponent,
+  OrgLabelComponent,
   ToastService,
 } from '@faithtech-community/components';
 import { firstValueFrom } from 'rxjs';
@@ -45,6 +47,7 @@ type State = 'loading' | 'loaded' | 'error';
     ListSkeletonComponent,
     PageHeaderComponent,
     IconTileComponent,
+    OrgLabelComponent,
   ],
   templateUrl: './workspaces.page.html',
   styleUrl: './workspaces.page.scss',
@@ -62,8 +65,15 @@ export class WorkspacesPage {
   /** Listed only to their owner and System Admin, who may restore them (L2-037 AC1). */
   protected readonly archived = computed(() => this.all().filter((w) => w.isArchived));
 
-  /** Holders of workspaces.create make workspaces in the org (L2-031 AC1, ADR 0033). */
-  protected readonly canCreate = computed(() => this.access.can(Permission.WorkspacesCreate));
+  /** Rows are labelled with their org under "All orgs" (L2-145). */
+  protected readonly allOrgs = computed(() => this.access.activeSlug() === ALL_ORGS);
+  /**
+   * Holders of workspaces.create make workspaces in the org (L2-031 AC1, ADR 0033); nothing is
+   * created under "All orgs", which has no org to put it in (L2-145 AC2).
+   */
+  protected readonly canCreate = computed(
+    () => !this.allOrgs() && this.access.can(Permission.WorkspacesCreate),
+  );
   /** Reading every workspace without making them is the read-only oversight (Staff, ADR 0035). */
   protected readonly isStaff = computed(
     () =>
@@ -73,6 +83,7 @@ export class WorkspacesPage {
   protected readonly subtitle = computed(() => {
     if (this.isStaff()) return 'Every workspace, read-only';
     if (this.access.isSystemAdmin()) return 'Every workspace';
+    if (this.allOrgs()) return 'Workspaces you own or belong to in every org you cover';
     return this.canCreate() ? 'Workspaces you own or belong to' : 'Workspaces you’ve been added to';
   });
 

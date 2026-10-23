@@ -22,6 +22,7 @@ describe('HttpAgileService', () => {
 
   it.each([
     ['listWorkspaces', () => service.listWorkspaces(), 'GET', '/api/workspaces', undefined],
+    ['myWork', () => service.myWork(), 'GET', '/api/work/mine', undefined],
     [
       'createWorkspace',
       () => service.createWorkspace({ name: 'Ops', method: 'Kanban', memberIds: ['p1'] }),

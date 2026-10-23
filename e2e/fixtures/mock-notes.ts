@@ -537,6 +537,7 @@ export class MockNotes {
 
   private summary(n: MockNote, caller: MockAccount) {
     return {
+      organization: { id: 'org-toronto', slug: 'faithtech-toronto', name: 'FaithTech Toronto' },
       id: n.id,
       title: n.title,
       icon: n.icon,

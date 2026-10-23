@@ -5,7 +5,13 @@ import type { MockAccount, MockProfile } from './mock-api';
 import type { MockNotifications } from './mock-notifications';
 
 export type MockResourceType =
-  'Deck' | 'Logo' | 'Image' | 'Training' | 'Template' | 'Document' | 'Other';
+  | 'Deck'
+  | 'Logo'
+  | 'Image'
+  | 'Training'
+  | 'Template'
+  | 'Document'
+  | 'Other';
 export type MockVisibility = 'Private' | 'Shared' | 'Global';
 
 /** A resource as the Resources table holds it, with its file bytes when it is an upload. */
@@ -658,6 +664,7 @@ export class MockResources {
   private summary(r: MockResource, caller: MockAccount) {
     const isOwn = r.ownerId === caller.profileId;
     return {
+      organization: { id: 'org-toronto', slug: 'faithtech-toronto', name: 'FaithTech Toronto' },
       id: r.id,
       title: r.title,
       type: r.type,

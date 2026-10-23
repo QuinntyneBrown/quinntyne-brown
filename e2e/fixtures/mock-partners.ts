@@ -29,7 +29,14 @@ export interface MockDismissal {
 export type MockStage = 'Lead' | 'InFunnel' | 'Confirmed';
 
 export type MockActivityKind =
-  'Call' | 'Email' | 'Meeting' | 'Note' | 'Added' | 'StageMoved' | 'Merged' | 'Restored';
+  | 'Call'
+  | 'Email'
+  | 'Meeting'
+  | 'Note'
+  | 'Added'
+  | 'StageMoved'
+  | 'Merged'
+  | 'Restored';
 
 /** One row of PartnerActivities. */
 export interface MockActivity {

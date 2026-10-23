@@ -3,9 +3,11 @@
     <ft-button variant="ghost" href="/notes/archived">
       <ft-icon name="archive" /> Archived
     </ft-button>
-    <ft-button variant="primary" [loading]="creating()" (click)="create()">
-      <ft-icon name="add" /> New page
-    </ft-button>
+    @if (!allOrgs()) {
+      <ft-button variant="primary" [loading]="creating()" (click)="create()">
+        <ft-icon name="add" /> New page
+      </ft-button>
+    }
   </ft-cluster>
 </ft-page-header>
 
@@ -67,6 +69,9 @@
               <ft-icon-tile leading name="notes" [emoji]="note.icon" />
               @if (badgeOf(note); as badge) {
                 <ft-badge meta [variant]="badge.variant">{{ badge.text }}</ft-badge>
+              }
+              @if (allOrgs() && note.organization; as org) {
+                <ft-org-label meta [name]="org.name" />
               }
             </ft-list-item>
           }

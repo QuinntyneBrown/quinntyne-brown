@@ -9,6 +9,8 @@ export interface Section {
   secondary?: boolean;
   /** Personal and platform pages live outside /o/{slug} (ADR 0037). */
   orgless?: boolean;
+  /** Shown under "All orgs", which combines People, Workspaces, My work, Resources and Notes (L2-145). */
+  allOrgs?: boolean;
   /**
    * Whether the caller may open the section in `org` (a slug or `all`); it only hides links, and
    * the API refuses the rest (ADR 0037).
@@ -29,7 +31,7 @@ const can =
  * caller's permissions and the org's features (ADR 0037, refining ADR 0009).
  */
 export const SECTIONS: readonly Section[] = [
-  { label: 'Home', path: '', icon: 'home', opens: anyone },
+  { label: 'Home', path: '', icon: 'home', allOrgs: true, opens: anyone },
   { label: 'Events', path: 'events', icon: 'events', opens: feature('events') },
   // Private contacts belong to the person who created them (L2-012).
   {
@@ -44,6 +46,7 @@ export const SECTIONS: readonly Section[] = [
     path: 'workspaces',
     icon: 'workspaces',
     secondary: true,
+    allOrgs: true,
     // Any workspace permission, or a cross-org role that may join work there (L2-155 AC3).
     opens: (access, org) =>
       can(
@@ -52,6 +55,15 @@ export const SECTIONS: readonly Section[] = [
         Permission.WorkspacesReadAll,
       )(access, org) ||
       access.orgs().some((o) => (org === ALL_ORGS || o.slug === org) && o.canJoinWork),
+  },
+  // The work assigned to someone who works in several orgs, in one list (L2-145 AC3).
+  {
+    label: 'My work',
+    path: 'my-work',
+    icon: 'workspaces',
+    secondary: true,
+    allOrgs: true,
+    opens: (access, org) => access.orgs().length > 1 && access.feature('agile', org),
   },
   { label: 'Team', path: 'team', icon: 'team', secondary: true, opens: feature('team') },
   {
@@ -66,15 +78,17 @@ export const SECTIONS: readonly Section[] = [
     path: 'resources',
     icon: 'resources',
     secondary: true,
+    allOrgs: true,
     opens: feature('resources'),
   },
   // Docs & notes are on in every org (ADR 0038).
-  { label: 'Notes', path: 'notes', icon: 'notes', secondary: true, opens: anyone },
+  { label: 'Notes', path: 'notes', icon: 'notes', secondary: true, allOrgs: true, opens: anyone },
   {
     label: 'People',
     path: 'people',
     icon: 'team',
     secondary: true,
+    allOrgs: true,
     opens: can(Permission.PeopleView),
   },
   {
@@ -83,6 +97,16 @@ export const SECTIONS: readonly Section[] = [
     icon: 'reports',
     secondary: true,
     opens: can(Permission.ReportsView),
+  },
+  // The org's settings for its Org Lead, the Portfolio Lead and System Admins (L2-155 AC3).
+  {
+    label: 'Organization',
+    path: 'settings',
+    icon: 'settings',
+    secondary: true,
+    opens: (access, org) =>
+      access.isSystemAdmin() ||
+      access.orgs().some((o) => o.slug === org && (o.isOrgLead || o.isPortfolioLead)),
   },
   // Only System Admins see the admin area (L2-040).
   {
@@ -111,7 +135,9 @@ export function hrefFor(section: Section, org: string | null): string {
 /** The sections the caller may open in `org` (a slug or `all`), in order. */
 export function sectionsFor(access: AccessService, org: string | null): Section[] {
   const scope = org ?? ALL_ORGS;
-  return SECTIONS.filter((s) => s.opens(access, scope));
+  return SECTIONS.filter(
+    (s) => (scope !== ALL_ORGS || s.allOrgs || s.orgless) && s.opens(access, scope),
+  );
 }
 
 /**

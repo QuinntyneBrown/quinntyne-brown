@@ -2,7 +2,12 @@
 import { ComponentRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { SEARCH_SERVICE, SearchResultsDto } from '@faithtech-community/api';
+import {
+  ACCESS_SERVICE,
+  SEARCH_SERVICE,
+  provideStaticAccess,
+  SearchResultsDto,
+} from '@faithtech-community/api';
 import { Observable, Subject, of, throwError } from 'rxjs';
 
 import { SearchPage } from './search.page';
@@ -80,10 +85,14 @@ const RESULTS: SearchResultsDto = {
 async function setup(
   q: string | undefined,
   search: (term: string) => Observable<SearchResultsDto>,
+  allOrgs = false,
 ) {
   const service = { search: vi.fn(search) };
-  TestBed.configureTestingModule({ providers: [{ provide: SEARCH_SERVICE, useValue: service }] });
+  TestBed.configureTestingModule({
+    providers: [{ provide: SEARCH_SERVICE, useValue: service }, provideStaticAccess()],
+  });
   const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+  if (allOrgs) TestBed.inject(ACCESS_SERVICE).setActive('all');
   const fixture = TestBed.createComponent(SearchPage);
   const settle = async () => {
     fixture.detectChanges();
@@ -102,6 +111,23 @@ async function setup(
 }
 
 describe('SearchPage', () => {
+  // Traces to: L2-152 AC2
+  it('names each result’s org under All orgs, and not inside one org', async () => {
+    const labelled: SearchResultsDto = {
+      ...RESULTS,
+      groups: RESULTS.groups.map((g) => ({
+        ...g,
+        items: g.items.map((i) => ({ ...i, organization: 'Shelfie' })),
+      })),
+    };
+    const all = await setup('shelter', () => of(labelled), true);
+    expect(all.host.textContent).toContain('Story · Toronto team · In progress · Shelfie');
+    TestBed.resetTestingModule();
+
+    const one = await setup('shelter', () => of(labelled));
+    expect(one.host.textContent).not.toContain('In progress · Shelfie');
+  });
+
   it('invites a search before anything is typed and runs none', async () => {
     const { host, service } = await setup(undefined, () => of(RESULTS));
 

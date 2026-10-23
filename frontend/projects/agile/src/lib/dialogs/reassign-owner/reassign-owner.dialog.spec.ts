@@ -53,9 +53,11 @@ describe('ReassignOwnerDialog', () => {
   it('says why and offers only City Leads', async () => {
     const { host, select } = await setup();
     expect(host.textContent).toContain('Choose a new owner for Toronto team');
-    expect(host.textContent).toContain('Grace Okonkwo no longer holds the City Lead role');
+    expect(host.textContent).toContain(
+      'Grace Okonkwo can no longer own workspaces in this organization',
+    );
     expect(Array.from(select.options).map((o) => o.textContent?.trim())).toEqual([
-      'Choose a City Lead',
+      'Choose a new owner',
       'Esther Nakamura',
       'Joel Mbeki',
     ]);
@@ -79,12 +81,16 @@ describe('ReassignOwnerDialog', () => {
   it('shows the server’s reason when the choice is refused', async () => {
     const refused = new HttpErrorResponse({
       status: 400,
-      error: { errors: { OwnerId: ['Choose a City Lead.'] } },
+      error: {
+        errors: { OwnerId: ['Choose someone who can create workspaces in this organization.'] },
+      },
     });
     const { ref, host, choose, confirm } = await setup(() => throwError(() => refused));
     choose('p3');
     await confirm();
     expect(ref.close).not.toHaveBeenCalled();
-    expect(host.textContent).toContain('Choose a City Lead.');
+    expect(host.textContent).toContain(
+      'Choose someone who can create workspaces in this organization.',
+    );
   });
 });

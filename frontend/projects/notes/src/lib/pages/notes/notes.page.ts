@@ -9,7 +9,13 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NOTES_SERVICE, NotePageSummary, NoteQuery } from '@faithtech-community/api';
+import {
+  ACCESS_SERVICE,
+  ALL_ORGS,
+  NOTES_SERVICE,
+  NotePageSummary,
+  NoteQuery,
+} from '@faithtech-community/api';
 import {
   BadgeComponent,
   ButtonComponent,
@@ -27,6 +33,7 @@ import {
   PageHeaderComponent,
   TextFieldComponent,
   ToastService,
+  OrgLabelComponent,
 } from '@faithtech-community/components';
 import { debounceTime, distinctUntilChanged, firstValueFrom } from 'rxjs';
 
@@ -40,6 +47,7 @@ type Owner = NonNullable<NoteQuery['owner']>;
 @Component({
   selector: 'ft-notes-page',
   imports: [
+    OrgLabelComponent,
     ReactiveFormsModule,
     BadgeComponent,
     ButtonComponent,
@@ -63,6 +71,9 @@ type Owner = NonNullable<NoteQuery['owner']>;
 })
 export class NotesPage {
   private readonly notes = inject(NOTES_SERVICE);
+  private readonly access = inject(ACCESS_SERVICE);
+  /** Rows are labelled with their org, and no page is created, under "All orgs" (L2-145). */
+  protected readonly allOrgs = computed(() => this.access.activeSlug() === ALL_ORGS);
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
 

@@ -93,6 +93,9 @@
               @if (badgeOf(resource); as badge) {
                 <ft-badge meta [variant]="badge.variant">{{ badge.text }}</ft-badge>
               }
+              @if (allOrgs() && resource.organization; as org) {
+                <ft-org-label meta [name]="org.name" />
+              }
               @if (resource.linkUrl) {
                 <ft-button
                   trailing

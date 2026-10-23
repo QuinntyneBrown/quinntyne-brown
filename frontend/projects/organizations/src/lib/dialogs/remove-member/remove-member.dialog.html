@@ -1,0 +1,20 @@
+<ft-dialog
+  [heading]="'Remove ' + data.member.name + ' from ' + orgName + '?'"
+  description="They can rejoin only through an invite, a connect link or by being added again."
+  icon="remove-member"
+  [busy]="busy()"
+  (closed)="ref.close()"
+>
+  @if (refusal(); as message) {
+    <ft-alert status="danger" heading="Member not removed">{{ message }}</ft-alert>
+  }
+  <p>
+    {{ data.member.name }} loses every role in {{ orgName }} and leaves its switcher. Records they
+    own stay in {{ orgName }} with them as owner, and workspaces they own are flagged as needing a
+    new owner.
+  </p>
+  <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+  <ft-button ftDialogFooter variant="danger" [loading]="busy()" (click)="remove()">
+    Remove {{ firstName }}
+  </ft-button>
+</ft-dialog>
