@@ -158,4 +158,17 @@ describe('HttpAuthService', () => {
       '/api/account/github/start?returnUrl=%2Fevents&keepSignedIn=true',
     );
   });
+
+  // Traces to: L2-111
+  it('marks Google and GitHub sign-in started from the community app', () => {
+    service.signInWithGoogle('/events', false, 'app');
+    service.signInWithGitHub('/', true, 'app');
+
+    expect(redirect).toHaveBeenCalledWith(
+      '/api/account/google/start?returnUrl=%2Fevents&keepSignedIn=false&from=app',
+    );
+    expect(redirect).toHaveBeenCalledWith(
+      '/api/account/github/start?returnUrl=%2F&keepSignedIn=true&from=app',
+    );
+  });
 });

@@ -2,7 +2,31 @@
   <ft-card>
     <ft-stack>
       <h1 class="text-center">Welcome back</h1>
-      <ft-sign-in-form [busy]="busy()" [failure]="failure()" (submitted)="submit($event)" />
+      <ft-sign-in-form
+        divider="or"
+        [busy]="busy()"
+        [failure]="failure()"
+        (submitted)="submit($event)"
+      >
+        <ft-button
+          ftAuthAlternatives
+          variant="google"
+          size="lg"
+          [block]="true"
+          [loading]="googleBusy()"
+          (click)="continueWithGoogle()"
+          >Sign in with Google</ft-button
+        >
+        <ft-button
+          ftAuthAlternatives
+          variant="github"
+          size="lg"
+          [block]="true"
+          [loading]="githubBusy()"
+          (click)="continueWithGitHub()"
+          >Sign in with GitHub</ft-button
+        >
+      </ft-sign-in-form>
     </ft-stack>
   </ft-card>
   <p class="text-caption text-center">

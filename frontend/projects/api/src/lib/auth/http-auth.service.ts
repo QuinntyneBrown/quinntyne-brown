@@ -17,6 +17,7 @@ import { BROWSER_REDIRECT } from './browser-redirect';
 import {
   AuthService,
   CurrentUser,
+  ExternalSignInFrom,
   SignInError,
   SignInOutcome,
   SignUpRequest,
@@ -64,14 +65,31 @@ export class HttpAuthService implements AuthService {
       );
   }
 
-  signInWithGoogle(returnUrl = '/', keepSignedIn = false): void {
-    const query = new URLSearchParams({ returnUrl, keepSignedIn: String(keepSignedIn) });
-    this.redirect(`${this.base}/account/google/start?${query}`);
+  signInWithGoogle(
+    returnUrl = '/',
+    keepSignedIn = false,
+    from: ExternalSignInFrom = 'marketing',
+  ): void {
+    this.startExternalSignIn('google', returnUrl, keepSignedIn, from);
   }
 
-  signInWithGitHub(returnUrl = '/', keepSignedIn = false): void {
+  signInWithGitHub(
+    returnUrl = '/',
+    keepSignedIn = false,
+    from: ExternalSignInFrom = 'marketing',
+  ): void {
+    this.startExternalSignIn('github', returnUrl, keepSignedIn, from);
+  }
+
+  private startExternalSignIn(
+    provider: 'google' | 'github',
+    returnUrl: string,
+    keepSignedIn: boolean,
+    from: ExternalSignInFrom,
+  ): void {
     const query = new URLSearchParams({ returnUrl, keepSignedIn: String(keepSignedIn) });
-    this.redirect(`${this.base}/account/github/start?${query}`);
+    if (from === 'app') query.set('from', 'app');
+    this.redirect(`${this.base}/account/${provider}/start?${query}`);
   }
 
   hasKeptSession(): boolean {

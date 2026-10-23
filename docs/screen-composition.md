@@ -25,14 +25,14 @@ Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the 
 - Not an Angular screen: the API's private-preview gate renders it before either app bundle may load, so it cannot use `@faithtech-community/components` (ADR 0026). It composes the design system's classes instead: auth layout, `card`, `field` with `field__error`, `alert` (`warning` for locked-out, `danger` for error) and `btn btn--primary btn--lg btn--block`, under the neutral accent scope (`data-accent="neutral"`, design system `patterns/private-preview-wall.html`).
 - Local (server template `backend/src/QuinntyneBrown.Community.Api/Middleware/PrivatePreview/wall.html`): the inline, nonce-protected copy of those rules read by role, the plain-HTML form (`csrf`, `returnUrl`, `passphrase`) and the small script that shows the busy state. No logo, product name, description, favicon or brand colour.
 
-### Sign in — `/sign-in` (`pages/sign-in`: default, invalid, busy, locked, error, suspended)
+### Sign in — `/sign-in` (`pages/sign-in`: default, invalid, busy, locked, error, suspended, google-failed, github-failed)
 
-- Library: `AuthLayoutComponent`, `CardComponent`, `SignInFormComponent` (fields, *Keep me signed in on this device*, failure alerts, busy submit, *Forgot your password?*), `LinkComponent` (*Create an account*).
-- Local: the "Welcome back" heading and the hand-off after a successful sign-in (resume `/connect/authorize` or start PKCE).
+- Library: `AuthLayoutComponent`, `CardComponent`, `SignInFormComponent` (`divider="or"`, fields, *Keep me signed in on this device*, failure alerts, busy submit, *Forgot your password?*) with `ButtonComponent` `variant="google"` *Sign in with Google* and `variant="github"` *Sign in with GitHub* in `ftAuthAlternatives`, `LinkComponent` (*Create an account*).
+- Local: the "Welcome back" heading, the hand-off after a successful sign-in (resume `/connect/authorize` or start PKCE) and the Google and GitHub outcomes (`?google=`, `?github=`, L2-111).
 
 ### Sign up — `/sign-up` (`pages/sign-up`: default, invalid, busy, error, success)
 
-- Library: `AuthLayoutComponent`, `CardComponent`, `SignUpFormComponent` (fields, error summary, busy submit, agreement caption), `LinkComponent` (*Sign in*, *send it again*); `signUpFieldErrors` from `api` maps the API's validation problem onto the form.
+- Library: `AuthLayoutComponent`, `CardComponent`, `SignUpFormComponent` (`divider="or"`, fields, error summary, busy submit, agreement caption) with `ButtonComponent` `variant="google"` *Sign up with Google* and `variant="github"` *Sign up with GitHub* in `ftAuthAlternatives`, `LinkComponent` (*Sign in*, *send it again*); `signUpFieldErrors` from `api` maps the API's validation problem onto the form.
 - Local: the "Join FaithTech" heading, its subtitle and the "Check your inbox" state.
 
 ### Auth continue — `/auth/continue` (no mock; shows the auth callback's "Signing you in…")

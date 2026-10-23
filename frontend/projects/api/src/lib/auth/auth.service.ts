@@ -35,6 +35,9 @@ export interface SignUpRequest {
 }
 
 /** Contract for the auth API. Pages depend on AUTH_SERVICE, never on HttpAuthService. */
+/** Where an external sign-in started, so the API returns a failure there (L2-111). */
+export type ExternalSignInFrom = 'marketing' | 'app';
+
 export interface AuthService {
   readonly isAuthenticated: Signal<boolean>;
   readonly roles: Signal<Role[]>;
@@ -49,14 +52,16 @@ export interface AuthService {
   signInWithPassword(email: string, password: string): Observable<SignInOutcome>;
   /**
    * Starts Google sign-in (one flow for signing in and signing up): the browser leaves for the API, then
-   * Google, and lands in the community app at returnUrl, or back here with ?google=failed|suspended.
+   * Google, and lands in the community app at returnUrl, or back where it started (the marketing page, or
+   * the community app's /sign-in for `from: 'app'`) with ?google=failed|suspended.
    */
-  signInWithGoogle(returnUrl?: string, keepSignedIn?: boolean): void;
+  signInWithGoogle(returnUrl?: string, keepSignedIn?: boolean, from?: ExternalSignInFrom): void;
   /**
    * Starts GitHub sign-in (one flow for signing in and signing up): the browser leaves for the API, then
-   * GitHub, and lands in the community app at returnUrl, or back here with ?github=failed|suspended.
+   * GitHub, and lands in the community app at returnUrl, or back where it started with
+   * ?github=failed|suspended.
    */
-  signInWithGitHub(returnUrl?: string, keepSignedIn?: boolean): void;
+  signInWithGitHub(returnUrl?: string, keepSignedIn?: boolean, from?: ExternalSignInFrom): void;
   signOut(): Observable<void>;
   /**
    * True when the community app keeps a "Keep me signed in" session on this device (the session hint,
