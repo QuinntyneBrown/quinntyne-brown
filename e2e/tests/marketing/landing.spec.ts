@@ -13,12 +13,6 @@ test.describe('Marketing page', () => {
     await expect(marketing.lead).toBeVisible();
     await expect(marketing.topBarJoin).toBeVisible();
     await expect(marketing.topBarSignIn).toBeVisible();
-    await expect(marketing.benefitsHeading).toBeVisible();
-    await expect(marketing.benefits).toHaveText([
-      'Find your city team',
-      'Show up together',
-      'Build what matters',
-    ]);
     await expect(marketing.callToActionJoin).toBeVisible();
     await expect(marketing.footer).toContainText('© 2026 Quinntyne Brown');
     await axe.check();
@@ -59,28 +53,6 @@ test.describe('Marketing page', () => {
     await marketing.downloadResume.click();
 
     expect((await download).suggestedFilename()).toBe('quinntyne-brown-resume.pdf');
-  });
-
-  // Traces to: L2-132 AC3
-  test('the work section shows the figures and the employers', async ({ page }) => {
-    const marketing = new MarketingPage(page);
-
-    await marketing.open();
-
-    await expect(marketing.workEyebrow).toBeVisible();
-    expect(await marketing.figureTexts()).toEqual([
-      { value: '15+', label: 'years' },
-      { value: '2×', label: 'faster Canadarm3 software' },
-      { value: '10×', label: 'serialization throughput' },
-      { value: '~30', label: 'developers mentored' },
-    ]);
-    await expect(marketing.employers).toHaveText([
-      'MDA',
-      'Protiviti',
-      'RBC Ventures',
-      'AutoTrader.ca',
-      'Corus',
-    ]);
   });
 
   // Traces to: L2-132 AC4
@@ -146,9 +118,7 @@ test.describe('Marketing page', () => {
     await marketing.open();
 
     await expect(marketing.sectionHeadings).toHaveText([
-      'Fifteen years shipping.',
       'What I’m building in the open. Jump in anywhere.',
-      'Why join',
       'Ready to build with us?',
     ]);
   });

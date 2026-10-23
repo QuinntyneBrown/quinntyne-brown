@@ -116,20 +116,6 @@
           label="Quinntyne Brown in 21 seconds"
         />
       </ft-landing-hero>
-      <ft-landing-section eyebrow="Work" heading="Fifteen years shipping.">
-        <div class="landing__figures">
-          @for (figure of figures; track figure.label) {
-            <ft-stat variant="figure" [label]="figure.label" [value]="figure.value" />
-          }
-        </div>
-        <ul class="landing__employers" aria-label="Where I’ve worked">
-          @for (employer of employers; track employer) {
-            <li>
-              <ft-badge variant="role">{{ employer }}</ft-badge>
-            </li>
-          }
-        </ul>
-      </ft-landing-section>
       <ft-landing-section heading="What I’m building in the open. Jump in anywhere.">
         <ul class="landing__projects">
           @for (project of projects; track project.name) {
@@ -144,20 +130,6 @@
         </ul>
         <p><ft-link [href]="gitHubUrl">All on GitHub →</ft-link></p>
       </ft-landing-section>
-      <section class="landing__section" aria-labelledby="why-join">
-        <h2 id="why-join">Why join</h2>
-        <ft-grid [auto]="true">
-          <ft-benefit icon="team" heading="Find your city team">
-            See who builds near you, from first-time volunteers to city leads.
-          </ft-benefit>
-          <ft-benefit icon="events" heading="Show up together">
-            RSVP to builders nights and hackathons, and add them to your calendar.
-          </ft-benefit>
-          <ft-benefit icon="workspaces" heading="Build what matters">
-            Plan projects with your team that serve churches, shelters and neighbours.
-          </ft-benefit>
-        </ft-grid>
-      </section>
       <ft-cta-band heading="Ready to build with us?" text="It’s free, and it takes a minute.">
         <ft-button variant="primary" size="lg" (click)="show('join')">Join now</ft-button>
       </ft-cta-band>

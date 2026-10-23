@@ -12,8 +12,6 @@ export class MarketingPage {
   readonly topBar: Locator;
   readonly topBarJoin: Locator;
   readonly topBarSignIn: Locator;
-  readonly benefitsHeading: Locator;
-  readonly benefits: Locator;
   readonly callToAction: Locator;
   readonly callToActionJoin: Locator;
   readonly footer: Locator;
@@ -48,10 +46,6 @@ export class MarketingPage {
   readonly linkedIn: Locator;
   readonly gitHub: Locator;
   readonly downloadResume: Locator;
-  readonly work: Locator;
-  readonly workEyebrow: Locator;
-  readonly figures: Locator;
-  readonly employers: Locator;
   readonly building: Locator;
   readonly projects: Locator;
   readonly allOnGitHub: Locator;
@@ -67,8 +61,6 @@ export class MarketingPage {
     this.topBar = page.getByRole('banner');
     this.topBarJoin = this.topBar.getByRole('button', { name: 'Join now' });
     this.topBarSignIn = this.topBar.getByRole('button', { name: 'Sign in' });
-    this.benefitsHeading = page.getByRole('heading', { level: 2, name: 'Why join' });
-    this.benefits = page.getByRole('heading', { level: 3 });
     this.callToAction = page.getByRole('region', { name: 'Ready to build with us?' });
     this.callToActionJoin = this.callToAction.getByRole('button', { name: 'Join now' });
     this.footer = page.getByRole('contentinfo');
@@ -109,12 +101,6 @@ export class MarketingPage {
     this.linkedIn = main.getByRole('link', { name: 'LinkedIn', exact: true });
     this.gitHub = main.getByRole('link', { name: 'GitHub', exact: true });
     this.downloadResume = main.getByRole('link', { name: 'Download résumé' });
-    this.work = page.getByRole('region', { name: 'Fifteen years shipping.' });
-    this.workEyebrow = this.work.getByText('Work', { exact: true });
-    this.figures = this.work.getByRole('group');
-    this.employers = this.work
-      .getByRole('list', { name: 'Where I’ve worked' })
-      .getByRole('listitem');
     this.building = page.getByRole('region', {
       name: 'What I’m building in the open. Jump in anywhere.',
     });
@@ -200,16 +186,6 @@ export class MarketingPage {
   runningAnimations(): Promise<number> {
     return this.page.evaluate(
       () => document.getAnimations().filter((a) => a.playState === 'running').length,
-    );
-  }
-
-  /** Each figure in the work section as the visitor reads it: its value, then its label. */
-  async figureTexts(): Promise<{ value: string; label: string }[]> {
-    return this.figures.evaluateAll((groups) =>
-      groups.map((g) => ({
-        value: g.querySelector('.ft-stat__value')?.textContent?.trim() ?? '',
-        label: g.querySelector('.ft-stat__label')?.textContent?.trim() ?? '',
-      })),
     );
   }
 
