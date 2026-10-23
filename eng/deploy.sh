@@ -10,6 +10,7 @@
 #   CUSTOM_DOMAINS_STAGE      none | issue | bound (default: none; see runbook.md)
 #   PRIVATE_PREVIEW_ENABLED   true (default) | false to lift the wall
 #   GOOGLE_SIGN_IN_ENABLED    false (default) | true once the Google secrets are in Key Vault
+#   GITHUB_SIGN_IN_ENABLED    false (default) | true once the GitHub secrets are in Key Vault
 #   SHARED_ONLY               true to create only the shared resources (first run, before the secrets exist)
 set -euo pipefail
 
@@ -19,6 +20,7 @@ export POSTGRES_ADMIN_PASSWORD
 export CUSTOM_DOMAINS_STAGE="${CUSTOM_DOMAINS_STAGE:-none}"
 export PRIVATE_PREVIEW_ENABLED="${PRIVATE_PREVIEW_ENABLED:-true}"
 export GOOGLE_SIGN_IN_ENABLED="${GOOGLE_SIGN_IN_ENABLED:-false}"
+export GITHUB_SIGN_IN_ENABLED="${GITHUB_SIGN_IN_ENABLED:-false}"
 root="$(cd "$(dirname "$0")/.." && pwd)"
 tag="${IMAGE_TAG:-$(git -C "$root" rev-parse --short=12 HEAD)}"
 

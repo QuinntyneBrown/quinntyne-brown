@@ -51,6 +51,10 @@ public static class AccountEndpoints
         account.MapGet("/google/start", StartGoogleSignIn).AllowAnonymous();
         account.MapGet("/google/callback", CompleteGoogleSignInAsync).AllowAnonymous();
 
+        // GitHub sign-in for the marketing page (L2-110, ADR 0027): the same browser redirects, with PKCE.
+        account.MapGet("/github/start", StartGitHubSignIn).AllowAnonymous();
+        account.MapGet("/github/callback", CompleteGitHubSignInAsync).AllowAnonymous();
+
         return app;
     }
 
@@ -131,10 +135,62 @@ public static class AccountEndpoints
         return Results.Redirect($"{webApp.Value.Origin}/auth/continue?returnUrl={Uri.EscapeDataString(pending.ReturnUrl)}&keepSignedIn={keep}");
     }
 
+    private static IResult StartGitHubSignIn(
+        HttpContext context,
+        IGitHubIdentityProvider github,
+        GitHubCorrelation correlation,
+        IOptions<WebAppOptions> webApp,
+        IOptions<MarketingOptions> marketing,
+        string? returnUrl,
+        bool? keepSignedIn)
+    {
+        var state = SignInCorrelation.NewSecret();
+        var codeVerifier = SignInCorrelation.NewSecret();
+        var authorizationUrl = github.BuildAuthorizationUrl(state, codeVerifier, GitHubRedirectUri(webApp.Value));
+        if (authorizationUrl is null)
+        {
+            return Results.Redirect(GitHubOutcome(marketing.Value, "failed"));
+        }
+
+        correlation.Write(context, new SignInCorrelation.Pending(state, codeVerifier, AppPath(returnUrl), keepSignedIn ?? false));
+        return Results.Redirect(authorizationUrl);
+    }
+
+    private static async Task<IResult> CompleteGitHubSignInAsync(
+        HttpContext context,
+        GitHubSignInHandler handler,
+        GitHubCorrelation correlation,
+        IOptions<WebAppOptions> webApp,
+        IOptions<MarketingOptions> marketing,
+        string? code,
+        string? state,
+        CancellationToken ct)
+    {
+        var pending = correlation.ReadAndClear(context);
+        if (pending is null || string.IsNullOrEmpty(code) || !SignInCorrelation.StateMatches(pending, state))
+        {
+            return Results.Redirect(GitHubOutcome(marketing.Value, "failed"));
+        }
+
+        var result = await handler.HandleAsync(new GitHubSignInCommand(code, GitHubRedirectUri(webApp.Value), pending.Secret), ct);
+        if (!result.Succeeded)
+        {
+            return Results.Redirect(GitHubOutcome(marketing.Value, result.Error == GitHubSignInError.Suspended ? "suspended" : "failed"));
+        }
+
+        await StartSessionAsync(context, result.User!);
+        var keep = pending.KeepSignedIn ? "1" : "0";
+        return Results.Redirect($"{webApp.Value.Origin}/auth/continue?returnUrl={Uri.EscapeDataString(pending.ReturnUrl)}&keepSignedIn={keep}");
+    }
+
     // The API sits behind the community app's origin, so Google returns there.
     private static string GoogleRedirectUri(WebAppOptions webApp) => $"{webApp.Origin}/api/account/google/callback";
 
     private static string GoogleOutcome(MarketingOptions marketing, string outcome) => $"{marketing.Origin}/?google={outcome}";
+
+    private static string GitHubRedirectUri(WebAppOptions webApp) => $"{webApp.Origin}/api/account/github/callback";
+
+    private static string GitHubOutcome(MarketingOptions marketing, string outcome) => $"{marketing.Origin}/?github={outcome}";
 
     /// <summary>Only a path inside the community app is kept; anything else lands on home.</summary>
     private static string AppPath(string? url) =>

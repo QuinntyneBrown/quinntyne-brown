@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<SignInHandler>();
         services.AddScoped<ExternalAccounts>();
         services.AddScoped<GoogleSignInHandler>();
+        services.AddScoped<GitHubSignInHandler>();
         services.AddScoped<RequestPasswordResetHandler>();
         services.AddScoped<ResetPasswordHandler>();
         services.AddScoped<ProfileAccess>();

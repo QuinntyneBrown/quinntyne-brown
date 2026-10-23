@@ -74,3 +74,11 @@ public class GoogleCorrelation(IDataProtectionProvider dataProtection, TimeProvi
     public const string CookieName = "ftc.google";
     public const string CookiePath = "/api/account/google";
 }
+
+/// <summary>The GitHub sign-in correlation cookie (ADR 0027).</summary>
+public class GitHubCorrelation(IDataProtectionProvider dataProtection, TimeProvider time)
+    : SignInCorrelation(dataProtection, time, CookieName, CookiePath, "QuinntyneBrown.Community.GitHubSignIn")
+{
+    public const string CookieName = "ftc.github";
+    public const string CookiePath = "/api/account/github";
+}
