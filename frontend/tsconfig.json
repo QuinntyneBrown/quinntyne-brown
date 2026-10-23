@@ -1,4 +1,4 @@
-/* SCAFFOLD: the app and unit tests resolve @faithtech-community/* to library sources.
+/* The app and unit tests resolve @faithtech-community/* to library sources.
    Library builds override these paths to ./dist in their tsconfig.lib.json. */
 {
   "compileOnSave": false,
