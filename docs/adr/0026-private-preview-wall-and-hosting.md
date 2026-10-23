@@ -29,3 +29,7 @@ QuinntyneBrown.Community is about to be deployed to `app.faithtech.community` an
 - The wall page must be kept in step with `docs/design-system/patterns/private-preview-wall.html` by hand.
 - Scaling past one replica needs the lockout state (and the Data Protection key ring) moved to shared storage first.
 - The owner provisions Azure, creates DNS records and sets the secrets (`docs/detailed-designs/platform/private-preview-wall/runbook.md`).
+
+## Addendum (2026-10-23): hosts moved to quinntynebrown.com
+
+The site is deployed as `app.quinntynebrown.com` (community app, API, identity server) and `www.quinntynebrown.com` (marketing page), with the unlock cookie and the session hint on `quinntynebrown.com`. Nothing else in this decision changes: the two hosts are still one site on one parent domain, which is what the wall cookie and the marketing page's credentialed calls need. `eng/infra/main.bicepparam`, the production environment files of both Angular applications, the runbook and `.github/workflows/` carry the new hosts; the Google and GitHub OAuth callbacks are `https://app.quinntynebrown.com/api/account/{google,github}/callback`.

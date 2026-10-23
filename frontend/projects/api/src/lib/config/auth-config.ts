@@ -14,7 +14,7 @@ export interface AuthConfig {
   postLogoutRedirectUri: string;
   /**
    * Domain of the non-secret "kept session" hint cookie the marketing page reads (ADR 0018), such as
-   * faithtech.community; unset keeps it host-only, which localhost shares across ports.
+   * quinntynebrown.com; unset keeps it host-only, which localhost shares across ports.
    */
   sessionHintDomain?: string;
 }

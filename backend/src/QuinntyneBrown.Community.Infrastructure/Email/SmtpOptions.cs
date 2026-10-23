@@ -14,5 +14,5 @@ public class SmtpOptions
 
     public string? Password { get; set; }
 
-    public string From { get; set; } = "Quinntyne Brown <no-reply@faithtech.community>";
+    public string From { get; set; } = "Quinntyne Brown <no-reply@quinntynebrown.com>";
 }

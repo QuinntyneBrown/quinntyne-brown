@@ -56,7 +56,7 @@ services:
       PrivatePreview__Enabled: "true"
       PrivatePreview__PassphraseHash: pbkdf2-sha256$$600000$$PvxUWWjPK+jvB9wexynOFA==$$jpHONZCQ6YcwnGF4rs9C+AdNBSmkxQPPSesg2UfM07w=
       PrivatePreview__SigningKey: DNqda7Mxuxq8VWHxk3in190OcF48uMZ60DbAl5nOWdY=
-      # Host-only here: app.localhost and www.localhost each unlock separately. Production sets faithtech.community.
+      # Host-only here: app.localhost and www.localhost each unlock separately. Production sets quinntynebrown.com.
       PrivatePreview__CookieDomain: ""
       StaticSites__ImageOrigins: http://localhost:10000
     depends_on:

@@ -9,8 +9,8 @@ COPY frontend/package.json frontend/package-lock.json ./
 # --ignore-scripts skips the husky "prepare" hook, which needs the git checkout.
 RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY frontend/ ./
-# Production configurations: COMMUNITY_ORIGIN https://app.faithtech.community, session hint domain
-# faithtech.community, hashed file names, no source maps (angular.json).
+# Production configurations: COMMUNITY_ORIGIN https://app.quinntynebrown.com, session hint domain
+# quinntynebrown.com, hashed file names, no source maps (angular.json).
 RUN npm run build
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend
