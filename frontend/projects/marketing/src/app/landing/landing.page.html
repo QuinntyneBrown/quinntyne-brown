@@ -3,9 +3,20 @@
     <div class="landing">
       <ft-landing-hero
         eyebrow="Quinntyne Brown"
-        heading="Build with people who share your faith"
-        lead="Meet the builders, leads and volunteers in your city, show up to events and hackathons together, and work on projects that serve your neighbours."
+        heading="Builds software. Builds community."
+        lead="I’m Quinntyne Brown: a Christian, a Chief Product Officer and founder, and City Lead for FaithTech Toronto. This is home for the builders, leads, volunteers and partners I work with. Make a profile, meet the community and build with us."
       >
+        <ft-cluster ftHeroActions gap="2">
+          <ft-button variant="outline" size="sm" [href]="linkedInUrl" target="_blank"
+            >LinkedIn</ft-button
+          >
+          <ft-button variant="outline" size="sm" [href]="gitHubUrl" target="_blank"
+            >GitHub</ft-button
+          >
+          <ft-button variant="primary" size="sm" [href]="resumeUrl" download=""
+            >Download résumé</ft-button
+          >
+        </ft-cluster>
         <ft-card ftHeroPanel>
           @if (handingOff(); as handOff) {
             <h2 aria-live="polite">Signing you in…</h2>
@@ -107,6 +118,32 @@
           caption="Quinntyne Brown in 21 seconds · captions on"
         />
       </ft-landing-hero>
+      <ft-landing-section eyebrow="Work" heading="Fifteen years shipping.">
+        <div class="landing__figures">
+          @for (figure of figures; track figure.label) {
+            <ft-stat variant="figure" [label]="figure.label" [value]="figure.value" />
+          }
+        </div>
+        <ul class="landing__employers" aria-label="Where I’ve worked">
+          @for (employer of employers; track employer) {
+            <li>
+              <ft-badge variant="role">{{ employer }}</ft-badge>
+            </li>
+          }
+        </ul>
+      </ft-landing-section>
+      <ft-landing-section eyebrow="Pinned on GitHub" heading="Things I’m building.">
+        <ul class="landing__projects">
+          @for (project of projects; track project.name) {
+            <ft-project-card
+              [name]="project.name"
+              [language]="project.language"
+              [href]="projectUrl(project.name)"
+            />
+          }
+        </ul>
+        <p><ft-link [href]="gitHubUrl">All on GitHub →</ft-link></p>
+      </ft-landing-section>
       <section class="landing__section" aria-labelledby="why-join">
         <h2 id="why-join">Why join</h2>
         <ft-grid [auto]="true">

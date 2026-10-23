@@ -22,20 +22,25 @@ import {
 } from '@faithtech-community/api';
 import {
   AlertComponent,
+  BadgeComponent,
   BenefitComponent,
   ButtonComponent,
   CardComponent,
+  ClusterComponent,
   ContainerComponent,
   CtaBandComponent,
   EmptyStateComponent,
   GridComponent,
   LandingHeroComponent,
+  LandingSectionComponent,
   LinkComponent,
+  ProjectCardComponent,
   SignInCredentials,
   SignInFormComponent,
   SignInFormFailure,
   SignUpDetails,
   SignUpFormComponent,
+  StatComponent,
   VideoPlayerComponent,
 } from '@faithtech-community/components';
 import { firstValueFrom } from 'rxjs';
@@ -44,23 +49,29 @@ import { COMMUNITY_ORIGIN } from '../community-origin';
 
 /**
  * The marketing page (L2-074), matching docs/mocks/pages/marketing. It collects credentials and
- * hands the session to the community app, which completes PKCE (ADR 0018).
+ * hands the session to the community app, which completes PKCE (ADR 0018). It also introduces
+ * Quinntyne Brown: profile links, work figures and pinned projects, all static (L2-132).
  */
 @Component({
   selector: 'ft-landing-page',
   imports: [
     AlertComponent,
+    BadgeComponent,
     BenefitComponent,
     ButtonComponent,
     CardComponent,
+    ClusterComponent,
     ContainerComponent,
     CtaBandComponent,
     EmptyStateComponent,
     GridComponent,
     LandingHeroComponent,
+    LandingSectionComponent,
     LinkComponent,
+    ProjectCardComponent,
     SignInFormComponent,
     SignUpFormComponent,
+    StatComponent,
     VideoPlayerComponent,
   ],
   templateUrl: './landing.page.html',
@@ -72,6 +83,26 @@ export class LandingPage implements OnInit {
   private readonly auth = inject(AUTH_SERVICE);
   private readonly redirect = inject(BROWSER_REDIRECT);
   protected readonly communityOrigin = inject(COMMUNITY_ORIGIN);
+
+  protected readonly linkedInUrl = 'https://www.linkedin.com/in/quinntynebrown';
+  protected readonly gitHubUrl = 'https://github.com/QuinntyneBrown';
+  /** Served from the marketing app's public/ folder. */
+  protected readonly resumeUrl = '/resume/quinntyne-brown-resume.pdf';
+  protected readonly figures = [
+    { value: '15+', label: 'years' },
+    { value: '2×', label: 'faster Canadarm3 software' },
+    { value: '10×', label: 'serialization throughput' },
+    { value: '~30', label: 'developers mentored' },
+  ];
+  protected readonly employers = ['MDA', 'Protiviti', 'RBC Ventures', 'AutoTrader.ca', 'Corus'];
+  protected readonly projects = [
+    { name: 'Shelfie', language: 'TypeScript' },
+    { name: 'Saturdaze', language: 'C#' },
+    { name: 'TwinkleTune', language: 'TypeScript' },
+    { name: 'Fullstack with Claude', language: 'HTML' },
+    { name: 'Loupe', language: 'C#' },
+    { name: 'Studio', language: 'C#' },
+  ];
 
   /** The community app page to land on after signing in (`?returnUrl=/events`). */
   readonly returnUrl = input<string>();
@@ -157,6 +188,11 @@ export class LandingPage implements OnInit {
       appPath(this.returnUrl()),
       this.signInForm()?.keepSignedIn() ?? false,
     );
+  }
+
+  /** The project in Quinntyne Brown's GitHub repositories, until each repository URL is confirmed. */
+  protected projectUrl(name: string): string {
+    return `${this.gitHubUrl}?tab=repositories&q=${encodeURIComponent(name)}`;
   }
 
   protected verifyEmailLink(email: string): string {

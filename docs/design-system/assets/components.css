@@ -1071,7 +1071,7 @@ mark { background: var(--color-warning-bg); color: inherit; border-radius: var(-
 .figure-row { display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); }
 
 /* Project card: a decorative thumbnail, the name as the card's one (stretched) link and its main language. */
-.project-grid { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr)); list-style: none; margin: 0; padding: 0; }
+.project-grid { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr)); list-style: none; margin: 0; padding: 0; }
 .project-card { position: relative; display: flex; flex-direction: column; height: 100%; overflow: hidden; border-radius: var(--radius-lg); background: var(--color-bg-surface); border: var(--border-width-hairline) solid var(--color-border-default); box-shadow: var(--shadow-1); }
 .project-card:hover { box-shadow: var(--shadow-2); }
 .project-card:focus-within { box-shadow: var(--shadow-focus); }
