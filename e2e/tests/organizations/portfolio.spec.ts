@@ -68,7 +68,7 @@ test.describe('Portfolio administration', () => {
     await expect(portfolio.toast).toContainText('Features saved');
 
     expect(api.callsTo('PUT', '/api/org-types/type-startup/features')[0].body).toEqual({
-      enabled: ['invites', 'agile'],
+      enabled: ['invites', 'agile', 'integrations'],
     });
     expect(api.organizations.bySlug('shelfie')!.features).not.toContain('resources');
   });

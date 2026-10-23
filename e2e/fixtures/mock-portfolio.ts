@@ -15,6 +15,7 @@ const SWITCHABLE = [
   'resources',
   'agile',
   'reports',
+  'integrations',
 ];
 
 const FEATURE_OF_CODE: Record<string, string> = {
@@ -38,6 +39,8 @@ const FEATURE_OF_CODE: Record<string, string> = {
   'workspaces.join': 'agile',
   'workspaces.readAll': 'agile',
   'reports.view': 'reports',
+  'integrations.view': 'integrations',
+  'integrations.manage': 'integrations',
 };
 
 const FEATURES = ['profiles', 'notes', ...SWITCHABLE];
