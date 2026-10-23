@@ -23,7 +23,7 @@ Where it lives today (placeholders or partial):
 
 - Backend: Domain `Contacts/` (Contact, ContactNote), `Partners/` (Partner, PartnerStage, PartnerStageChange);
   Application, Infrastructure and Api have no feature code for these yet.
-- Frontend: `frontend/projects/contacts/`, `frontend/projects/partners/` (each has a `SCAFFOLD.md`), plus `api`,
+- Frontend: `frontend/projects/contacts/`, `frontend/projects/partners/`, plus `api` and
   `components`.
 - Mocks: `docs/mocks/pages/{contacts,archived-contacts,contact,contact-form,partners,partner}`,
   `docs/mocks/dialogs/{add-partner,archive-contact,delete-contact,link-contact,move-partner}`.
@@ -69,10 +69,10 @@ Out of scope: events, search indexing of contacts and partners beyond what these
 
 - Read all four contacts designs, both partners designs, the mocks, ADRs and `docs/screen-composition.md`.
   Confirm every state has a mock (light, dark, phone, tablet, desktop).
-- Resolve the open question in `frontend/projects/partners/SCAFFOLD.md`: Edit navigates to an edit screen, but no
+- Resolve the open partner question: Edit navigates to an edit screen, but no
   mock or page exists. Add the partner form mock (reuse the contact-form pattern), design-system and
-  screen-composition entries, and update `manage-partners` before building it. Check `contacts/SCAFFOLD.md` for
-  further open questions and resolve them the same way, recording an ADR where a real decision is made.
+  screen-composition entries, and update `manage-partners` before building it. Resolve any further open questions
+  for contacts the same way, recording an ADR where a real decision is made.
 - Fix any other gap or contradiction first (skills `writing-html-mocks`, `extracting-design-systems`,
   `writing-requirements` with the next number after L2-054, `writing-design-documents`,
   `writing-screen-composition`).
@@ -98,14 +98,13 @@ For each slice:
 - Do not start the next slice until the checks pass.
 
 After all slices: update `docs/estimates/contacts.md`, `docs/estimates/partners.md` and the README roll-up to true
-percent complete (skill `estimating-designs`); delete the two `SCAFFOLD.md` files once their projects are real;
-keep mocks, design system, screen composition and designs aligned with what was built.
+percent complete (skill `estimating-designs`); keep mocks, design system, screen composition and designs aligned with what was built.
 
 ## Done means
 
 - L2-013 to L2-018 work end to end, enforced on the server, with private-contact visibility proven by tests.
 - All new and existing backend, frontend unit and Playwright tests pass; lint, format and build are clean.
-- The documentation agrees with the code; no `SCAFFOLD.md` remains in `contacts` or `partners`.
+- The documentation agrees with the code.
 - The work is on a branch with a pull request to `main`, and its checks are green. Fetch and rebase first.
 - Only then end the run, with a short summary of what was built, decisions made (with ADR links) and anything
   deferred.

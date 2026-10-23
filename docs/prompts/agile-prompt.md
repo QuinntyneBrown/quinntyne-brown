@@ -131,7 +131,7 @@ For each slice:
 - Do not start the next slice until the checks pass.
 
 After all slices: update `docs/estimates/agile.md` and the README roll-up to true percent complete (skill
-`estimating-designs`); remove any scaffold note once the project is real; keep mocks, design system, screen
+`estimating-designs`); keep mocks, design system, screen
 composition and designs aligned with what was built.
 
 ## Done means
