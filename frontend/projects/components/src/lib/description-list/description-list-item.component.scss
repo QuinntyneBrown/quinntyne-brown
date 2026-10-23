@@ -21,3 +21,12 @@
 .ft-dl__missing {
   color: var(--color-fg-muted);
 }
+
+.ft-dl__detail--mono {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+}
+
+.ft-dl__detail--multiline {
+  white-space: pre-line;
+}

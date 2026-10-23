@@ -28,9 +28,7 @@
   <ft-stack>
     @switch (state()) {
       @case ('loading') {
-        <div role="status" aria-busy="true" aria-label="Loading applications">
-          <ft-table caption="Applications" [columns]="columns()" [rows]="[]" [loading]="true" />
-        </div>
+        <ft-list-skeleton label="Loading applications" [rows]="2" />
       }
       @case ('error') {
         <ft-empty-state

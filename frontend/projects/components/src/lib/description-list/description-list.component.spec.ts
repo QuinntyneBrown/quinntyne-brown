@@ -74,3 +74,23 @@ describe('DescriptionListComponent', () => {
     expect(setup().querySelector('ft-description-list')?.getAttribute('aria-busy')).toBeNull();
   });
 });
+
+@Component({
+  imports: [DescriptionListComponent, DescriptionListItemComponent],
+  template: `<ft-description-list>
+    <ft-description-list-item label="Event ID" [mono]="true">0b1f</ft-description-list-item>
+    <ft-description-list-item label="Message" [multiline]="true">Hi</ft-description-list-item>
+  </ft-description-list>`,
+})
+class MonoHostComponent {}
+
+describe('DescriptionListItemComponent mono and multiline', () => {
+  it('marks the value as an identifier or as keeping its line breaks', () => {
+    const fixture = TestBed.createComponent(MonoHostComponent);
+    fixture.detectChanges();
+    const details = (fixture.nativeElement as HTMLElement).querySelectorAll('dd');
+
+    expect(details[0].classList).toContain('ft-dl__detail--mono');
+    expect(details[1].classList).toContain('ft-dl__detail--multiline');
+  });
+});

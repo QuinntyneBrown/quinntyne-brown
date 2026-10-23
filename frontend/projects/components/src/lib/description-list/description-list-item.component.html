@@ -1,6 +1,10 @@
 <dl class="ft-dl">
   <dt class="ft-dl__term">{{ label() }}</dt>
-  <dd class="ft-dl__detail">
+  <dd
+    class="ft-dl__detail"
+    [class.ft-dl__detail--mono]="mono()"
+    [class.ft-dl__detail--multiline]="multiline()"
+  >
     @if (loading()) {
       <ft-skeleton shape="text" />
     } @else if (missing()) {
