@@ -1,25 +1,26 @@
-# FaithTech Community in 30 seconds
+# Quinntyne Brown in 24 seconds
 
 The brochure video on the marketing page (`frontend/projects/marketing`). One `##` section per slide in
 `deck.html`; each section's paragraph is spoken and becomes one caption. Keep the whole video at 30
-seconds or less: `build.mjs` fails if it is longer.
+seconds or less: `build.mjs` fails if it is longer. The current render uses `--engine edge`
+(`en-US-AndrewMultilingualNeural`).
 
 ## title
 
-FaithTech is a community of Christians who build with technology.
+I’m Quinntyne Brown. I build products in the open, with people like you.
 
-## team
+## projects
 
-Find the builders, leads and volunteers in your city.
+Shelfie, Sweet Hand and more are open source. Jump in anywhere.
 
-## events
+## connect
 
-RSVP to builders nights and hackathons, and bring a friend.
+This is where we share the people, the events, the notes and the backlog.
 
-## build
+## impact
 
-Work together on projects that serve your neighbours.
+Less time getting on the same page. More time making an impact.
 
 ## join
 
-Join FaithTech Community. It’s free, and it takes a minute.
+Make a profile, and let’s stay connected.

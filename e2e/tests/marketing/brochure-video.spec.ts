@@ -31,6 +31,18 @@ test.describe('Brochure video', () => {
     expect(seconds).toBeLessThanOrEqual(30);
   });
 
+  test('the captions carry the home-base narration', async ({ page }) => {
+    const marketing = new MarketingPage(page);
+    await marketing.open();
+
+    const captions = await marketing.captions();
+
+    expect(captions).toContain('Shelfie');
+    expect(captions).toContain('Sweet Hand');
+    expect(captions).toContain('Make a profile');
+    expect(captions).not.toContain('FaithTech');
+  });
+
   test('offers no transcript; the captions carry the narration', async ({ page }) => {
     const marketing = new MarketingPage(page);
 

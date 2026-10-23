@@ -69,7 +69,7 @@ export class MarketingPage {
     this.videoUnavailable = page.getByRole('status').filter({
       hasText: 'This video can’t play right now',
     });
-    this.videoPoster = page.getByRole('img', { name: /FaithTech builders/ });
+    this.videoPoster = page.getByRole('img', { name: /Quinntyne Brown/ });
     this.panel = page.locator('ft-card').filter({ has: page.getByRole('heading', { level: 2 }) });
     this.signInHeading = page.getByRole('heading', { level: 2, name: 'Sign in' });
     this.email = this.panel.getByLabel('Email');
@@ -202,6 +202,13 @@ export class MarketingPage {
         links: item.querySelectorAll('a').length,
       })),
     );
+  }
+
+  /** The English caption file the video's track points at, as the browser would fetch it. */
+  async captions(): Promise<string> {
+    const src = await this.video.locator('track').getAttribute('src');
+    const response = await this.page.request.get(new URL(src ?? '', this.page.url()).href);
+    return response.text();
   }
 
   async open(query = ''): Promise<void> {
