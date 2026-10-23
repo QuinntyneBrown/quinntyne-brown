@@ -17,6 +17,7 @@ public record ProfileDto(
     string? Bio,
     PhotoDto? FeaturedPhoto,
     IReadOnlyList<PhotoDto> Photos,
-    IReadOnlyList<string> Roles,
+    IReadOnlyList<Organizations.RoleDto> Roles,
     bool IsOwn,
-    bool CanEdit);
+    bool CanEdit,
+    bool IsAgent = false);

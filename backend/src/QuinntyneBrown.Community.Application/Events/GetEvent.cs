@@ -1,6 +1,6 @@
-using QuinntyneBrown.Community.Application.Admin;
 using QuinntyneBrown.Community.Application.Common;
-using QuinntyneBrown.Community.Domain.Profiles;
+using QuinntyneBrown.Community.Application.Organizations;
+using QuinntyneBrown.Community.Domain.Organizations;
 using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Events;
@@ -44,27 +44,28 @@ public record EventDetailDto(
     IReadOnlyList<RsvpDto>? Rsvps,
     int? CheckedInCount = null,
     bool CanCheckIn = false,
-    bool CanViewCheckIn = false);
+    bool CanViewCheckIn = false,
+    OrgLabel? Organization = null);
 
 /// <summary>Reads one event for a signed-in member; every member may see every event.</summary>
-public class GetEventHandler(IApplicationDbContext db, EventPermissions permissions)
+public class GetEventHandler(IApplicationDbContext db, ICurrentUser current, EventPermissions permissions, AccessResolver resolver)
 {
-    private static readonly Role[] HostRoles = [Role.EventLead, Role.CityLead, Role.SystemAdmin];
-
     public async Task<EventDetailDto?> HandleAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var e = await db.Events.AsNoTracking().Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var e = await permissions.Covered(db.Events.AsNoTracking()).Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (e is null)
         {
             return null;
         }
+
+        permissions.Focus(e.OrganizationId);
 
         var caller = await permissions.CallerProfileIdAsync(cancellationToken);
         var host = await db.Profiles.AsNoTracking().SingleOrDefaultAsync(p => p.Id == e.CreatedById, cancellationToken);
         var cancelledBy = e.CancelledById is { } by
             ? await db.Profiles.AsNoTracking().Where(p => p.Id == by).Select(p => p.Name).SingleOrDefaultAsync(cancellationToken)
             : null;
-        var hostRole = host is null ? null : HostRoles.Where(host.HasRole).Select(r => (Role?)r).FirstOrDefault();
+        var hostRole = host is null ? null : await HostRoleAsync(host.Id, e.OrganizationId, cancellationToken);
 
         IReadOnlyList<RsvpDto>? rsvps = null;
         if (permissions.CanSeeRsvpList)
@@ -86,9 +87,27 @@ public class GetEventHandler(IApplicationDbContext db, EventPermissions permissi
         return new EventDetailDto(
             e.Id, e.Title, e.Description, e.Type.ToString(), e.StartsAt, e.EndsAt, e.City, e.Format.ToString(), e.Venue,
             e.OnlineLink, e.Capacity, e.Visibility.ToString(), e.RsvpCount, e.IsFull, e.IsCancelled, e.CancellationReason,
-            cancelledBy, e.CancelledAt, host?.Name, hostRole is { } role ? RoleLabels.Of(role) : null,
+            cancelledBy, e.CancelledAt, host?.Name, hostRole,
             caller is { } me && e.Rsvps.Any(r => r.ProfileId == me),
             permissions.CanManageEvents, permissions.CanExportRsvps, rsvps,
-            permissions.CanSeeRsvpList ? e.CheckedInCount : null, permissions.CanCheckIn, permissions.CanViewCheckIn);
+            permissions.CanSeeRsvpList ? e.CheckedInCount : null, permissions.CanCheckIn, permissions.CanViewCheckIn,
+            OrgLabel.Of(current.Access.Orgs, e.OrganizationId));
+    }
+
+    /// <summary>The host's event-managing role in the event's org, latest in the catalogue first (Event Lead before City Lead).</summary>
+    private async Task<string?> HostRoleAsync(Guid hostId, Guid orgId, CancellationToken cancellationToken)
+    {
+        var held = await db.OrgRoleAssignments.AsNoTracking().Where(a => a.ProfileId == hostId && a.OrganizationId == orgId)
+            .Join(db.RoleDefinitions, a => a.RoleDefinitionId, r => r.Id, (a, r) => r).ToListAsync(cancellationToken);
+        if (held.Where(r => r.Permissions.Contains(Permissions.EventsManage)).OrderByDescending(r => r.SortOrder).FirstOrDefault() is { } role)
+        {
+            return role.Name;
+        }
+
+        var host = await resolver.ForProfileAsync(hostId, cancellationToken);
+        return host.IsSystemAdmin ? RoleKeys.NameOf(RoleKeys.SystemAdmin)
+            : host.IsPortfolioLead(orgId) ? RoleKeys.NameOf(RoleKeys.PortfolioLead)
+            : host.IsOrgLead(orgId) ? RoleKeys.NameOf(RoleKeys.OrgLead)
+            : null;
     }
 }

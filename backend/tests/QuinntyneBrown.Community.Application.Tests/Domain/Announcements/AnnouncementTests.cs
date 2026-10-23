@@ -20,10 +20,11 @@ public class AnnouncementTests
     [Fact]
     public void An_audience_can_be_the_holders_of_one_or_more_roles()
     {
-        var audience = AnnouncementAudience.ForRoles(Role.Volunteer, Role.EventLead, Role.Volunteer);
+        var (volunteer, eventLead) = (Guid.NewGuid(), Guid.NewGuid());
+        var audience = AnnouncementAudience.ForRoles(volunteer, eventLead, volunteer);
 
         Assert.Equal(AudienceKind.Roles, audience.Kind);
-        Assert.Equal(new HashSet<Role> { Role.Volunteer, Role.EventLead }, audience.Roles);
+        Assert.Equal(new HashSet<Guid> { volunteer, eventLead }, audience.Roles);
     }
 
     [Fact]
@@ -47,7 +48,7 @@ public class AnnouncementTests
     {
         var audience = AnnouncementAudience.Everyone();
 
-        var announcement = new Announcement("Hackathon dates", "Save the date.", audience, Sender, Now, alsoEmail: true);
+        var announcement = new Announcement(Guid.NewGuid(), "Hackathon dates", "Save the date.", audience, Sender, Now, alsoEmail: true);
 
         Assert.Equal(
             ("Hackathon dates", "Save the date.", audience, Sender, Now, true),
@@ -59,13 +60,13 @@ public class AnnouncementTests
     [InlineData("Subject", " ")]
     public void An_announcement_needs_a_subject_and_a_body(string subject, string body)
     {
-        Assert.Throws<ArgumentException>(() => new Announcement(subject, body, AnnouncementAudience.Everyone(), Sender, Now, alsoEmail: false));
+        Assert.Throws<ArgumentException>(() => new Announcement(Guid.NewGuid(), subject, body, AnnouncementAudience.Everyone(), Sender, Now, alsoEmail: false));
     }
 
     [Fact]
     public void Recipients_are_recorded_once_each()
     {
-        var announcement = new Announcement("Subject", "Body", AnnouncementAudience.Everyone(), Sender, Now, alsoEmail: true);
+        var announcement = new Announcement(Guid.NewGuid(), "Subject", "Body", AnnouncementAudience.Everyone(), Sender, Now, alsoEmail: true);
         var ada = Guid.NewGuid();
         var grace = Guid.NewGuid();
 

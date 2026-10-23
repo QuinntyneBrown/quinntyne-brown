@@ -29,7 +29,7 @@ All data was global: any member saw any event, partner, resource or workspace th
 ### The active org on API requests
 
 - The web app sends the active org with every API request as the **`X-Org` header**: an org slug, or `all` for the "All orgs" view (ADR 0037). API routes keep their shape (`/api/events`, `/api/partners/{id}`); the org is context, not a path segment, so the 25 endpoint groups and their contracts stay stable.
-- A header naming an org the caller does not cover, or that does not exist, makes the request's scope empty: lists return nothing and creation returns `404`, so an org's existence is not revealed.
+- A header naming an org the caller does not cover, or that does not exist, or whose type has the route's feature switched off, is answered `404` by `CurrentAccessMiddleware` before any handler runs (lists and creation alike), so an org's existence is not revealed. Without a known org the scope is empty.
 - Without a header, **reads** cover every org the caller covers (as "All orgs"), and **creation** uses the only org the caller may create in; if there are several, the API answers `400` with "Choose an organization". This keeps integrations and the one-org case simple.
 - **By-id requests ignore the header** and use the record's own `OrganizationId`. A record whose org the caller does not cover, or whose feature is off there (ADR 0038), answers `404`. A covered record the caller lacks the permission for answers `403`, as before.
 

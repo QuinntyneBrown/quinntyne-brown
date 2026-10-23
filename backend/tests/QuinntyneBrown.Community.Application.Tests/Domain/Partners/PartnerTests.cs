@@ -9,12 +9,12 @@ public class PartnerTests
     private static readonly Guid Lead = Guid.NewGuid();
 
     private static Partner NewPartner(PartnerStage stage = PartnerStage.Lead) =>
-        new("Grace Church", "https://grace.example.org", "Venue", Lead, "Pat", "pat@grace.example.org", "555-0100", "Warm intro", stage);
+        new(Guid.NewGuid(), "Grace Church", "https://grace.example.org", "Venue", Lead, "Pat", "pat@grace.example.org", "555-0100", "Warm intro", stage);
 
     [Fact]
     public void A_new_partner_starts_at_the_lead_stage_by_default()
     {
-        var partner = new Partner("Grace Church", null, null, null, null, null, null, null);
+        var partner = new Partner(Guid.NewGuid(), "Grace Church", null, null, null, null, null, null, null);
 
         Assert.Equal(PartnerStage.Lead, partner.Stage);
         Assert.Empty(partner.StageChanges);
@@ -33,7 +33,7 @@ public class PartnerTests
     [Fact]
     public void A_partner_needs_a_name()
     {
-        Assert.Throws<ArgumentException>(() => new Partner("", null, null, null, null, null, null, null));
+        Assert.Throws<ArgumentException>(() => new Partner(Guid.NewGuid(), "", null, null, null, null, null, null, null));
     }
 
     [Fact]

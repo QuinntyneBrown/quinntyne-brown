@@ -55,14 +55,19 @@ public class MergePartnersHandler(IApplicationDbContext db, PartnerAccess access
             return (Result.Invalid("OtherId", "Choose two different partners."), null);
         }
 
-        var pair = await db.Partners.Include(p => p.StageChanges)
+        var pair = await access.Readable(db.Partners).Include(p => p.StageChanges)
             .Where(p => p.Id == keepId || p.Id == otherId)
             .ToListAsync(cancellationToken);
         var kept = pair.SingleOrDefault(p => p.Id == keepId);
         var other = pair.SingleOrDefault(p => p.Id == otherId);
-        if (kept is null || other is null)
+        if (kept is null || other is null || kept.OrganizationId != other.OrganizationId)
         {
             return (Result.NotFound(), null);
+        }
+
+        if (!access.CanWriteIn(kept.OrganizationId))
+        {
+            return (Result.Forbidden(), null);
         }
 
         if (pair.FirstOrDefault(p => p.IsArchived) is { } archived)

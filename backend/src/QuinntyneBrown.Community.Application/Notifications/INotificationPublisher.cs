@@ -13,7 +13,7 @@ public record NotificationEmail(string Subject, string Body);
 public interface INotificationPublisher
 {
     /// <summary>Adds one in-app notification, with no email.</summary>
-    void Publish(Guid recipientProfileId, NotificationKind kind, string title, string linkPath);
+    void Publish(Guid recipientProfileId, NotificationKind kind, string title, string linkPath, Guid? organizationId = null);
 
     /// <summary>Adds an in-app notification for each recipient and queues the emails; returns how many were queued.</summary>
     Task<int> PublishAsync(
@@ -23,5 +23,6 @@ public interface INotificationPublisher
         string linkPath,
         Guid? actorId,
         Func<Guid, NotificationEmail?>? email,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        Guid? organizationId = null);
 }

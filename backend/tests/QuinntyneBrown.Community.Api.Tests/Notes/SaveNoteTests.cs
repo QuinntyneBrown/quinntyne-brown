@@ -48,8 +48,8 @@ public class SaveNoteTests(CommunityApiFactory factory) : IClassFixture<Communit
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var page = await factory.AddNoteAsync(grace, "Toronto city team playbook", "Global");
-        var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), Role.CityLead);
-        var esther = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), Role.Staff);
+        var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead);
+        var esther = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), SeededRole.Staff);
 
         var read = (await marcus.GetFromJsonAsync<Detail>($"/api/notes/{page.Id}"))!;
 

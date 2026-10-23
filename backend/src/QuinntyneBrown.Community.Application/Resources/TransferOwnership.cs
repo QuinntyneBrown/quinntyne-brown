@@ -39,7 +39,7 @@ public class TransferOwnershipHandler(
 
         var candidate = await db.Profiles.Where(p => p.Id == ownerId && !p.IsSuspended && db.Users.Any(u => u.ProfileId == p.Id))
             .Select(p => new { p.Name }).SingleOrDefaultAsync(cancellationToken);
-        var role = candidate is null ? null : await contributors.OwnerRoleAsync(ownerId, cancellationToken);
+        var role = candidate is null ? null : await contributors.OwnerRoleAsync(ownerId, resource.OrganizationId, cancellationToken);
         if (role is null)
         {
             return (Result.Invalid("OwnerId", "Choose a lead, Staff member or System Admin; only they can own resources."), null);
@@ -52,7 +52,7 @@ public class TransferOwnershipHandler(
         }
 
         resource.SetOwner(ownerId, role);
-        audit.Record(caller, "resource.owner.transferred", nameof(Resource), resource.Id.ToString(), new { OwnerId = previous }, new { OwnerId = ownerId });
+        audit.Record(caller, "resource.owner.transferred", nameof(Resource), resource.Id.ToString(), new { OwnerId = previous }, new { OwnerId = ownerId }, resource.OrganizationId);
         var admin = await db.Profiles.Where(p => p.Id == caller).Select(p => p.Name).SingleAsync(cancellationToken);
         var title = $"{admin} made you the owner of {resource.Title}";
         await publisher.PublishAsync(

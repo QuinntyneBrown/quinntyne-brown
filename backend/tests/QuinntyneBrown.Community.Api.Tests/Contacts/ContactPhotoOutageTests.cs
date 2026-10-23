@@ -105,7 +105,7 @@ public class ContactPhotoOutageTests(CommunityApiFactory factory) : IClassFixtur
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
-        return (factory.ClientFor(grace, Role.CityLead), contact);
+        return (factory.ClientFor(grace, SeededRole.CityLead), contact);
     }
 
     private static async Task<Contact> Reload(HttpClient client, Guid contactId) =>

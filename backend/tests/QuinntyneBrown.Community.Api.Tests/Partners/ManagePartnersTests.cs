@@ -14,8 +14,8 @@ public class ManagePartnersTests(CommunityApiFactory factory) : IClassFixture<Co
     [Fact]
     public async Task A_lead_adds_a_partner_with_its_details_and_it_appears_at_the_lead_stage()
     {
-        var grace = await factory.AddMemberAsync("Grace Okonkwo", p => p.AddRole(Role.CityLead, Guid.Empty, DateTime.UtcNow));
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var grace = await factory.AddMemberAsync("Grace Okonkwo", p => p.AddRole(SeededRole.CityLead, Guid.Empty, DateTime.UtcNow));
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         var name = $"Kestrel Labs {Guid.NewGuid():N}";
 
         var response = await client.PostAsJsonAsync("/api/partners", NewPartner(name, ownerId: grace.ProfileId, email: "nadia@kestrel.example"));
@@ -44,7 +44,7 @@ public class ManagePartnersTests(CommunityApiFactory factory) : IClassFixture<Co
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead)
+        var response = await factory.ClientFor(grace, SeededRole.CityLead)
             .PostAsJsonAsync("/api/partners", NewPartner(" ", stage: "Signed", email: "nadia@"));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -58,9 +58,9 @@ public class ManagePartnersTests(CommunityApiFactory factory) : IClassFixture<Co
     public async Task The_owner_must_be_a_member_with_a_lead_role()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var volunteer = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(Role.Volunteer, Guid.Empty, DateTime.UtcNow));
+        var volunteer = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(SeededRole.Volunteer, Guid.Empty, DateTime.UtcNow));
 
-        var response = await factory.ClientFor(grace, Role.CityLead)
+        var response = await factory.ClientFor(grace, SeededRole.CityLead)
             .PostAsJsonAsync("/api/partners", NewPartner("Kestrel Labs", ownerId: volunteer.ProfileId));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -68,10 +68,10 @@ public class ManagePartnersTests(CommunityApiFactory factory) : IClassFixture<Co
     }
 
     [Theory]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Every_lead_staff_and_system_admin_see_the_same_shared_partner(Role role)
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Every_lead_staff_and_system_admin_see_the_same_shared_partner(SeededRole role)
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var partner = await factory.CreatePartnerAsync(grace, "Trinity Community Centre");
@@ -82,8 +82,8 @@ public class ManagePartnersTests(CommunityApiFactory factory) : IClassFixture<Co
 
         Assert.Equal(("Trinity Community Centre", "Nadia Petrov"), (read!.Name, read.ContactName));
         Assert.Contains(board!.Columns.SelectMany(c => c.Cards), c => c.Id == partner.Id);
-        Assert.Equal(role != Role.Staff, read.CanEdit);
-        Assert.Equal(role != Role.Staff, board.CanEdit);
+        Assert.Equal(role != SeededRole.Staff, read.CanEdit);
+        Assert.Equal(role != SeededRole.Staff, board.CanEdit);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class ManagePartnersTests(CommunityApiFactory factory) : IClassFixture<Co
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var partner = await factory.CreatePartnerAsync(grace, "Summit Cloud");
-        var staff = factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), Role.Staff);
+        var staff = factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), SeededRole.Staff);
 
         var create = await staff.PostAsJsonAsync("/api/partners", NewPartner("Northgate Credit Union"));
         var edit = await staff.PutAsJsonAsync($"/api/partners/{partner.Id}", NewPartner("Changed"));
@@ -102,10 +102,10 @@ public class ManagePartnersTests(CommunityApiFactory factory) : IClassFixture<Co
 
     [Theory]
     [InlineData]
-    [InlineData(Role.Volunteer)]
-    [InlineData(Role.ProductEngineer)]
-    [InlineData(Role.Attendee)]
-    public async Task Anyone_without_a_lead_role_staff_or_system_admin_gets_403(params Role[] roles)
+    [InlineData(SeededRole.Volunteer)]
+    [InlineData(SeededRole.ProductEngineer)]
+    [InlineData(SeededRole.Attendee)]
+    public async Task Anyone_without_a_lead_role_staff_or_system_admin_gets_403(params SeededRole[] roles)
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var partner = await factory.CreatePartnerAsync(grace, "Oakridge Bible College");
@@ -127,7 +127,7 @@ public class ManagePartnersTests(CommunityApiFactory factory) : IClassFixture<Co
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).GetAsync($"/api/partners/{Guid.NewGuid()}");
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).GetAsync($"/api/partners/{Guid.NewGuid()}");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -138,7 +138,7 @@ public class ManagePartnersTests(CommunityApiFactory factory) : IClassFixture<Co
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var partner = await factory.CreatePartnerAsync(grace, "Kestrel Labs", "InFunnel");
 
-        var response = await factory.ClientFor(grace, Role.EventLead).PutAsJsonAsync($"/api/partners/{partner.Id}", new
+        var response = await factory.ClientFor(grace, SeededRole.EventLead).PutAsJsonAsync($"/api/partners/{partner.Id}", new
         {
             Name = "Kestrel Labs Inc.",
             Website = "",
@@ -155,11 +155,11 @@ public class ManagePartnersTests(CommunityApiFactory factory) : IClassFixture<Co
     [Fact]
     public async Task The_owner_list_offers_members_with_a_lead_role()
     {
-        var grace = await factory.AddMemberAsync($"Grace {Guid.NewGuid():N}", p => p.AddRole(Role.CityLead, Guid.Empty, DateTime.UtcNow));
-        var hannah = await factory.AddMemberAsync($"Hannah {Guid.NewGuid():N}", p => p.AddRole(Role.CommunicationsLead, Guid.Empty, DateTime.UtcNow));
-        var ruth = await factory.AddMemberAsync($"Ruth {Guid.NewGuid():N}", p => p.AddRole(Role.Volunteer, Guid.Empty, DateTime.UtcNow));
+        var grace = await factory.AddMemberAsync($"Grace {Guid.NewGuid():N}", p => p.AddRole(SeededRole.CityLead, Guid.Empty, DateTime.UtcNow));
+        var hannah = await factory.AddMemberAsync($"Hannah {Guid.NewGuid():N}", p => p.AddRole(SeededRole.CommunicationsLead, Guid.Empty, DateTime.UtcNow));
+        var ruth = await factory.AddMemberAsync($"Ruth {Guid.NewGuid():N}", p => p.AddRole(SeededRole.Volunteer, Guid.Empty, DateTime.UtcNow));
 
-        var owners = (await factory.ClientFor(grace, Role.CityLead).GetFromJsonAsync<Owner[]>("/api/partners/owners"))!;
+        var owners = (await factory.ClientFor(grace, SeededRole.CityLead).GetFromJsonAsync<Owner[]>("/api/partners/owners"))!;
 
         Assert.Contains(owners, o => o.ProfileId == grace.ProfileId);
         Assert.Contains(owners, o => o.ProfileId == hannah.ProfileId);
@@ -171,7 +171,7 @@ public class ManagePartnersTests(CommunityApiFactory factory) : IClassFixture<Co
     public async Task A_system_admin_without_a_lead_role_changing_a_partner_is_audited()
     {
         var admin = await factory.AddMemberAsync("Priya Shah");
-        var client = factory.ClientFor(admin, Role.SystemAdmin);
+        var client = factory.ClientFor(admin, SeededRole.SystemAdmin);
 
         var response = await client.PostAsJsonAsync("/api/partners", NewPartner("Pine & Co. Legal"));
         var partner = (await response.Content.ReadFromJsonAsync<Partner>())!;

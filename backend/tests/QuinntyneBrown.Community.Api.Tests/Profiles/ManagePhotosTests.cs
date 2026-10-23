@@ -97,7 +97,7 @@ public class ManagePhotosTests(CommunityApiFactory factory) : IClassFixture<Comm
         var (samuel, photos) = await MemberWithPhotosAsync(2);
         var staff = await factory.AddMemberAsync("Daniel Reyes");
 
-        var response = await Send(factory.ClientFor(staff, Role.Staff), method, $"/api/profiles/{samuel.ProfileId}/photos/{photos[1]}{suffix}");
+        var response = await Send(factory.ClientFor(staff, SeededRole.Staff), method, $"/api/profiles/{samuel.ProfileId}/photos/{photos[1]}{suffix}");
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         var profile = await LoadAsync(samuel.ProfileId);
@@ -115,7 +115,7 @@ public class ManagePhotosTests(CommunityApiFactory factory) : IClassFixture<Comm
         var priya = await factory.AddMemberAsync("Priya Shah");
         var (samuel, photos) = await MemberWithPhotosAsync(2);
 
-        var response = await Send(factory.ClientFor(priya, Role.SystemAdmin), method, $"/api/profiles/{samuel.ProfileId}/photos/{photos[1]}{suffix}");
+        var response = await Send(factory.ClientFor(priya, SeededRole.SystemAdmin), method, $"/api/profiles/{samuel.ProfileId}/photos/{photos[1]}{suffix}");
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         var entry = await factory.WithDbAsync(db => db.AuditEntries.SingleAsync(a => a.TargetId == samuel.ProfileId.ToString()));

@@ -19,7 +19,7 @@ public class ConnectMemberTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task A_signed_in_member_is_connected_at_once_and_a_repeat_changes_nothing()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var jonah = await factory.AddMemberAsync("Jonah Bell", p => p.AddRole(Role.Volunteer, Guid.Empty, DateTime.UtcNow));
+        var jonah = await factory.AddMemberAsync("Jonah Bell", p => p.AddRole(SeededRole.Volunteer, Guid.Empty, DateTime.UtcNow));
         var token = await factory.ConnectTokenOfAsync(grace);
         var client = factory.ClientFor(jonah);
 
@@ -32,8 +32,7 @@ public class ConnectMemberTests(CommunityApiFactory factory) : IClassFixture<Com
         Assert.Equal(("Jonah Bell", await factory.EmailOfAsync(jonah), jonah.ProfileId), (contact.Name, contact.Email, contact.LinkedProfileId));
         var notice = Assert.Single(await factory.WithDbAsync(db => db.Notifications.AsNoTracking().Where(n => n.RecipientId == grace.ProfileId).ToListAsync()));
         Assert.Equal("Jonah Bell connected with you", notice.Title);
-        var roles = (await factory.WithDbAsync(db => db.Profiles.AsNoTracking().SingleAsync(p => p.Id == jonah.ProfileId))).Roles;
-        Assert.Equal([Role.Volunteer], roles.Select(r => r.Role));
+        Assert.Equal([SeededRole.Volunteer], await factory.WithDbAsync(db => SeededRoles.OfAsync(db, jonah.ProfileId)));
     }
 
     [Fact]
@@ -62,7 +61,7 @@ public class ConnectMemberTests(CommunityApiFactory factory) : IClassFixture<Com
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var token = await factory.ConnectTokenOfAsync(grace);
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsJsonAsync("/api/connect", new { token });
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync("/api/connect", new { token });
 
         Assert.Equal("OwnCode", (await response.Content.ReadFromJsonAsync<ConnectBody>())!.Outcome);
         Assert.False(await factory.WithDbAsync(db => db.Contacts.AnyAsync(c => c.OwnerId == grace.ProfileId)));

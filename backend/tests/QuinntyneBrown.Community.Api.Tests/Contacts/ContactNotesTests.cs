@@ -16,7 +16,7 @@ public class ContactNotesTests(CommunityApiFactory factory) : IClassFixture<Comm
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega", notes: "Met at Builders Night.");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         factory.Time.Advance(TimeSpan.FromDays(2));
         var addedAt = factory.Time.GetUtcNow().UtcDateTime;
 
@@ -37,7 +37,7 @@ public class ContactNotesTests(CommunityApiFactory factory) : IClassFixture<Comm
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsJsonAsync($"/api/contacts/{contact.Id}/notes", new { Body = body });
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync($"/api/contacts/{contact.Id}/notes", new { Body = body });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Equal([message], (await response.Content.ReadFromJsonAsync<ValidationProblemDetails>())!.Errors["Body"]);
@@ -49,17 +49,17 @@ public class ContactNotesTests(CommunityApiFactory factory) : IClassFixture<Comm
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
 
-        var response = await factory.ClientFor(grace, Role.CityLead)
+        var response = await factory.ClientFor(grace, SeededRole.CityLead)
             .PostAsJsonAsync($"/api/contacts/{contact.Id}/notes", new { Body = new string('a', 2001) });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.Staff)]
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.Staff)]
     [InlineData]
-    public async Task Nobody_else_reads_or_adds_notes(params Role[] roles)
+    public async Task Nobody_else_reads_or_adds_notes(params SeededRole[] roles)
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega", notes: "Private.");
@@ -85,8 +85,8 @@ public class ContactNotesTests(CommunityApiFactory factory) : IClassFixture<Comm
             return await db.SaveChangesAsync();
         });
 
-        var lead = (await factory.ClientFor(grace, Role.CityLead).GetFromJsonAsync<Note[]>($"/api/contacts/{contact.Id}/notes"))!;
-        var member = await factory.ClientFor(tomas, Role.CityLead).GetAsync($"/api/contacts/{contact.Id}/notes");
+        var lead = (await factory.ClientFor(grace, SeededRole.CityLead).GetFromJsonAsync<Note[]>($"/api/contacts/{contact.Id}/notes"))!;
+        var member = await factory.ClientFor(tomas, SeededRole.CityLead).GetAsync($"/api/contacts/{contact.Id}/notes");
 
         Assert.Equal(["Private follow-up."], lead.Select(n => n.Body));
         Assert.Equal(HttpStatusCode.NotFound, member.StatusCode);
@@ -98,7 +98,7 @@ public class ContactNotesTests(CommunityApiFactory factory) : IClassFixture<Comm
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega", notes: "Private.");
         var admin = await factory.AddMemberAsync("Priya Shah");
-        var client = factory.ClientFor(admin, Role.SystemAdmin);
+        var client = factory.ClientFor(admin, SeededRole.SystemAdmin);
 
         var notes = (await client.GetFromJsonAsync<Note[]>($"/api/contacts/{contact.Id}/notes"))!;
         await client.PostAsJsonAsync($"/api/contacts/{contact.Id}/notes", new { Body = "Admin note." });

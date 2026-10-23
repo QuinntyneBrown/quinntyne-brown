@@ -44,13 +44,14 @@ public record ContactDto(
     int NoteCount,
     bool IsOwn,
     DateTime CreatedAtUtc,
-    IReadOnlyList<ContactPhotoDto> Photos);
+    IReadOnlyList<ContactPhotoDto> Photos,
+    Organizations.OrgLabel? Org = null);
 
 /// <summary>The caller's own contact with the same email as the contact form (L2-116): the oldest, active or archived.</summary>
 public record DuplicateContactDto(Guid Id, string Name, string? Organization, string Email, DateTime AddedAtUtc, int NoteCount, bool IsArchived);
 
 /// <summary>Builds contact DTOs: the linked profile's name and photo, and any verified member with the same email.</summary>
-public class ContactViews(IApplicationDbContext db, IPhotoStorage storage)
+public class ContactViews(IApplicationDbContext db, IPhotoStorage storage, ICurrentUser current)
 {
     public async Task<ContactDto> ToDtoAsync(Contact contact, bool isOwn, CancellationToken cancellationToken = default)
     {
@@ -78,7 +79,8 @@ public class ContactViews(IApplicationDbContext db, IPhotoStorage storage)
             noteCount,
             isOwn,
             contact.CreatedAtUtc,
-            [.. contact.Photos.OrderByDescending(p => p.UploadedAt).Select(p => ContactPhotoDto.From(contact.Id, p))]);
+            [.. contact.Photos.OrderByDescending(p => p.UploadedAt).Select(p => ContactPhotoDto.From(contact.Id, p))],
+            Organizations.OrgLabel.Of(current.Access.Orgs, contact.OrganizationId));
     }
 
     /// <summary>The verified member whose account uses this email, compared case-insensitively.</summary>

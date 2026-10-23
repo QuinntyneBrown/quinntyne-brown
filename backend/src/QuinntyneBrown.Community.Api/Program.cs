@@ -62,7 +62,7 @@ app.UseStatusCodePages();
 app.UseStaticSites(app.Configuration);
 app.UseCors(WebProtectionSetup.WebAppCorsPolicy);
 app.UseAuthentication();
-app.UseMiddleware<CurrentRolesMiddleware>();
+app.UseMiddleware<CurrentAccessMiddleware>();
 app.UseRateLimiter();
 app.UseAuthorization();
 

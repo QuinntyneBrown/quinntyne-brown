@@ -21,13 +21,14 @@ public class NoteShareRole
 {
     private NoteShareRole() { }
 
-    public NoteShareRole(Guid pageId, Profiles.Role role)
+    public NoteShareRole(Guid pageId, Guid roleId)
     {
         PageId = pageId;
-        Role = role;
+        RoleId = roleId;
     }
 
     public Guid PageId { get; private set; }
 
-    public Profiles.Role Role { get; private set; }
+    /// <summary>A catalogue role of the page's org or a cross-org role covering it (ADR 0039).</summary>
+    public Guid RoleId { get; private set; }
 }

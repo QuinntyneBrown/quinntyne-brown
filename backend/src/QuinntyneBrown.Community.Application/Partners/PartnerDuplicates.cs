@@ -113,9 +113,9 @@ public class PartnerDuplicatesHandler(IApplicationDbContext db, PartnerAccess ac
             return (Result.Forbidden(), null);
         }
 
-        var partner = await db.Partners.AsNoTracking()
+        var partner = await access.Readable(db.Partners.AsNoTracking())
             .Where(p => p.Id == id)
-            .Select(p => new { p.Id, p.Name, p.Website, p.ArchivedAtUtc })
+            .Select(p => new { p.Id, p.Name, p.Website, p.ArchivedAtUtc, p.OrganizationId })
             .SingleOrDefaultAsync(cancellationToken);
         if (partner is null)
         {
@@ -129,7 +129,7 @@ public class PartnerDuplicatesHandler(IApplicationDbContext db, PartnerAccess ac
 
         // Every active partner's id, name and website; archived partners are never offered (AC8).
         var others = await db.Partners.AsNoTracking()
-            .Where(p => p.Id != id && p.ArchivedAtUtc == null)
+            .Where(p => p.Id != id && p.ArchivedAtUtc == null && p.OrganizationId == partner.OrganizationId)
             .Select(p => new { p.Id, p.Name, p.Website })
             .ToListAsync(cancellationToken);
         var key = PartnerKey.From(partner.Id, partner.Name, partner.Website);
@@ -189,12 +189,17 @@ public class PartnerDuplicatesHandler(IApplicationDbContext db, PartnerAccess ac
             return Result.Invalid("otherId", "Choose two different partners.");
         }
 
-        var pair = await db.Partners.AsNoTracking().Where(p => p.Id == id || p.Id == otherId).ToListAsync(cancellationToken);
+        var pair = await access.Readable(db.Partners.AsNoTracking()).Where(p => p.Id == id || p.Id == otherId).ToListAsync(cancellationToken);
         var partner = pair.SingleOrDefault(p => p.Id == id);
         var other = pair.SingleOrDefault(p => p.Id == otherId);
-        if (partner is null || other is null)
+        if (partner is null || other is null || partner.OrganizationId != other.OrganizationId)
         {
             return Result.NotFound();
+        }
+
+        if (!access.CanWriteIn(partner.OrganizationId))
+        {
+            return Result.Forbidden();
         }
 
         if (pair.FirstOrDefault(p => p.IsArchived) is { } archived)

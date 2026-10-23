@@ -1,6 +1,7 @@
 using QuinntyneBrown.Community.Application.Common;
 using QuinntyneBrown.Community.Domain.Contacts;
 using QuinntyneBrown.Community.Domain.Notifications;
+using QuinntyneBrown.Community.Domain.Organizations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -20,7 +21,7 @@ public enum ConnectOutcome
 /// </summary>
 public class ContactConnector(IApplicationDbContext db, IEmailQueue emails, IOptions<WebAppOptions> webApp, TimeProvider time)
 {
-    public async Task<ConnectOutcome> RequestAsync(Guid leadId, Guid profileId, CancellationToken cancellationToken = default)
+    public async Task<ConnectOutcome> RequestAsync(Guid organizationId, Guid leadId, Guid profileId, CancellationToken cancellationToken = default)
     {
         if (leadId == profileId)
         {
@@ -29,13 +30,13 @@ public class ContactConnector(IApplicationDbContext db, IEmailQueue emails, IOpt
 
         if (await db.Users.AnyAsync(u => u.ProfileId == profileId && u.EmailConfirmed, cancellationToken))
         {
-            await ConnectAsync(leadId, profileId, cancellationToken);
+            await ConnectAsync(organizationId, leadId, profileId, cancellationToken);
             return ConnectOutcome.Connected;
         }
 
-        if (!await db.PendingConnections.AnyAsync(p => p.ProfileId == profileId && p.LeadId == leadId, cancellationToken))
+        if (!await db.PendingConnections.AnyAsync(p => p.ProfileId == profileId && p.LeadId == leadId && p.OrganizationId == organizationId, cancellationToken))
         {
-            db.PendingConnections.Add(new PendingConnection(profileId, leadId, time.GetUtcNow()));
+            db.PendingConnections.Add(new PendingConnection(organizationId, profileId, leadId, time.GetUtcNow()));
             await db.SaveChangesAsync(cancellationToken);
         }
 
@@ -49,17 +50,23 @@ public class ContactConnector(IApplicationDbContext db, IEmailQueue emails, IOpt
         foreach (var connection in pending)
         {
             db.PendingConnections.Remove(connection);
-            await ConnectAsync(connection.LeadId, profileId, cancellationToken);
+            await ConnectAsync(connection.OrganizationId, connection.LeadId, profileId, cancellationToken);
         }
     }
 
     /// <summary>
-    /// Links the lead's contact for the person, creating it if needed; true when a new link was made.
-    /// Saves the contact, the notification and the email together (L2-028).
+    /// Makes the person a member of the link's org (ADR 0041) and links the lead's contact for them there, creating it
+    /// if needed; true when a new link was made. Saves the membership, contact, notification and email together (L2-028).
     /// </summary>
-    public async Task<bool> ConnectAsync(Guid leadId, Guid profileId, CancellationToken cancellationToken = default)
+    public async Task<bool> ConnectAsync(Guid organizationId, Guid leadId, Guid profileId, CancellationToken cancellationToken = default)
     {
-        if (await db.Contacts.AnyAsync(c => c.OwnerId == leadId && c.LinkedProfileId == profileId, cancellationToken))
+        if (!await db.OrgMemberships.AnyAsync(m => m.OrganizationId == organizationId && m.ProfileId == profileId, cancellationToken)
+            && !db.OrgMemberships.Local.Any(m => m.OrganizationId == organizationId && m.ProfileId == profileId))
+        {
+            db.OrgMemberships.Add(new OrgMembership(organizationId, profileId, JoinedVia.ConnectLink, time.GetUtcNow().UtcDateTime));
+        }
+
+        if (await db.Contacts.AnyAsync(c => c.OwnerId == leadId && c.OrganizationId == organizationId && c.LinkedProfileId == profileId, cancellationToken))
         {
             // Already the lead's contact (L2-084 AC3); only a removed pending row may need saving.
             await db.SaveChangesAsync(cancellationToken);
@@ -75,12 +82,12 @@ public class ContactConnector(IApplicationDbContext db, IEmailQueue emails, IOpt
 
         // One contact per email: the lead's earlier unlinked contact is linked, restored if archived (AC2).
         var contact = await db.Contacts
-            .Where(c => c.OwnerId == leadId && c.LinkedProfileId == null && c.Email != null && c.Email.ToUpper() == normalized)
+            .Where(c => c.OwnerId == leadId && c.OrganizationId == organizationId && c.LinkedProfileId == null && c.Email != null && c.Email.ToUpper() == normalized)
             .OrderBy(c => c.ArchivedAtUtc != null)
             .FirstOrDefaultAsync(cancellationToken);
         if (contact is null)
         {
-            contact = new Contact(leadId, person.Name, email, null, null, null, now.UtcDateTime);
+            contact = new Contact(organizationId, leadId, person.Name, email, null, null, null, now.UtcDateTime);
             db.Contacts.Add(contact);
         }
         else if (contact.IsArchived)
@@ -90,7 +97,7 @@ public class ContactConnector(IApplicationDbContext db, IEmailQueue emails, IOpt
 
         contact.LinkTo(profileId);
         var title = $"{person.Name} connected with you";
-        db.Notifications.Add(new Notification(leadId, NotificationKind.ContactSignedUp, title, $"/contacts/{contact.Id}", now));
+        db.Notifications.Add(new Notification(leadId, NotificationKind.ContactSignedUp, title, $"/contacts/{contact.Id}", now, organizationId: organizationId));
         if (await db.Users.Where(u => u.ProfileId == leadId).Select(u => u.Email).SingleOrDefaultAsync(cancellationToken) is { } address)
         {
             emails.Enqueue(new EmailMessage(

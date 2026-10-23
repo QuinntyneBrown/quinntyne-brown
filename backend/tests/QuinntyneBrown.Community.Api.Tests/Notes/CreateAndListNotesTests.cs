@@ -30,9 +30,9 @@ public class CreateAndListNotesTests(CommunityApiFactory factory) : IClassFixtur
     public async Task A_new_page_is_listed_for_its_owner_only()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var page = await factory.ClientFor(grace, Role.CityLead).CreateNoteAsync("Partner meeting notes");
-        var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), Role.CityLead);
-        var staff = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), Role.Staff);
+        var page = await factory.ClientFor(grace, SeededRole.CityLead).CreateNoteAsync("Partner meeting notes");
+        var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead);
+        var staff = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), SeededRole.Staff);
 
         var own = (await factory.ClientFor(grace).ListNotesAsync()).Items.Single(p => p.Id == page.Id);
 

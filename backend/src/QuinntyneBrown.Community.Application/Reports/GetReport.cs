@@ -24,6 +24,9 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
     public const int MaxMonths = 12;
     public static readonly TimeSpan UpcomingHorizon = TimeSpan.FromDays(30);
 
+    // The orgs this report covers: where the caller holds reports.view in the request's scope (L2-150).
+    private List<Guid> _scope = [];
+
     public async Task<(Result Result, ReportDto? Report)> HandleAsync(GetReportQuery query, CancellationToken cancellationToken = default)
     {
         if (!access.CanRead)
@@ -31,6 +34,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
             return (Result.Forbidden(), null);
         }
 
+        _scope = [.. access.Scope];
         if (ReportPeriod.Resolve(query.Period, time) is not { } window)
         {
             return (Result.Invalid("period", "Choose Last 30 days, Last 90 days, This year or All time."), null);
@@ -44,7 +48,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
         }
 
         var members = Members();
-        var events = db.Events.AsNoTracking();
+        var events = db.Events.AsNoTracking().Where(e => _scope.Contains(e.OrganizationId));
         if (city is not null)
         {
             members = members.Where(p => p.HomeCity == city);
@@ -78,7 +82,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
     private IQueryable<Profile> Members() =>
         from p in db.Profiles.AsNoTracking()
         join u in db.Users on p.Id equals u.ProfileId
-        where u.EmailConfirmed && !p.IsSuspended
+        where u.EmailConfirmed && !p.IsSuspended && db.OrgMemberships.Any(m => m.ProfileId == p.Id && _scope.Contains(m.OrganizationId))
         select p;
 
     /// <summary>The non-blank home cities of members and every event's city, ordinal-ignore-case sorted.</summary>
@@ -86,7 +90,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
     {
         var homeCities = await Members().Where(p => p.HomeCity != null && p.HomeCity.Trim() != string.Empty)
             .Select(p => p.HomeCity!).Distinct().ToListAsync(cancellationToken);
-        var eventCities = await db.Events.Where(e => e.City.Trim() != string.Empty)
+        var eventCities = await db.Events.Where(e => _scope.Contains(e.OrganizationId) && e.City.Trim() != string.Empty)
             .Select(e => e.City).Distinct().ToListAsync(cancellationToken);
         return homeCities.Union(eventCities, StringComparer.Ordinal).Order(StringComparer.OrdinalIgnoreCase).ToList();
     }
@@ -126,7 +130,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
     private async Task<List<PartnerPipelineRowDto>> PartnerPipelineAsync(string? city, List<string> cities, CancellationToken cancellationToken)
     {
         var groups = await (
-                from p in db.Partners.AsNoTracking()
+                from p in db.Partners.AsNoTracking().Where(x => _scope.Contains(x.OrganizationId))
                 where p.ArchivedAtUtc == null
                 join o in db.Profiles on p.OwnerId equals (Guid?)o.Id into owners
                 from o in owners.DefaultIfEmpty()
@@ -162,7 +166,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
     /// <summary>Announcements sent in the window; one city means the sender's home city.</summary>
     private Task<int> AnnouncementsAsync(string? city, ReportWindow window, CancellationToken cancellationToken)
     {
-        var announcements = db.Announcements.AsNoTracking().Where(a => a.SentAt <= window.To);
+        var announcements = db.Announcements.AsNoTracking().Where(a => _scope.Contains(a.OrganizationId) && a.SentAt <= window.To);
         if (window.From is { } from)
         {
             announcements = announcements.Where(a => a.SentAt >= from);

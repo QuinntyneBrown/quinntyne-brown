@@ -21,12 +21,12 @@ public class PartnerActivityTests(CommunityApiFactory factory) : IClassFixture<C
     private DateOnly Today => DateOnly.FromDateTime(factory.Time.GetUtcNow().UtcDateTime);
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CreateLead)]
-    [InlineData(Role.CommunicationsLead)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task A_lead_or_system_admin_logs_an_activity_and_it_is_on_the_shared_timeline(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CreateLead)]
+    [InlineData(SeededRole.CommunicationsLead)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task A_lead_or_system_admin_logs_an_activity_and_it_is_on_the_shared_timeline(SeededRole role)
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var partner = await factory.CreatePartnerAsync(grace, "Kestrel Labs");
@@ -43,7 +43,7 @@ public class PartnerActivityTests(CommunityApiFactory factory) : IClassFixture<C
             ("Call", "Called Nadia about the contract.", "Called Nadia about the contract.", Today, (TimeOnly?)new TimeOnly(14, 15), "Send credit-line wording", (DateOnly?)Today.AddDays(1), marcus.ProfileId, "Marcus Lee", loggedAt),
             (logged.Kind, logged.Summary, logged.Text, logged.OccurredOn, logged.OccurredAt, logged.NextStep, logged.NextStepDue, logged.LoggedById, logged.LoggedByName, logged.LoggedAtUtc));
         // Every reader sees the same entry; the system's Added entry may be later today, so read the calls.
-        var timeline = await factory.ClientFor(grace, Role.CityLead).ActivitiesAsync(partner.Id, "?kind=Call");
+        var timeline = await factory.ClientFor(grace, SeededRole.CityLead).ActivitiesAsync(partner.Id, "?kind=Call");
         Assert.Equal(logged, Assert.Single(timeline.Items));
     }
 
@@ -53,7 +53,7 @@ public class PartnerActivityTests(CommunityApiFactory factory) : IClassFixture<C
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var partner = await factory.CreatePartnerAsync(grace, "Kestrel Labs");
 
-        var response = await factory.ClientFor(grace, Role.CityLead)
+        var response = await factory.ClientFor(grace, SeededRole.CityLead)
             .LogActivityAsync(partner.Id, NewActivity("Note", occurredOn: Today.AddDays(1).ToString("yyyy-MM-dd")));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -78,7 +78,7 @@ public class PartnerActivityTests(CommunityApiFactory factory) : IClassFixture<C
         var partner = await factory.CreatePartnerAsync(grace, "Kestrel Labs");
         var body = WithDate(activity);
 
-        var response = await factory.ClientFor(grace, Role.CityLead).LogActivityAsync(partner.Id, body);
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).LogActivityAsync(partner.Id, body);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Equal([message], (await response.Content.ReadFromJsonAsync<ValidationProblemDetails>())!.Errors[field]);
@@ -90,7 +90,7 @@ public class PartnerActivityTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var partner = await factory.CreatePartnerAsync(grace, "Kestrel Labs");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var missing = await client.LogActivityAsync(partner.Id, NewActivity(occurredOn: null));
         var future = await client.LogActivityAsync(partner.Id, NewActivity(occurredOn: Today.AddDays(2).ToString("yyyy-MM-dd")));
@@ -105,7 +105,7 @@ public class PartnerActivityTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var partner = await factory.CreatePartnerAsync(grace, "Kestrel Labs");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         var logged = (await (await client.LogActivityAsync(partner.Id, WithDate(NewActivity()))).Content.ReadFromJsonAsync<Activity>())!;
         var path = $"/api/partners/{partner.Id}/activities/{logged.Id}";
 
@@ -122,7 +122,7 @@ public class PartnerActivityTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).LogActivityAsync(Guid.NewGuid(), WithDate(NewActivity()));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).LogActivityAsync(Guid.NewGuid(), WithDate(NewActivity()));
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }

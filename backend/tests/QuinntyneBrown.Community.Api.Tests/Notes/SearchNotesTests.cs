@@ -48,7 +48,7 @@ public class SearchNotesTests(CommunityApiFactory factory) : IClassFixture<Commu
         await factory.AddNoteAsync(hannah, $"{word} private plan");
         var archived = await factory.AddNoteAsync(grace, $"{word} old notes", "Global");
         await factory.ClientFor(grace).PostAsync($"/api/notes/{archived.Id}/archive", null);
-        var staff = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), Role.Staff);
+        var staff = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), SeededRole.Staff);
 
         Assert.Empty(await NotesFoundAsync(factory.ClientFor(grace), word));
         Assert.Empty(await NotesFoundAsync(staff, word));

@@ -1,7 +1,7 @@
 using QuinntyneBrown.Community.Application.Common;
+using QuinntyneBrown.Community.Application.Organizations;
 using QuinntyneBrown.Community.Domain.Agile;
-using QuinntyneBrown.Community.Domain.Profiles;
-using QuinntyneBrown.Community.Domain.Team;
+using QuinntyneBrown.Community.Domain.Organizations;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,6 +48,8 @@ public class WorkspaceSettingsHandler(
     ICurrentUser current,
     WorkspaceAccessPolicy policy,
     WorkspaceMembership membership,
+    WorkEligibility eligibility,
+    ProfileRoles profileRoles,
     AgileNotifier notifier)
 {
     public async Task<Result> AddMembersAsync(Guid workspaceId, AddWorkspaceMembersCommand command, CancellationToken cancellationToken = default)
@@ -143,13 +145,15 @@ public class WorkspaceSettingsHandler(
     }
 
     /// <summary>
-    /// Profiles that can join: holders of a lead or volunteer role who are not in the workspace yet. Without a workspace
-    /// (the create dialog) it offers every team member but the caller, to a City Lead or System Admin.
+    /// Profiles that can join (L2-146 AC2): members of the workspace's org holding <c>workspaces.join</c> and holders of a
+    /// covering cross-org role with <c>CanJoinWork</c>, not in the workspace yet and not suspended. Without a workspace
+    /// (the create dialog) it offers the candidates of the org the workspace will be created in, but the caller.
     /// </summary>
     public async Task<(Result Result, IReadOnlyList<MemberCandidateDto>? Candidates)> CandidatesAsync(
         Guid? workspaceId, CancellationToken cancellationToken = default)
     {
         HashSet<Guid> excluded;
+        Guid orgId;
         if (workspaceId is { } id)
         {
             var (workspace, _, refusal) = await policy.AuthorizeAsync(id, manage: true, cancellationToken);
@@ -159,24 +163,25 @@ public class WorkspaceSettingsHandler(
             }
 
             excluded = [.. workspace.Members.Select(m => m.ProfileId), workspace.OwnerId];
+            orgId = workspace.OrganizationId;
         }
         else
         {
-            if (!current.HasRole(Role.CityLead) && !current.HasRole(Role.SystemAdmin))
+            var target = current.Access.TargetFor(Permissions.WorkspacesCreate);
+            if (!target.Allowed)
             {
-                return (Result.Forbidden(), null);
+                return (target.Refusal!, null);
             }
 
             excluded = await policy.CallerProfileIdAsync(cancellationToken) is { } me ? [me] : [];
+            orgId = target.OrgId;
         }
 
-        var teamRoles = TeamRoles.All.ToList();
-        var profiles = await db.Profiles.AsNoTracking()
-            .Where(p => !p.IsSuspended && p.Roles.Any(r => teamRoles.Contains(r.Role)))
-            .OrderBy(p => p.Name)
-            .ToListAsync(cancellationToken);
-        return (Result.Ok(), [.. profiles
-            .Where(p => !excluded.Contains(p.Id))
-            .Select(p => new MemberCandidateDto(p.Id, p.Name, [.. p.Roles.Select(r => r.Role).Order().Select(r => r.ToString())]))]);
+        var candidates = await eligibility.CandidatesAsync(orgId, cancellationToken);
+        var ids = candidates.Select(c => c.ProfileId).Where(c => !excluded.Contains(c)).ToList();
+        var profiles = await db.Profiles.AsNoTracking().Where(p => ids.Contains(p.Id) && !p.IsSuspended).OrderBy(p => p.Name).ToListAsync(cancellationToken);
+        var roles = await profileRoles.ForAsync(ids, [orgId], cancellationToken);
+        return (Result.Ok(), [.. profiles.Select(p => new MemberCandidateDto(
+            p.Id, p.Name, [.. roles[p.Id].Select(r => r.Name)], candidates.Any(c => c.ProfileId == p.Id && c.IsCrossOrg)))]);
     }
 }

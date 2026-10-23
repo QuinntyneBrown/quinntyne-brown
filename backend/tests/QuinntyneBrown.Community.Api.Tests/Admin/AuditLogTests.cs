@@ -11,9 +11,9 @@ public class AuditLogTests(CommunityApiFactory factory) : IClassFixture<Communit
 {
     [Theory]
     [InlineData]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.CityLead)]
-    public async Task Anyone_but_a_system_admin_gets_403(params Role[] roles)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.CityLead)]
+    public async Task Anyone_but_a_system_admin_gets_403(params SeededRole[] roles)
     {
         var member = await factory.AddMemberAsync("Daniel Reyes");
 
@@ -29,11 +29,11 @@ public class AuditLogTests(CommunityApiFactory factory) : IClassFixture<Communit
         var esther = await factory.AddMemberAsync("Esther Nakamura");
         var now = factory.Time.GetUtcNow().UtcDateTime;
         await AddEntriesAsync(
-            Entry(priya, "role.granted", esther, now.AddHours(-1), new { Roles = Array.Empty<string>() }, new { Roles = new[] { "CityLead" } }),
+            Entry(priya, "role.granted", esther, now.AddHours(-1), new { Roles = Array.Empty<string>() }, new { Roles = new[] { "city-lead" } }),
             Entry(priya, "user.suspended", esther, now.AddHours(-2), null, new { Reason = "Spam event listings" }),
-            Entry(priya, "role.removed", esther, now.AddDays(-91), new { Roles = new[] { "Staff" } }, new { Roles = Array.Empty<string>() }));
+            Entry(priya, "role.removed", esther, now.AddDays(-91), new { Roles = new[] { "staff" } }, new { Roles = Array.Empty<string>() }));
 
-        var page = await factory.ClientFor(priya, Role.SystemAdmin)
+        var page = await factory.ClientFor(priya, SeededRole.SystemAdmin)
             .GetFromJsonAsync<Page>($"/api/admin/audit?actor={priya.ProfileId}");
 
         Assert.Equal(2, page!.TotalCount);
@@ -44,7 +44,7 @@ public class AuditLogTests(CommunityApiFactory factory) : IClassFixture<Communit
         Assert.Equal("Granted City Lead to Esther Nakamura", granted.Summary);
         Assert.Equal("Suspended Esther Nakamura — reason: Spam event listings", page.Items[1].Summary);
         Assert.Equal("10.0.0.1", granted.IpAddress);
-        Assert.Contains("CityLead", granted.After);
+        Assert.Contains("city-lead", granted.After);
     }
 
     [Fact]
@@ -54,11 +54,11 @@ public class AuditLogTests(CommunityApiFactory factory) : IClassFixture<Communit
         var victor = await factory.AddMemberAsync("Victor Kane");
         var now = factory.Time.GetUtcNow().UtcDateTime;
         await AddEntriesAsync(
-            Entry(priya, "role.granted", victor, now.AddMinutes(-3), new { Roles = Array.Empty<string>() }, new { Roles = new[] { "Volunteer" } }),
+            Entry(priya, "role.granted", victor, now.AddMinutes(-3), new { Roles = Array.Empty<string>() }, new { Roles = new[] { "volunteer" } }),
             Entry(priya, "user.suspended", victor, now.AddMinutes(-2), null, new { Reason = "Spam" }),
             Entry(priya, "user.reinstated", victor, now.AddMinutes(-1), null, null),
             Entry(priya, "profile.photo.deleted", victor, now.AddMinutes(-1), null, null));
-        var client = factory.ClientFor(priya, Role.SystemAdmin);
+        var client = factory.ClientFor(priya, SeededRole.SystemAdmin);
 
         var suspensions = await client.GetFromJsonAsync<Page>($"/api/admin/audit?actor={priya.ProfileId}&category=suspensions");
         var deletions = await client.GetFromJsonAsync<Page>($"/api/admin/audit?actor={priya.ProfileId}&category=deletions");
@@ -76,7 +76,7 @@ public class AuditLogTests(CommunityApiFactory factory) : IClassFixture<Communit
         var now = factory.Time.GetUtcNow().UtcDateTime;
         await AddEntriesAsync([.. Enumerable.Range(0, 51).Select(i =>
             Entry(priya, "profile.updated", priya, now.AddMinutes(-i), null, null))]);
-        var client = factory.ClientFor(priya, Role.SystemAdmin);
+        var client = factory.ClientFor(priya, SeededRole.SystemAdmin);
 
         var first = await client.GetFromJsonAsync<Page>($"/api/admin/audit?actor={priya.ProfileId}");
         var second = await client.GetFromJsonAsync<Page>($"/api/admin/audit?actor={priya.ProfileId}&page=2");
@@ -96,7 +96,7 @@ public class AuditLogTests(CommunityApiFactory factory) : IClassFixture<Communit
         var entry = Entry(priya, "user.reinstated", priya, factory.Time.GetUtcNow().UtcDateTime, null, null);
         await AddEntriesAsync(entry);
 
-        var response = await factory.ClientFor(priya, Role.SystemAdmin)
+        var response = await factory.ClientFor(priya, SeededRole.SystemAdmin)
             .SendAsync(new HttpRequestMessage(new HttpMethod(method), $"/api/admin/audit/{entry.Id}") { Content = JsonContent.Create(new { }) });
 
         Assert.Contains(response.StatusCode, new[] { HttpStatusCode.NotFound, HttpStatusCode.MethodNotAllowed });
@@ -110,10 +110,10 @@ public class AuditLogTests(CommunityApiFactory factory) : IClassFixture<Communit
         var daniel = await factory.AddMemberAsync("Daniel Reyes");
         var now = factory.Time.GetUtcNow().UtcDateTime;
         await AddEntriesAsync(
-            Entry(priya, "role.granted", daniel, now.AddMinutes(-2), new { Roles = Array.Empty<string>() }, new { Roles = new[] { "Staff" } }),
+            Entry(priya, "role.granted", daniel, now.AddMinutes(-2), new { Roles = Array.Empty<string>() }, new { Roles = new[] { "staff" } }),
             Entry(priya, "user.suspended", daniel, now.AddMinutes(-1), null, new { Reason = "Spam, again" }));
 
-        var response = await factory.ClientFor(priya, Role.SystemAdmin)
+        var response = await factory.ClientFor(priya, SeededRole.SystemAdmin)
             .GetAsync($"/api/admin/audit/export?actor={priya.ProfileId}&category=roles");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -130,7 +130,7 @@ public class AuditLogTests(CommunityApiFactory factory) : IClassFixture<Communit
     {
         var member = await factory.AddMemberAsync("Daniel Reyes");
 
-        var response = await factory.ClientFor(member, Role.Staff).GetAsync("/api/admin/audit/export");
+        var response = await factory.ClientFor(member, SeededRole.Staff).GetAsync("/api/admin/audit/export");
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }

@@ -28,8 +28,8 @@ public class ViewProfileTests(CommunityApiFactory factory) : IClassFixture<Commu
         var samuel = await factory.AddMemberAsync("Samuel Mensah", p =>
         {
             p.Update("Samuel Mensah", "Toronto", "Backend engineer.");
-            p.AddRole(Role.CreateLead, Guid.Empty, DateTime.UtcNow);
-            p.AddRole(Role.ProductEngineer, Guid.Empty, DateTime.UtcNow);
+            p.AddRole(SeededRole.CreateLead, Guid.Empty, DateTime.UtcNow);
+            p.AddRole(SeededRole.ProductEngineer, Guid.Empty, DateTime.UtcNow);
             p.AddPhoto(new ProfilePhoto($"profiles/{p.Id}/a.jpg", "Samuel at Builders Night", Earlier));
             p.AddPhoto(new ProfilePhoto($"profiles/{p.Id}/b.jpg", "The hackathon team", Earlier.AddDays(1)));
         });
@@ -40,7 +40,7 @@ public class ViewProfileTests(CommunityApiFactory factory) : IClassFixture<Commu
         Assert.Equal("Samuel Mensah", profile.Name);
         Assert.Equal("Toronto", profile.HomeCity);
         Assert.Equal("Backend engineer.", profile.Bio);
-        Assert.Equal(["CreateLead", "ProductEngineer"], profile.Roles);
+        Assert.Equal(["create-lead", "product-engineer"], profile.Roles.Select(r => r.Key));
         Assert.Equal(["The hackathon team", "Samuel at Builders Night"], profile.Photos.Select(p => p.AltText));
         Assert.Equal("Samuel at Builders Night", profile.FeaturedPhoto!.AltText);
         Assert.Equal($"{FakePhotoStorage.BaseUrl}profiles/{samuel.ProfileId}/a.jpg", profile.FeaturedPhoto.Url);
@@ -70,7 +70,7 @@ public class ViewProfileTests(CommunityApiFactory factory) : IClassFixture<Commu
         var priya = await factory.AddMemberAsync("Priya Shah");
         var samuel = await factory.AddMemberAsync("Samuel Mensah");
 
-        var profile = await factory.ClientFor(priya, Role.SystemAdmin)
+        var profile = await factory.ClientFor(priya, SeededRole.SystemAdmin)
             .GetFromJsonAsync<ProfileResponse>($"/api/profiles/{samuel.ProfileId}");
 
         Assert.False(profile!.IsOwn);
@@ -83,9 +83,9 @@ public class ViewProfileTests(CommunityApiFactory factory) : IClassFixture<Commu
     public async Task Unlinked_private_contact_requested_as_a_profile_is_404(bool asSystemAdmin)
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var contact = new Contact(grace.ProfileId, "Tomás Ortega", "tomas@example.org", null, null, "Toronto", DateTime.UtcNow);
+        var contact = new Contact(Infrastructure.Persistence.HierarchySeed.TorontoId, grace.ProfileId, "Tomás Ortega", "tomas@example.org", null, null, "Toronto", DateTime.UtcNow);
         var jonah = await factory.AddMemberAsync("Jonah Bell");
-        var client = asSystemAdmin ? factory.ClientFor(jonah, Role.SystemAdmin) : factory.ClientFor(jonah);
+        var client = asSystemAdmin ? factory.ClientFor(jonah, SeededRole.SystemAdmin) : factory.ClientFor(jonah);
 
         var response = await client.GetAsync($"/api/profiles/{contact.Id}");
 
@@ -101,7 +101,7 @@ public class ViewProfileTests(CommunityApiFactory factory) : IClassFixture<Commu
         string? Bio,
         PhotoResponse? FeaturedPhoto,
         PhotoResponse[] Photos,
-        string[] Roles,
+        RoleRef[] Roles,
         bool IsOwn,
         bool CanEdit);
 }

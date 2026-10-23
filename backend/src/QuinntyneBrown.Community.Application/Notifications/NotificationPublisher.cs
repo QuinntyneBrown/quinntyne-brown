@@ -12,8 +12,8 @@ namespace QuinntyneBrown.Community.Application.Notifications;
 public class NotificationPublisher(IApplicationDbContext db, IEmailQueue emails, IOptions<WebAppOptions> webApp, TimeProvider time)
     : INotificationPublisher
 {
-    public void Publish(Guid recipientProfileId, NotificationKind kind, string title, string linkPath) =>
-        db.Notifications.Add(new Notification(recipientProfileId, kind, title, linkPath, time.GetUtcNow()));
+    public void Publish(Guid recipientProfileId, NotificationKind kind, string title, string linkPath, Guid? organizationId = null) =>
+        db.Notifications.Add(new Notification(recipientProfileId, kind, title, linkPath, time.GetUtcNow(), organizationId: organizationId));
 
     public async Task<int> PublishAsync(
         IReadOnlyCollection<Guid> recipientIds,
@@ -22,13 +22,14 @@ public class NotificationPublisher(IApplicationDbContext db, IEmailQueue emails,
         string linkPath,
         Guid? actorId,
         Func<Guid, NotificationEmail?>? email,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Guid? organizationId = null)
     {
         var now = time.GetUtcNow();
         var recipients = recipientIds.Distinct().ToList();
         foreach (var recipient in recipients)
         {
-            db.Notifications.Add(new Notification(recipient, kind, title, linkPath, now, actorId));
+            db.Notifications.Add(new Notification(recipient, kind, title, linkPath, now, actorId, organizationId));
         }
 
         if (email is null || recipients.Count == 0)

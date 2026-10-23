@@ -41,7 +41,7 @@ public static class ContactClients
     public static async Task<Contact> CreateContactAsync(
         this CommunityApiFactory factory, ProfileClients.Member lead, string name, string? email = null, string? notes = null, string? organization = null)
     {
-        var response = await factory.ClientFor(lead, Role.CityLead).PostAsJsonAsync("/api/contacts", NewContact(name, email, notes, organization));
+        var response = await factory.ClientFor(lead, SeededRole.CityLead).PostAsJsonAsync("/api/contacts", NewContact(name, email, notes, organization));
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<Contact>())!;
     }

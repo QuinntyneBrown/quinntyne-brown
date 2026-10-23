@@ -5,7 +5,7 @@ public class Notification
     private Notification() { }
 
     public Notification(
-        Guid recipientId, NotificationKind kind, string title, string linkPath, DateTimeOffset createdAt, Guid? actorId = null)
+        Guid recipientId, NotificationKind kind, string title, string linkPath, DateTimeOffset createdAt, Guid? actorId = null, Guid? organizationId = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentException.ThrowIfNullOrWhiteSpace(linkPath);
@@ -16,11 +16,15 @@ public class Notification
         LinkPath = linkPath;
         CreatedAt = createdAt;
         ActorId = actorId;
+        OrganizationId = organizationId;
     }
 
     public Guid Id { get; private set; }
 
     public Guid RecipientId { get; private set; }
+
+    /// <summary>The org whose activity raised it, shown as a label (L2-152); null for platform notices.</summary>
+    public Guid? OrganizationId { get; private set; }
 
     public NotificationKind Kind { get; private set; }
 

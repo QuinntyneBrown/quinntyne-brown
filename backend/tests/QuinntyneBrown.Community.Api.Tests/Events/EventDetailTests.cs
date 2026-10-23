@@ -37,7 +37,7 @@ public class EventDetailTests(CommunityApiFactory factory) : IClassFixture<Commu
             type: EventType.PrayerAndPlanning, format: EventFormat.Online, visibility: EventVisibility.Public, capacity: 30, rsvps: 2);
         var member = await factory.AddMemberAsync("Leah Thompson");
 
-        var json = await factory.ClientFor(member, Role.Attendee).GetFromJsonAsync<JsonElement>($"/api/events/{existing.Id}");
+        var json = await factory.ClientFor(member, SeededRole.Attendee).GetFromJsonAsync<JsonElement>($"/api/events/{existing.Id}");
 
         Assert.Equal(existing.Id, json.GetProperty("id").GetGuid());
         Assert.Equal("Prayer & Planning", json.GetProperty("title").GetString());
@@ -57,10 +57,10 @@ public class EventDetailTests(CommunityApiFactory factory) : IClassFixture<Commu
     }
 
     [Theory]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Event_managers_are_told_they_can_manage_the_event(Role role)
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Event_managers_are_told_they_can_manage_the_event(SeededRole role)
     {
         var existing = await factory.AddEventAsync("Builders Night", TimeSpan.FromDays(7));
         var lead = await factory.AddMemberAsync("Grace Okonkwo");

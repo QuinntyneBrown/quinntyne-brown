@@ -18,12 +18,12 @@ public class CheckInExportTests(CommunityApiFactory factory) : IClassFixture<Com
     // with name, type (Member, Guest or Walk-in), email, RSVP'd at and checked in at (empty when not checked in).
     // L2-122 AC3: cells starting with =, +, - or @ are guarded, and values are quoted per RFC 4180.
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CreateLead)]
-    [InlineData(Role.CommunicationsLead)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Leads_and_System_Admins_export_the_attendance_as_csv(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CreateLead)]
+    [InlineData(SeededRole.CommunicationsLead)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Leads_and_System_Admins_export_the_attendance_as_csv(SeededRole role)
     {
         var ruth = await factory.AddMemberAsync("Ruth Alvarez");
         var e = await factory.AddEventAsync("Toronto Builders Night", Soon, members: [ruth.ProfileId],
@@ -53,9 +53,9 @@ public class CheckInExportTests(CommunityApiFactory factory) : IClassFixture<Com
     // L2-122 AC2: Given Staff, a member without a lead role, or an anonymous visitor, when they request the export,
     // then the response is 403, or 401 for the anonymous visitor.
     [Theory]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.Attendee)]
-    public async Task Staff_and_members_cannot_export_the_attendance(Role role)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.Attendee)]
+    public async Task Staff_and_members_cannot_export_the_attendance(SeededRole role)
     {
         var e = await factory.AddEventAsync("Toronto Builders Night", Soon, rsvps: 1);
         var client = factory.ClientFor(await factory.AddMemberAsync("Sam Rivera"), role);
@@ -66,7 +66,7 @@ public class CheckInExportTests(CommunityApiFactory factory) : IClassFixture<Com
     [Fact]
     public async Task Anonymous_visitors_get_401_and_an_unknown_event_is_404()
     {
-        var lead = factory.ClientFor(await factory.AddMemberAsync("Grace Okonkwo"), Role.EventLead);
+        var lead = factory.ClientFor(await factory.AddMemberAsync("Grace Okonkwo"), SeededRole.EventLead);
 
         Assert.Equal(HttpStatusCode.Unauthorized, (await factory.CreateClient().GetAsync($"/api/events/{Guid.NewGuid()}/check-ins.csv")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await lead.GetAsync($"/api/events/{Guid.NewGuid()}/check-ins.csv")).StatusCode);

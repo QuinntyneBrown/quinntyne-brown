@@ -11,10 +11,13 @@ public record WorkspaceSummaryDto(
     string? ActiveSprintName,
     int MemberCount,
     bool IsArchived,
-    bool NeedsNewOwner);
+    bool NeedsNewOwner,
+    Organizations.OrgLabel? Organization = null);
 
 /// <summary>A workspace member with the work assigned to them, which a removal unassigns (L2-031 AC8).</summary>
-public record WorkspaceMemberDto(Guid ProfileId, string Name, IReadOnlyList<string> Roles, bool IsOwner, int AssignedStories, int AssignedTasks, bool IsYou);
+/// <param name="Roles">Role names held in the workspace's org.</param>
+/// <param name="IsCrossOrg">Joined through a cross-org role rather than as a member of the org (L2-146 AC2).</param>
+public record WorkspaceMemberDto(Guid ProfileId, string Name, IReadOnlyList<string> Roles, bool IsOwner, int AssignedStories, int AssignedTasks, bool IsYou, bool IsCrossOrg = false);
 
 /// <summary>
 /// One workspace as the caller may see it. <see cref="Access"/> is Owner, Member, Admin or Staff (ADR 0011);
@@ -31,7 +34,8 @@ public record WorkspaceDto(
     string Access,
     bool CanEdit,
     bool CanManage,
-    bool NeedsNewOwner);
+    bool NeedsNewOwner,
+    Organizations.OrgLabel? Organization = null);
 
-/// <summary>A profile that can join a workspace: it holds a lead or volunteer role.</summary>
-public record MemberCandidateDto(Guid ProfileId, string Name, IReadOnlyList<string> Roles);
+/// <summary>A profile that can join (or own) a workspace of the org; <see cref="IsCrossOrg"/> marks cross-org holders.</summary>
+public record MemberCandidateDto(Guid ProfileId, string Name, IReadOnlyList<string> Roles, bool IsCrossOrg = false);

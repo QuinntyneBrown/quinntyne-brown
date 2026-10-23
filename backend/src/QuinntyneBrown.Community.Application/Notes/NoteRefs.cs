@@ -24,7 +24,7 @@ public class NoteRefs(IApplicationDbContext db, NoteAccess access)
         }
 
         var list = ids.ToList();
-        var rows = await access.Visible(db.NotePages.AsNoTracking(), caller).Where(p => list.Contains(p.Id))
+        var rows = await access.VisibleAnywhere(db.NotePages.AsNoTracking(), caller).Where(p => list.Contains(p.Id))
             .Select(p => new { p.Id, p.Title, p.Icon })
             .ToListAsync(cancellationToken);
         return rows.ToDictionary(r => r.Id, r => new NotePageRefDto(r.Id, TitleOf(r.Title), r.Icon));
@@ -60,7 +60,7 @@ public class NoteRefs(IApplicationDbContext db, NoteAccess access)
     }
 
     public async Task<IReadOnlyList<NotePageRefDto>> ChildrenAsync(Guid pageId, Guid caller, CancellationToken cancellationToken) =>
-        await access.Visible(db.NotePages.AsNoTracking(), caller).Where(p => p.ParentId == pageId)
+        await access.VisibleAnywhere(db.NotePages.AsNoTracking(), caller).Where(p => p.ParentId == pageId)
             .OrderByDescending(p => p.UpdatedAt).ThenBy(p => p.Id)
             .Select(p => new NotePageRefDto(p.Id, p.Title == "" ? Untitled : p.Title, p.Icon))
             .ToListAsync(cancellationToken);
@@ -69,7 +69,7 @@ public class NoteRefs(IApplicationDbContext db, NoteAccess access)
     public async Task<IReadOnlyList<NotePageRefDto>> BacklinksAsync(Guid pageId, Guid caller, CancellationToken cancellationToken)
     {
         var sources = db.NoteLinks.Where(l => l.TargetId == pageId).Select(l => l.SourceId);
-        return await access.Visible(db.NotePages.AsNoTracking(), caller).Where(p => sources.Contains(p.Id))
+        return await access.VisibleAnywhere(db.NotePages.AsNoTracking(), caller).Where(p => sources.Contains(p.Id))
             .OrderByDescending(p => p.UpdatedAt).ThenBy(p => p.Id)
             .Select(p => new NotePageRefDto(p.Id, p.Title == "" ? Untitled : p.Title, p.Icon))
             .ToListAsync(cancellationToken);

@@ -23,7 +23,7 @@ public class PartnerActivityAccessTests(CommunityApiFactory factory) : IClassFix
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var partner = await factory.CreatePartnerAsync(grace, "Kestrel Labs");
-        var staff = factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), Role.Staff);
+        var staff = factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), SeededRole.Staff);
 
         var read = await staff.GetAsync($"/api/partners/{partner.Id}/activities");
         var log = await staff.LogActivityAsync(partner.Id, Activity());
@@ -37,7 +37,7 @@ public class PartnerActivityAccessTests(CommunityApiFactory factory) : IClassFix
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var partner = await factory.CreatePartnerAsync(grace, "Kestrel Labs");
-        var volunteer = factory.ClientFor(await factory.AddMemberAsync("Ruth Alvarez"), Role.Volunteer);
+        var volunteer = factory.ClientFor(await factory.AddMemberAsync("Ruth Alvarez"), SeededRole.Volunteer);
 
         var read = await volunteer.GetAsync($"/api/partners/{partner.Id}/activities");
         var log = await volunteer.LogActivityAsync(partner.Id, Activity());
@@ -65,7 +65,7 @@ public class PartnerActivityAccessTests(CommunityApiFactory factory) : IClassFix
         var partner = await factory.CreatePartnerAsync(grace, "Kestrel Labs");
         var priya = await factory.AddMemberAsync("Priya Shah");
 
-        var response = await factory.ClientFor(priya, Role.SystemAdmin).LogActivityAsync(partner.Id, Activity());
+        var response = await factory.ClientFor(priya, SeededRole.SystemAdmin).LogActivityAsync(partner.Id, Activity());
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var entry = Assert.Single(await factory.WithDbAsync(db => db.AuditEntries
@@ -76,9 +76,9 @@ public class PartnerActivityAccessTests(CommunityApiFactory factory) : IClassFix
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.CityLead, Role.SystemAdmin)]
-    public async Task A_lead_logging_is_not_audited(params Role[] roles)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.CityLead, SeededRole.SystemAdmin)]
+    public async Task A_lead_logging_is_not_audited(params SeededRole[] roles)
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var partner = await factory.CreatePartnerAsync(grace, "Kestrel Labs");

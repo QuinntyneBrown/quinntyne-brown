@@ -1,4 +1,6 @@
 using QuinntyneBrown.Community.Application.Common;
+using QuinntyneBrown.Community.Application.Organizations;
+using QuinntyneBrown.Community.Domain.Organizations;
 using QuinntyneBrown.Community.Domain.Partners;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -53,22 +55,24 @@ public class PartnerValidator : AbstractValidator<PartnerCommand>
 }
 
 /// <summary>Creates, reads and edits partners in the shared pipeline (L2-017).</summary>
-public class ManagePartnersHandler(IApplicationDbContext db, PartnerAccess access, PartnerViews views, TimeProvider time)
+public class ManagePartnersHandler(IApplicationDbContext db, PartnerAccess access, PartnerViews views, PermissionHolders holders, TimeProvider time)
 {
     public async Task<(Result Result, PartnerDto? Partner)> CreateAsync(PartnerCommand command, CancellationToken cancellationToken = default)
     {
-        if (!access.CanWrite)
+        var target = access.CreateTarget();
+        if (!target.Allowed)
         {
-            return (Result.Forbidden(), null);
+            return (target.Refusal!, null);
         }
 
-        if (await OwnerErrorAsync(command.OwnerId, cancellationToken) is { } invalid)
+        if (await OwnerErrorAsync(target.OrgId, command.OwnerId, cancellationToken) is { } invalid)
         {
             return (invalid, null);
         }
 
         var stage = PartnerRules.TryParseStage(command.Stage, out var chosen) ? chosen : PartnerStage.Lead;
         var partner = new Partner(
+            target.OrgId,
             command.Name!.Trim(),
             PartnerRules.Blank(command.Website),
             PartnerRules.Blank(command.Offering),
@@ -93,7 +97,7 @@ public class ManagePartnersHandler(IApplicationDbContext db, PartnerAccess acces
             return (Result.Forbidden(), null);
         }
 
-        var partner = await db.Partners.AsNoTracking().Include(p => p.StageChanges).SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+        var partner = await access.Readable(db.Partners.AsNoTracking()).Include(p => p.StageChanges).SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
         return partner is null ? (Result.NotFound(), null) : (Result.Ok(), await views.ToDtoAsync(partner, cancellationToken));
     }
 
@@ -104,10 +108,15 @@ public class ManagePartnersHandler(IApplicationDbContext db, PartnerAccess acces
             return (Result.Forbidden(), null);
         }
 
-        var partner = await db.Partners.Include(p => p.StageChanges).SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+        var partner = await access.Readable(db.Partners).Include(p => p.StageChanges).SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
         if (partner is null)
         {
             return (Result.NotFound(), null);
+        }
+
+        if (!access.CanWriteIn(partner.OrganizationId))
+        {
+            return (Result.Forbidden(), null);
         }
 
         if (partner.IsArchived)
@@ -115,7 +124,7 @@ public class ManagePartnersHandler(IApplicationDbContext db, PartnerAccess acces
             return (await access.ArchivedConflictAsync(partner, "Change it there.", cancellationToken), null);
         }
 
-        if (await OwnerErrorAsync(command.OwnerId, cancellationToken) is { } invalid)
+        if (await OwnerErrorAsync(partner.OrganizationId, command.OwnerId, cancellationToken) is { } invalid)
         {
             return (invalid, null);
         }
@@ -143,8 +152,9 @@ public class ManagePartnersHandler(IApplicationDbContext db, PartnerAccess acces
             return null;
         }
 
+        var scope = access.ReadScope;
         var partners = await db.Partners.AsNoTracking()
-            .Where(p => p.ArchivedAtUtc == null)
+            .Where(p => p.ArchivedAtUtc == null && scope.Contains(p.OrganizationId))
             .Select(p => new { p.Id, p.Name, p.ContactName, p.Offering, p.Stage })
             .ToListAsync(cancellationToken);
         // One query for every card's next step: the first logged activity with one per partner, in timeline order.
@@ -168,7 +178,7 @@ public class ManagePartnersHandler(IApplicationDbContext db, PartnerAccess acces
         return new PartnerBoardDto(columns, access.CanWrite);
     }
 
-    /// <summary>Members holding a lead role, by name: the people a partner can be owned by.</summary>
+    /// <summary>Members holding <c>partners.write</c> by role in the scope's orgs, by name: the people a partner can be owned by.</summary>
     public async Task<IReadOnlyList<PartnerOwnerDto>?> OwnersAsync(CancellationToken cancellationToken = default)
     {
         if (!access.CanRead)
@@ -176,21 +186,27 @@ public class ManagePartnersHandler(IApplicationDbContext db, PartnerAccess acces
             return null;
         }
 
+        var ids = new HashSet<Guid>();
+        foreach (var org in access.ReadScope)
+        {
+            ids.UnionWith(await holders.MembersWithAsync(org, Permissions.PartnersWrite, cancellationToken));
+        }
+
         var owners = await db.Profiles.AsNoTracking()
-            .Where(p => p.Roles.Any(r => LeadRoles.All.Contains(r.Role)))
+            .Where(p => ids.Contains(p.Id))
             .Select(p => new PartnerOwnerDto(p.Id, p.Name))
             .ToListAsync(cancellationToken);
         return [.. owners.OrderBy(o => o.Name, StringComparer.CurrentCultureIgnoreCase)];
     }
 
-    private async Task<Result?> OwnerErrorAsync(Guid? ownerId, CancellationToken cancellationToken)
+    private async Task<Result?> OwnerErrorAsync(Guid orgId, Guid? ownerId, CancellationToken cancellationToken)
     {
         if (ownerId is not { } owner)
         {
             return null;
         }
 
-        var isLead = await db.Profiles.AnyAsync(p => p.Id == owner && p.Roles.Any(r => LeadRoles.All.Contains(r.Role)), cancellationToken);
+        var isLead = (await holders.MembersWithAsync(orgId, Permissions.PartnersWrite, cancellationToken)).Contains(owner);
         return isLead ? null : Result.Invalid("OwnerId", "Choose a lead as the owner.");
     }
 

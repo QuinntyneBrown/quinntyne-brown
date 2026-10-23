@@ -47,8 +47,8 @@ public static class AuthorizationEndpoints
         identity.SetClaim(Claims.Subject, user.Id.ToString())
             .SetClaim(Claims.Email, user.Email)
             .SetClaim(Claims.EmailVerified, user.EmailConfirmed)
-            .SetClaim(Claims.Name, profile.Name)
-            .SetClaims(Claims.Role, [.. profile.Roles.Select(r => r.Role.ToString())]);
+            .SetClaim(Claims.Name, profile.Name);
+        // Tokens carry identity only; permissions are resolved per request (ADR 0034).
         identity.SetScopes(request.GetScopes());
         identity.SetDestinations(_ => [Destinations.AccessToken, Destinations.IdentityToken]);
 

@@ -27,8 +27,9 @@ public class FindDuplicateContactHandler(IApplicationDbContext db, ContactAccess
 
         // Contact emails are stored trimmed (ContactRules.Blank), so only the query value is trimmed.
         var lower = email.ToLower();
+        var scope = access.KeepingScope;
         var match = await db.Contacts.AsNoTracking()
-            .Where(c => c.OwnerId == owner && c.Email != null && c.Email.ToLower() == lower)
+            .Where(c => c.OwnerId == owner && scope.Contains(c.OrganizationId) && c.Email != null && c.Email.ToLower() == lower)
             .Where(c => query.ExcludeId == null || c.Id != query.ExcludeId)
             .OrderBy(c => c.CreatedAtUtc)
             .Select(c => new DuplicateContactDto(

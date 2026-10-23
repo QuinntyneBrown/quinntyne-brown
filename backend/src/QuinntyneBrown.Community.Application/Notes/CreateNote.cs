@@ -24,6 +24,7 @@ public class CreateNoteHandler(IApplicationDbContext db, NoteAccess access, Note
             return (Result.Invalid("Title", error), null);
         }
 
+        Guid orgId;
         if (command.ParentId is { } parentId)
         {
             var parent = await access.FindAsync(parentId, caller, cancellationToken);
@@ -36,9 +37,22 @@ public class CreateNoteHandler(IApplicationDbContext db, NoteAccess access, Note
             {
                 return (Result.Invalid("ParentId", NoteFields.ParentMessage), null);
             }
+
+            // A child lives in its parent's org (L2-139).
+            orgId = parent.OrganizationId;
+        }
+        else
+        {
+            var target = access.CreateTarget();
+            if (!target.Allowed)
+            {
+                return (target.Refusal!, null);
+            }
+
+            orgId = target.OrgId;
         }
 
-        var page = new NotePage(caller, command.Title, command.ParentId, time.GetUtcNow());
+        var page = new NotePage(orgId, caller, command.Title, command.ParentId, time.GetUtcNow());
         db.NotePages.Add(page);
         await db.SaveChangesAsync(cancellationToken);
         return (Result.Ok(), await views.DetailAsync(page, caller, cancellationToken));

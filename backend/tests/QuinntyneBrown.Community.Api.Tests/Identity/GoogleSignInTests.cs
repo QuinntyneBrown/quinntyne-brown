@@ -54,8 +54,11 @@ public class GoogleSignInTests(CommunityApiFactory factory) : IClassFixture<Comm
         Assert.Equal(email, me.GetProperty("email").GetString());
         Assert.Equal("Leah Thompson", me.GetProperty("name").GetString());
         Assert.True(me.GetProperty("emailVerified").GetBoolean());
-        Assert.Empty(me.GetProperty("roles").EnumerateArray());
+        Assert.False(me.GetProperty("isSystemAdmin").GetBoolean());
         var user = await factory.WithDbAsync(db => db.Users.SingleAsync(u => u.Email == email));
+        // Signing up without an org's link joins no org and grants no role (L2-142 AC1).
+        Assert.False(await factory.WithDbAsync(db => db.OrgMemberships.AnyAsync(m => m.ProfileId == user.ProfileId)));
+        Assert.Empty(await factory.WithDbAsync(db => SeededRoles.OfAsync(db, user.ProfileId)));
         Assert.Null(user.PasswordHash);
         Assert.True(await factory.WithDbAsync(db => db.UserLogins.AnyAsync(l => l.UserId == user.Id && l.LoginProvider == "Google")));
     }

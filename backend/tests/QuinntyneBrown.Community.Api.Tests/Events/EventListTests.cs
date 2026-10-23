@@ -30,7 +30,7 @@ public class EventListTests(CommunityApiFactory factory) : IClassFixture<Communi
         await factory.AddEventAsync("Last month's panel", -30 * Day, city, type: EventType.Panel);
         var member = await factory.AddMemberAsync("Leah Thompson");
 
-        var list = await factory.ClientFor(member, Role.Attendee).GetFromJsonAsync<EventListResponse>($"/api/events?city={city}");
+        var list = await factory.ClientFor(member, SeededRole.Attendee).GetFromJsonAsync<EventListResponse>($"/api/events?city={city}");
 
         Assert.Equal(["Builders Night", "Advent Build Night"], list!.Events.Select(e => e.Title));
         var first = list.Events[0];

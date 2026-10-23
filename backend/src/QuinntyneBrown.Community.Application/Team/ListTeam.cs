@@ -1,8 +1,9 @@
 using System.Text;
 using QuinntyneBrown.Community.Application.Common;
+using QuinntyneBrown.Community.Application.Organizations;
 using QuinntyneBrown.Community.Application.Profiles;
+using QuinntyneBrown.Community.Domain.Organizations;
 using QuinntyneBrown.Community.Domain.Profiles;
-using QuinntyneBrown.Community.Domain.Team;
 using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Team;
@@ -20,13 +21,17 @@ public enum TeamRoleFilter
 public record ListTeamQuery(TeamRoleFilter? Role = null, string? City = null, string? After = null, int? PageSize = null);
 
 /// <summary>
-/// Derives the team from current roles on every request, so role changes show at once (L2-019). Filters
-/// and the name order run in the database before paging, and pages hold at most
+/// Derives each org's team from current roles on every request, so role changes show at once (L2-019): members whose
+/// catalogue roles grant <c>team.member</c>, with <c>team.lead</c> for the Leads filter and the rest for Volunteers.
+/// Filters and the name order run in the database before paging, and pages hold at most
 /// <see cref="PageRequest.MaxPageSize"/> members (L2-046 AC3, ADR 0015).
 /// </summary>
-public class ListTeamHandler(IApplicationDbContext db, IPhotoStorage storage)
+public class ListTeamHandler(IApplicationDbContext db, ICurrentUser current, ProfileRoles profileRoles, IPhotoStorage storage)
 {
     public const int DefaultPageSize = 50;
+
+    /// <summary><c>X-Org</c> names an org the caller does not cover or without the team feature: 404.</summary>
+    public bool Unavailable => current.Access.ActiveOrgUnavailable(Features.Team);
 
     /// <summary>The page, or null when <see cref="ListTeamQuery.After"/> is not a continuation this list gave out.</summary>
     public async Task<TeamListDto?> HandleAsync(ListTeamQuery query, CancellationToken cancellationToken = default)
@@ -37,14 +42,18 @@ public class ListTeamHandler(IApplicationDbContext db, IPhotoStorage storage)
             return null;
         }
 
-        var teamRoles = TeamRoles.All.ToList();
-        var leads = TeamRoles.Leads.ToList();
-        var team = db.Profiles.AsNoTracking().Where(p => p.Roles.Any(r => teamRoles.Contains(r.Role)));
+        var scope = current.Access.ReadScope(Features.Team).ToList();
+        var catalogue = await db.RoleDefinitions.AsNoTracking().ToListAsync(cancellationToken);
+        var teamRoles = catalogue.Where(r => r.Permissions.Contains(Permissions.TeamMember)).Select(r => r.Id).ToList();
+        var leads = catalogue.Where(r => r.Permissions.Contains(Permissions.TeamLead)).Select(r => r.Id).ToList();
+        var volunteers = teamRoles.Except(leads).ToList();
+        var assignments = db.OrgRoleAssignments.Where(a => scope.Contains(a.OrganizationId));
+        var team = db.Profiles.AsNoTracking().Where(p => assignments.Any(a => a.ProfileId == p.Id && teamRoles.Contains(a.RoleDefinitionId)));
 
         var matching = query.Role switch
         {
-            TeamRoleFilter.Leads => team.Where(p => p.Roles.Any(r => leads.Contains(r.Role))),
-            TeamRoleFilter.Volunteers => team.Where(p => p.Roles.Any(r => r.Role == Role.Volunteer)),
+            TeamRoleFilter.Leads => team.Where(p => assignments.Any(a => a.ProfileId == p.Id && leads.Contains(a.RoleDefinitionId))),
+            TeamRoleFilter.Volunteers => team.Where(p => assignments.Any(a => a.ProfileId == p.Id && volunteers.Contains(a.RoleDefinitionId))),
             _ => team,
         };
         var city = query.City?.Trim().ToLower();
@@ -77,15 +86,16 @@ public class ListTeamHandler(IApplicationDbContext db, IPhotoStorage storage)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .Order(StringComparer.OrdinalIgnoreCase)
             .ToList();
-        return new TeamListDto([.. members.Select(ToDto)], cities, next, total);
+        var roles = await profileRoles.ForAsync([.. members.Select(m => m.Id)], scope, cancellationToken);
+        return new TeamListDto([.. members.Select(m => ToDto(m, roles[m.Id]))], cities, next, total);
     }
 
-    private TeamMemberDto ToDto(Profile profile) => new(
+    private TeamMemberDto ToDto(Profile profile, IReadOnlyList<RoleDto> roles) => new(
         profile.Id,
         profile.Name,
         profile.HomeCity,
         profile.Photos.FirstOrDefault(p => p.IsFeatured) is { } featured ? storage.GetReadUrl(featured.BlobName) : null,
-        [.. profile.Roles.OrderBy(r => r.Role).Select(r => r.Role.ToString())]);
+        [.. roles.Where(r => r.Kind == "catalogue").Select(r => r.Name)]);
 }
 
 /// <summary>The position after the last member of a page: their lower-cased name and profile id.</summary>

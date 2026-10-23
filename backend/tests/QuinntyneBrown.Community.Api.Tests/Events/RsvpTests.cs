@@ -141,8 +141,8 @@ public class RsvpTests(CommunityApiFactory factory) : IClassFixture<CommunityApi
     // AC3: Given an attendee who is not a lead or Staff, when they view an event, then they see only the RSVP count.
     [Theory]
     [InlineData]
-    [InlineData(Role.Attendee, Role.Volunteer, Role.ProductEngineer)]
-    public async Task An_attendee_sees_only_the_rsvp_count(params Role[] roles)
+    [InlineData(SeededRole.Attendee, SeededRole.Volunteer, SeededRole.ProductEngineer)]
+    public async Task An_attendee_sees_only_the_rsvp_count(params SeededRole[] roles)
     {
         var ruth = await factory.AddMemberAsync("Ruth Alvarez");
         var existing = await factory.AddEventAsync("Builders Night", Week, members: [ruth.ProfileId], guests: [("Abby Brooks", "abby@example.org")]);
@@ -159,13 +159,13 @@ public class RsvpTests(CommunityApiFactory factory) : IClassFixture<CommunityApi
     // AC4: Given a lead, Staff or System Admin, when they view an event, then they see the full RSVP list. Guest
     // emails are shown to leads and System Admin only.
     [Theory]
-    [InlineData(Role.EventLead, true)]
-    [InlineData(Role.CityLead, true)]
-    [InlineData(Role.CreateLead, true)]
-    [InlineData(Role.CommunicationsLead, true)]
-    [InlineData(Role.SystemAdmin, true)]
-    [InlineData(Role.Staff, false)]
-    public async Task Leads_Staff_and_System_Admins_see_the_list_and_only_leads_and_admins_see_guest_emails(Role role, bool seesEmails)
+    [InlineData(SeededRole.EventLead, true)]
+    [InlineData(SeededRole.CityLead, true)]
+    [InlineData(SeededRole.CreateLead, true)]
+    [InlineData(SeededRole.CommunicationsLead, true)]
+    [InlineData(SeededRole.SystemAdmin, true)]
+    [InlineData(SeededRole.Staff, false)]
+    public async Task Leads_Staff_and_System_Admins_see_the_list_and_only_leads_and_admins_see_guest_emails(SeededRole role, bool seesEmails)
     {
         var ruth = await factory.AddMemberAsync("Ruth Alvarez");
         var existing = await factory.AddEventAsync("Builders Night", Week, members: [ruth.ProfileId], guests: [("Abby Brooks", "abby@example.org")]);
@@ -184,9 +184,9 @@ public class RsvpTests(CommunityApiFactory factory) : IClassFixture<CommunityApi
 
     // AC5: Given a lead or System Admin, when they choose "Export CSV" on the RSVP list, then a CSV of the list is downloaded.
     [Theory]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Leads_and_System_Admins_export_the_rsvp_list_as_csv(Role role)
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Leads_and_System_Admins_export_the_rsvp_list_as_csv(SeededRole role)
     {
         var ruth = await factory.AddMemberAsync("Ruth Alvarez");
         var existing = await factory.AddEventAsync("Builders Night", Week, members: [ruth.ProfileId], guests: [("Abby \"AB\" Brooks", "abby@example.org")]);
@@ -205,9 +205,9 @@ public class RsvpTests(CommunityApiFactory factory) : IClassFixture<CommunityApi
     }
 
     [Theory]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.Attendee)]
-    public async Task Staff_and_attendees_cannot_export_the_rsvp_list(Role role)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.Attendee)]
+    public async Task Staff_and_attendees_cannot_export_the_rsvp_list(SeededRole role)
     {
         var existing = await factory.AddEventAsync("Builders Night", Week, rsvps: 1);
         var viewer = await factory.AddMemberAsync("Leah Thompson");
@@ -220,7 +220,7 @@ public class RsvpTests(CommunityApiFactory factory) : IClassFixture<CommunityApi
     [Fact]
     public async Task The_page_names_the_host_and_their_event_role()
     {
-        var marcus = await factory.AddMemberAsync("Marcus Lee", p => p.AddRole(Role.EventLead, Guid.Empty, DateTime.UtcNow));
+        var marcus = await factory.AddMemberAsync("Marcus Lee", p => p.AddRole(SeededRole.EventLead, Guid.Empty, DateTime.UtcNow));
         var existing = await factory.AddEventAsync("Builders Night", Week, createdBy: marcus.ProfileId);
         var leah = await factory.AddMemberAsync("Leah Thompson");
 

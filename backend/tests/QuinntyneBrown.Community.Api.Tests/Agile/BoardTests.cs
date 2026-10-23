@@ -166,7 +166,7 @@ public class BoardTests(CommunityApiFactory factory) : IClassFixture<CommunityAp
                 .AddAuthentication(TestAuthHandler.SchemeName)
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, null))
             .ConfigureTestServices(s => s.AddScoped<IBoardNotifier, SignalRAgileNotifier>()));
-        var viewer = Connect(live, cast.Owner, Role.CityLead);
+        var viewer = Connect(live, cast.Owner, SeededRole.CityLead);
         var moved = new TaskCompletionSource<(Guid, string)>();
         viewer.On<Guid, string>("CardMoved", (id, status) => moved.TrySetResult((id, status)));
         await viewer.StartAsync();
@@ -187,14 +187,14 @@ public class BoardTests(CommunityApiFactory factory) : IClassFixture<CommunityAp
         await using var live = factory.WithWebHostBuilder(b => b.ConfigureServices(s => s
             .AddAuthentication(TestAuthHandler.SchemeName)
             .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, null)));
-        var outsider = Connect(live, cast.Outsider, Role.Volunteer);
+        var outsider = Connect(live, cast.Outsider, SeededRole.Volunteer);
         await outsider.StartAsync();
 
         await Assert.ThrowsAsync<HubException>(() => outsider.InvokeAsync("WatchBoard", cast.WorkspaceId));
         await outsider.DisposeAsync();
     }
 
-    internal static HubConnection Connect(Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory<Program> server, ProfileClients.Member member, Role role) =>
+    internal static HubConnection Connect(Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory<Program> server, ProfileClients.Member member, SeededRole role) =>
         new HubConnectionBuilder()
             .WithUrl(new Uri(server.Server.BaseAddress, "/hubs/agile"), options =>
             {

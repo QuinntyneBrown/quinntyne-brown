@@ -107,7 +107,7 @@ public class PartnerTimelineHandler(IApplicationDbContext db, PartnerAccess acce
             return (Result.Invalid("before", "That page of the timeline no longer exists. Reload the partner."), null);
         }
 
-        var partner = await db.Partners.AsNoTracking().SingleOrDefaultAsync(p => p.Id == partnerId, cancellationToken);
+        var partner = await access.Readable(db.Partners.AsNoTracking()).SingleOrDefaultAsync(p => p.Id == partnerId, cancellationToken);
         if (partner is null)
         {
             return (Result.NotFound(), null);

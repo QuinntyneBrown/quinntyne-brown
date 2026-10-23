@@ -49,10 +49,16 @@ public class AddWalkInHandler(IApplicationDbContext db, EventPermissions permiss
             return (Result.Forbidden(), null);
         }
 
-        var e = await db.Events.Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var e = await permissions.Covered(db.Events).Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (e is null)
         {
             return (Result.NotFound(), null);
+        }
+
+        permissions.Focus(e.OrganizationId);
+        if (!permissions.CanCheckIn)
+        {
+            return (Result.Forbidden(), null);
         }
 
         if (CheckInHandler.Refusal(e, time.GetUtcNow()) is { } refusal)

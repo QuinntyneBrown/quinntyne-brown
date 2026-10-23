@@ -67,19 +67,29 @@ public partial class ServerAuthorizationTests(CommunityApiFactory factory) : ICl
     }
 
     [Fact]
-    public async Task Me_returns_the_signed_in_user_and_roles()
+    // Traces to: L2-135, L2-155
+    public async Task Me_returns_the_signed_in_user_and_access_gives_their_permissions_from_their_roles()
     {
-        // The roles come from the profile, so the member really holds them.
+        // The permissions come from the roles the member really holds, resolved on this request.
         var member = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(member, Role.CityLead, Role.Staff);
+        var client = factory.ClientFor(member, SeededRole.CityLead, SeededRole.Staff);
 
         var me = await client.GetFromJsonAsync<MeResponse>("/api/me");
+        var access = await client.GetFromJsonAsync<AccessResponse>("/api/me/access");
 
-        Assert.Equal(member.UserId, me!.Id);
-        Assert.Equal(["CityLead", "Staff"], me.Roles);
+        Assert.Equal((member.UserId, false), (me!.Id, me.IsSystemAdmin));
+        var toronto = access!.Orgs.Single(o => o.Slug == "faithtech-toronto");
+        Assert.True(toronto.IsMember);
+        Assert.Contains("workspaces.create", toronto.Permissions);
+        Assert.Contains("reports.view", toronto.Permissions);
+        Assert.DoesNotContain("announcements.send", toronto.Permissions);
     }
 
-    private sealed record MeResponse(Guid Id, string[] Roles);
+    private sealed record MeResponse(Guid Id, bool IsSystemAdmin);
+
+    private sealed record AccessOrg(string Slug, bool IsMember, string[] Permissions);
+
+    private sealed record AccessResponse(AccessOrg[] Orgs);
 
     [GeneratedRegex(@"\{[^}]+\}")]
     private static partial Regex RouteParameter();

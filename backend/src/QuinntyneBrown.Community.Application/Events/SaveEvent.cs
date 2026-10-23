@@ -85,19 +85,27 @@ public class SaveEventHandler(
 {
     public async Task<(Result Result, Guid? Id)> CreateAsync(SaveEventCommand command, CancellationToken cancellationToken = default)
     {
-        if (!permissions.CanManageEvents || await permissions.CallerProfileIdAsync(cancellationToken) is not { } creator)
+        var target = permissions.CreateTarget();
+        if (!target.Allowed)
+        {
+            return (target.Refusal!, null);
+        }
+
+        if (await permissions.CallerProfileIdAsync(cancellationToken) is not { } creator)
         {
             return (Result.Forbidden(), null);
         }
 
+        permissions.Focus(target.OrgId);
         var details = Details.From(command);
         var created = new Event(
+            target.OrgId,
             details.Title, details.Description, details.Type, command.StartsAt, command.EndsAt, details.City,
             details.Format, details.Venue, details.OnlineLink, command.Capacity, details.Visibility, creator);
         db.Events.Add(created);
         if (permissions.IsAdminOverride)
         {
-            audit.Record(creator, "event.created", "Event", created.Id.ToString(), null, Snapshot(created));
+            audit.Record(creator, "event.created", "Event", created.Id.ToString(), null, Snapshot(created), created.OrganizationId);
         }
 
         await db.SaveChangesAsync(cancellationToken);
@@ -111,10 +119,16 @@ public class SaveEventHandler(
             return Result.Forbidden();
         }
 
-        var existing = await db.Events.Include(e => e.Rsvps).SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
+        var existing = await permissions.Covered(db.Events).Include(e => e.Rsvps).SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
         if (existing is null)
         {
             return Result.NotFound();
+        }
+
+        permissions.Focus(existing.OrganizationId);
+        if (!permissions.CanManageEvents)
+        {
+            return Result.Forbidden();
         }
 
         if (existing.IsCancelled)
@@ -134,7 +148,7 @@ public class SaveEventHandler(
 
         if (permissions.IsAdminOverride)
         {
-            audit.Record(actor, "event.updated", "Event", existing.Id.ToString(), before, Snapshot(existing));
+            audit.Record(actor, "event.updated", "Event", existing.Id.ToString(), before, Snapshot(existing), existing.OrganizationId);
         }
 
         await db.SaveChangesAsync(cancellationToken);

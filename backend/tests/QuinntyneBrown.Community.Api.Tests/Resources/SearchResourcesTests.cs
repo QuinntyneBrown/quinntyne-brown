@@ -42,9 +42,9 @@ public class SearchResourcesTests(CommunityApiFactory factory) : IClassFixture<C
         var shared = await factory.AddFileAsync(grace, new Upload($"{word}-pitch.pdf", Pdf),
             new Dictionary<string, string> { ["visibility"] = "Shared", ["memberIds"] = daniel.ProfileId.ToString() });
         var archived = await factory.AddFileAsync(grace, new Upload($"{word}-old.pdf", Pdf));
-        await factory.ClientFor(grace, Role.CityLead).PostAsync($"/api/resources/{archived.Id}/archive", null);
+        await factory.ClientFor(grace, SeededRole.CityLead).PostAsync($"/api/resources/{archived.Id}/archive", null);
 
-        var other = await ResourcesFoundAsync(factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), Role.CityLead), word);
+        var other = await ResourcesFoundAsync(factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead), word);
         var recipient = await ResourcesFoundAsync(factory.ClientFor(daniel), word);
         var owner = await ResourcesFoundAsync(factory.ClientFor(grace), word);
 
@@ -59,7 +59,7 @@ public class SearchResourcesTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var word = Word();
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         var response = await client.PostAsJsonAsync("/api/resources/links", new
         {
             Url = "https://canva.com/d/1", Title = "Poster template", Description = $"For the {word} night", Type = "Template", Visibility = "Global",

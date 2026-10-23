@@ -95,8 +95,8 @@ public class WorkItemTests
     [Fact]
     public void An_item_can_be_assigned_to_a_workspace_member_and_unassigned()
     {
-        var member = ProfileWith(Role.Volunteer);
-        _workspace.AddMember(member, Now);
+        var member = ProfileWith();
+        _workspace.AddMember(member, eligible: true, Now);
         var story = Item(WorkItemKind.Story);
 
         story.Assign(member.Id, _workspace);
@@ -198,10 +198,10 @@ public class WorkItemTests
     [Fact]
     public void Removing_a_member_unassigns_their_items()
     {
-        var member = ProfileWith(Role.Volunteer);
-        var other = ProfileWith(Role.Volunteer);
-        _workspace.AddMember(member, Now);
-        _workspace.AddMember(other, Now);
+        var member = ProfileWith();
+        var other = ProfileWith();
+        _workspace.AddMember(member, eligible: true, Now);
+        _workspace.AddMember(other, eligible: true, Now);
         var theirs = Item(WorkItemKind.Story);
         var others = Item(WorkItemKind.Story);
         theirs.Assign(member.Id, _workspace);

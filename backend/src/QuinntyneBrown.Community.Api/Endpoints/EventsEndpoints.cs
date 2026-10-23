@@ -28,7 +28,7 @@ public static class EventsEndpoints
                 parsed = Enum.Parse<EventListFilter>(filter, ignoreCase: true);
             }
 
-            return Results.Ok(await handler.HandleAsync(new ListEventsQuery(parsed, city), cancellationToken));
+            return await handler.HandleAsync(new ListEventsQuery(parsed, city), cancellationToken) is { } list ? Results.Ok(list) : Results.NotFound();
         });
 
         events.MapGet("/{id:guid}", async (Guid id, GetEventHandler handler, CancellationToken cancellationToken) =>

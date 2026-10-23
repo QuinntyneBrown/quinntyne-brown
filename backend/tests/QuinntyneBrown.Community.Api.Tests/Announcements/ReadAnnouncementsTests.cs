@@ -24,13 +24,13 @@ public partial class ReadAnnouncementsTests(CommunityApiFactory factory) : IClas
     {
         // Given two announcements to volunteers, one to attendees, sent a day apart
         var hannah = await factory.AddMemberAsync("Hannah Kim");
-        var ruth = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(Role.Volunteer, Guid.Empty, DateTime.UtcNow));
-        var sender = factory.ClientFor(hannah, Role.CommunicationsLead);
-        await SendAsync(sender, "First for volunteers", Roles("Volunteer"));
+        var ruth = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(SeededRole.Volunteer, Guid.Empty, DateTime.UtcNow));
+        var sender = factory.ClientFor(hannah, SeededRole.CommunicationsLead);
+        await SendAsync(sender, "First for volunteers", Roles("volunteer"));
         factory.Time.Advance(TimeSpan.FromDays(1));
-        await SendAsync(sender, "For attendees", Roles("Attendee"));
+        await SendAsync(sender, "For attendees", Roles("attendee"));
         factory.Time.Advance(TimeSpan.FromDays(1));
-        await SendAsync(sender, "Second for volunteers", Roles("Volunteer"));
+        await SendAsync(sender, "Second for volunteers", Roles("volunteer"));
 
         // When Ruth opens announcements
         var page = (await factory.ClientFor(ruth).GetFromJsonAsync<AnnouncementPage>("/api/announcements"))!;
@@ -39,7 +39,7 @@ public partial class ReadAnnouncementsTests(CommunityApiFactory factory) : IClas
         Assert.Equal(["Second for volunteers", "First for volunteers"], page.Items.Select(i => i.Subject));
         var latest = page.Items[0];
         Assert.Equal(("Hannah Kim", "Roles", "Body of Second for volunteers"), (latest.SenderName, latest.AudienceKind, latest.Body));
-        Assert.Equal(["Volunteer"], latest.Roles);
+        Assert.Equal(["volunteer"], latest.Roles);
         Assert.True(latest.RecipientCount >= 1);
     }
 
@@ -47,8 +47,8 @@ public partial class ReadAnnouncementsTests(CommunityApiFactory factory) : IClas
     public async Task A_sender_also_sees_what_they_sent_to_others()
     {
         var hannah = await factory.AddMemberAsync("Hannah Kim");
-        var sender = factory.ClientFor(hannah, Role.CommunicationsLead);
-        await SendAsync(sender, "Only for Staff", Roles("Staff"));
+        var sender = factory.ClientFor(hannah, SeededRole.CommunicationsLead);
+        await SendAsync(sender, "Only for Staff", Roles("staff"));
 
         var page = (await sender.GetFromJsonAsync<AnnouncementPage>("/api/announcements"))!;
 
@@ -59,7 +59,7 @@ public partial class ReadAnnouncementsTests(CommunityApiFactory factory) : IClas
     public async Task Turning_announcement_emails_off_is_saved_and_applies_to_the_next_send()
     {
         var hannah = await factory.AddMemberAsync("Hannah Kim");
-        var ruth = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(Role.ProductEngineer, Guid.Empty, DateTime.UtcNow));
+        var ruth = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(SeededRole.ProductEngineer, Guid.Empty, DateTime.UtcNow));
         var client = factory.ClientFor(ruth);
         Assert.Equal(new OptOut(false), await client.GetFromJsonAsync<OptOut>("/api/me/announcement-email-opt-out"));
 
@@ -67,7 +67,7 @@ public partial class ReadAnnouncementsTests(CommunityApiFactory factory) : IClas
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.Equal(new OptOut(true), await client.GetFromJsonAsync<OptOut>("/api/me/announcement-email-opt-out"));
-        await SendAsync(factory.ClientFor(hannah, Role.CommunicationsLead), "After opting out", Roles("ProductEngineer"));
+        await SendAsync(factory.ClientFor(hannah, SeededRole.CommunicationsLead), "After opting out", Roles("product-engineer"));
         Assert.Empty(await EmailsToAsync(ruth, "After opting out"));
     }
 
@@ -76,8 +76,8 @@ public partial class ReadAnnouncementsTests(CommunityApiFactory factory) : IClas
     {
         // Given an announcement email
         var hannah = await factory.AddMemberAsync("Hannah Kim");
-        var ruth = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(Role.Attendee, Guid.Empty, DateTime.UtcNow));
-        await SendAsync(factory.ClientFor(hannah, Role.CommunicationsLead), "Builders Night", Roles("Attendee"));
+        var ruth = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(SeededRole.Attendee, Guid.Empty, DateTime.UtcNow));
+        await SendAsync(factory.ClientFor(hannah, SeededRole.CommunicationsLead), "Builders Night", Roles("attendee"));
         var email = Assert.Single(await EmailsToAsync(ruth, "Builders Night"));
         var link = UnsubscribeLink().Match(email.Body);
         Assert.True(link.Success, email.Body);
@@ -105,8 +105,8 @@ public partial class ReadAnnouncementsTests(CommunityApiFactory factory) : IClas
     public async Task An_unsubscribe_link_older_than_a_year_is_refused()
     {
         var hannah = await factory.AddMemberAsync("Hannah Kim");
-        var ruth = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(Role.CreateLead, Guid.Empty, DateTime.UtcNow));
-        await SendAsync(factory.ClientFor(hannah, Role.CommunicationsLead), "Old news", Roles("CreateLead"));
+        var ruth = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(SeededRole.CreateLead, Guid.Empty, DateTime.UtcNow));
+        await SendAsync(factory.ClientFor(hannah, SeededRole.CommunicationsLead), "Old news", Roles("create-lead"));
         var token = HttpUtility.ParseQueryString(new Uri(UnsubscribeLink().Match(Assert.Single(await EmailsToAsync(ruth, "Old news")).Body).Value).Query)["token"];
         factory.Time.Advance(TimeSpan.FromDays(366));
 

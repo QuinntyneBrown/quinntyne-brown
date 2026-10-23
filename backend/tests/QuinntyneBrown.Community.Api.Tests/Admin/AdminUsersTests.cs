@@ -14,7 +14,7 @@ public class AdminUsersTests(CommunityApiFactory factory) : IClassFixture<Commun
     {
         var priya = await factory.AddMemberAsync("Priya Shah");
         var tag = Guid.NewGuid().ToString("N")[..8];
-        var active = await factory.AddMemberAsync($"Grace {tag}", p => p.AddRole(Role.CityLead, Guid.Empty, DateTime.UtcNow));
+        var active = await factory.AddMemberAsync($"Grace {tag}", p => p.AddRole(SeededRole.CityLead, Guid.Empty, DateTime.UtcNow));
         var suspended = await factory.AddMemberAsync($"Victor {tag}", p => p.Suspend("Spam", DateTime.UtcNow));
         var unverified = await factory.AddMemberAsync($"Leah {tag}");
         await factory.WithDbAsync(async db =>
@@ -23,21 +23,21 @@ public class AdminUsersTests(CommunityApiFactory factory) : IClassFixture<Commun
             return await db.SaveChangesAsync();
         });
 
-        var page = await factory.ClientFor(priya, Role.SystemAdmin).GetFromJsonAsync<Page>($"/api/admin/users?q={tag.ToUpperInvariant()}");
+        var page = await factory.ClientFor(priya, SeededRole.SystemAdmin).GetFromJsonAsync<Page>($"/api/admin/users?q={tag.ToUpperInvariant()}");
 
         Assert.Equal(3, page!.TotalCount);
         Assert.Equal(25, page.PageSize);
         Assert.Equal([$"Grace {tag}", $"Leah {tag}", $"Victor {tag}"], page.Items.Select(u => u.Name));
         var grace = page.Items[0];
         Assert.Equal(active.ProfileId, grace.Id);
-        Assert.Equal(["CityLead"], grace.Roles);
+        Assert.Equal(["city-lead"], grace.Roles.Select(r => r.Key));
         Assert.Equal("Active", grace.Status);
         Assert.Equal("Unverified", page.Items[1].Status);
         Assert.Equal("Suspended", page.Items[2].Status);
         Assert.Equal(suspended.ProfileId, page.Items[2].Id);
 
         var email = await factory.WithDbAsync(db => db.Users.Where(u => u.Id == active.UserId).Select(u => u.Email!).SingleAsync());
-        var byEmail = await factory.ClientFor(priya, Role.SystemAdmin).GetFromJsonAsync<Page>($"/api/admin/users?q={email[..10]}");
+        var byEmail = await factory.ClientFor(priya, SeededRole.SystemAdmin).GetFromJsonAsync<Page>($"/api/admin/users?q={email[..10]}");
         Assert.Equal([active.ProfileId], byEmail!.Items.Select(u => u.Id));
         Assert.Equal(email, byEmail.Items[0].Email);
     }
@@ -51,7 +51,7 @@ public class AdminUsersTests(CommunityApiFactory factory) : IClassFixture<Commun
             await factory.AddMemberAsync($"Member {i:00}");
         }
 
-        var client = factory.ClientFor(priya, Role.SystemAdmin);
+        var client = factory.ClientFor(priya, SeededRole.SystemAdmin);
         var first = await client.GetFromJsonAsync<Page>("/api/admin/users");
         var second = await client.GetFromJsonAsync<Page>("/api/admin/users?page=2");
 
@@ -63,9 +63,9 @@ public class AdminUsersTests(CommunityApiFactory factory) : IClassFixture<Commun
 
     [Theory]
     [InlineData]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.CityLead)]
-    public async Task Anyone_but_a_system_admin_gets_403(params Role[] roles)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.CityLead)]
+    public async Task Anyone_but_a_system_admin_gets_403(params SeededRole[] roles)
     {
         var member = await factory.AddMemberAsync("Daniel Reyes");
 
@@ -74,7 +74,7 @@ public class AdminUsersTests(CommunityApiFactory factory) : IClassFixture<Commun
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
-    private sealed record User(Guid Id, string Name, string Email, string[] Roles, string Status);
+    private sealed record User(Guid Id, string Name, string Email, RoleRef[] Roles, string Status);
 
     private sealed record Page(List<User> Items, int PageSize, int TotalCount);
 }

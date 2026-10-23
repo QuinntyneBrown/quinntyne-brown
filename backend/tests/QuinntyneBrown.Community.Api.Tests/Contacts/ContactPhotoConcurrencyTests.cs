@@ -81,7 +81,7 @@ public class ContactPhotoConcurrencyTests(CommunityApiFactory factory) : IClassF
             await db.SaveChangesAsync();
             return ids.ToArray();
         });
-        return (factory.ClientFor(grace, Role.CityLead), contact.Id, photos);
+        return (factory.ClientFor(grace, SeededRole.CityLead), contact.Id, photos);
     }
 
     private static Task<HttpResponseMessage> Upload(HttpClient client, Guid contactId, string altText) =>

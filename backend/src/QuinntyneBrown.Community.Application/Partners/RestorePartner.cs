@@ -31,7 +31,7 @@ public class RestorePartnerHandler(IApplicationDbContext db, PartnerAccess acces
             return (Result.Forbidden(), null);
         }
 
-        var partner = await db.Partners.SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+        var partner = await access.Readable(db.Partners).SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
         if (partner is null)
         {
             return (Result.NotFound(), null);

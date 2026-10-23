@@ -25,10 +25,10 @@ public class TeamListTests(CommunityApiFactory factory) : IClassFixture<Communit
     public async Task Member_sees_every_lead_and_volunteer_with_name_photo_and_roles_by_name()
     {
         var team = new TeamFactory(factory);
-        var samuel = await team.AddAsync("Samuel Mensah", "Toronto", Role.CreateLead, Role.ProductEngineer);
-        await team.AddAsync("Ruth Alvarez", "Toronto", Role.Volunteer);
-        await team.AddAsync("Grace Okonkwo", "Toronto", Role.CityLead);
-        await team.AddAsync("Nate Oyelaran", "Toronto", Role.ProductEngineer);
+        var samuel = await team.AddAsync("Samuel Mensah", "Toronto", SeededRole.CreateLead, SeededRole.ProductEngineer);
+        await team.AddAsync("Ruth Alvarez", "Toronto", SeededRole.Volunteer);
+        await team.AddAsync("Grace Okonkwo", "Toronto", SeededRole.CityLead);
+        await team.AddAsync("Nate Oyelaran", "Toronto", SeededRole.ProductEngineer);
         await team.AddAsync("Felix Wu", "Austin");
         var viewer = await factory.AddMemberAsync("Leah Thompson");
 
@@ -36,7 +36,7 @@ public class TeamListTests(CommunityApiFactory factory) : IClassFixture<Communit
 
         Assert.Equal(["Grace Okonkwo", "Ruth Alvarez", "Samuel Mensah"], team.Mine(list!).Select(m => m.Name));
         var samuelRow = list!.Members.Single(m => m.ProfileId == samuel.ProfileId);
-        Assert.Equal(["CreateLead", "ProductEngineer"], samuelRow.Roles);
+        Assert.Equal(["Create Lead", "Product Engineer"], samuelRow.Roles);
         Assert.Equal("Toronto", samuelRow.HomeCity);
         Assert.Equal($"{FakePhotoStorage.BaseUrl}profiles/{samuel.ProfileId}/featured.jpg", samuelRow.PhotoUrl);
         Assert.Null(list.Members.Single(m => m.Name.StartsWith("Ruth") && team.Owns(m)).PhotoUrl);
@@ -53,11 +53,11 @@ public class TeamListTests(CommunityApiFactory factory) : IClassFixture<Communit
     public async Task Role_and_city_filters_narrow_the_team(string query, string[] expected)
     {
         var team = new TeamFactory(factory);
-        await team.AddAsync("Grace Okonkwo", "Toronto", Role.CityLead);
-        await team.AddAsync("Marcus Lee", "Austin", Role.EventLead);
-        await team.AddAsync("Hannah Kim", "Vancouver", Role.CommunicationsLead);
-        await team.AddAsync("Ruth Alvarez", "Toronto", Role.Volunteer, Role.Attendee);
-        await team.AddAsync("Tomasz Nowak", "Vancouver", Role.Volunteer);
+        await team.AddAsync("Grace Okonkwo", "Toronto", SeededRole.CityLead);
+        await team.AddAsync("Marcus Lee", "Austin", SeededRole.EventLead);
+        await team.AddAsync("Hannah Kim", "Vancouver", SeededRole.CommunicationsLead);
+        await team.AddAsync("Ruth Alvarez", "Toronto", SeededRole.Volunteer, SeededRole.Attendee);
+        await team.AddAsync("Tomasz Nowak", "Vancouver", SeededRole.Volunteer);
         var viewer = await factory.AddMemberAsync("Leah Thompson");
 
         var list = await factory.ClientFor(viewer).GetFromJsonAsync<TeamListResponse>(team.Url(query));
@@ -71,9 +71,9 @@ public class TeamListTests(CommunityApiFactory factory) : IClassFixture<Communit
     public async Task Cities_list_every_team_members_home_city_once_whatever_the_filters()
     {
         var team = new TeamFactory(factory);
-        await team.AddAsync("Grace Okonkwo", "Halifax", Role.CityLead);
-        await team.AddAsync("Ruth Alvarez", "halifax ", Role.Volunteer);
-        await team.AddAsync("Nate Oyelaran", "Regina", Role.ProductEngineer);
+        await team.AddAsync("Grace Okonkwo", "Halifax", SeededRole.CityLead);
+        await team.AddAsync("Ruth Alvarez", "halifax ", SeededRole.Volunteer);
+        await team.AddAsync("Nate Oyelaran", "Regina", SeededRole.ProductEngineer);
         var viewer = await factory.AddMemberAsync("Leah Thompson");
 
         var list = await factory.ClientFor(viewer).GetFromJsonAsync<TeamListResponse>(team.Url("?role=Volunteers&city=Halifax"));
@@ -88,19 +88,19 @@ public class TeamListTests(CommunityApiFactory factory) : IClassFixture<Communit
     public async Task Profile_that_loses_its_last_team_role_drops_off_and_one_keeping_a_team_role_stays()
     {
         var team = new TeamFactory(factory);
-        var ruth = await team.AddAsync("Ruth Alvarez", "Toronto", Role.Volunteer, Role.Attendee);
-        var marcus = await team.AddAsync("Marcus Lee", "Toronto", Role.EventLead, Role.Volunteer);
+        var ruth = await team.AddAsync("Ruth Alvarez", "Toronto", SeededRole.Volunteer, SeededRole.Attendee);
+        var marcus = await team.AddAsync("Marcus Lee", "Toronto", SeededRole.EventLead, SeededRole.Volunteer);
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var lead = factory.ClientFor(grace, Role.CityLead);
+        var lead = factory.ClientFor(grace, SeededRole.CityLead);
         Assert.Equal(["Marcus Lee", "Ruth Alvarez"], team.Mine((await lead.GetFromJsonAsync<TeamListResponse>(team.Url()))!).Select(m => m.Name));
 
-        (await lead.DeleteAsync($"/api/profiles/{ruth.ProfileId}/roles/Volunteer")).EnsureSuccessStatusCode();
-        (await lead.DeleteAsync($"/api/profiles/{marcus.ProfileId}/roles/Volunteer")).EnsureSuccessStatusCode();
+        (await lead.DeleteAsync($"/api/profiles/{ruth.ProfileId}/roles/volunteer")).EnsureSuccessStatusCode();
+        (await lead.DeleteAsync($"/api/profiles/{marcus.ProfileId}/roles/volunteer")).EnsureSuccessStatusCode();
 
         var list = await lead.GetFromJsonAsync<TeamListResponse>(team.Url());
         var marcusRow = Assert.Single(team.Mine(list!));
         Assert.Equal(marcus.ProfileId, marcusRow.ProfileId);
-        Assert.Equal(["EventLead"], marcusRow.Roles);
+        Assert.Equal(["Event Lead"], marcusRow.Roles);
     }
 
     [Theory]
@@ -124,7 +124,7 @@ public class TeamListTests(CommunityApiFactory factory) : IClassFixture<Communit
     {
         private readonly HashSet<Guid> _ids = [];
 
-        public async Task<ProfileClients.Member> AddAsync(string name, string? city, params Role[] roles)
+        public async Task<ProfileClients.Member> AddAsync(string name, string? city, params SeededRole[] roles)
         {
             var member = await factory.AddMemberAsync(name, p =>
             {
@@ -134,7 +134,7 @@ public class TeamListTests(CommunityApiFactory factory) : IClassFixture<Communit
                     p.AddRole(role, Guid.Empty, DateTime.UtcNow);
                 }
 
-                if (roles.Contains(Role.CreateLead))
+                if (roles.Contains(SeededRole.CreateLead))
                 {
                     p.AddPhoto(new ProfilePhoto($"profiles/{p.Id}/featured.jpg", $"{name} at Builders Night", Earlier));
                     p.AddPhoto(new ProfilePhoto($"profiles/{p.Id}/other.jpg", "The hackathon team", Earlier.AddDays(1)));

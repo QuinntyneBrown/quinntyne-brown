@@ -40,6 +40,8 @@ public class ReportVolumeTests : IAsyncLifetime
                     Id = Guid.NewGuid(), UserName = email, Email = email, NormalizedEmail = email.ToUpperInvariant(),
                     NormalizedUserName = email.ToUpperInvariant(), EmailConfirmed = verified, ProfileId = profile.Id,
                 });
+                db.OrgMemberships.Add(new Domain.Organizations.OrgMembership(
+                    Infrastructure.Persistence.HierarchySeed.TorontoId, profile.Id, Domain.Organizations.JoinedVia.Seed, DateTime.UtcNow));
             }
 
             db.Events.AddRange(events);
@@ -80,7 +82,7 @@ public class ReportVolumeTests : IAsyncLifetime
     {
         var starts = Now.AddDays(30 - (i * 430 / 1_000.0));
         var e = new Event(
-            $"Night {i:0000}", "About the night.", EventType.Gathering, starts, starts.AddHours(2), Cities[i % Cities.Length],
+            Infrastructure.Persistence.HierarchySeed.TorontoId, $"Night {i:0000}", "About the night.", EventType.Gathering, starts, starts.AddHours(2), Cities[i % Cities.Length],
             EventFormat.InPerson, "Kestrel Labs", null, null, EventVisibility.MembersOnly, Guid.NewGuid());
         var taken = Enumerable.Range(0, 3).Select(r => e.Rsvp(Guid.NewGuid(), starts.AddDays(-2).AddMinutes(r))).ToList();
         if (starts <= Now)

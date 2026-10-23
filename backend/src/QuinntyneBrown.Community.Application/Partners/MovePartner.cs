@@ -30,10 +30,15 @@ public class MovePartnerHandler(IApplicationDbContext db, PartnerAccess access, 
             return (Result.Forbidden(), null);
         }
 
-        var partner = await db.Partners.Include(p => p.StageChanges).SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+        var partner = await access.Readable(db.Partners).Include(p => p.StageChanges).SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
         if (partner is null)
         {
             return (Result.NotFound(), null);
+        }
+
+        if (!access.CanWriteIn(partner.OrganizationId))
+        {
+            return (Result.Forbidden(), null);
         }
 
         if (partner.IsArchived)

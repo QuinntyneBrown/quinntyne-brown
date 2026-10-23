@@ -7,6 +7,7 @@ using QuinntyneBrown.Community.Domain.Events;
 using QuinntyneBrown.Community.Domain.Invites;
 using QuinntyneBrown.Community.Domain.Notes;
 using QuinntyneBrown.Community.Domain.Notifications;
+using QuinntyneBrown.Community.Domain.Organizations;
 using QuinntyneBrown.Community.Domain.Partners;
 using QuinntyneBrown.Community.Domain.Profiles;
 using QuinntyneBrown.Community.Domain.Resources;
@@ -66,6 +67,28 @@ public interface IApplicationDbContext
     DbSet<NoteLink> NoteLinks { get; }
 
     DbSet<NoteImage> NoteImages { get; }
+
+    DbSet<Portfolio> Portfolios { get; }
+
+    DbSet<PortfolioLead> PortfolioLeads { get; }
+
+    DbSet<OrgType> OrgTypes { get; }
+
+    DbSet<RoleDefinition> RoleDefinitions { get; }
+
+    DbSet<Organization> Organizations { get; }
+
+    DbSet<OrgSlugAlias> OrgSlugAliases { get; }
+
+    DbSet<OrgMembership> OrgMemberships { get; }
+
+    DbSet<OrgRoleAssignment> OrgRoleAssignments { get; }
+
+    DbSet<CrossOrgRole> CrossOrgRoles { get; }
+
+    DbSet<CrossOrgAssignment> CrossOrgAssignments { get; }
+
+    DbSet<AgentCredential> AgentCredentials { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

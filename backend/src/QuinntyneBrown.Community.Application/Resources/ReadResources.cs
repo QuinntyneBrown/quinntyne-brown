@@ -149,7 +149,7 @@ internal static class ResourceAudit
         Tags = r.Tags.Select(t => t.Tag).ToList(),
         Visibility = r.Visibility.ToString(),
         Members = r.SharedMembers.Select(m => m.ProfileId).ToList(),
-        Roles = r.SharedRoles.Select(x => x.Role.ToString()).ToList(),
+        Roles = r.SharedRoles.Select(x => x.RoleId).ToList(),
         r.File?.FileName,
         r.LinkUrl,
         r.OwnerId,

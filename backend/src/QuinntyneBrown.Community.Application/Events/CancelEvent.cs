@@ -43,10 +43,16 @@ public class CancelEventHandler(
             return Result.Forbidden();
         }
 
-        var e = await db.Events.Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var e = await permissions.Covered(db.Events).Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (e is null)
         {
             return Result.NotFound();
+        }
+
+        permissions.Focus(e.OrganizationId);
+        if (!permissions.CanManageEvents)
+        {
+            return Result.Forbidden();
         }
 
         if (e.IsCancelled)
@@ -65,7 +71,7 @@ public class CancelEventHandler(
 
         if (permissions.IsAdminOverride)
         {
-            audit.Record(actor, "event.cancelled", "Event", e.Id.ToString(), null, new { Reason = reason });
+            audit.Record(actor, "event.cancelled", "Event", e.Id.ToString(), null, new { Reason = reason }, e.OrganizationId);
         }
 
         // Everyone who RSVP'd hears why, the person who cancelled included, since their RSVP is cancelled too.

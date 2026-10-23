@@ -14,14 +14,16 @@ public record NotePageSummaryDto(
     bool SharedWithYou,
     DateTimeOffset UpdatedAt,
     string UpdatedByName,
-    string? ParentTitle);
+    string? ParentTitle,
+    Organizations.OrgLabel? Organization = null);
 
 /// <summary>A page named in a breadcrumb, a child list, backlinks or link suggestions. A page the viewer cannot open has no id and reads "Private page".</summary>
 public record NotePageRefDto(Guid? Id, string Title, string? Icon);
 
 public record NoteAudienceMemberDto(Guid Id, string Name, string? City);
 
-public record NoteAudienceRoleDto(string Role, int Count);
+/// <param name="Role">The role's key; <see cref="Name"/> is its display name.</param>
+public record NoteAudienceRoleDto(string Role, int Count, string? Name = null);
 
 public record NoteAudienceDto(IReadOnlyList<NoteAudienceMemberDto> Members, IReadOnlyList<NoteAudienceRoleDto> Roles);
 
@@ -52,4 +54,5 @@ public record NotePageDto(
     IReadOnlyList<NotePageRefDto> Breadcrumb,
     IReadOnlyList<NotePageRefDto> Children,
     IReadOnlyList<NotePageRefDto> Backlinks,
-    IReadOnlyList<NotePageRefDto> Links);
+    IReadOnlyList<NotePageRefDto> Links,
+    Organizations.OrgLabel? Organization = null);

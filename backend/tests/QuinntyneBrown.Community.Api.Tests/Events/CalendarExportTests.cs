@@ -92,7 +92,7 @@ public class CalendarExportTests(CommunityApiFactory factory) : IClassFixture<Co
     {
         var existing = await factory.AddEventAsync("Toronto Builders Night", Week, visibility: EventVisibility.Public);
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(lead, Role.EventLead);
+        var client = factory.ClientFor(lead, SeededRole.EventLead);
         var before = await LinesAsync(await client.GetAsync($"/api/events/{existing.Id}/calendar.ics"));
 
         (await client.PutAsJsonAsync($"/api/events/{existing.Id}", new

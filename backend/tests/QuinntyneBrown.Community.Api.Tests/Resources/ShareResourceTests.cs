@@ -22,7 +22,7 @@ public class ShareResourceTests : IAsyncLifetime
     private static Dictionary<string, string> SharedWith(Guid? member = null) =>
         member is { } id ? new() { ["visibility"] = "Shared", ["memberIds"] = id.ToString() } : new() { ["visibility"] = "Shared" };
 
-    private async Task<ProfileClients.Member> MemberWithRoleAsync(string name, Role role)
+    private async Task<ProfileClients.Member> MemberWithRoleAsync(string name, SeededRole role)
     {
         var member = await factory.AddMemberAsync(name);
         factory.ClientFor(member, role);
@@ -41,7 +41,7 @@ public class ShareResourceTests : IAsyncLifetime
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var daniel = await factory.AddMemberAsync("Daniel Reyes");
         var pitch = await factory.AddFileAsync(grace, new Upload("partner-pitch.pdf", Pdf), SharedWith(daniel.ProfileId));
-        var other = factory.ClientFor(await factory.AddMemberAsync("Samuel Mensah"), Role.CityLead);
+        var other = factory.ClientFor(await factory.AddMemberAsync("Samuel Mensah"), SeededRole.CityLead);
 
         var page = (await factory.ClientFor(daniel).GetFromJsonAsync<Detail>($"/api/resources/{pitch.Id}"))!;
 
@@ -58,18 +58,18 @@ public class ShareResourceTests : IAsyncLifetime
     public async Task A_role_in_the_audience_follows_role_changes_live()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var kit = await factory.AddFileAsync(grace, new Upload("volunteer-kit.pdf", Pdf), new Dictionary<string, string> { ["visibility"] = "Shared", ["roles"] = "Volunteer" });
+        var kit = await factory.AddFileAsync(grace, new Upload("volunteer-kit.pdf", Pdf), new Dictionary<string, string> { ["visibility"] = "Shared", ["roles"] = "volunteer" });
         var samuel = await factory.AddMemberAsync("Samuel Mensah");
 
         Assert.Equal(HttpStatusCode.NotFound, (await factory.ClientFor(samuel).GetAsync($"/api/resources/{kit.Id}")).StatusCode);
-        var volunteer = factory.ClientFor(samuel, Role.Volunteer);
+        var volunteer = factory.ClientFor(samuel, SeededRole.Volunteer);
         var page = (await volunteer.GetFromJsonAsync<Detail>($"/api/resources/{kit.Id}"))!;
-        Assert.Equal("Volunteer", page.SharedVia);
+        Assert.Equal("volunteer", page.SharedVia);
         Assert.Empty(await NotificationsAsync(samuel));
 
         await factory.WithDbAsync(async db =>
         {
-            (await db.Profiles.SingleAsync(p => p.Id == samuel.ProfileId)).RemoveRole(Role.Volunteer);
+            await SeededRoles.RevokeAsync(db, samuel.ProfileId, SeededRole.Volunteer);
             return await db.SaveChangesAsync();
         });
         Assert.Equal(HttpStatusCode.NotFound, (await factory.ClientFor(samuel).GetAsync($"/api/resources/{kit.Id}")).StatusCode);
@@ -78,10 +78,10 @@ public class ShareResourceTests : IAsyncLifetime
     [Fact]
     public async Task Sharing_notifies_each_recipient_once_in_app_and_by_email_but_not_the_owner_or_suspended_members()
     {
-        var grace = await MemberWithRoleAsync("Grace Okonkwo", Role.CityLead);
-        var daniel = await MemberWithRoleAsync("Daniel Reyes", Role.Volunteer);
-        var samuel = await MemberWithRoleAsync("Samuel Mensah", Role.Volunteer);
-        var away = await MemberWithRoleAsync("Ruth Away", Role.Volunteer);
+        var grace = await MemberWithRoleAsync("Grace Okonkwo", SeededRole.CityLead);
+        var daniel = await MemberWithRoleAsync("Daniel Reyes", SeededRole.Volunteer);
+        var samuel = await MemberWithRoleAsync("Samuel Mensah", SeededRole.Volunteer);
+        var away = await MemberWithRoleAsync("Ruth Away", SeededRole.Volunteer);
         await factory.WithDbAsync(async db =>
         {
             (await db.Profiles.SingleAsync(p => p.Id == away.ProfileId)).Suspend("Away", DateTime.UtcNow);
@@ -91,9 +91,9 @@ public class ShareResourceTests : IAsyncLifetime
             new Dictionary<string, string> { ["visibility"] = "Shared", ["title"] = "Volunteer kit" }, null);
         form.Add(new StringContent(daniel.ProfileId.ToString()), "memberIds");
         form.Add(new StringContent(grace.ProfileId.ToString()), "memberIds");
-        form.Add(new StringContent("Volunteer"), "roles");
+        form.Add(new StringContent("volunteer"), "roles");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsync("/api/resources", form);
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsync("/api/resources", form);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var kit = (await response.Content.ReadFromJsonAsync<Detail[]>())!.Single();
@@ -123,7 +123,7 @@ public class ShareResourceTests : IAsyncLifetime
         var daniel = await factory.AddMemberAsync("Daniel Reyes");
         var hannah = await factory.AddMemberAsync("Hannah Kim");
         var pitch = await factory.AddFileAsync(grace, Deck(), SharedWith(daniel.ProfileId));
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         await client.PutAsJsonAsync($"/api/resources/{pitch.Id}", EditBody(pitch, visibility: "Shared", memberIds: [daniel.ProfileId, hannah.ProfileId]));
         var global = await client.PutAsJsonAsync($"/api/resources/{pitch.Id}", EditBody(pitch, visibility: "Global"));
@@ -142,7 +142,7 @@ public class ShareResourceTests : IAsyncLifetime
         var pitch = await factory.AddFileAsync(grace, Deck(), SharedWith(daniel.ProfileId));
         var hannah = await factory.AddMemberAsync("Hannah Kim");
 
-        var response = await factory.ClientFor(daniel, Role.CityLead)
+        var response = await factory.ClientFor(daniel, SeededRole.CityLead)
             .PutAsJsonAsync($"/api/resources/{pitch.Id}", EditBody(pitch, visibility: "Shared", memberIds: [daniel.ProfileId, hannah.ProfileId]));
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -153,11 +153,11 @@ public class ShareResourceTests : IAsyncLifetime
     public async Task Shared_with_nobody_or_an_unknown_member_or_role_is_refused()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var nobody = await client.UploadAsync(Deck(), SharedWith());
         var unknown = await client.UploadAsync(Deck(), SharedWith(Guid.NewGuid()));
-        var admins = await client.UploadAsync(Deck(), new Dictionary<string, string> { ["visibility"] = "Shared", ["roles"] = "SystemAdmin" });
+        var admins = await client.UploadAsync(Deck(), new Dictionary<string, string> { ["visibility"] = "Shared", ["roles"] = "system-admin" });
 
         Assert.Equal("Choose at least one person or role, or pick another visibility.",
             (await nobody.Content.ReadFromJsonAsync<ValidationProblemDetails>())!.Errors["Visibility"].Single());
@@ -167,11 +167,11 @@ public class ShareResourceTests : IAsyncLifetime
     [Fact]
     public async Task Staff_share_their_own_resources_and_can_be_shared_with_as_a_role()
     {
-        var esther = await MemberWithRoleAsync("Esther Nakamura", Role.Staff);
-        var ruth = await MemberWithRoleAsync("Ruth Staff", Role.Staff);
+        var esther = await MemberWithRoleAsync("Esther Nakamura", SeededRole.Staff);
+        var ruth = await MemberWithRoleAsync("Ruth Staff", SeededRole.Staff);
         var marcus = await factory.AddMemberAsync("Marcus Lee");
 
-        var response = await factory.ClientFor(esther, Role.Staff).UploadAsync(Deck(), new Dictionary<string, string> { ["visibility"] = "Shared", ["roles"] = "Staff", ["memberIds"] = marcus.ProfileId.ToString() });
+        var response = await factory.ClientFor(esther, SeededRole.Staff).UploadAsync(Deck(), new Dictionary<string, string> { ["visibility"] = "Shared", ["roles"] = "staff", ["memberIds"] = marcus.ProfileId.ToString() });
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.Single(await NotificationsAsync(ruth));
@@ -190,8 +190,8 @@ public class ShareResourceTests : IAsyncLifetime
             return await db.SaveChangesAsync();
         });
 
-        var people = (await factory.ClientFor(grace, Role.CityLead).GetFromJsonAsync<Person[]>("/api/resources/members?q=dan"))!;
-        var refused = await factory.ClientFor(await factory.AddMemberAsync("Samuel Mensah"), Role.Volunteer).GetAsync("/api/resources/members?q=dan");
+        var people = (await factory.ClientFor(grace, SeededRole.CityLead).GetFromJsonAsync<Person[]>("/api/resources/members?q=dan"))!;
+        var refused = await factory.ClientFor(await factory.AddMemberAsync("Samuel Mensah"), SeededRole.Volunteer).GetAsync("/api/resources/members?q=dan");
 
         Assert.Equal([("Daniel Reyes", "Austin")], people.Select(p => (p.Name, p.City)));
         Assert.Equal(HttpStatusCode.Forbidden, refused.StatusCode);

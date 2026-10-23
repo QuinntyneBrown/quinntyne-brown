@@ -31,18 +31,22 @@ public class ResourceShareMember
     public Guid ProfileId { get; private set; }
 }
 
-/// <summary>A role named in a Shared resource's audience. Whoever holds it at request time may open the resource (ADR 0017).</summary>
+/// <summary>
+/// A role named in a Shared resource's audience: a catalogue role of the resource's org or a cross-org role covering
+/// it (ADR 0039). Whoever holds it at request time may open the resource (ADR 0017).
+/// </summary>
 public class ResourceShareRole
 {
     private ResourceShareRole() { }
 
-    public ResourceShareRole(Guid resourceId, Profiles.Role role)
+    public ResourceShareRole(Guid resourceId, Guid roleId)
     {
         ResourceId = resourceId;
-        Role = role;
+        RoleId = roleId;
     }
 
     public Guid ResourceId { get; private set; }
 
-    public Profiles.Role Role { get; private set; }
+    /// <summary>A <c>RoleDefinition</c> or <c>CrossOrgRole</c> id.</summary>
+    public Guid RoleId { get; private set; }
 }

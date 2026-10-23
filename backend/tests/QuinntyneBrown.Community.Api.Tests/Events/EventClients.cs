@@ -26,6 +26,7 @@ public static class EventClients
         var now = factory.Time.GetUtcNow();
         var starts = now + startsIn;
         var created = new Event(
+            Infrastructure.Persistence.HierarchySeed.TorontoId,
             title,
             $"About {title}.",
             type,

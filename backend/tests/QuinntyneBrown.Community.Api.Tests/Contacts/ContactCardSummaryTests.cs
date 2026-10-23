@@ -14,7 +14,7 @@ public class ContactCardSummaryTests(CommunityApiFactory factory) : IClassFixtur
     public async Task A_contact_with_photos_and_notes_lists_its_featured_photo_and_note_count()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega", notes: "Met at Builders Night.");
         await client.PostAsJsonAsync($"/api/contacts/{contact.Id}/notes", new { Body = "Wants to help." });
         var featured = await client.AddContactPhotoAsync(contact.Id, "Tomás smiling outside the shelter");
@@ -32,7 +32,7 @@ public class ContactCardSummaryTests(CommunityApiFactory factory) : IClassFixtur
     public async Task A_contact_without_photos_or_whose_photo_is_storing_lists_no_photo()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         var plain = await factory.CreateContactAsync(grace, "Kwame Asante");
         var storing = await factory.CreateContactAsync(grace, "Abby Brooks");
         factory.Photos.Down = true;
@@ -49,7 +49,7 @@ public class ContactCardSummaryTests(CommunityApiFactory factory) : IClassFixtur
     public async Task A_linked_contact_lists_the_members_name_and_featured_photo()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         var tomas = await factory.AddMemberAsync("Tomás Ortega", p =>
             p.AddPhoto(new ProfilePhoto($"profiles/{p.Id}/me.jpg", "Tomás in his own words", DateTimeOffset.UtcNow)));
         var contact = await factory.CreateContactAsync(grace, "Tomás O.");

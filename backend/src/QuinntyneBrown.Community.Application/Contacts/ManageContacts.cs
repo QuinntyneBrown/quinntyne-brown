@@ -63,7 +63,13 @@ public class ManageContactsHandler(IApplicationDbContext db, ContactAccess acces
 {
     public async Task<(Result Result, ContactDto? Contact)> CreateAsync(CreateContactCommand command, CancellationToken cancellationToken = default)
     {
-        if (!access.CanKeepContacts || await access.CallerProfileIdAsync(cancellationToken) is not { } owner)
+        var target = access.CreateTarget();
+        if (!target.Allowed)
+        {
+            return (target.Refusal!, null);
+        }
+
+        if (await access.CallerProfileIdAsync(cancellationToken) is not { } owner)
         {
             return (Result.Forbidden(), null);
         }
@@ -76,6 +82,7 @@ public class ManageContactsHandler(IApplicationDbContext db, ContactAccess acces
         }
 
         var contact = new Contact(
+            target.OrgId,
             owner,
             command.Name!.Trim(),
             ContactRules.Blank(command.Email),
@@ -149,7 +156,8 @@ public class ManageContactsHandler(IApplicationDbContext db, ContactAccess acces
             return null;
         }
 
-        var contacts = db.Contacts.AsNoTracking().Where(c => c.OwnerId == owner && (c.ArchivedAtUtc != null) == archived);
+        var scope = access.KeepingScope;
+        var contacts = db.Contacts.AsNoTracking().Where(c => c.OwnerId == owner && scope.Contains(c.OrganizationId) && (c.ArchivedAtUtc != null) == archived);
         if (ContactRules.Blank(term) is { } search)
         {
             var like = search.ToLower();

@@ -27,7 +27,7 @@ public class SignUpTests(CommunityApiFactory factory) : IClassFixture<CommunityA
         });
         Assert.False(user.EmailConfirmed);
         Assert.Equal("Grace Hopper", profile.Name);
-        Assert.Empty(profile.Roles);
+        Assert.Empty(await factory.WithDbAsync(db => SeededRoles.OfAsync(db, profile.Id)));
         var message = Assert.Single(factory.Emails.SentTo(email));
         Assert.Contains($"{CommunityApiFactory.WebAppOrigin}/verify-email?", message.Body);
     }

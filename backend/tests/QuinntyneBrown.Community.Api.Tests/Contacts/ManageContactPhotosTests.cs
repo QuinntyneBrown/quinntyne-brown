@@ -74,16 +74,16 @@ public class ManageContactPhotosTests(CommunityApiFactory factory) : IClassFixtu
         Assert.Equal(HttpStatusCode.NotFound, delete.StatusCode);
     }
 
-    public static TheoryData<string, Role[]> Outsiders() => new()
+    public static TheoryData<string, SeededRole[]> Outsiders() => new()
     {
-        { "another lead", [Role.CityLead] },
-        { "Staff", [Role.Staff] },
+        { "another lead", [SeededRole.CityLead] },
+        { "Staff", [SeededRole.Staff] },
         { "a member with no role", [] },
     };
 
     [Theory]
     [MemberData(nameof(Outsiders))]
-    public async Task Anyone_but_the_owner_or_a_system_admin_gets_404_and_changes_nothing(string who, Role[] roles)
+    public async Task Anyone_but_the_owner_or_a_system_admin_gets_404_and_changes_nothing(string who, SeededRole[] roles)
     {
         var (owner, contact) = await OwnContact();
         await owner.AddContactPhotoAsync(contact.Id, "First");
@@ -111,7 +111,7 @@ public class ManageContactPhotosTests(CommunityApiFactory factory) : IClassFixtu
         await owner.AddContactPhotoAsync(contact.Id, "First");
         var second = await owner.AddContactPhotoAsync(contact.Id, "Second");
         var admin = await factory.AddMemberAsync("Priya Shah");
-        var client = factory.ClientFor(admin, Role.SystemAdmin);
+        var client = factory.ClientFor(admin, SeededRole.SystemAdmin);
 
         await client.PutAsync($"/api/contacts/{contact.Id}/photos/{second.Id}/featured", null);
         await client.PutAsJsonAsync($"/api/contacts/{contact.Id}/photos/{second.Id}", new { AltText = "Changed" });
@@ -145,7 +145,7 @@ public class ManageContactPhotosTests(CommunityApiFactory factory) : IClassFixtu
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
-        return (factory.ClientFor(grace, Role.CityLead), contact);
+        return (factory.ClientFor(grace, SeededRole.CityLead), contact);
     }
 
     private static async Task<Contact> Reload(HttpClient client, Guid contactId) =>

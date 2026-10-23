@@ -18,15 +18,15 @@ public class TransferOwnershipTests(CommunityApiFactory factory) : IClassFixture
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var pitch = await factory.AddFileAsync(grace, Deck(), new Dictionary<string, string> { ["visibility"] = "Private" }, ["partners"]);
         var marcus = await factory.AddMemberAsync("Marcus Lee");
-        factory.ClientFor(marcus, Role.EventLead);
+        factory.ClientFor(marcus, SeededRole.EventLead);
         var priya = await factory.AddMemberAsync("Priya Shah");
 
-        var response = await factory.ClientFor(priya, Role.SystemAdmin).PutAsJsonAsync($"/api/resources/{pitch.Id}/owner", new { OwnerId = marcus.ProfileId });
+        var response = await factory.ClientFor(priya, SeededRole.SystemAdmin).PutAsJsonAsync($"/api/resources/{pitch.Id}/owner", new { OwnerId = marcus.ProfileId });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var page = (await factory.ClientFor(marcus, Role.EventLead).GetFromJsonAsync<Detail>($"/api/resources/{pitch.Id}"))!;
+        var page = (await factory.ClientFor(marcus, SeededRole.EventLead).GetFromJsonAsync<Detail>($"/api/resources/{pitch.Id}"))!;
         Assert.Equal((marcus.ProfileId, true, "Private", "partners", "city-launch-deck.pptx"), (page.OwnerId, page.CanEdit, page.Visibility, page.Tags.Single(), page.FileName));
-        Assert.Equal(HttpStatusCode.NotFound, (await factory.ClientFor(grace, Role.CityLead).GetAsync($"/api/resources/{pitch.Id}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await factory.ClientFor(grace, SeededRole.CityLead).GetAsync($"/api/resources/{pitch.Id}")).StatusCode);
         var entry = await factory.WithDbAsync(db => db.AuditEntries.SingleAsync(e => e.Action == "resource.owner.transferred" && e.TargetId == pitch.Id.ToString()));
         Assert.Contains(grace.ProfileId.ToString(), entry.BeforeJson);
         Assert.Contains(marcus.ProfileId.ToString(), entry.AfterJson);
@@ -43,8 +43,8 @@ public class TransferOwnershipTests(CommunityApiFactory factory) : IClassFixture
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck());
         var volunteer = await factory.AddMemberAsync("Samuel Mensah");
-        factory.ClientFor(volunteer, Role.Volunteer);
-        var admin = factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), Role.SystemAdmin);
+        factory.ClientFor(volunteer, SeededRole.Volunteer);
+        var admin = factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), SeededRole.SystemAdmin);
 
         var none = await admin.PutAsJsonAsync($"/api/resources/{deck.Id}/owner", new { OwnerId = (Guid?)null });
         var notContributor = await admin.PutAsJsonAsync($"/api/resources/{deck.Id}/owner", new { OwnerId = volunteer.ProfileId });
@@ -54,14 +54,14 @@ public class TransferOwnershipTests(CommunityApiFactory factory) : IClassFixture
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.Staff)]
-    public async Task Anyone_but_a_system_admin_is_refused_even_the_owner(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.Staff)]
+    public async Task Anyone_but_a_system_admin_is_refused_even_the_owner(SeededRole role)
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck(), role: role);
         var marcus = await factory.AddMemberAsync("Marcus Lee");
-        factory.ClientFor(marcus, Role.CityLead);
+        factory.ClientFor(marcus, SeededRole.CityLead);
 
         var response = await factory.ClientFor(grace, role).PutAsJsonAsync($"/api/resources/{deck.Id}/owner", new { OwnerId = marcus.ProfileId });
         var candidates = await factory.ClientFor(grace, role).GetAsync("/api/resources/owner-candidates");
@@ -73,11 +73,11 @@ public class TransferOwnershipTests(CommunityApiFactory factory) : IClassFixture
     public async Task Owner_candidates_are_members_who_can_own_resources_staff_included()
     {
         var esther = await factory.AddMemberAsync("Zed Staffer");
-        factory.ClientFor(esther, Role.Staff);
+        factory.ClientFor(esther, SeededRole.Staff);
         var volunteer = await factory.AddMemberAsync("Zed Volunteer");
-        factory.ClientFor(volunteer, Role.Volunteer);
+        factory.ClientFor(volunteer, SeededRole.Volunteer);
 
-        var people = (await factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), Role.SystemAdmin)
+        var people = (await factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), SeededRole.SystemAdmin)
             .GetFromJsonAsync<ShareResourceTests.Person[]>("/api/resources/owner-candidates?q=zed"))!;
 
         Assert.Equal(["Zed Staffer"], people.Select(p => p.Name));

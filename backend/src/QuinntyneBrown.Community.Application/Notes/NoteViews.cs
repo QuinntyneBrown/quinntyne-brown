@@ -1,12 +1,12 @@
 using QuinntyneBrown.Community.Application.Common;
 using QuinntyneBrown.Community.Domain.Notes;
-using QuinntyneBrown.Community.Domain.Profiles;
+using QuinntyneBrown.Community.Application.Organizations;
 using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Notes;
 
 /// <summary>Builds the note DTOs as the caller sees them.</summary>
-public class NoteViews(IApplicationDbContext db, ICurrentUser current, NoteAccess access, NoteRefs refs)
+public class NoteViews(IApplicationDbContext db, NoteAccess access, NoteRefs refs, ShareRoles shareRoles)
 {
     public const string FormerMember = "A former member";
 
@@ -17,16 +17,18 @@ public class NoteViews(IApplicationDbContext db, ICurrentUser current, NoteAcces
             .Select(p => new { p.Id, p.Name, p.HomeCity })
             .ToDictionaryAsync(p => p.Id, cancellationToken);
         var roleCounts = new List<NoteAudienceRoleDto>();
-        foreach (var role in NoteAccess.ShareableRoles.Where(r => page.SharedRoles.Any(x => x.Role == r)))
+        var shareable = await shareRoles.ForOrgAsync(page.OrganizationId, cancellationToken);
+        foreach (var role in shareable.Where(r => page.SharedRoles.Any(x => x.RoleId == r.Id)))
         {
-            var count = await db.Profiles.CountAsync(p => !p.IsSuspended && p.Roles.Any(x => x.Role == role), cancellationToken);
-            roleCounts.Add(new NoteAudienceRoleDto(role.ToString(), count));
+            var holders = await shareRoles.HoldersAsync(page.OrganizationId, [role.Id], cancellationToken);
+            var count = await db.Profiles.CountAsync(p => !p.IsSuspended && holders.Contains(p.Id), cancellationToken);
+            roleCounts.Add(new NoteAudienceRoleDto(role.Key, count, role.Name));
         }
 
         var blocks = NoteContent.Read(page.Content);
         var links = await refs.VisibleAsync([.. NoteRefs.LinkedIds(blocks)], caller, cancellationToken);
         var isOwn = page.OwnerId == caller;
-        var sharedVia = SharedVia(page, caller, isOwn);
+        var sharedVia = SharedVia(page, caller, isOwn, shareable);
         string Name(Guid id) => profiles.TryGetValue(id, out var p) ? p.Name : FormerMember;
         return new NotePageDto(
             page.Id,
@@ -54,13 +56,13 @@ public class NoteViews(IApplicationDbContext db, ICurrentUser current, NoteAcces
             await refs.BreadcrumbAsync(page, caller, cancellationToken),
             await refs.ChildrenAsync(page.Id, caller, cancellationToken),
             await refs.BacklinksAsync(page.Id, caller, cancellationToken),
-            [.. links.Values]);
+            [.. links.Values],
+            OrgLabel.Of(access.Access.Orgs, page.OrganizationId));
     }
 
     /// <summary>The list rows with owner and editor names in one query.</summary>
     public async Task<IReadOnlyList<NotePageSummaryDto>> SummariesAsync(IQueryable<NotePage> pages, Guid caller, CancellationToken cancellationToken = default)
     {
-        var roles = current.Roles.ToList();
         var rows = await pages
             .Select(p => new
             {
@@ -70,7 +72,9 @@ public class NoteViews(IApplicationDbContext db, ICurrentUser current, NoteAcces
                 p.OwnerId,
                 Owner = db.Profiles.Where(x => x.Id == p.OwnerId).Select(x => x.Name).FirstOrDefault(),
                 p.Visibility,
-                SharedWithCaller = p.SharedMembers.Any(m => m.ProfileId == caller) || p.SharedRoles.Any(x => roles.Contains(x.Role)),
+                SharedWithCaller = p.SharedMembers.Any(m => m.ProfileId == caller),
+                SharedRoleIds = p.SharedRoles.Select(x => x.RoleId).ToList(),
+                p.OrganizationId,
                 p.UpdatedAt,
                 Editor = db.Profiles.Where(x => x.Id == p.UpdatedById).Select(x => x.Name).FirstOrDefault(),
                 p.ParentId,
@@ -85,13 +89,14 @@ public class NoteViews(IApplicationDbContext db, ICurrentUser current, NoteAcces
             r.Owner ?? FormerMember,
             r.OwnerId == caller,
             r.Visibility.ToString(),
-            r.OwnerId != caller && r.Visibility == NoteVisibility.Shared && r.SharedWithCaller,
+            r.OwnerId != caller && r.Visibility == NoteVisibility.Shared && (r.SharedWithCaller || access.HoldsAny(r.OrganizationId, r.SharedRoleIds)),
             r.UpdatedAt,
             r.Editor ?? FormerMember,
-            r.ParentId is { } parent ? parents.GetValueOrDefault(parent)?.Title ?? NoteRefs.PrivatePage : null))];
+            r.ParentId is { } parent ? parents.GetValueOrDefault(parent)?.Title ?? NoteRefs.PrivatePage : null,
+            OrgLabel.Of(access.Access.Orgs, r.OrganizationId)))];
     }
 
-    private string? SharedVia(NotePage page, Guid caller, bool isOwn)
+    private string? SharedVia(NotePage page, Guid caller, bool isOwn, IReadOnlyList<ShareRole> shareable)
     {
         if (isOwn || page.Visibility != NoteVisibility.Shared)
         {
@@ -103,6 +108,7 @@ public class NoteViews(IApplicationDbContext db, ICurrentUser current, NoteAcces
             return "you";
         }
 
-        return page.SharedRoles.Select(x => x.Role).Where(current.HasRole).Select(x => (Role?)x).FirstOrDefault()?.ToString();
+        var held = page.SharedRoles.Select(x => x.RoleId).FirstOrDefault(id => access.HoldsAny(page.OrganizationId, [id]));
+        return shareable.FirstOrDefault(r => r.Id == held)?.Key;
     }
 }

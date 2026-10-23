@@ -17,7 +17,8 @@ public enum SearchResultKind
 }
 
 /// <summary>One result: what it is called, a line of context, and the app route that opens it.</summary>
-public record SearchResultItem(Guid Id, string Title, string Snippet, string Route, DateTimeOffset? StartsAt = null, string? Badge = null);
+/// <param name="Organization">The org's name, shown as a label under "All orgs" (L2-152).</param>
+public record SearchResultItem(Guid Id, string Title, string Snippet, string Route, DateTimeOffset? StartsAt = null, string? Badge = null, string? Organization = null);
 
 public record SearchResultGroup(string Kind, IReadOnlyList<SearchResultItem> Items);
 

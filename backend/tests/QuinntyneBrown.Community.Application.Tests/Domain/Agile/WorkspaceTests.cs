@@ -8,34 +8,27 @@ public class WorkspaceTests
 {
     internal static readonly DateTimeOffset Now = new(2026, 10, 21, 12, 0, 0, TimeSpan.Zero);
 
-    internal static Profile ProfileWith(params Role[] roles)
-    {
-        var profile = new Profile("Member");
-        foreach (var role in roles)
-        {
-            profile.AddRole(role, Guid.NewGuid(), Now.UtcDateTime);
-        }
+    internal static readonly Guid Org = Guid.NewGuid();
 
-        return profile;
-    }
+    internal static Profile ProfileWith() => new("Member");
 
-    internal static Workspace NewWorkspace(WorkspaceMethod method = WorkspaceMethod.Scrum) => new("Hackathon app", method, Guid.NewGuid());
+    internal static Workspace NewWorkspace(WorkspaceMethod method = WorkspaceMethod.Scrum) => new(Org, "Hackathon app", method, Guid.NewGuid());
 
     [Fact]
     public void The_creator_owns_a_new_workspace()
     {
         var owner = Guid.NewGuid();
 
-        var workspace = new Workspace("Hackathon app", WorkspaceMethod.Kanban, owner);
+        var workspace = new Workspace(Org, "Hackathon app", WorkspaceMethod.Kanban, owner);
 
-        Assert.Equal(("Hackathon app", WorkspaceMethod.Kanban, owner, false), (workspace.Name, workspace.Method, workspace.OwnerId, workspace.IsArchived));
+        Assert.Equal(("Hackathon app", WorkspaceMethod.Kanban, owner, false, Org), (workspace.Name, workspace.Method, workspace.OwnerId, workspace.IsArchived, workspace.OrganizationId));
         Assert.True(workspace.IsMember(owner));
     }
 
     [Fact]
     public void A_workspace_needs_a_name()
     {
-        Assert.Throws<ArgumentException>(() => new Workspace(" ", WorkspaceMethod.Scrum, Guid.NewGuid()));
+        Assert.Throws<ArgumentException>(() => new Workspace(Org, " ", WorkspaceMethod.Scrum, Guid.NewGuid()));
     }
 
     [Fact]
@@ -49,31 +42,25 @@ public class WorkspaceTests
         Assert.Throws<ArgumentException>(() => workspace.Rename(""));
     }
 
-    [Theory]
-    [InlineData(Role.Volunteer)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CityLead)]
-    public void A_profile_holding_a_lead_or_volunteer_role_can_be_added(Role role)
+    [Fact]
+    public void A_profile_who_may_join_the_orgs_work_can_be_added()
     {
         var workspace = NewWorkspace();
-        var profile = ProfileWith(role);
+        var profile = ProfileWith();
 
-        workspace.AddMember(profile, Now);
+        workspace.AddMember(profile, eligible: true, Now);
 
         var member = Assert.Single(workspace.Members);
         Assert.Equal((workspace.Id, profile.Id, Now), (member.WorkspaceId, member.ProfileId, member.AddedAt));
         Assert.True(workspace.IsMember(profile.Id));
     }
 
-    [Theory]
-    [InlineData(Role.Attendee)]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.ProductEngineer)]
-    public void A_profile_without_a_lead_or_volunteer_role_cannot_be_added(Role role)
+    [Fact]
+    public void A_profile_who_may_not_join_the_orgs_work_cannot_be_added()
     {
         var workspace = NewWorkspace();
 
-        Assert.Throws<InvalidOperationException>(() => workspace.AddMember(ProfileWith(role), Now));
+        Assert.Throws<InvalidOperationException>(() => workspace.AddMember(ProfileWith(), eligible: false, Now));
         Assert.Empty(workspace.Members);
     }
 
@@ -81,10 +68,10 @@ public class WorkspaceTests
     public void Adding_a_member_twice_is_rejected()
     {
         var workspace = NewWorkspace();
-        var profile = ProfileWith(Role.Volunteer);
-        workspace.AddMember(profile, Now);
+        var profile = ProfileWith();
+        workspace.AddMember(profile, eligible: true, Now);
 
-        Assert.Throws<InvalidOperationException>(() => workspace.AddMember(profile, Now));
+        Assert.Throws<InvalidOperationException>(() => workspace.AddMember(profile, eligible: true, Now));
     }
 
     [Fact]
@@ -105,12 +92,12 @@ public class WorkspaceTests
     public void Ownership_can_be_reassigned_to_another_city_lead()
     {
         var workspace = NewWorkspace();
-        var newOwner = ProfileWith(Role.CityLead);
+        var newOwner = ProfileWith();
 
         var formerOwner = workspace.OwnerId;
-        workspace.AddMember(newOwner, Now);
+        workspace.AddMember(newOwner, eligible: true, Now);
 
-        workspace.ReassignOwner(newOwner, Now);
+        workspace.ReassignOwner(newOwner, canOwn: true, Now);
 
         Assert.Equal(newOwner.Id, workspace.OwnerId);
         Assert.Equal([formerOwner], workspace.Members.Select(m => m.ProfileId));
@@ -122,7 +109,7 @@ public class WorkspaceTests
         var workspace = NewWorkspace();
         var owner = workspace.OwnerId;
 
-        Assert.Throws<InvalidOperationException>(() => workspace.ReassignOwner(ProfileWith(Role.EventLead), Now));
+        Assert.Throws<InvalidOperationException>(() => workspace.ReassignOwner(ProfileWith(), canOwn: false, Now));
         Assert.Equal(owner, workspace.OwnerId);
     }
 }

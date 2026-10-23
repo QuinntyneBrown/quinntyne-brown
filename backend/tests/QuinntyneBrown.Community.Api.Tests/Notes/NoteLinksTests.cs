@@ -35,7 +35,7 @@ public class NoteLinksTests(CommunityApiFactory factory) : IClassFixture<Communi
         await factory.ShareInDbAsync(retro.Id, [grace.ProfileId], []);
         var playbook = await factory.AddNoteAsync(grace, "Playbook", "Global");
         (await factory.ClientFor(grace).SaveNoteAsync(playbook, [Block("paragraph", [new { Text = "Read " }, PageLink(retro.Id)])])).EnsureSuccessStatusCode();
-        var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), Role.CityLead);
+        var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead);
 
         var json = await marcus.GetStringAsync($"/api/notes/{playbook.Id}");
         var read = (await marcus.GetFromJsonAsync<Detail>($"/api/notes/{playbook.Id}"))!;

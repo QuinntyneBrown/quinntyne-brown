@@ -33,7 +33,7 @@ public class SendAnnouncementTests(CommunityApiFactory factory) : IClassFixture<
         var hannah = await factory.AddMemberAsync("Hannah Kim");
         var ruth = await factory.AddMemberAsync("Ruth Alvarez");
         var jonah = await factory.AddMemberAsync("Jonah Bell");
-        var client = factory.ClientFor(hannah, Role.CommunicationsLead);
+        var client = factory.ClientFor(hannah, SeededRole.CommunicationsLead);
         var members = await factory.WithDbAsync(db => db.Users.CountAsync(u => db.Profiles.Any(p => p.Id == u.ProfileId && !p.IsSuspended)));
         var emailable = await factory.WithDbAsync(db =>
             db.Users.CountAsync(u => db.Profiles.Any(p => p.Id == u.ProfileId && !p.IsSuspended && !p.AnnouncementEmailsOptedOut)));
@@ -63,13 +63,13 @@ public class SendAnnouncementTests(CommunityApiFactory factory) : IClassFixture<
     public async Task Sending_to_roles_reaches_only_members_holding_one_of_them()
     {
         var admin = await factory.AddMemberAsync("Priya Shah");
-        var engineer = await factory.AddMemberAsync("Samuel Mensah", p => p.AddRole(Role.ProductEngineer, Guid.Empty, DateTime.UtcNow));
-        var volunteer = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(Role.Volunteer, Guid.Empty, DateTime.UtcNow));
-        var attendee = await factory.AddMemberAsync("Jonah Bell", p => p.AddRole(Role.Attendee, Guid.Empty, DateTime.UtcNow));
-        var client = factory.ClientFor(admin, Role.SystemAdmin);
-        var holders = await factory.WithDbAsync(db => db.Profiles.CountAsync(p => !p.IsSuspended && p.Roles.Any(r => r.Role == Role.ProductEngineer || r.Role == Role.Volunteer)));
+        var engineer = await factory.AddMemberAsync("Samuel Mensah", p => p.AddRole(SeededRole.ProductEngineer, Guid.Empty, DateTime.UtcNow));
+        var volunteer = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(SeededRole.Volunteer, Guid.Empty, DateTime.UtcNow));
+        var attendee = await factory.AddMemberAsync("Jonah Bell", p => p.AddRole(SeededRole.Attendee, Guid.Empty, DateTime.UtcNow));
+        var client = factory.ClientFor(admin, SeededRole.SystemAdmin);
+        var holders = await factory.WithDbAsync(db => db.OrgRoleAssignments.Where(a => a.RoleDefinitionId == SeededRole.ProductEngineer.Id() || a.RoleDefinitionId == SeededRole.Volunteer.Id()).Select(a => a.ProfileId).Distinct().CountAsync());
 
-        var response = await client.PostAsJsonAsync("/api/announcements", Announcement(ToRoles("ProductEngineer", "Volunteer")));
+        var response = await client.PostAsJsonAsync("/api/announcements", Announcement(ToRoles("product-engineer", "volunteer")));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.Equal(holders, (await response.Content.ReadFromJsonAsync<Sent>())!.RecipientCount);
@@ -93,7 +93,7 @@ public class SendAnnouncementTests(CommunityApiFactory factory) : IClassFixture<
             tracked.GuestRsvp("A Guest", "guest@example.org", factory.Time.GetUtcNow());
             return await db.SaveChangesAsync();
         });
-        var client = factory.ClientFor(hannah, Role.CommunicationsLead);
+        var client = factory.ClientFor(hannah, SeededRole.CommunicationsLead);
 
         var count = await client.PostAsJsonAsync("/api/announcements/recipient-count", ToRsvps(ev.Id));
         var response = await client.PostAsJsonAsync("/api/announcements", Announcement(ToRsvps(ev.Id)));
@@ -109,7 +109,7 @@ public class SendAnnouncementTests(CommunityApiFactory factory) : IClassFixture<
     {
         var hannah = await factory.AddMemberAsync("Hannah Kim");
 
-        var response = await factory.ClientFor(hannah, Role.CommunicationsLead)
+        var response = await factory.ClientFor(hannah, SeededRole.CommunicationsLead)
             .PostAsJsonAsync("/api/announcements", Announcement(ToRsvps(Guid.NewGuid())));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -123,12 +123,12 @@ public class SendAnnouncementTests(CommunityApiFactory factory) : IClassFixture<
         var hannah = await factory.AddMemberAsync("Hannah Kim");
         var ruth = await factory.AddMemberAsync("Ruth Alvarez", p =>
         {
-            p.AddRole(Role.Volunteer, Guid.Empty, DateTime.UtcNow);
+            p.AddRole(SeededRole.Volunteer, Guid.Empty, DateTime.UtcNow);
             p.SetAnnouncementEmailOptOut(true);
         });
-        var client = factory.ClientFor(hannah, Role.CommunicationsLead);
+        var client = factory.ClientFor(hannah, SeededRole.CommunicationsLead);
 
-        var response = await client.PostAsJsonAsync("/api/announcements", Announcement(ToRoles("Volunteer")));
+        var response = await client.PostAsJsonAsync("/api/announcements", Announcement(ToRoles("volunteer")));
 
         var sent = (await response.Content.ReadFromJsonAsync<Sent>())!;
         Assert.Equal(sent.RecipientCount - 1, sent.EmailCount);
@@ -140,10 +140,10 @@ public class SendAnnouncementTests(CommunityApiFactory factory) : IClassFixture<
     public async Task Turning_off_also_send_by_email_sends_it_in_the_app_only()
     {
         var hannah = await factory.AddMemberAsync("Hannah Kim");
-        var ruth = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(Role.Attendee, Guid.Empty, DateTime.UtcNow));
+        var ruth = await factory.AddMemberAsync("Ruth Alvarez", p => p.AddRole(SeededRole.Attendee, Guid.Empty, DateTime.UtcNow));
 
-        var response = await factory.ClientFor(hannah, Role.CommunicationsLead)
-            .PostAsJsonAsync("/api/announcements", Announcement(ToRoles("Attendee"), alsoEmail: false));
+        var response = await factory.ClientFor(hannah, SeededRole.CommunicationsLead)
+            .PostAsJsonAsync("/api/announcements", Announcement(ToRoles("attendee"), alsoEmail: false));
 
         Assert.Equal(0, (await response.Content.ReadFromJsonAsync<Sent>())!.EmailCount);
         Assert.Single(await NotificationsAsync(ruth));
@@ -156,11 +156,11 @@ public class SendAnnouncementTests(CommunityApiFactory factory) : IClassFixture<
         var hannah = await factory.AddMemberAsync("Hannah Kim");
         var suspended = await factory.AddMemberAsync("Gone Away", p =>
         {
-            p.AddRole(Role.CreateLead, Guid.Empty, DateTime.UtcNow);
+            p.AddRole(SeededRole.CreateLead, Guid.Empty, DateTime.UtcNow);
             p.Suspend("Spam", DateTime.UtcNow);
         });
 
-        await factory.ClientFor(hannah, Role.CommunicationsLead).PostAsJsonAsync("/api/announcements", Announcement(ToRoles("CreateLead")));
+        await factory.ClientFor(hannah, SeededRole.CommunicationsLead).PostAsJsonAsync("/api/announcements", Announcement(ToRoles("create-lead")));
 
         Assert.Empty(await NotificationsAsync(suspended));
     }
@@ -171,7 +171,7 @@ public class SendAnnouncementTests(CommunityApiFactory factory) : IClassFixture<
         var hannah = await factory.AddMemberAsync("Hannah Kim");
         var before = await factory.WithDbAsync(db => db.Announcements.CountAsync());
 
-        var response = await factory.ClientFor(hannah, Role.CommunicationsLead)
+        var response = await factory.ClientFor(hannah, SeededRole.CommunicationsLead)
             .PostAsJsonAsync("/api/announcements", Announcement(Everyone, subject: " ", body: ""));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -185,7 +185,7 @@ public class SendAnnouncementTests(CommunityApiFactory factory) : IClassFixture<
     public async Task A_role_audience_needs_at_least_one_known_role()
     {
         var hannah = await factory.AddMemberAsync("Hannah Kim");
-        var client = factory.ClientFor(hannah, Role.CommunicationsLead);
+        var client = factory.ClientFor(hannah, SeededRole.CommunicationsLead);
 
         var none = await client.PostAsJsonAsync("/api/announcements", Announcement(ToRoles()));
         var unknown = await client.PostAsJsonAsync("/api/announcements/recipient-count", ToRoles("Wizard"));
@@ -195,11 +195,11 @@ public class SendAnnouncementTests(CommunityApiFactory factory) : IClassFixture<
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.Volunteer)]
-    public async Task Anyone_else_gets_403_for_sending_and_for_the_count(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.Volunteer)]
+    public async Task Anyone_else_gets_403_for_sending_and_for_the_count(SeededRole role)
     {
         var member = await factory.AddMemberAsync("Marcus Lee");
         var client = factory.ClientFor(member, role);
@@ -224,12 +224,12 @@ public class SendAnnouncementTests(CommunityApiFactory factory) : IClassFixture<
     public async Task The_recipient_count_is_shown_before_sending_and_stores_nothing()
     {
         var hannah = await factory.AddMemberAsync("Hannah Kim");
-        await factory.AddMemberAsync("Esther Nakamura", p => p.AddRole(Role.EventLead, Guid.Empty, DateTime.UtcNow));
-        var client = factory.ClientFor(hannah, Role.CommunicationsLead);
-        var holders = await factory.WithDbAsync(db => db.Profiles.CountAsync(p => !p.IsSuspended && p.Roles.Any(r => r.Role == Role.EventLead)));
+        await factory.AddMemberAsync("Esther Nakamura", p => p.AddRole(SeededRole.EventLead, Guid.Empty, DateTime.UtcNow));
+        var client = factory.ClientFor(hannah, SeededRole.CommunicationsLead);
+        var holders = await factory.WithDbAsync(db => SeededRoles.CountHoldersAsync(db, SeededRole.EventLead));
         var announcements = await factory.WithDbAsync(db => db.Announcements.CountAsync());
 
-        var response = await client.PostAsJsonAsync("/api/announcements/recipient-count", ToRoles("EventLead"));
+        var response = await client.PostAsJsonAsync("/api/announcements/recipient-count", ToRoles("event-lead"));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(new RecipientCount(holders), await response.Content.ReadFromJsonAsync<RecipientCount>());

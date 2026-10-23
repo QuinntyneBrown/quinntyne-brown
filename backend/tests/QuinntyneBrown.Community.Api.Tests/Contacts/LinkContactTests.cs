@@ -42,7 +42,7 @@ public class LinkContactTests(CommunityApiFactory factory) : IClassFixture<Commu
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var email = $"{Guid.NewGuid():N}@example.org";
         var archived = await factory.CreateContactAsync(grace, "Tomás Ortega", email);
-        await factory.ClientFor(grace, Role.CityLead).PostAsync($"/api/contacts/{archived.Id}/archive", null);
+        await factory.ClientFor(grace, SeededRole.CityLead).PostAsync($"/api/contacts/{archived.Id}/archive", null);
         var linked = await factory.CreateContactAsync(grace, "Tomás O.", email);
         await factory.WithDbAsync(async db =>
         {
@@ -75,7 +75,7 @@ public class LinkContactTests(CommunityApiFactory factory) : IClassFixture<Commu
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var email = $"{Guid.NewGuid():N}@example.org";
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega", email);
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         await VerifyAsync(await SignUpAsync(email, "Tomás A. Ortega"));
         var member = await ProfileOfAsync(email);
 
@@ -92,7 +92,7 @@ public class LinkContactTests(CommunityApiFactory factory) : IClassFixture<Commu
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var tomas = await factory.AddMemberAsync("Tomás A. Ortega");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega", notes: "Private follow-up.");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var response = await client.PostAsJsonAsync($"/api/contacts/{contact.Id}/link", new { ProfileId = tomas.ProfileId, DiscardNotes = false });
 
@@ -110,7 +110,7 @@ public class LinkContactTests(CommunityApiFactory factory) : IClassFixture<Commu
         var tomas = await factory.AddMemberAsync("Tomás Ortega");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega", notes: "Private follow-up.");
 
-        var response = await factory.ClientFor(grace, Role.CityLead)
+        var response = await factory.ClientFor(grace, SeededRole.CityLead)
             .PostAsJsonAsync($"/api/contacts/{contact.Id}/link", new { ProfileId = tomas.ProfileId, DiscardNotes = true });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -123,7 +123,7 @@ public class LinkContactTests(CommunityApiFactory factory) : IClassFixture<Commu
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var tomas = await factory.AddMemberAsync("Tomás Ortega");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var unknown = await client.PostAsJsonAsync($"/api/contacts/{contact.Id}/link", new { ProfileId = Guid.NewGuid() });
         await client.PostAsJsonAsync($"/api/contacts/{contact.Id}/link", new { ProfileId = tomas.ProfileId });
@@ -139,7 +139,7 @@ public class LinkContactTests(CommunityApiFactory factory) : IClassFixture<Commu
         var tomas = await factory.AddMemberAsync("Tomás Ortega");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
 
-        var response = await factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), Role.CityLead)
+        var response = await factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead)
             .PostAsJsonAsync($"/api/contacts/{contact.Id}/link", new { ProfileId = tomas.ProfileId });
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -151,7 +151,7 @@ public class LinkContactTests(CommunityApiFactory factory) : IClassFixture<Commu
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var email = $"{Guid.NewGuid():N}@example.org";
         await VerifyAsync(await SignUpAsync(email, "Kwame Asante"));
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var offered = await client.PostAsJsonAsync("/api/contacts", NewContact("Kwame", email));
         var problem = (await offered.Content.ReadFromJsonAsync<ProblemDetails>())!;
@@ -173,7 +173,7 @@ public class LinkContactTests(CommunityApiFactory factory) : IClassFixture<Commu
         var email = $"{Guid.NewGuid():N}@example.org";
         await SignUpAsync(email, "Kwame Asante");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsJsonAsync("/api/contacts", NewContact("Kwame", email));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync("/api/contacts", NewContact("Kwame", email));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.Null((await response.Content.ReadFromJsonAsync<Contact>())!.Match);
@@ -186,7 +186,7 @@ public class LinkContactTests(CommunityApiFactory factory) : IClassFixture<Commu
         var tomas = await factory.AddMemberAsync("Tomás Ortega");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
 
-        await factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), Role.SystemAdmin)
+        await factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), SeededRole.SystemAdmin)
             .PostAsJsonAsync($"/api/contacts/{contact.Id}/link", new { ProfileId = tomas.ProfileId });
 
         Assert.True(await factory.WithDbAsync(db => db.AuditEntries.AnyAsync(e => e.TargetId == contact.Id.ToString() && e.Action == "contact.linked")));

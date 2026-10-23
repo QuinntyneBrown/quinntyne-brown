@@ -31,12 +31,12 @@ public class CheckInTests(CommunityApiFactory factory) : IClassFixture<Community
     // who RSVP'd, in RSVP order, with the event's title, date, and counts of going and checked in.
     // L2-117 AC6: it carries whether the caller can edit, and guest emails only for callers who may see them.
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CreateLead)]
-    [InlineData(Role.CommunicationsLead)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Leads_and_System_Admins_get_the_attendees_in_rsvp_order_with_guest_emails(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CreateLead)]
+    [InlineData(SeededRole.CommunicationsLead)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Leads_and_System_Admins_get_the_attendees_in_rsvp_order_with_guest_emails(SeededRole role)
     {
         var (eventId, ruth, _) = await EventWithRsvpsAsync();
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
@@ -65,7 +65,7 @@ public class CheckInTests(CommunityApiFactory factory) : IClassFixture<Community
     {
         var (eventId, _, _) = await EventWithRsvpsAsync();
         var sam = await factory.AddMemberAsync("Sam Rivera");
-        var client = factory.ClientFor(sam, Role.Staff);
+        var client = factory.ClientFor(sam, SeededRole.Staff);
 
         var json = await client.GetFromJsonAsync<JsonElement>($"/api/events/{eventId}/check-in");
 
@@ -82,12 +82,12 @@ public class CheckInTests(CommunityApiFactory factory) : IClassFixture<Community
     // page or call a check-in endpoint, then the response is 403.
     [Theory]
     [InlineData]
-    [InlineData(Role.Attendee, Role.Volunteer, Role.ProductEngineer)]
-    public async Task Other_members_get_403(params Role[] roles)
+    [InlineData(SeededRole.Attendee, SeededRole.Volunteer, SeededRole.ProductEngineer)]
+    public async Task Other_members_get_403(params SeededRole[] roles)
     {
         var (eventId, _, _) = await EventWithRsvpsAsync();
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
-        var rsvpId = await RsvpIdAsync(factory.ClientFor(lead, Role.EventLead), eventId, "Abby Brooks");
+        var rsvpId = await RsvpIdAsync(factory.ClientFor(lead, SeededRole.EventLead), eventId, "Abby Brooks");
         var leah = await factory.AddMemberAsync("Leah Thompson");
         var client = factory.ClientFor(leah, roles);
 
@@ -115,7 +115,7 @@ public class CheckInTests(CommunityApiFactory factory) : IClassFixture<Community
         var (eventId, _, _) = await EventWithRsvpsAsync();
         var other = await factory.AddEventAsync("Panel", Soon, guests: [("Ben Carter", "ben@example.org")]);
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(lead, Role.EventLead);
+        var client = factory.ClientFor(lead, SeededRole.EventLead);
         var elsewhere = await RsvpIdAsync(client, other.Id, "Ben Carter");
 
         Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync($"/api/events/{Guid.NewGuid()}/check-in")).StatusCode);
@@ -131,7 +131,7 @@ public class CheckInTests(CommunityApiFactory factory) : IClassFixture<Community
     {
         var (eventId, _, _) = await EventWithRsvpsAsync();
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(lead, Role.CreateLead);
+        var client = factory.ClientFor(lead, SeededRole.CreateLead);
         var rsvpId = await RsvpIdAsync(client, eventId, "Abby Brooks");
         var at = factory.Time.GetUtcNow();
 
@@ -161,8 +161,8 @@ public class CheckInTests(CommunityApiFactory factory) : IClassFixture<Community
         var (eventId, _, _) = await EventWithRsvpsAsync();
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var marcus = await factory.AddMemberAsync("Marcus Lee");
-        var first = factory.ClientFor(grace, Role.EventLead);
-        var second = factory.ClientFor(marcus, Role.CityLead);
+        var first = factory.ClientFor(grace, SeededRole.EventLead);
+        var second = factory.ClientFor(marcus, SeededRole.CityLead);
         var rsvpId = await RsvpIdAsync(first, eventId, "Ruth Alvarez");
         await first.PutAsync($"/api/events/{eventId}/check-ins/{rsvpId}", null);
 
@@ -185,13 +185,13 @@ public class CheckInTests(CommunityApiFactory factory) : IClassFixture<Community
     {
         var (eventId, _, _) = await EventWithRsvpsAsync();
         var priya = await factory.AddMemberAsync("Priya Shah");
-        var admin = factory.ClientFor(priya, Role.SystemAdmin);
+        var admin = factory.ClientFor(priya, SeededRole.SystemAdmin);
         var rsvpId = await RsvpIdAsync(admin, eventId, "Abby Brooks");
 
         await admin.PutAsync($"/api/events/{eventId}/check-ins/{rsvpId}", null);
         await admin.DeleteAsync($"/api/events/{eventId}/check-ins/{rsvpId}");
         var esther = await factory.AddMemberAsync("Esther Nakamura");
-        var both = factory.ClientFor(esther, Role.SystemAdmin, Role.CityLead);
+        var both = factory.ClientFor(esther, SeededRole.SystemAdmin, SeededRole.CityLead);
         await both.PutAsync($"/api/events/{eventId}/check-ins/{rsvpId}", null);
 
         var entries = await factory.WithDbAsync(db => db.AuditEntries.AsNoTracking()
@@ -210,7 +210,7 @@ public class CheckInTests(CommunityApiFactory factory) : IClassFixture<Community
     {
         var (eventId, _, _) = await EventWithRsvpsAsync();
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(lead, Role.EventLead);
+        var client = factory.ClientFor(lead, SeededRole.EventLead);
         var rsvpId = await RsvpIdAsync(client, eventId, "Abby Brooks");
         await client.PutAsync($"/api/events/{eventId}/check-ins/{rsvpId}", null);
         await factory.CancelEventAsync(eventId, "The venue flooded.");
@@ -237,7 +237,7 @@ public class CheckInTests(CommunityApiFactory factory) : IClassFixture<Community
     {
         var e = await factory.AddEventAsync("Toronto Builders Night", TimeSpan.FromHours(25), guests: [("Abby Brooks", "abby@example.org")]);
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(lead, Role.EventLead);
+        var client = factory.ClientFor(lead, SeededRole.EventLead);
         var page = await client.GetFromJsonAsync<JsonElement>($"/api/events/{e.Id}/check-in");
         var rsvpId = page.GetProperty("attendees")[0].GetProperty("rsvpId").GetGuid();
 
@@ -258,16 +258,16 @@ public class CheckInTests(CommunityApiFactory factory) : IClassFixture<Community
     // L2-121 AC1: Given an event with at least one check-in, when a lead, Staff or System Admin opens the event page,
     // then the check-in count is shown; L2-121 AC2: members get no count. L2-117 AC1: leads are offered Check in.
     [Theory]
-    [InlineData(Role.EventLead, 1, true, true)]
-    [InlineData(Role.SystemAdmin, 1, true, true)]
-    [InlineData(Role.Staff, 1, false, true)]
-    [InlineData(Role.Attendee, null, false, false)]
+    [InlineData(SeededRole.EventLead, 1, true, true)]
+    [InlineData(SeededRole.SystemAdmin, 1, true, true)]
+    [InlineData(SeededRole.Staff, 1, false, true)]
+    [InlineData(SeededRole.Attendee, null, false, false)]
     public async Task The_event_page_carries_the_check_in_count_and_what_the_caller_may_do(
-        Role role, int? count, bool canCheckIn, bool canViewCheckIn)
+        SeededRole role, int? count, bool canCheckIn, bool canViewCheckIn)
     {
         var (eventId, _, _) = await EventWithRsvpsAsync();
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var lead = factory.ClientFor(grace, Role.EventLead);
+        var lead = factory.ClientFor(grace, SeededRole.EventLead);
         await lead.PutAsync($"/api/events/{eventId}/check-ins/{await RsvpIdAsync(lead, eventId, "Ruth Alvarez")}", null);
         var viewer = await factory.AddMemberAsync("Leah Thompson");
 
@@ -284,7 +284,7 @@ public class CheckInTests(CommunityApiFactory factory) : IClassFixture<Community
     {
         var (eventId, _, _) = await EventWithRsvpsAsync();
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var lead = factory.ClientFor(grace, Role.EventLead);
+        var lead = factory.ClientFor(grace, SeededRole.EventLead);
         await lead.PutAsync($"/api/events/{eventId}/check-ins/{await RsvpIdAsync(lead, eventId, "Ruth Alvarez")}", null);
 
         var rsvps = (await lead.GetFromJsonAsync<JsonElement>($"/api/events/{eventId}")).GetProperty("rsvps").EnumerateArray().ToList();

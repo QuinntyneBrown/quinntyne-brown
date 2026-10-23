@@ -12,12 +12,12 @@ namespace QuinntyneBrown.Community.Api.Tests.Contacts;
 public class ManageContactsTests(CommunityApiFactory factory) : IClassFixture<CommunityApiFactory>
 {
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CreateLead)]
-    [InlineData(Role.CommunicationsLead)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task A_lead_creates_a_contact_and_it_appears_in_their_list(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CreateLead)]
+    [InlineData(SeededRole.CommunicationsLead)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task A_lead_creates_a_contact_and_it_appears_in_their_list(SeededRole role)
     {
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
         var client = factory.ClientFor(lead, role);
@@ -47,22 +47,22 @@ public class ManageContactsTests(CommunityApiFactory factory) : IClassFixture<Co
     {
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(lead, Role.CityLead).PostAsJsonAsync("/api/contacts", NewContact(" ", "kwame@"));
+        var response = await factory.ClientFor(lead, SeededRole.CityLead).PostAsJsonAsync("/api/contacts", NewContact(" ", "kwame@"));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = (await response.Content.ReadFromJsonAsync<ValidationProblemDetails>())!;
         Assert.Equal(["Enter at least a first name."], problem.Errors["Name"]);
         Assert.Equal(["Enter an email like name@example.org, or leave it empty."], problem.Errors["Email"]);
-        Assert.Empty(await factory.ClientFor(lead, Role.CityLead).ListContactsAsync());
+        Assert.Empty(await factory.ClientFor(lead, SeededRole.CityLead).ListContactsAsync());
     }
 
     [Theory]
     [InlineData]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.Volunteer)]
-    [InlineData(Role.ProductEngineer)]
-    [InlineData(Role.Attendee)]
-    public async Task Anyone_without_a_lead_role_or_system_admin_cannot_list_or_create_contacts(params Role[] roles)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.Volunteer)]
+    [InlineData(SeededRole.ProductEngineer)]
+    [InlineData(SeededRole.Attendee)]
+    public async Task Anyone_without_a_lead_role_or_system_admin_cannot_list_or_create_contacts(params SeededRole[] roles)
     {
         var member = await factory.AddMemberAsync("Daniel Reyes");
         var client = factory.ClientFor(member, roles);
@@ -72,11 +72,11 @@ public class ManageContactsTests(CommunityApiFactory factory) : IClassFixture<Co
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.Staff)]
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.Staff)]
     [InlineData]
-    public async Task Another_user_including_staff_gets_404_for_someone_elses_contact(params Role[] roles)
+    public async Task Another_user_including_staff_gets_404_for_someone_elses_contact(params SeededRole[] roles)
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega", "tomas.ortega@example.org");
@@ -87,7 +87,7 @@ public class ManageContactsTests(CommunityApiFactory factory) : IClassFixture<Co
         var put = await client.PutAsJsonAsync($"/api/contacts/{contact.Id}", NewContact("Changed"));
 
         Assert.Equal((HttpStatusCode.NotFound, HttpStatusCode.NotFound), (get.StatusCode, put.StatusCode));
-        Assert.Equal("Tomás Ortega", (await factory.ClientFor(grace, Role.CityLead).GetFromJsonAsync<Contact>($"/api/contacts/{contact.Id}"))!.Name);
+        Assert.Equal("Tomás Ortega", (await factory.ClientFor(grace, SeededRole.CityLead).GetFromJsonAsync<Contact>($"/api/contacts/{contact.Id}"))!.Name);
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class ManageContactsTests(CommunityApiFactory factory) : IClassFixture<Co
     {
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(lead, Role.CityLead).GetAsync($"/api/contacts/{Guid.NewGuid()}");
+        var response = await factory.ClientFor(lead, SeededRole.CityLead).GetAsync($"/api/contacts/{Guid.NewGuid()}");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -107,12 +107,12 @@ public class ManageContactsTests(CommunityApiFactory factory) : IClassFixture<Co
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega", "tomas.ortega@example.org");
         var admin = await factory.AddMemberAsync("Priya Shah");
 
-        var read = await factory.ClientFor(admin, Role.SystemAdmin).GetFromJsonAsync<Contact>($"/api/contacts/{contact.Id}");
+        var read = await factory.ClientFor(admin, SeededRole.SystemAdmin).GetFromJsonAsync<Contact>($"/api/contacts/{contact.Id}");
 
         Assert.Equal(("Tomás Ortega", false), (read!.Name, read.IsOwn));
         var entry = await factory.WithDbAsync(db => db.AuditEntries.AsNoTracking().SingleAsync(e => e.TargetId == contact.Id.ToString()));
         Assert.Equal(("contact.viewed", "Contact", admin.ProfileId), (entry.Action, entry.TargetType, entry.ActorId));
-        var log = await factory.ClientFor(admin, Role.SystemAdmin).GetStringAsync($"/api/admin/audit?category=contacts&actor={admin.ProfileId}");
+        var log = await factory.ClientFor(admin, SeededRole.SystemAdmin).GetStringAsync($"/api/admin/audit?category=contacts&actor={admin.ProfileId}");
         Assert.Contains("Opened Tomás Ortega, another lead’s private contact", log);
     }
 
@@ -122,7 +122,7 @@ public class ManageContactsTests(CommunityApiFactory factory) : IClassFixture<Co
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
 
-        await factory.ClientFor(grace, Role.CityLead, Role.SystemAdmin).GetFromJsonAsync<Contact>($"/api/contacts/{contact.Id}");
+        await factory.ClientFor(grace, SeededRole.CityLead, SeededRole.SystemAdmin).GetFromJsonAsync<Contact>($"/api/contacts/{contact.Id}");
 
         Assert.False(await factory.WithDbAsync(db => db.AuditEntries.AnyAsync(e => e.TargetId == contact.Id.ToString())));
     }
@@ -136,7 +136,7 @@ public class ManageContactsTests(CommunityApiFactory factory) : IClassFixture<Co
         await factory.CreateContactAsync(grace, "Abby Brooks");
         await factory.CreateContactAsync(marcus, "Ruth Alvarez");
 
-        var listed = await factory.ClientFor(grace, Role.CityLead).ListContactsAsync();
+        var listed = await factory.ClientFor(grace, SeededRole.CityLead).ListContactsAsync();
 
         Assert.Equal(["Abby Brooks", "Tomás Ortega"], listed.Select(c => c.Name));
     }
@@ -155,7 +155,7 @@ public class ManageContactsTests(CommunityApiFactory factory) : IClassFixture<Co
         await factory.CreateContactAsync(grace, "Abby Brooks", "abby@example.org", "UX designer.", "Ellis Design Studio");
         await factory.CreateContactAsync(marcus, "Tomás Harbour", "tomas.ortega@example.net", "bed availability", "Harbour Coffee");
 
-        var found = await factory.ClientFor(grace, Role.CityLead).ListContactsAsync(term);
+        var found = await factory.ClientFor(grace, SeededRole.CityLead).ListContactsAsync(term);
 
         Assert.Equal(["Tomás Ortega"], found.Select(c => c.Name));
     }
@@ -165,7 +165,7 @@ public class ManageContactsTests(CommunityApiFactory factory) : IClassFixture<Co
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega", "tomas.ortega@example.org");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var response = await client.PutAsJsonAsync($"/api/contacts/{contact.Id}", new
         {
@@ -190,7 +190,7 @@ public class ManageContactsTests(CommunityApiFactory factory) : IClassFixture<Co
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
         var admin = await factory.AddMemberAsync("Priya Shah");
 
-        var response = await factory.ClientFor(admin, Role.SystemAdmin).PutAsJsonAsync($"/api/contacts/{contact.Id}", NewContact("Tomás A. Ortega"));
+        var response = await factory.ClientFor(admin, SeededRole.SystemAdmin).PutAsJsonAsync($"/api/contacts/{contact.Id}", NewContact("Tomás A. Ortega"));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var entry = await factory.WithDbAsync(db => db.AuditEntries.AsNoTracking().SingleAsync(e => e.TargetId == contact.Id.ToString()));

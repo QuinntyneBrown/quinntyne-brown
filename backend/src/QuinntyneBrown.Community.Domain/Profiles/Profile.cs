@@ -4,26 +4,29 @@ public class Profile
 {
     public const int MaxPhotos = 10;
 
-    private readonly List<ProfileRole> _roles = [];
     private readonly List<ProfilePhoto> _photos = [];
     private readonly List<object> _domainEvents = [];
 
     private Profile() { }
 
     /// <param name="joinedAtUtc">When the account was created; set once and never changed (Reports, ADR 0030).</param>
-    public Profile(string name, DateTime? joinedAtUtc = null)
+    public Profile(string name, DateTime? joinedAtUtc = null, ProfileKind kind = ProfileKind.Person)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         Id = Guid.NewGuid();
         Name = name;
         JoinedAtUtc = joinedAtUtc;
+        Kind = kind;
     }
 
     public Guid Id { get; private set; }
 
     public string Name { get; private set; } = string.Empty;
 
-    public IReadOnlyCollection<ProfileRole> Roles => _roles;
+    public ProfileKind Kind { get; private set; }
+
+    /// <summary>The built-in platform tier (ADR 0033): anything, anywhere, audited.</summary>
+    public bool IsSystemAdmin { get; private set; }
 
     public IReadOnlyCollection<ProfilePhoto> Photos => _photos;
 
@@ -112,29 +115,9 @@ public class Profile
         }
     }
 
-    public bool HasRole(Role role) => _roles.Any(r => r.Role == role);
+    public void SetSystemAdmin(bool isSystemAdmin) => IsSystemAdmin = isSystemAdmin;
 
-    public void AddRole(Role role, Guid grantedBy, DateTime nowUtc)
-    {
-        if (HasRole(role))
-        {
-            throw new InvalidOperationException($"The profile already holds the {role} role.");
-        }
-
-        _roles.Add(new ProfileRole(Id, role, grantedBy, nowUtc));
-    }
-
-    public void RemoveRole(Role role)
-    {
-        var held = _roles.FirstOrDefault(r => r.Role == role)
-            ?? throw new InvalidOperationException($"The profile does not hold the {role} role.");
-
-        _roles.Remove(held);
-        if (role == Role.CityLead)
-        {
-            _domainEvents.Add(new CityLeadRoleRemoved(Id));
-        }
-    }
+    public void Raise(object domainEvent) => _domainEvents.Add(domainEvent);
 
     public void ClearDomainEvents() => _domainEvents.Clear();
 

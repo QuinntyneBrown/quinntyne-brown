@@ -31,7 +31,7 @@ public class SeedCommandTests
     public async Task Seed_adds_the_starter_resources_once_owned_by_the_first_system_admin()
     {
         var admin = new QuinntyneBrown.Community.Domain.Profiles.Profile("Priya Shah");
-        admin.AddRole(QuinntyneBrown.Community.Domain.Profiles.Role.SystemAdmin, Guid.Empty, DateTime.UtcNow);
+        admin.SetSystemAdmin(true);
         await using (var setup = Db())
         {
             setup.Profiles.Add(admin);
@@ -44,7 +44,9 @@ public class SeedCommandTests
         await using var db = Db();
         var resources = await db.Resources.ToListAsync();
         Assert.Equal(CommunitySeeder.StarterResources.Count, resources.Count);
-        Assert.All(resources, r => Assert.Equal((admin.Id, QuinntyneBrown.Community.Domain.Resources.ResourceVisibility.Global), (r.OwnerId, r.Visibility)));
+        Assert.All(resources, r => Assert.Equal(
+            (admin.Id, QuinntyneBrown.Community.Domain.Resources.ResourceVisibility.Global, HierarchySeed.TorontoId),
+            (r.OwnerId, r.Visibility, r.OrganizationId)));
         Assert.All(resources, r => Assert.StartsWith("https://", r.LinkUrl));
     }
 
@@ -71,7 +73,8 @@ public class SeedCommandTests
         var hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<QuinntyneBrown.Community.Application.Identity.CommunityUser>();
         Assert.NotEqual(Microsoft.AspNetCore.Identity.PasswordVerificationResult.Failed, hasher.VerifyHashedPassword(user, user.PasswordHash!, "P@ssw0rd"));
         var profile = await db.Profiles.SingleAsync(p => p.Id == user.ProfileId);
-        Assert.True(profile.HasRole(QuinntyneBrown.Community.Domain.Profiles.Role.SystemAdmin));
+        Assert.True(profile.IsSystemAdmin);
+        Assert.True(await db.PortfolioLeads.AnyAsync(l => l.ProfileId == profile.Id));
     }
 
     [Fact]

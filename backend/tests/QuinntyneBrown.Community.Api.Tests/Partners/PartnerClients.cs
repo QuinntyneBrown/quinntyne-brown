@@ -82,7 +82,7 @@ public static class PartnerClients
     public static async Task<Partner> CreatePartnerAsync(
         this CommunityApiFactory factory, ProfileClients.Member lead, string name, string? stage = null)
     {
-        var response = await factory.ClientFor(lead, Role.CityLead).PostAsJsonAsync("/api/partners", NewPartner(name, stage));
+        var response = await factory.ClientFor(lead, SeededRole.CityLead).PostAsJsonAsync("/api/partners", NewPartner(name, stage));
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<Partner>())!;
     }
@@ -91,7 +91,7 @@ public static class PartnerClients
     public static async Task<Partner> AddPartnerAsync(
         this CommunityApiFactory factory, ProfileClients.Member lead, string name, string? website, string? email = null)
     {
-        var response = await factory.ClientFor(lead, Role.CityLead).PostAsJsonAsync("/api/partners", new
+        var response = await factory.ClientFor(lead, SeededRole.CityLead).PostAsJsonAsync("/api/partners", new
         {
             Name = name,
             Website = website,

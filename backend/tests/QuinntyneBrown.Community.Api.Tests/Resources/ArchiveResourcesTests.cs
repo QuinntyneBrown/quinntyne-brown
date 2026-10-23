@@ -17,7 +17,7 @@ public class ArchiveResourcesTests(CommunityApiFactory factory) : IClassFixture<
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck());
-        var owner = factory.ClientFor(grace, Role.CityLead);
+        var owner = factory.ClientFor(grace, SeededRole.CityLead);
         var member = factory.ClientFor(await factory.AddMemberAsync("Samuel Mensah"));
 
         var response = await owner.PostAsync($"/api/resources/{deck.Id}/archive", null);
@@ -41,7 +41,7 @@ public class ArchiveResourcesTests(CommunityApiFactory factory) : IClassFixture<
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var daniel = await factory.AddMemberAsync("Daniel Reyes");
         var pitch = await factory.AddFileAsync(grace, Deck(), new Dictionary<string, string> { ["visibility"] = "Shared", ["memberIds"] = daniel.ProfileId.ToString() }, ["partners"]);
-        var owner = factory.ClientFor(grace, Role.CityLead);
+        var owner = factory.ClientFor(grace, SeededRole.CityLead);
         await owner.PostAsync($"/api/resources/{pitch.Id}/archive", null);
 
         var response = await owner.PostAsync($"/api/resources/{pitch.Id}/restore", null);
@@ -56,7 +56,7 @@ public class ArchiveResourcesTests(CommunityApiFactory factory) : IClassFixture<
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck());
-        var owner = factory.ClientFor(grace, Role.CityLead);
+        var owner = factory.ClientFor(grace, SeededRole.CityLead);
         await owner.PostAsync($"/api/resources/{deck.Id}/archive", null);
 
         Assert.Equal(HttpStatusCode.Conflict, (await owner.PostAsync($"/api/resources/{deck.Id}/archive", null)).StatusCode);
@@ -64,16 +64,16 @@ public class ArchiveResourcesTests(CommunityApiFactory factory) : IClassFixture<
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.Staff)]
-    public async Task Members_who_do_not_own_it_cannot_archive_or_restore(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.Staff)]
+    public async Task Members_who_do_not_own_it_cannot_archive_or_restore(SeededRole role)
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck());
         var other = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), role);
 
         Assert.Equal(HttpStatusCode.Forbidden, (await other.PostAsync($"/api/resources/{deck.Id}/archive", null)).StatusCode);
-        await factory.ClientFor(grace, Role.CityLead).PostAsync($"/api/resources/{deck.Id}/archive", null);
+        await factory.ClientFor(grace, SeededRole.CityLead).PostAsync($"/api/resources/{deck.Id}/archive", null);
         Assert.Equal(HttpStatusCode.NotFound, (await other.PostAsync($"/api/resources/{deck.Id}/restore", null)).StatusCode);
     }
 
@@ -81,8 +81,8 @@ public class ArchiveResourcesTests(CommunityApiFactory factory) : IClassFixture<
     public async Task Staff_archive_and_restore_their_own()
     {
         var esther = await factory.AddMemberAsync("Esther Nakamura");
-        var deck = await factory.AddFileAsync(esther, Deck(), role: Role.Staff);
-        var staff = factory.ClientFor(esther, Role.Staff);
+        var deck = await factory.AddFileAsync(esther, Deck(), role: SeededRole.Staff);
+        var staff = factory.ClientFor(esther, SeededRole.Staff);
 
         Assert.Equal(HttpStatusCode.NoContent, (await staff.PostAsync($"/api/resources/{deck.Id}/archive", null)).StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, (await staff.PostAsync($"/api/resources/{deck.Id}/restore", null)).StatusCode);
@@ -94,7 +94,7 @@ public class ArchiveResourcesTests(CommunityApiFactory factory) : IClassFixture<
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck());
         var priya = await factory.AddMemberAsync("Priya Shah");
-        var admin = factory.ClientFor(priya, Role.SystemAdmin);
+        var admin = factory.ClientFor(priya, SeededRole.SystemAdmin);
 
         await admin.PostAsync($"/api/resources/{deck.Id}/archive", null);
         await admin.PostAsync($"/api/resources/{deck.Id}/restore", null);
@@ -111,9 +111,9 @@ public class ArchiveResourcesTests(CommunityApiFactory factory) : IClassFixture<
         var old = await factory.AddFileAsync(grace, new Upload("old.jpg", TestImages.Jpeg()));
         var recent = await factory.AddFileAsync(grace, Deck());
         var priya = await factory.AddMemberAsync("Priya Shah");
-        await factory.ClientFor(priya, Role.SystemAdmin).PostAsync($"/api/resources/{old.Id}/archive", null);
+        await factory.ClientFor(priya, SeededRole.SystemAdmin).PostAsync($"/api/resources/{old.Id}/archive", null);
         factory.Time.Advance(TimeSpan.FromDays(29));
-        await factory.ClientFor(grace, Role.CityLead).PostAsync($"/api/resources/{recent.Id}/archive", null);
+        await factory.ClientFor(grace, SeededRole.CityLead).PostAsync($"/api/resources/{recent.Id}/archive", null);
         var oldBlobs = factory.Files.Blobs.Keys.Where(k => k.Contains(old.Id.ToString())).ToList();
 
         await factory.PurgeArchivedResourcesAsync();

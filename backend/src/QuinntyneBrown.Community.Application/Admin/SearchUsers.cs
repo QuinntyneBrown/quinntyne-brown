@@ -1,5 +1,5 @@
 using QuinntyneBrown.Community.Application.Common;
-using QuinntyneBrown.Community.Domain.Profiles;
+using QuinntyneBrown.Community.Application.Organizations;
 using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Admin;
@@ -12,16 +12,16 @@ public enum UserStatus
 }
 
 /// <summary>One account on the admin users page (L2-040 AC1). <see cref="Id"/> is the profile id.</summary>
-public record AdminUserSummary(Guid Id, string Name, string Email, IReadOnlyList<string> Roles, string Status);
+public record AdminUserSummary(Guid Id, string Name, string Email, IReadOnlyList<RoleDto> Roles, string Status, bool IsAgent = false);
 
 /// <summary>Searches every account by name or email; System Admin only.</summary>
-public class SearchUsersHandler(IApplicationDbContext db, ICurrentUser current)
+public class SearchUsersHandler(IApplicationDbContext db, ICurrentUser current, ProfileRoles profileRoles)
 {
     public const int PageSize = 25;
 
     public async Task<PagedResult<AdminUserSummary>?> HandleAsync(string? term, int page, CancellationToken cancellationToken = default)
     {
-        if (!current.HasRole(Role.SystemAdmin))
+        if (!current.Access.IsSystemAdmin)
         {
             return null;
         }
@@ -45,18 +45,20 @@ public class SearchUsersHandler(IApplicationDbContext db, ICurrentUser current)
                 a.profile.Id,
                 a.profile.Name,
                 a.user.Email,
-                Roles = a.profile.Roles.Select(r => r.Role).ToList(),
+                a.profile.Kind,
                 a.profile.IsSuspended,
                 a.user.EmailConfirmed,
             })
             .ToListAsync(cancellationToken);
 
+        var roles = await profileRoles.ForAsync([.. rows.Select(r => r.Id)], cancellationToken: cancellationToken);
         var items = rows.Select(r => new AdminUserSummary(
             r.Id,
             r.Name,
             r.Email ?? string.Empty,
-            [.. r.Roles.Order().Select(role => role.ToString())],
-            (r.IsSuspended ? UserStatus.Suspended : r.EmailConfirmed ? UserStatus.Active : UserStatus.Unverified).ToString())).ToList();
+            roles[r.Id],
+            (r.IsSuspended ? UserStatus.Suspended : r.EmailConfirmed ? UserStatus.Active : UserStatus.Unverified).ToString(),
+            r.Kind == Domain.Profiles.ProfileKind.Agent)).ToList();
         return new PagedResult<AdminUserSummary>(items, request.Page, request.PageSize, total);
     }
 }

@@ -13,7 +13,7 @@ public class InvitesPagingTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task Pages_hold_50_by_default_and_never_more_than_100()
     {
         var grace = await AddInvitesAsync(120);
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var first = await PageAsync(client, "/api/invites");
         var oversized = await PageAsync(client, "/api/invites?pageSize=500");
@@ -28,7 +28,7 @@ public class InvitesPagingTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task Following_next_reaches_every_invite_once_newest_first_even_when_one_is_sent_meanwhile()
     {
         var grace = await AddInvitesAsync(75);
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         var expected = (await AllAsync(client)).Select(i => i.Id).ToList();
 
         var seen = new List<Invite>();
@@ -37,7 +37,7 @@ public class InvitesPagingTests(CommunityApiFactory factory) : IClassFixture<Com
         // A new invite lands at the top while the lead is reading; the next page must not shift.
         factory.Time.Advance(TimeSpan.FromMinutes(1));
         var marcus = await factory.AddMemberAsync("Marcus Lee");
-        (await factory.ClientFor(marcus, Role.CityLead).PostAsJsonAsync("/api/invites", new { Email = $"{Guid.NewGuid():N}@example.org" }))
+        (await factory.ClientFor(marcus, SeededRole.CityLead).PostAsJsonAsync("/api/invites", new { Email = $"{Guid.NewGuid():N}@example.org" }))
             .EnsureSuccessStatusCode();
         while (page.Next is { } next)
         {
@@ -54,7 +54,7 @@ public class InvitesPagingTests(CommunityApiFactory factory) : IClassFixture<Com
     {
         var jonah = await factory.AddMemberAsync("Jonah Bell");
 
-        var member = await factory.ClientFor(jonah, Role.Volunteer).GetAsync("/api/invites?pageSize=10&after=x");
+        var member = await factory.ClientFor(jonah, SeededRole.Volunteer).GetAsync("/api/invites?pageSize=10&after=x");
         var anonymous = await factory.CreateClient().GetAsync("/api/invites?pageSize=10");
 
         Assert.Equal(HttpStatusCode.Forbidden, member.StatusCode);
@@ -66,7 +66,7 @@ public class InvitesPagingTests(CommunityApiFactory factory) : IClassFixture<Com
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).GetAsync("/api/invites?after=not-a-cursor");
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).GetAsync("/api/invites?after=not-a-cursor");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }

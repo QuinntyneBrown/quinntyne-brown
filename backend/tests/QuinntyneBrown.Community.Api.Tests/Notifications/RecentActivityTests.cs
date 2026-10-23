@@ -30,7 +30,7 @@ public class RecentActivityTests(CommunityApiFactory factory) : IClassFixture<Co
         await AddNotificationAsync(grace, NotificationKind.ContactSignedUp, "Tomás Ortega just joined Quinntyne Brown", "/contacts/tomas", Noon);
         await AddNotificationAsync(grace, NotificationKind.EventChanged, "Toronto Builders Night changed. Check the new details.", "/events/builders", Noon.AddDays(-1));
 
-        var feed = await factory.ClientFor(grace, Role.CityLead).GetFromJsonAsync<List<ActivityItem>>("/api/activity");
+        var feed = await factory.ClientFor(grace, SeededRole.CityLead).GetFromJsonAsync<List<ActivityItem>>("/api/activity");
 
         Assert.Equal(
             ["Tomás Ortega just joined Quinntyne Brown", "Toronto Builders Night changed. Check the new details.", "Ruth Alvarez accepted your invite"],
@@ -49,7 +49,7 @@ public class RecentActivityTests(CommunityApiFactory factory) : IClassFixture<Co
             await AddNotificationAsync(hannah, NotificationKind.RsvpConfirmed, $"You’re going to event {i}", $"/events/{i}", Noon.AddHours(i));
         }
 
-        var feed = await factory.ClientFor(hannah, Role.Volunteer).GetFromJsonAsync<List<ActivityItem>>("/api/activity");
+        var feed = await factory.ClientFor(hannah, SeededRole.Volunteer).GetFromJsonAsync<List<ActivityItem>>("/api/activity");
 
         Assert.Equal(10, feed!.Count);
         Assert.Equal("You’re going to event 11", feed[0].Text);
@@ -65,9 +65,9 @@ public class RecentActivityTests(CommunityApiFactory factory) : IClassFixture<Co
         var volunteer = await factory.AddMemberAsync("Ruth Alvarez");
         await AddNotificationAsync(lead, NotificationKind.ContactSignedUp, "Private Person just joined Quinntyne Brown", "/contacts/private", Noon);
 
-        var staffFeed = await factory.ClientFor(staff, Role.Staff).GetFromJsonAsync<List<ActivityItem>>("/api/activity");
-        var volunteerFeed = await factory.ClientFor(volunteer, Role.Volunteer).GetFromJsonAsync<List<ActivityItem>>("/api/activity");
-        var adminFeed = await factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), Role.SystemAdmin)
+        var staffFeed = await factory.ClientFor(staff, SeededRole.Staff).GetFromJsonAsync<List<ActivityItem>>("/api/activity");
+        var volunteerFeed = await factory.ClientFor(volunteer, SeededRole.Volunteer).GetFromJsonAsync<List<ActivityItem>>("/api/activity");
+        var adminFeed = await factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), SeededRole.SystemAdmin)
             .GetFromJsonAsync<List<ActivityItem>>("/api/activity");
 
         Assert.Empty(staffFeed!);

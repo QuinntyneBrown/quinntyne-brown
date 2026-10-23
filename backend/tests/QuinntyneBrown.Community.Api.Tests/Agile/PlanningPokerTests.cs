@@ -304,9 +304,9 @@ public class PlanningPokerTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task Given_a_member_who_was_not_invited_when_they_vote_before_or_after_the_reveal_then_403()
     {
         var (cast, _, _, id) = await StartAsync();
-        var uninvited = await factory.AddWithRolesAsync("Hannah Kim", Role.Volunteer);
+        var uninvited = await factory.AddWithRolesAsync("Hannah Kim", SeededRole.Volunteer);
         await factory.OwnerClient(cast).PostAsJsonAsync($"/api/workspaces/{cast.WorkspaceId}/members", new { ProfileIds = new[] { uninvited.ProfileId } });
-        var client = factory.ClientFor(uninvited, Role.Volunteer);
+        var client = factory.ClientFor(uninvited, SeededRole.Volunteer);
 
         var before = await client.PutAsJsonAsync($"/api/poker-sessions/{id}/vote", new { Value = "5" });
         await factory.MemberClient(cast).PostAsync($"/api/poker-sessions/{id}/reveal", null);

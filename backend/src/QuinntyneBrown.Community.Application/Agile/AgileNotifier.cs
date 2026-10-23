@@ -14,14 +14,14 @@ public class AgileNotifier(IApplicationDbContext db, IEmailQueue emails, IOption
 {
     private readonly List<(Guid Recipient, string Subject, string Body)> _emails = [];
 
-    public void Notify(Guid actor, Guid recipient, NotificationKind kind, string title, string linkPath, string subject, string body)
+    public void Notify(Guid actor, Guid recipient, NotificationKind kind, string title, string linkPath, string subject, string body, Guid? organizationId = null)
     {
         if (recipient == actor)
         {
             return;
         }
 
-        db.Notifications.Add(new Notification(recipient, kind, title, linkPath, time.GetUtcNow()));
+        db.Notifications.Add(new Notification(recipient, kind, title, linkPath, time.GetUtcNow(), organizationId: organizationId));
         _emails.Add((recipient, subject, $"{body}\n\n{webApp.Value.Origin}{linkPath}"));
     }
 

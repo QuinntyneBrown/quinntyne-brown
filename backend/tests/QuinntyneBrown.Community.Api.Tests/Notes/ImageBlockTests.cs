@@ -57,7 +57,7 @@ public class ImageBlockTests(CommunityApiFactory factory) : IClassFixture<Commun
         var page = await factory.AddNoteAsync(grace, "Private plan");
         var image = (await (await UploadAsync(factory.ClientFor(grace), page.Id, "plan.jpg", TestImages.Jpeg())).Content.ReadFromJsonAsync<Uploaded>())!;
         var global = await factory.AddNoteAsync(grace, "Playbook", "Global");
-        var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), Role.CityLead);
+        var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead);
 
         Assert.Equal(HttpStatusCode.NotFound, (await marcus.GetAsync($"/api/notes/{page.Id}/images/{image.ImageId}")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await UploadAsync(marcus, page.Id, "x.png", TestImages.Png())).StatusCode);

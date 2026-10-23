@@ -65,7 +65,7 @@ public class ArchiveNotesTests(CommunityApiFactory factory) : IClassFixture<Comm
         var owner = factory.ClientFor(grace);
         var playbook = await factory.AddNoteAsync(grace, "Playbook", "Global");
         var child = await owner.CreateNoteAsync("Run sheet", playbook.Id);
-        var staff = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), Role.Staff);
+        var staff = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), SeededRole.Staff);
 
         Assert.Equal(HttpStatusCode.Forbidden, (await staff.PostAsync($"/api/notes/{playbook.Id}/archive", null)).StatusCode);
         await owner.PostAsync($"/api/notes/{playbook.Id}/archive", null);
