@@ -59,12 +59,12 @@ describe('LandingPage', () => {
     return el;
   }
 
-  it('names the community in the page heading', async () => {
+  it('welcomes the visitor in the page heading', async () => {
     const fixture = TestBed.createComponent(LandingPage);
     await fixture.whenStable();
 
     const heading = (fixture.nativeElement as HTMLElement).querySelector('h1');
-    expect(heading?.textContent?.trim()).toBe('Builds software. Builds community.');
+    expect(heading?.textContent?.trim()).toBe('Let’s build great products together. Welcome.');
   });
 
   it('hands a signed-in visitor to the community app with the page they asked for', async () => {

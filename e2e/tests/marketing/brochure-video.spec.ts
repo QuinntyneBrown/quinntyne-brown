@@ -17,7 +17,7 @@ test.describe('Brochure video', () => {
     expect(state).toMatchObject({ paused: true, autoplay: false, controls: true });
     expect(state.poster).toMatch(/brochure-poster\.jpg$/);
     expect(state.captions).toEqual([{ kind: 'captions', language: 'en', mode: 'showing' }]);
-    await expect(marketing.videoCaption).toContainText('captions on');
+    await expect(page.locator('figure figcaption')).toHaveCount(0);
     await axe.check();
   });
 

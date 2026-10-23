@@ -8,7 +8,6 @@ export const MARKETING_URL = process.env['E2E_MARKETING_URL'] ?? 'http://localho
 /** The public marketing page at www.faithtech.community (docs/mocks/pages/marketing). */
 export class MarketingPage {
   readonly heading: Locator;
-  readonly eyebrow: Locator;
   readonly lead: Locator;
   readonly topBar: Locator;
   readonly topBarJoin: Locator;
@@ -19,7 +18,6 @@ export class MarketingPage {
   readonly callToActionJoin: Locator;
   readonly footer: Locator;
   readonly video: Locator;
-  readonly videoCaption: Locator;
   readonly transcriptToggle: Locator;
   readonly videoUnavailable: Locator;
   readonly videoPoster: Locator;
@@ -55,7 +53,6 @@ export class MarketingPage {
   readonly figures: Locator;
   readonly employers: Locator;
   readonly building: Locator;
-  readonly buildingEyebrow: Locator;
   readonly projects: Locator;
   readonly allOnGitHub: Locator;
   /** The level-2 headings of the sections under the hero, in page order. */
@@ -64,10 +61,9 @@ export class MarketingPage {
   constructor(private readonly page: Page) {
     this.heading = page.getByRole('heading', {
       level: 1,
-      name: 'Builds software. Builds community.',
+      name: 'Let’s build great products together. Welcome.',
     });
-    this.eyebrow = page.getByRole('main').getByText('Quinntyne Brown', { exact: true });
-    this.lead = page.getByText(/^I’m Quinntyne Brown: a Christian, a Chief Product Officer/);
+    this.lead = page.getByText(/^I’m Quinntyne Brown — a Christian, a founder who builds/);
     this.topBar = page.getByRole('banner');
     this.topBarJoin = this.topBar.getByRole('button', { name: 'Join now' });
     this.topBarSignIn = this.topBar.getByRole('button', { name: 'Sign in' });
@@ -77,7 +73,6 @@ export class MarketingPage {
     this.callToActionJoin = this.callToAction.getByRole('button', { name: 'Join now' });
     this.footer = page.getByRole('contentinfo');
     this.video = page.locator('video');
-    this.videoCaption = page.locator('figure figcaption');
     this.transcriptToggle = page.getByText('Read the transcript');
     this.videoUnavailable = page.getByRole('status').filter({
       hasText: 'This video can’t play right now',
@@ -120,8 +115,9 @@ export class MarketingPage {
     this.employers = this.work
       .getByRole('list', { name: 'Where I’ve worked' })
       .getByRole('listitem');
-    this.building = page.getByRole('region', { name: 'Things I’m building.' });
-    this.buildingEyebrow = this.building.getByText('Pinned on GitHub', { exact: true });
+    this.building = page.getByRole('region', {
+      name: 'What I’m building in the open. Jump in anywhere.',
+    });
     this.projects = this.building.getByRole('listitem');
     this.allOnGitHub = this.building.getByRole('link', { name: 'All on GitHub' });
     this.sectionHeadings = main.locator('h2:not(ft-landing-hero h2)');
@@ -217,13 +213,16 @@ export class MarketingPage {
     );
   }
 
-  /** Each project card's one link (its name and where it goes) and its language. */
-  async projectCards(): Promise<{ name: string; href: string; language: string; links: number }[]> {
+  /** Each project card's one link (its name and where it goes), its language and description. */
+  async projectCards(): Promise<
+    { name: string; href: string; language: string; description: string; links: number }[]
+  > {
     return this.projects.evaluateAll((items) =>
       items.map((item) => ({
         name: item.querySelector('a')?.textContent?.trim() ?? '',
         href: item.querySelector('a')?.getAttribute('href') ?? '',
         language: item.querySelector('.project-card__language')?.textContent?.trim() ?? '',
+        description: item.querySelector('.project-card__description')?.textContent?.trim() ?? '',
         links: item.querySelectorAll('a').length,
       })),
     );

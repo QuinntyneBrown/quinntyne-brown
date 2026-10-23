@@ -10,7 +10,6 @@ test.describe('Marketing page', () => {
     await marketing.open();
 
     await expect(marketing.heading).toBeVisible();
-    await expect(marketing.eyebrow).toBeVisible();
     await expect(marketing.lead).toBeVisible();
     await expect(marketing.topBarJoin).toBeVisible();
     await expect(marketing.topBarSignIn).toBeVisible();
@@ -33,7 +32,6 @@ test.describe('Marketing page', () => {
 
     await marketing.open();
 
-    await expect(marketing.eyebrow).toBeVisible();
     await expect(marketing.heading).toBeVisible();
     await expect(marketing.lead).toBeVisible();
     await expect(marketing.linkedIn).toHaveAttribute(
@@ -86,26 +84,52 @@ test.describe('Marketing page', () => {
   });
 
   // Traces to: L2-132 AC4
-  test('things I’m building lists the pinned projects, each linking to GitHub', async ({
+  test('what I’m building in the open lists the pinned projects, each linking to GitHub', async ({
     page,
   }) => {
     const marketing = new MarketingPage(page);
 
     await marketing.open();
 
-    await expect(marketing.buildingEyebrow).toBeVisible();
+    await expect(marketing.building).toBeVisible();
     expect(await marketing.projectCards()).toEqual(
       [
-        ['Shelfie', 'shelfie', 'TypeScript · .NET'],
-        ['Saturdaze', 'saturdaze', 'TypeScript · .NET'],
-        ['TwinkleTune', 'TwinkleTune', 'TypeScript · .NET'],
-        ['Fullstack with Claude', 'fullstack-with-claude', 'Python'],
-        ['Loupe', 'loupe', 'C# · TypeScript'],
-        ['Studio', 'quinntyne-brown-studio', 'C# · TypeScript · Azure'],
-      ].map(([name, repo, language]) => ({
+        [
+          'Shelfie',
+          'shelfie',
+          'TypeScript · .NET',
+          'A reading habit tracker for a young reader, with parent rewards.',
+        ],
+        ['Saturdaze', 'saturdaze', 'TypeScript · .NET', 'A weekend planner for a family of four.'],
+        [
+          'TwinkleTune',
+          'TwinkleTune',
+          'TypeScript · .NET',
+          'A singing buddy for kids. Every song is tuned to their voice.',
+        ],
+        [
+          'Fullstack with Claude',
+          'fullstack-with-claude',
+          'Python',
+          'A narrated video series on building a full-stack app with Claude.',
+        ],
+        [
+          'Loupe',
+          'loupe',
+          'C# · TypeScript',
+          'AI critiques for photographers, plus a library of the work that inspires them.',
+        ],
+        [
+          'Studio',
+          'quinntyne-brown-studio',
+          'C# · TypeScript · Azure',
+          'Photography studio platform: galleries, quotes, client albums, prints.',
+        ],
+      ].map(([name, repo, language, description]) => ({
         name,
         href: `https://github.com/QuinntyneBrown/${repo}`,
         language,
+        description,
         links: 1,
       })),
     );
@@ -123,7 +147,7 @@ test.describe('Marketing page', () => {
 
     await expect(marketing.sectionHeadings).toHaveText([
       'Fifteen years shipping.',
-      'Things I’m building.',
+      'What I’m building in the open. Jump in anywhere.',
       'Why join',
       'Ready to build with us?',
     ]);

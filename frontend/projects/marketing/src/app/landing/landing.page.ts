@@ -96,26 +96,47 @@ export class LandingPage implements OnInit {
   ];
   protected readonly employers = ['MDA', 'Protiviti', 'RBC Ventures', 'AutoTrader.ca', 'Corus'];
   protected readonly projects = [
-    { name: 'Shelfie', repo: 'shelfie', language: 'TypeScript · .NET', image: 'shelfie' },
-    { name: 'Saturdaze', repo: 'saturdaze', language: 'TypeScript · .NET', image: 'saturdaze' },
+    {
+      name: 'Shelfie',
+      repo: 'shelfie',
+      language: 'TypeScript · .NET',
+      image: 'shelfie',
+      description: 'A reading habit tracker for a young reader, with parent rewards.',
+    },
+    {
+      name: 'Saturdaze',
+      repo: 'saturdaze',
+      language: 'TypeScript · .NET',
+      image: 'saturdaze',
+      description: 'A weekend planner for a family of four.',
+    },
     {
       name: 'TwinkleTune',
       repo: 'TwinkleTune',
       language: 'TypeScript · .NET',
       image: 'twinkletune',
+      description: 'A singing buddy for kids. Every song is tuned to their voice.',
     },
     {
       name: 'Fullstack with Claude',
       repo: 'fullstack-with-claude',
       language: 'Python',
       image: 'fullstack-with-claude',
+      description: 'A narrated video series on building a full-stack app with Claude.',
     },
-    { name: 'Loupe', repo: 'loupe', language: 'C# · TypeScript', image: 'loupe' },
+    {
+      name: 'Loupe',
+      repo: 'loupe',
+      language: 'C# · TypeScript',
+      image: 'loupe',
+      description: 'AI critiques for photographers, plus a library of the work that inspires them.',
+    },
     {
       name: 'Studio',
       repo: 'quinntyne-brown-studio',
       language: 'C# · TypeScript · Azure',
       image: 'studio',
+      description: 'Photography studio platform: galleries, quotes, client albums, prints.',
     },
   ];
 
