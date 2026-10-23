@@ -201,7 +201,7 @@ All backend tests MUST use a fake database: the EF Core in-memory provider, with
 - Use the Page Object Model. Each screen has one page object, which owns its selectors and interactions. Tests state intent; page objects know the DOM. Never put a selector in a test.
 - Run frontend tests in Chromium only. Do not configure or run Firefox, WebKit or any other browser.
 - Run axe accessibility checks on every screen.
-- Journey demo videos (`docs/videos/journeys/`) are recorded by `pwsh eng/videos/Record-JourneyVideos.ps1`. Their stories reuse `e2e/pages/` and `e2e/fixtures/`, but they are recordings, not tests: keep them out of `e2e/tests/` and the acceptance run. Re-record a journey when its screens change.
+- Journey demo videos (`docs/videos/journeys/`) are recorded by `pwsh eng/videos/Record-JourneyVideos.ps1`. Their stories reuse `e2e/pages/` and `e2e/fixtures/`, but they are recordings, not tests: keep them out of `e2e/tests/` and the acceptance run. Re-record a journey when its screens change. Journey videos have NO captions by default: no caption overlay, no burned-in subtitles, no `captions.vtt` or `<track>` unless the user explicitly asks for them. Narration audio stays.
 
 ### The backend is faked (MANDATORY)
 

@@ -50,7 +50,7 @@ test('people-directory', async ({ page, api }) => {
   );
 
   await show.step('protected-roles', async () => {
-    await expect(people.row('Daniel Reyes')).toContainText('Only System Admin can change');
+    await expect(people.row('Daniel Reyes')).toContainText('Only an Org Lead or above can change');
     await expect(people.removeRole('Daniel Reyes')).toHaveCount(0);
   });
 

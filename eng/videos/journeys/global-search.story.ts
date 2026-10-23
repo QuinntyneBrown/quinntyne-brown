@@ -49,7 +49,7 @@ test('global-search', async ({ page, api }) => {
   );
 
   await show.step('intro', async () => {
-    await expect(search.emptyState).toContainText('Search all of FaithTech');
+    await expect(search.emptyState).toContainText('Search all of Quinntyne Brown');
   });
 
   await show.step(

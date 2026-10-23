@@ -74,7 +74,7 @@ export class Presenter {
     return this.manifest.title;
   }
 
-  /** A full-screen card with the FaithTech logo, narrated by the paragraph `id`. */
+  /** A full-screen card with the logo, narrated by the paragraph `id`. */
   async card(
     id: string,
     kind: 'opening' | 'closing',
@@ -263,7 +263,7 @@ function installOverlay(): void {
       const kicker = document.createElement('div');
       kicker.className = 'kicker';
       kicker.textContent =
-        s.card.kind === 'opening' ? 'FaithTech Community · Journey' : 'What you saw';
+        s.card.kind === 'opening' ? 'Quinntyne Brown Community · Journey' : 'What you saw';
       const title = document.createElement('h1');
       title.textContent = s.card.title;
       const list = document.createElement('ul');

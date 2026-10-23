@@ -20,7 +20,7 @@ test('docs-and-notes', async ({ page, api }) => {
     roles: ['EventLead'],
   });
   api.notes.add(
-    { title: 'Hackathon judging how-to', ownerId: marcus.profileId, visibility: 'Global' },
+    { title: 'Hackathon judging how-to', ownerId: marcus.profileId, visibility: 'OrgWide' },
     3,
   );
   const checklist = api.notes.add(

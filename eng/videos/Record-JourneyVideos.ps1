@@ -205,7 +205,7 @@ function Complete-Video([string] $Slug) {
             '-map', '[out]', '-ac', '1', '-c:a', 'libopus', '-b:a', '48k', $audio)) | Out-Null
 
     # Chapters (FFMETADATA) and WebVTT captions from the same corrected times.
-    $meta = @(';FFMETADATA1', "title=FaithTech Community: $($manifest.title)")
+    $meta = @(';FFMETADATA1', "title=Quinntyne Brown Community: $($manifest.title)")
     $vtt = @('WEBVTT', '')
     for ($i = 0; $i -lt $steps.Count; $i++) {
         $start = $steps[$i].start

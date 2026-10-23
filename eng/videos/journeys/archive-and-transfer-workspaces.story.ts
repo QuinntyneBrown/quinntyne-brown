@@ -91,7 +91,7 @@ test('archive-and-transfer-workspaces', async ({ page, api }) => {
       });
       api.agile.addWorkspace({ name: 'Austin team', ownerId: kofi.profileId });
       await api.signInAs(priya, '/admin/users');
-      await expect(admin.needsOwner).toContainText('no longer holds the City Lead role');
+      await expect(admin.needsOwner).toContainText('can no longer own workspaces but owns');
     },
     { poster: true },
   );

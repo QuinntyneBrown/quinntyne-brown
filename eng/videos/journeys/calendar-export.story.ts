@@ -47,6 +47,11 @@ test('calendar-export', async ({ page, api }) => {
   );
 
   await show.step('public-download', async () => {
+    // A visitor is signed out: the org-addressed address shows the member page to someone signed in.
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
     await publicPage.open(event.id);
     await expect(publicPage.heading).toHaveText('Toronto Builders Night');
     const [file] = await Promise.all([
@@ -59,7 +64,7 @@ test('calendar-export', async ({ page, api }) => {
   await show.step('cancelled-update', async () => {
     event.isCancelled = true;
     event.sequence++;
-    await eventPage.open(event.id);
+    await api.signInAs(leah, `/events/${event.id}`);
     await expect(eventPage.updateCalendar).toBeVisible();
     const [file] = await Promise.all([
       page.waitForEvent('download'),
