@@ -177,6 +177,7 @@ export class MockApi {
       const account = this.accounts.get(email.toLowerCase());
       return account?.verified ? account.profileId : undefined;
     },
+    (slug) => this.organizations.publicOrg(slug),
   );
   /** In-app notifications (L2-027) for the bell, the notifications page and home's Recent activity. */
   readonly notifications = new MockNotifications(() => this.now);
@@ -482,6 +483,9 @@ export class MockApi {
       url.pathname,
     );
     if (members) return this.members(route, method, url, members, body, authorization);
+    const branding = /^\/api\/organizations\/([^/]+)\/branding(\/logo)?$/.exec(url.pathname);
+    if (branding)
+      return this.branding(route, method, branding[1], !!branding[2], body, authorization);
     const inviteAction = /^\/api\/invites\/([^/]+)\/(resend|revoke)$/.exec(url.pathname);
     if (method === 'POST' && inviteAction) {
       return this.inviteAction(route, inviteAction[1], inviteAction[2], authorization);
@@ -858,6 +862,39 @@ export class MockApi {
    * MembersHandler: an org's Org Lead, its Portfolio Lead or a System Admin lists, adds and
    * removes members (L2-143); anyone else 403, an uncovered org 404.
    */
+  /** PUT /api/organizations/{id}/branding and PUT or DELETE …/branding/logo (L2-149 AC4, AC5). */
+  private branding(
+    route: Route,
+    method: string,
+    orgId: string,
+    logo: boolean,
+    body: Record<string, unknown>,
+    authorization: string | undefined,
+  ) {
+    const caller = this.caller(authorization);
+    if (!caller) return route.fulfill({ status: 401 });
+    const covered = this.organizations.covered(caller).find((c) => c.org.id === orgId);
+    if (!covered) return route.fulfill({ status: 404 });
+    const lead =
+      caller.roles.includes('SystemAdmin') || covered.isPortfolioLead || covered.isOrgLead;
+    if (!lead) return route.fulfill({ status: 403 });
+    const org = covered.org;
+    if (logo && method === 'DELETE') {
+      org.logoUrl = null;
+      return route.fulfill({ status: 204 });
+    }
+    if (logo) {
+      org.logoUrl = `https://blobs.example/organizations/${org.id}/logo.png`;
+      return route.fulfill({ status: 200, json: this.organizations.brandingOf(org) });
+    }
+    const result = this.organizations.saveBranding(
+      org,
+      String(body['displayName'] ?? ''),
+      (body['accent'] as string | null) ?? null,
+    );
+    return route.fulfill(result);
+  }
+
   private members(
     route: Route,
     method: string,

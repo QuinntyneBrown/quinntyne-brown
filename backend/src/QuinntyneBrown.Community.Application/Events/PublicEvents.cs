@@ -1,7 +1,10 @@
 using System.Security.Cryptography;
 using System.Text;
 using QuinntyneBrown.Community.Application.Common;
+using QuinntyneBrown.Community.Application.Organizations;
+using QuinntyneBrown.Community.Application.Profiles;
 using QuinntyneBrown.Community.Domain.Events;
+using QuinntyneBrown.Community.Domain.Organizations;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -25,7 +28,14 @@ public record PublicEventDto(
     int RsvpCount,
     bool IsFull,
     bool IsCancelled,
-    string? CancellationReason);
+    string? CancellationReason,
+    PublicOrgDto Organization);
+
+/// <summary>
+/// The org a public event belongs to, with the light branding its page applies (L2-149, ADR 0037). The page redirects
+/// an alias to <see cref="Slug"/>.
+/// </summary>
+public record PublicOrgDto(string Slug, IReadOnlyList<string> Aliases, string DisplayName, string? LogoUrl, string? Accent, string? AccentForeground);
 
 public record GuestRsvpCommand(string? Name, string? Email);
 
@@ -71,16 +81,32 @@ public class PublicEventsHandler(
     RsvpHandler rsvps,
     IEmailQueue emails,
     IOptions<WebAppOptions> webApp,
+    IPhotoStorage storage,
     TimeProvider time)
 {
     public async Task<PublicEventDto?> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var e = await FindAsync(id, tracked: false, cancellationToken);
-        return e is null
-            ? null
-            : new PublicEventDto(
-                e.Id, e.Title, e.Description, e.Type.ToString(), e.StartsAt, e.EndsAt, e.City, e.Format.ToString(), e.Venue,
-                e.RsvpCount, e.IsFull, e.IsCancelled, e.CancellationReason);
+        if (e is null)
+        {
+            return null;
+        }
+
+        var org = await db.Organizations.AsNoTracking().SingleAsync(o => o.Id == e.OrganizationId, cancellationToken);
+        var aliases = await db.OrgSlugAliases.AsNoTracking().Where(a => a.OrganizationId == org.Id).Select(a => a.Slug).OrderBy(a => a).ToListAsync(cancellationToken);
+        return new PublicEventDto(
+            e.Id, e.Title, e.Description, e.Type.ToString(), e.StartsAt, e.EndsAt, e.City, e.Format.ToString(), e.Venue,
+            e.RsvpCount, e.IsFull, e.IsCancelled, e.CancellationReason,
+            new PublicOrgDto(
+                org.Slug, aliases, org.ShownName, org.LogoBlobName is { } logo ? storage.GetReadUrl(logo) : null, org.AccentColour,
+                org.AccentColour is { } accent ? AccentContrast.ForegroundFor(accent) : null));
+    }
+
+    /// <summary>The org-addressed page of a public event (L2-149 AC1).</summary>
+    public async Task<string> PageUrlAsync(Event e, CancellationToken cancellationToken = default)
+    {
+        var slug = await db.Organizations.Where(o => o.Id == e.OrganizationId).Select(o => o.Slug).SingleAsync(cancellationToken);
+        return $"{webApp.Value.Origin}/o/{slug}/events/{e.Id}";
     }
 
     /// <summary>One RSVP per event and email, whatever its case (AC5); each RSVP sends a fresh confirmation and cancel link.</summary>
@@ -106,7 +132,7 @@ public class PublicEventsHandler(
 
         // The RSVP and its confirmation commit together (L2-028).
         var origin = webApp.Value.Origin;
-        emails.Enqueue(rsvps.Confirmation(e, rsvp.GuestEmail!, $"{origin}/public/events/{e.Id}",
+        emails.Enqueue(rsvps.Confirmation(e, rsvp.GuestEmail!, await PageUrlAsync(e, cancellationToken),
             $"Can’t come after all? Cancel your RSVP: {origin}/public/events/{e.Id}/cancel-rsvp?token={token}"));
         await db.SaveChangesAsync(cancellationToken);
         return Result.Ok();
@@ -133,10 +159,19 @@ public class PublicEventsHandler(
         return Result.Ok();
     }
 
-    private Task<Event?> FindAsync(Guid id, bool tracked, CancellationToken cancellationToken)
+    // An org that is archived or has events off has no public events (L2-149 AC7, L2-147).
+    public async Task<Event?> FindAsync(Guid id, bool tracked, CancellationToken cancellationToken)
     {
         var events = tracked ? db.Events : db.Events.AsNoTracking();
-        return events.Include(x => x.Rsvps)
+        var e = await events.Include(x => x.Rsvps)
             .SingleOrDefaultAsync(x => x.Id == id && x.Visibility == EventVisibility.Public, cancellationToken);
+        if (e is null)
+        {
+            return null;
+        }
+
+        var org = await db.Organizations.AsNoTracking().SingleOrDefaultAsync(o => o.Id == e.OrganizationId && o.ArchivedAtUtc == null, cancellationToken);
+        var type = org is null ? null : await db.OrgTypes.AsNoTracking().SingleOrDefaultAsync(t => t.Id == org.OrgTypeId, cancellationToken);
+        return type is not null && type.IsEnabled(Features.Events) ? e : null;
     }
 }

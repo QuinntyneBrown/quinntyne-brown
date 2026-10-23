@@ -27,6 +27,13 @@
   }
   @case ('loaded') {
     @if (event(); as e) {
+      <ft-org-band
+        class="band"
+        [name]="e.organization.displayName"
+        [logoUrl]="e.organization.logoUrl"
+        [accent]="e.organization.accent"
+        [accentForeground]="e.organization.accentForeground"
+      />
       <ft-page-header [overline]="overline()" [title]="e.title" [subtitle]="subtitle()">
         <ft-button ftPageHeaderActions [href]="calendarUrl()">
           <ft-icon name="export" />

@@ -7,6 +7,7 @@ import {
   legacySection,
   orgGuard,
   orgRedirectGuard,
+  publicEventMatch,
 } from './guards';
 import {
   AuthCallbackPage,
@@ -106,6 +107,14 @@ export const routes: Routes = [
   { path: 'verify-email', component: VerifyEmailPage },
   { path: 'forgot-password', component: ForgotPasswordPage },
   { path: 'reset-password', component: ResetPasswordPage },
+  // A public event's page is addressed by its org (L2-149); /public/events/:id redirects there.
+  {
+    path: 'o',
+    component: PublicShellComponent,
+    canMatch: [publicEventMatch],
+    loadChildren: () =>
+      import('@faithtech-community/events').then((m) => m.ORG_PUBLIC_EVENT_ROUTES),
+  },
   {
     path: 'public/events',
     component: PublicShellComponent,

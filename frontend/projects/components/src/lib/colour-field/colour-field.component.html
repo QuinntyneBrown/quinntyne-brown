@@ -1,0 +1,28 @@
+<div class="colour-field__row">
+  <input
+    class="colour-field__swatch"
+    type="color"
+    tabindex="-1"
+    aria-label="Pick the accent colour"
+    [value]="colour() ?? '#000000'"
+    [disabled]="hex.disabled"
+    (input)="pick($event)"
+  />
+  <ft-text-field class="colour-field__hex" placeholder="#RRGGBB" [formControl]="hex" />
+  <!-- A pair below 4.5:1 is never shown as text on the accent. -->
+  @if (colour() && passes()) {
+    <span class="colour-field__preview" aria-hidden="true" [style]="previewStyle()"
+      >Aa {{ previewText() }}</span
+    >
+  }
+</div>
+@if (colour()) {
+  <p class="colour-field__ratio" aria-live="polite">
+    <span>{{ ratioText() }}</span>
+    @if (passes()) {
+      <ft-badge variant="success">Passes AA</ft-badge>
+    } @else {
+      <ft-badge variant="danger">Below 4.5:1</ft-badge>
+    }
+  </p>
+}

@@ -61,6 +61,11 @@ public static class DependencyInjection
         services.AddScoped<ResolveOrgSlugHandler>();
         services.AddScoped<MyWorkHandler>();
         services.AddScoped<MembersHandler>();
+        services.AddScoped<BrandingHandler>();
+        services.AddScoped<OrgTypesHandler>();
+        services.AddScoped<OrganizationAdminHandler>();
+        services.AddScoped<CrossOrgRolesHandler>();
+        services.AddScoped<AgentsHandler>();
         services.AddScoped<ProfileRoles>();
         services.AddScoped<PermissionHolders>();
         services.AddScoped<WorkEligibility>();

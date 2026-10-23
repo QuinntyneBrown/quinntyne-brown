@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--layout-margin);
+  background: var(--color-org-accent);
+  color: var(--color-org-accent-foreground);
+  font: var(--text-label);
+}
+
+.org-mark {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--size-avatar-md);
+  block-size: var(--size-avatar-md);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-bg-surface);
+  color: var(--color-fg-default);
+  font: var(--text-label);
+  font-size: var(--font-size-sm);
+  line-height: 1;
+
+  &::before {
+    content: attr(data-initials);
+  }
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}

@@ -22,6 +22,14 @@ function publicEvent(overrides: Partial<PublicEventDto> = {}): PublicEventDto {
     isFull: false,
     isCancelled: false,
     cancellationReason: null,
+    organization: {
+      slug: 'faithtech-toronto',
+      aliases: ['toronto'],
+      displayName: 'FaithTech Toronto',
+      logoUrl: null,
+      accent: '#0b6e4f',
+      accentForeground: '#ffffff',
+    },
     ...overrides,
   };
 }
@@ -31,7 +39,7 @@ interface Overrides {
   rsvpAsGuest?: () => Observable<void>;
 }
 
-async function setup(overrides: Overrides = {}) {
+async function setup(overrides: Overrides = {}, orgSlug: string | null = 'faithtech-toronto') {
   const service = {
     getPublicEvent: vi.fn(overrides.getPublicEvent ?? (() => of(publicEvent()))),
     rsvpAsGuest: vi.fn(overrides.rsvpAsGuest ?? (() => of(undefined))),
@@ -44,6 +52,7 @@ async function setup(overrides: Overrides = {}) {
   const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
   const fixture = TestBed.createComponent(PublicEventPage);
   fixture.componentRef.setInput('id', 'e1');
+  fixture.componentRef.setInput('orgSlug', orgSlug ?? undefined);
   const settle = async () => {
     for (let i = 0; i < 3; i++) {
       fixture.detectChanges();
@@ -77,6 +86,29 @@ async function setup(overrides: Overrides = {}) {
 }
 
 describe('PublicEventPage', () => {
+  it('shows the org band on the accent through the scoped tokens (L2-149 AC1, AC6)', async () => {
+    const { host } = await setup();
+    const band = host.querySelector<HTMLElement>('ft-org-band')!;
+    expect(band.textContent).toContain('FaithTech Toronto');
+    expect(band.style.getPropertyValue('--color-org-accent')).toBe('#0b6e4f');
+  });
+
+  it('redirects the old address to the org address (L2-149 AC2)', async () => {
+    const { navigate } = await setup({}, null);
+    expect(navigate).toHaveBeenCalledWith('/o/faithtech-toronto/events/e1', { replaceUrl: true });
+  });
+
+  it('redirects an old slug to the current one (L2-149 AC2)', async () => {
+    const { navigate } = await setup({}, 'toronto');
+    expect(navigate).toHaveBeenCalledWith('/o/faithtech-toronto/events/e1', { replaceUrl: true });
+  });
+
+  it('shows the not-found page for another org’s slug (L2-149 AC3)', async () => {
+    const { navigate, host } = await setup({}, 'shelfie');
+    expect(navigate).toHaveBeenCalledWith('/not-found', { skipLocationChange: true });
+    expect(host.querySelector('ft-org-band')).toBeNull();
+  });
+
   it('shows a public event to anyone, with the guest RSVP form (AC1)', async () => {
     const page = await setup();
 

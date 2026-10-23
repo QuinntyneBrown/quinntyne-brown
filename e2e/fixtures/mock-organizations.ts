@@ -17,6 +17,28 @@ export interface MockOrg {
   logoUrl?: string | null;
   accent?: string | null;
   accentForeground?: string | null;
+  archived?: boolean;
+}
+
+/** WCAG 2.2 contrast, as AccentContrast computes it. */
+function ratio(a: string, b: string): number {
+  const lum = (hex: string) => {
+    const c = (i: number) => {
+      const v = parseInt(hex.slice(i, i + 2), 16) / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * c(1) + 0.7152 * c(3) + 0.0722 * c(5);
+  };
+  const [x, y] = [lum(a), lum(b)];
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
+
+function foregroundOf(accent: string): string {
+  return ratio(accent, '#ffffff') >= ratio(accent, '#111111') ? '#ffffff' : '#111111';
+}
+
+function bestRatio(accent: string): number {
+  return Math.floor(Math.max(ratio(accent, '#ffffff'), ratio(accent, '#111111')) * 100) / 100;
 }
 
 /** The parts of an account the resolver reads; see MockAccount in mock-api.ts. */
@@ -304,6 +326,65 @@ export class MockOrganizations {
     const org = this.bySlug(from)!;
     org.aliases.push(from);
     org.slug = to;
+  }
+
+  /** Sets an org's light branding, as its Org Lead would save it (L2-149). */
+  brand(
+    slug: string,
+    branding: Pick<MockOrg, 'displayName' | 'logoUrl' | 'accent' | 'accentForeground'>,
+  ): void {
+    Object.assign(this.bySlug(slug)!, branding);
+  }
+
+  /** The org's branding as BrandingDto, with the accent's best ratio. */
+  brandingOf(org: MockOrg) {
+    return {
+      displayName: org.displayName ?? org.name,
+      logoUrl: org.logoUrl ?? null,
+      accent: org.accent ?? null,
+      accentForeground: org.accentForeground ?? null,
+      contrastRatio: org.accent ? bestRatio(org.accent) : null,
+    };
+  }
+
+  /** SaveBrandingHandler: 1 to 80 characters, #rrggbb, and 4.5:1 with white or #111111. */
+  saveBranding(
+    org: MockOrg,
+    displayName: string,
+    accent: string | null,
+  ): { status: number; json: unknown } {
+    const name = displayName.trim();
+    const colour = accent?.trim().toLowerCase() || null;
+    const errors: Record<string, string[]> = {};
+    if (!name || name.length > 80)
+      errors['displayName'] = ['Enter a display name of 80 characters or fewer.'];
+    if (colour && !/^#[0-9a-f]{6}$/.test(colour)) errors['accent'] = ['Enter a colour as #rrggbb.'];
+    else if (colour && bestRatio(colour) < 4.5) {
+      errors['accent'] = [
+        "This colour doesn't have enough contrast. Choose a darker or lighter shade.",
+      ];
+      return { status: 400, json: { status: 400, errors, contrastRatio: bestRatio(colour) } };
+    }
+    if (Object.keys(errors).length) return { status: 400, json: { status: 400, errors } };
+    org.displayName = name;
+    org.accent = colour;
+    org.accentForeground = colour ? foregroundOf(colour) : null;
+    return { status: 200, json: this.brandingOf(org) };
+  }
+
+  /** The org a public event shows, or undefined when it is archived or has events off. */
+  publicOrg(slug: string) {
+    const org = this.bySlug(slug);
+    if (!org || org.archived || !org.features.includes('events')) return undefined;
+    const branding = this.brandingOf(org);
+    return {
+      slug: org.slug,
+      aliases: [...org.aliases],
+      displayName: branding.displayName,
+      logoUrl: branding.logoUrl,
+      accent: branding.accent,
+      accentForeground: branding.accentForeground,
+    };
   }
 
   /** Switches a feature off (or on) for every org of the org's type (ADR 0038). */

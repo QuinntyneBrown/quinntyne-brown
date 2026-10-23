@@ -3,6 +3,11 @@
   margin-block-start: var(--space-4);
 }
 
+.band {
+  margin-block-end: var(--space-4);
+  border-radius: var(--radius-md);
+}
+
 ft-page-header {
   display: block;
   margin-block-end: var(--space-4);

@@ -7,7 +7,7 @@ public static class ResultMapper
     public static IResult ToHttp(this Result result, Func<IResult> onOk) => result.Status switch
     {
         ResultStatus.Ok => onOk(),
-        ResultStatus.Invalid => Results.ValidationProblem(result.Errors!.ToDictionary()),
+        ResultStatus.Invalid => Results.ValidationProblem(result.Errors!.ToDictionary(), extensions: result.Extensions),
         ResultStatus.NotFound => result.Detail is null
             ? Results.NotFound()
             : Results.Problem(result.Detail, statusCode: StatusCodes.Status404NotFound),

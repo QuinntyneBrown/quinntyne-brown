@@ -9,14 +9,20 @@ test.describe('Visibility levels', () => {
     api,
     axe,
   }) => {
-    const quinn = api.addAccount({ email: 'quinn@example.org', name: 'Quinntyne Brown', portfolioLead: true });
+    const quinn = api.addAccount({
+      email: 'quinn@example.org',
+      name: 'Quinntyne Brown',
+      portfolioLead: true,
+    });
     const plan = api.notes.add({ title: 'Portfolio values', ownerId: quinn.profileId, blocks: [] });
     await api.signInAs(quinn, `/notes/${plan.id}`);
     const note = new NotePage(page);
 
     await note.share.click();
     const dialog = new ShareNoteDialog(page, 'Portfolio values');
-    await expect(dialog.visibility('OrgWide')).toHaveAccessibleName(/^Everyone in FaithTech Toronto/);
+    await expect(dialog.visibility('OrgWide')).toHaveAccessibleName(
+      /^Everyone in FaithTech Toronto/,
+    );
     await dialog.visibility('PortfolioWide').check();
     await axe.check();
     await dialog.save.click();

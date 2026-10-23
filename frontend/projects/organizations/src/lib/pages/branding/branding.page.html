@@ -1,0 +1,76 @@
+@if (!allowed()) {
+  <h1 class="visually-hidden">Organization settings</h1>
+  <ft-empty-state
+    heading="Only Org Leads change branding"
+    text="Ask your Org Lead to change the display name, logo or accent colour."
+  >
+    <ft-button actions variant="primary" href="/">Back to home</ft-button>
+  </ft-empty-state>
+} @else {
+  <ft-page-header title="Organization settings" [subtitle]="subtitle()" />
+  <ft-tabs label="Organization settings">
+    <ft-tab label="Members" [href]="'/o/' + (org()?.slug ?? '') + '/settings/members'" />
+    <ft-tab
+      label="Branding"
+      [href]="'/o/' + (org()?.slug ?? '') + '/settings/branding'"
+      [current]="true"
+    />
+  </ft-tabs>
+  <form class="form" novalidate (submit)="$event.preventDefault(); save()">
+    <ft-stack gap="4">
+      <ft-card heading="Branding">
+        <ft-stack gap="4">
+          <ft-form-field
+            label="Display name"
+            help="Shown in the switcher and on public event pages."
+            [error]="nameError()"
+          >
+            <ft-text-field [formControl]="displayName" [maxlength]="80" />
+          </ft-form-field>
+          <ft-file-dropzone
+            [heading]="logoUrl() ? 'Replace logo' : 'Upload logo'"
+            hint="PNG, JPEG or WebP, up to 2 MB. Shown square, at least 128 × 128 pixels."
+            [accept]="logoTypes"
+            [multiple]="false"
+            [invalid]="!!logoError()"
+            [disabled]="uploading()"
+            (filesChosen)="upload($event)"
+          />
+          @if (logoError()) {
+            <ft-inline-message role="alert">{{ logoError() }}</ft-inline-message>
+          }
+          @if (logoUrl()) {
+            <div>
+              <ft-button variant="ghost" (click)="removeLogo()">Remove logo</ft-button>
+            </div>
+          }
+          <ft-form-field
+            label="Accent colour"
+            [optional]="true"
+            help="Used behind your logo in the switcher and as the band on public event pages. Text on it is white or near-black, whichever reads better; it needs at least 4.5:1."
+            [error]="accentError()"
+          >
+            <ft-colour-field [previewText]="preview().name" [formControl]="accent" />
+          </ft-form-field>
+        </ft-stack>
+      </ft-card>
+      <ft-card heading="Preview">
+        <ft-stack gap="2">
+          <ft-org-band
+            [name]="preview().name"
+            caption="Public event"
+            [logoUrl]="logoUrl()"
+            [accent]="preview().accent"
+            [accentForeground]="preview().accentForeground"
+          />
+          <p class="caption">
+            How the band looks on public event pages and behind your logo in the switcher.
+          </p>
+        </ft-stack>
+      </ft-card>
+      <div>
+        <ft-button type="submit" variant="primary" [loading]="saving()">Save changes</ft-button>
+      </div>
+    </ft-stack>
+  </form>
+}

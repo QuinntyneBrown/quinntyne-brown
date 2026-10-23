@@ -65,6 +65,7 @@
       [href]="'/o/' + (org()?.slug ?? '') + '/settings/members'"
       [current]="true"
     />
+    <ft-tab label="Branding" [href]="'/o/' + (org()?.slug ?? '') + '/settings/branding'" />
   </ft-tabs>
   <form class="search" role="search" (submit)="$event.preventDefault(); search()">
     <ft-text-field

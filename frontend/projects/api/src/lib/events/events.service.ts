@@ -104,6 +104,18 @@ export interface PublicEventDto {
   isFull: boolean;
   isCancelled: boolean;
   cancellationReason: string | null;
+  organization: PublicOrgDto;
+}
+
+/** The org a public event belongs to and its branding (PublicOrgDto, L2-149). */
+export interface PublicOrgDto {
+  slug: string;
+  /** Old slugs, which redirect to `slug`. */
+  aliases: string[];
+  displayName: string;
+  logoUrl: string | null;
+  accent: string | null;
+  accentForeground: string | null;
 }
 
 export interface GuestRsvpRequest {

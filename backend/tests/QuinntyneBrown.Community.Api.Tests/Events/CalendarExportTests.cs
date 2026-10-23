@@ -82,7 +82,7 @@ public class CalendarExportTests(CommunityApiFactory factory) : IClassFixture<Co
         var lines = await LinesAsync(await factory.CreateClient().GetAsync($"/api/public/events/{existing.Id}/calendar.ics"));
 
         Assert.DoesNotContain(lines, l => l.Contains("meet.example.org", StringComparison.Ordinal));
-        Assert.Contains($"URL:{CommunityApiFactory.WebAppOrigin}/public/events/{existing.Id}", lines);
+        Assert.Contains($"URL:{CommunityApiFactory.WebAppOrigin}/o/faithtech-toronto/events/{existing.Id}", lines);
     }
 
     // AC2: Given an event that is changed or cancelled, when the .ics is downloaded again, then it carries a higher

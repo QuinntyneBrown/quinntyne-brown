@@ -17,6 +17,15 @@ export interface OrgMemberDto {
   joinedVia: 'Seed' | 'Invite' | 'ConnectLink' | 'Added';
 }
 
+/** An org's light branding as saved (BrandingDto, L2-149). */
+export interface BrandingDto {
+  displayName: string;
+  logoUrl: string | null;
+  accent: string | null;
+  accentForeground: string | null;
+  contrastRatio: number | null;
+}
+
 /**
  * Contract for the organization endpoints (L2-143, L2-156). Pages depend on ORGANIZATIONS_SERVICE,
  * never on HttpOrganizationsService.
@@ -28,6 +37,14 @@ export interface OrganizationsService {
   /** Removes the member and their roles there; 409 for the last Org Lead. */
   removeMember(orgId: string, profileId: string): Observable<void>;
   setOrgLead(orgId: string, profileId: string, isLead: boolean): Observable<void>;
+  /** 400 on `accent` with `contrastRatio` when the colour lacks contrast (L2-149 AC5). */
+  saveBranding(
+    orgId: string,
+    branding: { displayName: string; accent: string | null },
+  ): Observable<BrandingDto>;
+  /** A PNG, JPEG or WebP of at most 2 MB; 400 on `logo` otherwise. */
+  uploadLogo(orgId: string, file: File): Observable<BrandingDto>;
+  removeLogo(orgId: string): Observable<void>;
 }
 
 export const ORGANIZATIONS_SERVICE = new InjectionToken<OrganizationsService>(

@@ -24,6 +24,7 @@ import {
   FormErrorFocusDirective,
   FormFieldComponent,
   IconComponent,
+  OrgBandComponent,
   PageHeaderComponent,
   SkeletonComponent,
   SplitComponent,
@@ -63,6 +64,7 @@ const LABELS: Record<Field, string> = { name: 'Your name', email: 'Email' };
     FormErrorFocusDirective,
     FormFieldComponent,
     IconComponent,
+    OrgBandComponent,
     PageHeaderComponent,
     SkeletonComponent,
     SplitComponent,
@@ -80,6 +82,8 @@ export class PublicEventPage {
 
   /** Route parameter. */
   readonly id = input.required<string>();
+  /** Route parameter; absent on the old /public/events/:id address, which redirects (L2-149 AC2). */
+  readonly orgSlug = input<string | undefined>(undefined);
 
   protected readonly form = inject(NonNullableFormBuilder).group({ name: [''], email: [''] });
   protected readonly state = signal<State>('loading');
@@ -97,9 +101,8 @@ export class PublicEventPage {
   protected readonly signInHref = computed(
     () => `/sign-in?returnUrl=${encodeURIComponent(`/events/${this.id()}`)}`,
   );
-  protected readonly overline = computed(
-    () => `FaithTech ${this.event()?.city ?? ''} · Public event`,
-  );
+  protected readonly org = computed(() => this.event()?.organization ?? null);
+  protected readonly overline = computed(() => `${this.org()?.displayName ?? ''} · Public event`);
   protected readonly subtitle = computed(() => {
     const e = this.event();
     if (!e) return '';
@@ -168,6 +171,18 @@ export class PublicEventPage {
     try {
       const event = await firstValueFrom(this.events.getPublicEvent(id));
       if (id !== this.id()) return;
+      // The page lives at its org's current slug: the old address and old slugs redirect; another org's slug is
+      // not found (L2-149 AC2, AC3).
+      const org = event.organization;
+      const slug = this.orgSlug();
+      if (slug !== org.slug) {
+        if (slug === undefined || org.aliases.includes(slug)) {
+          await this.router.navigateByUrl(`/o/${org.slug}/events/${id}`, { replaceUrl: true });
+        } else {
+          await this.router.navigateByUrl('/not-found', { skipLocationChange: true });
+        }
+        return;
+      }
       this.event.set(event);
       this.state.set('loaded');
     } catch (error) {

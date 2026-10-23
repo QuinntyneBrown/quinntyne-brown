@@ -21,12 +21,13 @@ public static class EventClients
         Guid? createdBy = null,
         TimeSpan? lasts = null,
         IEnumerable<Guid>? members = null,
-        IEnumerable<(string Name, string Email)>? guests = null)
+        IEnumerable<(string Name, string Email)>? guests = null,
+        Guid? organizationId = null)
     {
         var now = factory.Time.GetUtcNow();
         var starts = now + startsIn;
         var created = new Event(
-            Infrastructure.Persistence.HierarchySeed.TorontoId,
+            organizationId ?? Infrastructure.Persistence.HierarchySeed.TorontoId,
             title,
             $"About {title}.",
             type,

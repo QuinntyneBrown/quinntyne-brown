@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { API_BASE_URL } from '../config';
 import { HANDLES_FORBIDDEN } from '../errors';
-import { OrgMemberDto, OrganizationsService } from './organizations.service';
+import { BrandingDto, OrgMemberDto, OrganizationsService } from './organizations.service';
 
 @Injectable()
 export class HttpOrganizationsService implements OrganizationsService {
@@ -35,6 +35,29 @@ export class HttpOrganizationsService implements OrganizationsService {
     return isLead
       ? this.http.put<void>(url, null, { context: this.context })
       : this.http.delete<void>(url, { context: this.context });
+  }
+
+  saveBranding(
+    orgId: string,
+    branding: { displayName: string; accent: string | null },
+  ): Observable<BrandingDto> {
+    return this.http.put<BrandingDto>(this.brandingUrl(orgId), branding, { context: this.context });
+  }
+
+  uploadLogo(orgId: string, file: File): Observable<BrandingDto> {
+    const form = new FormData();
+    form.append('file', file, file.name);
+    return this.http.put<BrandingDto>(`${this.brandingUrl(orgId)}/logo`, form, {
+      context: this.context,
+    });
+  }
+
+  removeLogo(orgId: string): Observable<void> {
+    return this.http.delete<void>(`${this.brandingUrl(orgId)}/logo`, { context: this.context });
+  }
+
+  private brandingUrl(orgId: string): string {
+    return `${this.base}/${encodeURIComponent(orgId)}/branding`;
   }
 
   private url(orgId: string): string {

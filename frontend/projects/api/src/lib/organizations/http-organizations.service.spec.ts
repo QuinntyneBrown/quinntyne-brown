@@ -37,4 +37,22 @@ describe('HttpOrganizationsService', () => {
       'PUT',
     );
   });
+
+  it('saves branding, uploads the logo as multipart and removes it', () => {
+    service.saveBranding('o1', { displayName: 'Toronto', accent: '#0b6e4f' }).subscribe();
+    service.uploadLogo('o1', new File(['x'], 'logo.png', { type: 'image/png' })).subscribe();
+    service.removeLogo('o1').subscribe();
+
+    const save = controller.expectOne(
+      (r) => r.method === 'PUT' && r.url === '/api/organizations/o1/branding',
+    );
+    expect(save.request.body).toEqual({ displayName: 'Toronto', accent: '#0b6e4f' });
+    const logo = controller.expectOne(
+      (r) => r.method === 'PUT' && r.url === '/api/organizations/o1/branding/logo',
+    );
+    expect((logo.request.body as FormData).get('file')).toBeInstanceOf(File);
+    expect(
+      controller.expectOne((r) => r.method === 'DELETE' && r.url.endsWith('/branding/logo')),
+    ).toBeTruthy();
+  });
 });

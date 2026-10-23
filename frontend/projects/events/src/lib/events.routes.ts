@@ -17,7 +17,12 @@ export const EVENTS_ROUTES: Routes = [
   { path: ':id/check-in', component: EventCheckInPage, title: 'Check-in' },
 ];
 
-/** Anonymous routes under /public/events (L2-023): the share page and the guest cancel link. */
+/** The anonymous share page at /o/{slug}/events/{id} (L2-149). */
+export const ORG_PUBLIC_EVENT_ROUTES: Routes = [
+  { path: ':orgSlug/events/:id', component: PublicEventPage, title: 'Event' },
+];
+
+/** Anonymous routes under /public/events (L2-023): the old share address, which redirects to the org address, and the guest cancel link. */
 export const PUBLIC_EVENT_ROUTES: Routes = [
   { path: ':id', component: PublicEventPage, title: 'Event' },
   { path: ':id/cancel-rsvp', component: GuestCancelRsvpPage, title: 'Cancel your RSVP' },
