@@ -32,7 +32,9 @@ test.describe('Marketing page', () => {
     await marketing.open();
 
     await expect(marketing.heading).toBeVisible();
-    await expect(marketing.lead).toBeVisible();
+    await expect(marketing.lead).toHaveText(
+      'I’m Quinntyne Brown — a Christian, a founder who builds and ships products. If we’re working on something together, this is where it lives: the people, the events, the notes and the backlog. Make a profile so we can stay connected.',
+    );
     await expect(marketing.linkedIn).toHaveAttribute(
       'href',
       'https://www.linkedin.com/in/quinntynebrown',
