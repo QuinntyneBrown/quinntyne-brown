@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Share an app idea · contact — QuinntyneBrown.Community mocks</title>
+<meta name="mock:kind" content="page">
+<meta name="mock:screen" content="share-idea">
+<meta name="mock:state" content="contact">
+<meta name="mock:requirements" content="">
+<meta name="description" content="Step 3 of 4: name, email and the best way to reach them.">
+<link rel="stylesheet" href="../../../design-system/tokens/tokens.css">
+<link rel="stylesheet" href="../../../design-system/assets/components.css">
+<link rel="stylesheet" href="../../assets/mock.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar"><a class="topbar__brand" href="../marketing/default.html"><img class="topbar__mark" src="../../assets/logo.svg" alt="" width="32" height="32"> Quinntyne Brown</a><span class="topbar__spacer"></span><button class="btn btn--sm" type="button" data-href="../marketing/default.html">Sign in</button></header>
+<main id="main" class="container wizard-page">
+  <section class="card stack wizard" aria-labelledby="step-title">
+      <p class="steps"><span class="steps__dots" aria-hidden="true"><span class="steps__dot steps__dot--done"></span><span class="steps__dot steps__dot--done"></span><span class="steps__dot steps__dot--current"></span><span class="steps__dot"></span></span>Step 3 of 4</p>
+      <h1 id="step-title">How can I reach you?</h1>
+      <form class="stack" action="review.html" method="get" novalidate>
+        <div class="field"><label class="field__label" for="si-name">Your name</label><input class="input input--lg" id="si-name" name="name" type="text" autocomplete="name" required value="Leah Thompson"></div>
+        <div class="field"><label class="field__label" for="si-email">Email</label><input class="input input--lg" id="si-email" name="email" type="email" autocomplete="email" required value="leah.thompson@example.org"></div>
+        <fieldset class="stack"><legend class="field__label">Best way to reach you</legend><div class="choice-row"><label class="choice"><input type="radio" name="contactBy" value="email" checked><span class="choice__text">Email</span></label><label class="choice"><input type="radio" name="contactBy" value="phone"><span class="choice__text">Phone</span></label><label class="choice"><input type="radio" name="contactBy" value="linkedin"><span class="choice__text">LinkedIn</span></label></div></fieldset>
+        <div class="wizard__actions"><button class="btn btn--primary btn--lg btn--block" type="submit">Continue</button><a class="btn btn--ghost" href="involvement.html">Back</a></div>
+      </form>
+  </section>
+</main>
+<footer class="site-footer"><div class="container site-footer__inner"><p>© 2026 Quinntyne Brown</p><ul class="site-footer__links"><li><button class="btn btn--ghost btn--sm" type="button" data-href="../marketing/sign-up.html">Create a profile</button></li><li><button class="btn btn--ghost btn--sm" type="button" data-href="../marketing/default.html">Sign in</button></li></ul></div></footer>
+<nav class="mock-bar" aria-label="Mock navigation">
+  <a class="mock-bar__home" href="../../index.html" aria-label="All mocks">⌂</a>
+  <span class="mock-bar__screen">Share an app idea</span>
+  <ul class="mock-bar__states"><li><a href="default.html">default</a></li><li><a href="idea-filled.html">idea-filled</a></li><li><a href="idea-invalid.html">idea-invalid</a></li><li><a href="idea-too-long.html">idea-too-long</a></li><li><a href="involvement.html">involvement</a></li><li><a href="contact.html" aria-current="page">contact</a></li><li><a href="contact-phone.html">contact-phone</a></li><li><a href="contact-linkedin.html">contact-linkedin</a></li><li><a href="contact-invalid.html">contact-invalid</a></li><li><a href="review.html">review</a></li><li><a href="challenge.html">challenge</a></li><li><a href="challenge-failed.html">challenge-failed</a></li><li><a href="busy.html">busy</a></li><li><a href="error.html">error</a></li><li><a href="rate-limited.html">rate-limited</a></li><li><a href="success.html">success</a></li></ul>
+  <button type="button" data-theme-toggle aria-pressed="false">☾ Dark</button>
+  <button type="button" data-chrome-toggle aria-label="Hide mock chrome">×</button>
+</nav>
+<script src="../../assets/mock.js"></script>
+</body>
+</html>

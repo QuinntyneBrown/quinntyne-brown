@@ -591,6 +591,13 @@ label.bubble__text { cursor: pointer; }
 .wizard__added { width: 100%; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-2); text-align: left; }
 .wizard__added li { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); background: var(--color-bg-subtle); border-radius: var(--radius-md); }
 .wizard__added .list__meta { margin-left: auto; }
+/* A wizard on its own public page (Share an app idea): one centred card, wider than the auth card,
+   with roomier padding and the question at h1 size from md up. */
+.wizard-page { max-width: 46rem; padding-block: var(--space-8) var(--space-16); }
+@media (min-width: 48rem) {
+  .wizard-page > .wizard { padding: var(--space-12); gap: var(--space-6); }
+  .wizard-page .wizard h1 { font: var(--text-h1); }
+}
 
 /* Achievement badges: what she has earned (name and day) and what is still to earn (name and how). */
 .achievements { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); }

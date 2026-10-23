@@ -16,19 +16,12 @@
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="topbar"><a class="topbar__brand" href="../marketing/default.html"><img class="topbar__mark" src="../../assets/logo.svg" alt="" width="32" height="32"> Quinntyne Brown</a><span class="topbar__spacer"></span><button class="btn btn--sm" type="button" data-href="../marketing/default.html">Sign in</button></header>
-<main id="main" class="container landing">
-  <div class="landing-hero__copy">
-    <p class="landing-hero__eyebrow">Got an app idea?</p>
-    <div class="cluster cluster--between">
-      <h1 class="landing-hero__title">Let’s build it together.</h1>
-      <p class="landing-hero__lead">Tell me everything. The more detail, the better. I love to collaborate.</p>
-    </div>
-  </div>
-  <section class="card" aria-labelledby="panel-title">
-    <div class="empty"><span class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></span>
-      <h2 class="empty__title" id="panel-title" tabindex="-1">Thanks, Leah. Got it.</h2>
-      <p class="empty__text">I read every idea. I’ll reply by email within a few days.</p>
-      <div class="empty__actions"><button class="btn btn--outline" type="button" data-href="default.html">Share another idea</button></div></div>
+<main id="main" class="container wizard-page">
+  <section class="card stack wizard" aria-labelledby="step-title">
+      <span class="empty__icon" aria-hidden="true"><svg class="icon icon--lg" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></span>
+      <h1 id="step-title" tabindex="-1">Thanks, Leah. Got it.</h1>
+      <p>I read every idea. I’ll reply by email within a few days.</p>
+      <div class="wizard__actions"><button class="btn btn--outline btn--lg" type="button" data-href="default.html">Share another idea</button></div>
   </section>
 </main>
 <footer class="site-footer"><div class="container site-footer__inner"><p>© 2026 Quinntyne Brown</p><ul class="site-footer__links"><li><button class="btn btn--ghost btn--sm" type="button" data-href="../marketing/sign-up.html">Create a profile</button></li><li><button class="btn btn--ghost btn--sm" type="button" data-href="../marketing/default.html">Sign in</button></li></ul></div></footer>
@@ -36,7 +29,7 @@
 <nav class="mock-bar" aria-label="Mock navigation">
   <a class="mock-bar__home" href="../../index.html" aria-label="All mocks">⌂</a>
   <span class="mock-bar__screen">Share an app idea</span>
-  <ul class="mock-bar__states"><li><a href="default.html">default</a></li><li><a href="filled.html">filled</a></li><li><a href="contact-phone.html">contact-phone</a></li><li><a href="contact-linkedin.html">contact-linkedin</a></li><li><a href="invalid.html">invalid</a></li><li><a href="too-long.html">too-long</a></li><li><a href="challenge.html">challenge</a></li><li><a href="challenge-failed.html">challenge-failed</a></li><li><a href="busy.html">busy</a></li><li><a href="success.html" aria-current="page">success</a></li><li><a href="error.html">error</a></li><li><a href="rate-limited.html">rate-limited</a></li></ul>
+  <ul class="mock-bar__states"><li><a href="default.html">default</a></li><li><a href="idea-filled.html">idea-filled</a></li><li><a href="idea-invalid.html">idea-invalid</a></li><li><a href="idea-too-long.html">idea-too-long</a></li><li><a href="involvement.html">involvement</a></li><li><a href="contact.html">contact</a></li><li><a href="contact-phone.html">contact-phone</a></li><li><a href="contact-linkedin.html">contact-linkedin</a></li><li><a href="contact-invalid.html">contact-invalid</a></li><li><a href="review.html">review</a></li><li><a href="challenge.html">challenge</a></li><li><a href="challenge-failed.html">challenge-failed</a></li><li><a href="busy.html">busy</a></li><li><a href="error.html">error</a></li><li><a href="rate-limited.html">rate-limited</a></li><li><a href="success.html" aria-current="page">success</a></li></ul>
   <button type="button" data-theme-toggle aria-pressed="false">☾ Dark</button>
   <button type="button" data-chrome-toggle aria-label="Hide mock chrome">×</button>
 </nav>

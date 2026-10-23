@@ -52,17 +52,21 @@
       "opens_from": "marketing",
       "states": [
         "default",
-        "filled",
+        "idea-filled",
+        "idea-invalid",
+        "idea-too-long",
+        "involvement",
+        "contact",
         "contact-phone",
         "contact-linkedin",
-        "invalid",
-        "too-long",
+        "contact-invalid",
+        "review",
         "challenge",
         "challenge-failed",
         "busy",
-        "success",
         "error",
-        "rate-limited"
+        "rate-limited",
+        "success"
       ],
       "not_applicable": {
         "loading": "A static public form; nothing is fetched before it renders.",
