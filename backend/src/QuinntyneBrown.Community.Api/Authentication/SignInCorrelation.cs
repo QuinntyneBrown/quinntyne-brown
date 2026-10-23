@@ -5,19 +5,18 @@ using Microsoft.AspNetCore.DataProtection;
 namespace QuinntyneBrown.Community.Api.Authentication;
 
 /// <summary>
-/// The Google sign-in correlation cookie (ADR 0019): the state, the nonce and where to land, protected so the
-/// browser can neither read nor forge it, kept for 10 minutes and deleted when Google sends the browser back.
+/// An external sign-in's correlation cookie (ADR 0019, ADR 0027): the state, the secret that binds the code to
+/// this browser and where to land, protected so the browser can neither read nor forge it, kept for 10 minutes
+/// and deleted when the provider sends the browser back. Each provider has its own cookie, path and purpose.
 /// </summary>
-public class GoogleCorrelation(IDataProtectionProvider dataProtection, TimeProvider time)
+public abstract class SignInCorrelation(IDataProtectionProvider dataProtection, TimeProvider time, string cookieName, string cookiePath, string purpose)
 {
-    public const string CookieName = "ftc.google";
-    public const string CookiePath = "/api/account/google";
     public static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(10);
 
-    private readonly ITimeLimitedDataProtector _protector =
-        dataProtection.CreateProtector("QuinntyneBrown.Community.GoogleSignIn").ToTimeLimitedDataProtector();
+    private readonly ITimeLimitedDataProtector _protector = dataProtection.CreateProtector(purpose).ToTimeLimitedDataProtector();
 
-    public record Pending(string State, string Nonce, string ReturnUrl, bool KeepSignedIn);
+    /// <param name="Secret">Google's nonce, or GitHub's PKCE code verifier.</param>
+    public record Pending(string State, string Secret, string ReturnUrl, bool KeepSignedIn);
 
     public static string NewSecret() => Base64Url(RandomNumberGenerator.GetBytes(32));
 
@@ -25,13 +24,13 @@ public class GoogleCorrelation(IDataProtectionProvider dataProtection, TimeProvi
     {
         var expires = time.GetUtcNow() + Lifetime;
         var value = _protector.Protect(JsonSerializer.Serialize(pending), expires);
-        context.Response.Cookies.Append(CookieName, value, new CookieOptions
+        context.Response.Cookies.Append(cookieName, value, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
-            // Lax: Google's redirect back is a top-level GET, so the cookie comes with it.
+            // Lax: the provider's redirect back is a top-level GET, so the cookie comes with it.
             SameSite = SameSiteMode.Lax,
-            Path = CookiePath,
+            Path = cookiePath,
             Expires = expires,
             IsEssential = true,
         });
@@ -40,8 +39,8 @@ public class GoogleCorrelation(IDataProtectionProvider dataProtection, TimeProvi
     /// <summary>Reads the pending sign-in and deletes the cookie, so a callback can be used once.</summary>
     public Pending? ReadAndClear(HttpContext context)
     {
-        var value = context.Request.Cookies[CookieName];
-        context.Response.Cookies.Delete(CookieName, new CookieOptions { Path = CookiePath, Secure = true, HttpOnly = true, SameSite = SameSiteMode.Lax });
+        var value = context.Request.Cookies[cookieName];
+        context.Response.Cookies.Delete(cookieName, new CookieOptions { Path = cookiePath, Secure = true, HttpOnly = true, SameSite = SameSiteMode.Lax });
         if (string.IsNullOrEmpty(value))
         {
             return null;
@@ -59,11 +58,19 @@ public class GoogleCorrelation(IDataProtectionProvider dataProtection, TimeProvi
         }
     }
 
-    /// <summary>Compares the state Google returned with the one sent, in constant time.</summary>
+    /// <summary>Compares the state the provider returned with the one sent, in constant time.</summary>
     public static bool StateMatches(Pending pending, string? state) =>
         state is not null && CryptographicOperations.FixedTimeEquals(
             System.Text.Encoding.UTF8.GetBytes(pending.State), System.Text.Encoding.UTF8.GetBytes(state));
 
     private static string Base64Url(byte[] bytes) =>
         Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+}
+
+/// <summary>The Google sign-in correlation cookie (ADR 0019).</summary>
+public class GoogleCorrelation(IDataProtectionProvider dataProtection, TimeProvider time)
+    : SignInCorrelation(dataProtection, time, CookieName, CookiePath, "QuinntyneBrown.Community.GoogleSignIn")
+{
+    public const string CookieName = "ftc.google";
+    public const string CookiePath = "/api/account/google";
 }

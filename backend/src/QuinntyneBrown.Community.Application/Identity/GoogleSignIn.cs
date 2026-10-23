@@ -1,9 +1,5 @@
 using QuinntyneBrown.Community.Application.Common;
-using QuinntyneBrown.Community.Application.Contacts;
-using QuinntyneBrown.Community.Application.Profiles;
 using QuinntyneBrown.Community.Domain.Identity;
-using QuinntyneBrown.Community.Domain.Profiles;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Identity;
@@ -43,10 +39,9 @@ public record GoogleSignInResult(CommunityUser? User, GoogleSignInError? Error)
 /// to an account whose email Google has verified; a new account has no role, a verified email and no password.
 /// </summary>
 public class GoogleSignInHandler(
-    UserManager<CommunityUser> users,
     IApplicationDbContext db,
     IGoogleIdentityProvider google,
-    ContactSignedUpHandler contactSignedUp)
+    ExternalAccounts accounts)
 {
     public const string LoginProvider = "Google";
 
@@ -64,67 +59,12 @@ public class GoogleSignInHandler(
             return new(null, GoogleSignInError.UnverifiedEmail);
         }
 
-        var user = await users.FindByLoginAsync(LoginProvider, identity.Subject)
-            ?? await LinkByEmailAsync(identity, cancellationToken)
-            ?? await CreateAsync(identity, cancellationToken);
+        var user = await accounts.FindLinkOrCreateAsync(LoginProvider, identity.Subject, identity.Email, identity.Name, cancellationToken);
 
         // The same rule and outcome as password sign-in, reported only now the person has proven who they are.
         return await AccountStatus.IsSuspendedAsync(db, user, cancellationToken)
             ? new(null, GoogleSignInError.Suspended)
             : new(user, null);
-    }
-
-    private async Task<CommunityUser?> LinkByEmailAsync(GoogleIdentity identity, CancellationToken cancellationToken)
-    {
-        var user = await users.FindByEmailAsync(identity.Email);
-        if (user is null)
-        {
-            return null;
-        }
-
-        Ensure(await users.AddLoginAsync(user, new UserLoginInfo(LoginProvider, identity.Subject, "Google")));
-        if (!user.EmailConfirmed)
-        {
-            // Nobody proved they own this address until now, so whoever chose the password cannot keep it.
-            user.EmailConfirmed = true;
-            if (await users.HasPasswordAsync(user))
-            {
-                Ensure(await users.RemovePasswordAsync(user));
-            }
-
-            Ensure(await users.UpdateAsync(user));
-            await contactSignedUp.HandleAsync(new EmailVerified(user.ProfileId, user.Email!), cancellationToken);
-        }
-
-        return user;
-    }
-
-    private async Task<CommunityUser> CreateAsync(GoogleIdentity identity, CancellationToken cancellationToken)
-    {
-        var profile = new Profile(ProfileName(identity));
-        db.Profiles.Add(profile);
-        var user = new CommunityUser { UserName = identity.Email, Email = identity.Email, EmailConfirmed = true, ProfileId = profile.Id };
-
-        // The user store shares the context, so the profile and the account commit together. No role is granted.
-        Ensure(await users.CreateAsync(user));
-        Ensure(await users.AddLoginAsync(user, new UserLoginInfo(LoginProvider, identity.Subject, "Google")));
-        await contactSignedUp.HandleAsync(new EmailVerified(user.ProfileId, user.Email!), cancellationToken);
-        return user;
-    }
-
-    /// <summary>Google's name, held to the profile editor's limit, or the email's local part when Google gives none.</summary>
-    private static string ProfileName(GoogleIdentity identity)
-    {
-        var name = string.IsNullOrWhiteSpace(identity.Name) ? identity.Email.Split('@')[0] : identity.Name.Trim();
-        return name.Length <= UpdateProfileValidator.MaxName ? name : name[..UpdateProfileValidator.MaxName].TrimEnd();
-    }
-
-    private static void Ensure(IdentityResult result)
-    {
-        if (!result.Succeeded)
-        {
-            throw new InvalidOperationException($"Google sign-in failed: {string.Join(", ", result.Errors.Select(e => e.Code))}");
-        }
     }
 }
 

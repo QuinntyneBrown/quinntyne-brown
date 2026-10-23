@@ -92,15 +92,15 @@ public static class AccountEndpoints
         string? returnUrl,
         bool? keepSignedIn)
     {
-        var state = GoogleCorrelation.NewSecret();
-        var nonce = GoogleCorrelation.NewSecret();
+        var state = SignInCorrelation.NewSecret();
+        var nonce = SignInCorrelation.NewSecret();
         var authorizationUrl = google.BuildAuthorizationUrl(state, nonce, GoogleRedirectUri(webApp.Value));
         if (authorizationUrl is null)
         {
             return Results.Redirect(GoogleOutcome(marketing.Value, "failed"));
         }
 
-        correlation.Write(context, new GoogleCorrelation.Pending(state, nonce, AppPath(returnUrl), keepSignedIn ?? false));
+        correlation.Write(context, new SignInCorrelation.Pending(state, nonce, AppPath(returnUrl), keepSignedIn ?? false));
         return Results.Redirect(authorizationUrl);
     }
 
@@ -115,12 +115,12 @@ public static class AccountEndpoints
         CancellationToken ct)
     {
         var pending = correlation.ReadAndClear(context);
-        if (pending is null || string.IsNullOrEmpty(code) || !GoogleCorrelation.StateMatches(pending, state))
+        if (pending is null || string.IsNullOrEmpty(code) || !SignInCorrelation.StateMatches(pending, state))
         {
             return Results.Redirect(GoogleOutcome(marketing.Value, "failed"));
         }
 
-        var result = await handler.HandleAsync(new GoogleSignInCommand(code, GoogleRedirectUri(webApp.Value), pending.Nonce), ct);
+        var result = await handler.HandleAsync(new GoogleSignInCommand(code, GoogleRedirectUri(webApp.Value), pending.Secret), ct);
         if (!result.Succeeded)
         {
             return Results.Redirect(GoogleOutcome(marketing.Value, result.Error == GoogleSignInError.Suspended ? "suspended" : "failed"));
