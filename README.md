@@ -11,11 +11,10 @@
 QuinntyneBrown.Community is the open-source community platform of Quinntyne Brown, Christian,
 Chief Product Officer and founder, and City Lead for [FaithTech](https://faithtech.com) Toronto.
 
-It serves as a home for FaithTech staff, city leads, volunteers,
-builders, event attendees and partners, where leads get the tools to run a city: events, private
-contacts, a partner pipeline, their team and Agile workspaces with Planning Poker. It is also a
-space for anyone and everyone Quinntyne works with or engages with. Anyone can join and create a
-profile.
+It is the home base for everyone Quinntyne collaborates with: FaithTech Toronto's builders, city leads,
+volunteers, staff, event attendees and partners, where leads get the tools to run a city: events, private
+contacts, a partner pipeline, their team and Agile workspaces with Planning Poker. Anyone can join, create a profile, meet the community and
+build with us.
 
 ## Contents
 

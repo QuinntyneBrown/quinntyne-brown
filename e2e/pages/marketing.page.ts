@@ -67,7 +67,9 @@ export class MarketingPage {
       name: 'Builds software. Builds community.',
     });
     this.eyebrow = page.getByRole('main').getByText('Quinntyne Brown', { exact: true });
-    this.lead = page.getByText(/^I’m Quinntyne Brown: a Christian, a Chief Product Officer/);
+    this.lead = page.getByText(
+      /^I’m Quinntyne Brown — a Christian, founder and Chief Product Officer/,
+    );
     this.topBar = page.getByRole('banner');
     this.topBarJoin = this.topBar.getByRole('button', { name: 'Join now' });
     this.topBarSignIn = this.topBar.getByRole('button', { name: 'Sign in' });

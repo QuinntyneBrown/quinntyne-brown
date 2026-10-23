@@ -2,7 +2,7 @@
 
 ## Project overview
 
-QuinntyneBrown.Community is the full-stack community site of Quinntyne Brown, Christian, Chief Product Officer and founder, and City Lead for FaithTech Toronto. It serves FaithTech staff, leads, volunteers, builders, event attendees and partners, and is also a space for anyone and everyone Quinntyne works with or engages with. Anyone can sign up and create a profile. The .NET backend owns persistence, permissions and authentication; the Angular frontend provides the app; Playwright covers end-to-end behavior and accessibility.
+QuinntyneBrown.Community is the full-stack community site of Quinntyne Brown: a Christian, founder and Chief Product Officer, and City Lead for FaithTech Toronto. It is the home base for everyone Quinntyne collaborates with: FaithTech Toronto's builders, leads, volunteers, staff, event attendees and partners, and anyone else Quinntyne works with or engages with. Anyone can sign up, create a profile, meet the community and build with us. The marketing page (`frontend/projects/marketing/`) introduces Quinntyne Brown in the first person and says exactly this. The .NET backend owns persistence, permissions and authentication; the Angular frontend provides the app; Playwright covers end-to-end behavior and accessibility.
 
 `idea.txt` is the original brief. `decisions.txt` holds the agreed decisions and wins where the two differ.
 
