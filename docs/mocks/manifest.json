@@ -44,6 +44,32 @@
       }
     },
     {
+      "id": "share-idea",
+      "kind": "page",
+      "title": "Share an app idea",
+      "route": "www.faithtech.community /ideas",
+      "requirements": [],
+      "opens_from": "marketing",
+      "states": [
+        "default",
+        "filled",
+        "contact-phone",
+        "contact-linkedin",
+        "invalid",
+        "too-long",
+        "challenge",
+        "challenge-failed",
+        "busy",
+        "success",
+        "error",
+        "rate-limited"
+      ],
+      "not_applicable": {
+        "loading": "A static public form; nothing is fetched before it renders.",
+        "empty": "This screen has no collection that could be empty."
+      }
+    },
+    {
       "id": "private-preview",
       "kind": "page",
       "title": "Private preview wall",
