@@ -23,6 +23,7 @@ export const ORG_SECTIONS = [
   'announcements',
   'resources',
   'reports',
+  'applications',
   'notes',
   'invites',
   'my-work',

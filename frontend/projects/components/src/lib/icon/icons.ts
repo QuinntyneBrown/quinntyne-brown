@@ -77,6 +77,10 @@ export const ICONS: Readonly<Record<string, string>> = {
   merge: "<path d='M7 3v6a5 5 0 0 0 5 5 5 5 0 0 1 5 5v2M7 21v-6M17 3v3'/>",
   reports: "<path d='M4 20V10M10 20V4M16 20v-7M22 20H2'/>",
   'walk-in': "<circle cx='10' cy='8' r='4'/><path d='M3 21a7 7 0 0 1 14 0M19 8v6M16 11h6'/>",
+  // Integrations (L2-158 to L2-166): the Applications section and Revoke.
+  applications:
+    "<rect x='3' y='4' width='18' height='16' rx='2'/><path d='M3 9h18M7 13l2 2-2 2M12 17h4'/>",
+  revoke: "<circle cx='12' cy='12' r='9'/><path d='m5.7 5.7 12.6 12.6'/>",
 };
 
 export const ICON_NAMES = Object.keys(ICONS);

@@ -98,6 +98,14 @@ export const SECTIONS: readonly Section[] = [
     secondary: true,
     opens: can(Permission.ReportsView),
   },
+  // Applications that push events to the org, for whoever reads them there (L2-165, ADR 0042).
+  {
+    label: 'Applications',
+    path: 'applications',
+    icon: 'applications',
+    secondary: true,
+    opens: can(Permission.IntegrationsView),
+  },
   // The org's settings for its Org Lead, the Portfolio Lead and System Admins (L2-155 AC3).
   {
     label: 'Organization',

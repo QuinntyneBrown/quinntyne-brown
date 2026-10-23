@@ -78,6 +78,12 @@ const ORG_ROUTES: Routes = [
     loadChildren: () => import('@faithtech-community/reports').then((m) => m.REPORTS_ROUTES),
   },
   {
+    path: 'applications',
+    canActivate: [featureGuard('integrations')],
+    loadChildren: () =>
+      import('@faithtech-community/integrations').then((m) => m.INTEGRATIONS_ROUTES),
+  },
+  {
     path: 'notes',
     loadChildren: () => import('@faithtech-community/notes').then((m) => m.NOTES_ROUTES),
   },

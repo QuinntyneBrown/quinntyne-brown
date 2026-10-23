@@ -52,6 +52,7 @@ const SWITCHABLE: Feature[] = [
   'resources',
   'agile',
   'reports',
+  'integrations',
 ];
 
 /**
