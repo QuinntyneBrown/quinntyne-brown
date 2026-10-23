@@ -41,6 +41,17 @@
   border-radius: var(--radius-full);
 }
 
+// On phones the name would push the actions past the capsule, so only the mark shows; the name
+// stays as the link's accessible name.
+.top-bar__name {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .top-bar__mark {
   inline-size: var(--size-avatar-md);
   block-size: var(--size-avatar-md);
@@ -162,6 +173,16 @@ a:focus-visible,
 .top-bar__more:focus-visible {
   outline: none;
   box-shadow: var(--shadow-focus);
+}
+
+@include bp.up(sm) {
+  .top-bar__name {
+    position: static;
+    inline-size: auto;
+    block-size: auto;
+    overflow: visible;
+    clip-path: none;
+  }
 }
 
 @include bp.up(md) {
