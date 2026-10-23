@@ -27,10 +27,10 @@ The screens follow the mocks `pages/applications`, `pages/application` and the t
 
 ### Angular `integrations` feature library (`projects/integrations/`)
 
-- `INTEGRATIONS_ROUTES`: `''` → `ApplicationsPageComponent`, `':id'` → `ApplicationPageComponent`, lazy-loaded by the app shell at `/o/:orgSlug/applications`.
-- `ApplicationsPageComponent` — the table of applications; *Register application* only when `canManage` holds for the org (`ACCESS_SERVICE.can('integrations.manage')`); forbidden on `403`.
-- `ApplicationPageComponent` — the connection card, `EventEntryComponent` per event (contact request body or JSON), *Load more* while `items.length < totalCount`, *Rotate secret* and *Revoke* for managers on active applications, not-found on `404`.
-- Dialogs: `RegisterApplicationDialogComponent`, `RotateSecretDialogComponent`, `RevokeApplicationDialogComponent`.
+- `INTEGRATIONS_ROUTES`: `''` → `ApplicationsPageComponent`, `':id'` → `ApplicationPageComponent`, lazy-loaded by the app shell at `/o/:orgSlug/applications` behind `featureGuard('integrations')`.
+- `ApplicationsPage` — the table of applications; *Register application* only when `canManage` holds for the org (`ACCESS_SERVICE.can('integrations.manage')`); forbidden on `403`.
+- `ApplicationPage` — the route's `:id` through component input binding; the connection card (`DescriptionListComponent` with `mono` values and a masked `SecretFieldComponent`), `EventEntryComponent` per event (a contact request's fields with `multiline` for the message, or `json` for any other type), *Load more* while `items.length < totalCount` with focus moved to the first new entry, *Rotate secret* and *Revoke* in a `ClusterComponent` beside the status badge for managers on active applications, not-found on `404`.
+- Dialogs: `RegisterApplicationDialog`, `RotateSecretDialog`, `RevokeApplicationDialog` (CDK dialogs through `DialogService`).
 - Depends only on `components` and `api`.
 
 ### Shell navigation
@@ -39,7 +39,7 @@ The screens follow the mocks `pages/applications`, `pages/application` and the t
 
 ### e2e fake (`e2e/fixtures/`)
 
-`mock-integrations.ts` answers the five management routes and the events route from an in-memory set seeded per test, with the same status codes and shapes, and enforces coverage and the two permission codes through the fake's access model. `api.integrations.deliver(...)` adds an event as an accepted webhook would. Page objects: `e2e/pages/applications.page.ts`, `application.page.ts` and the dialogs.
+`mock-integrations.ts` answers the five management routes and the events route from an in-memory set seeded per test, with the same status codes and shapes, and enforces coverage and the two permission codes through the fake's access model. `api.integrations.deliver(...)` adds an event as an accepted webhook would. Page objects: `e2e/pages/applications.page.ts`, `e2e/pages/application.page.ts` and `e2e/pages/integration.dialogs.ts` (register, rotate, revoke and the secret field). Specs: `e2e/tests/integrations/` (applications, application events, rotate and revoke), each screen checked with axe.
 
 ## Requirements
 

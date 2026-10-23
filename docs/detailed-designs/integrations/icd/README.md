@@ -96,9 +96,9 @@ Every response is JSON. Error responses are RFC 9457 problem details (`applicati
 |--------|------|------|
 | `202 Accepted` | The event was verified, valid and stored. | `{ "status": "accepted", "eventId": "<uuid>" }` |
 | `200 OK` | An event with the same `eventId` was already stored for this application. Nothing is stored; the first payload is kept even if this one differs. | `{ "status": "duplicate", "eventId": "<uuid>" }` |
-| `400 Bad Request` | The signature is valid but the body is not a JSON object, the envelope or `contact-request.created` data breaks a rule above, or `Content-Type` is not JSON. | Problem details with `errors`, keyed by field path (`eventId`, `data.email`, …) |
+| `400 Bad Request` | The signature is valid but the body is not a JSON object, the envelope or `contact-request.created` data breaks a rule above, or `Content-Type` is not JSON. | Problem details with `errors`, keyed by field path (`body`, `contentType`, `eventId`, `data.email`, …) |
 | `401 Unauthorized` | A header is missing or malformed; the source is unknown or revoked; the timestamp is more than 300 seconds off; or the signature matches no valid secret. | One neutral problem: `"The request could not be authenticated."` The reason is never given. |
-| `413 Payload Too Large` | The body is over 65,536 bytes. | Empty or problem details |
+| `413 Payload Too Large` | The body is over 65,536 bytes. | Empty |
 | `429 Too Many Requests` | More than 60 requests in the current one-minute window for this `X-Webhook-Source`. | Empty; `Retry-After` gives the seconds to wait |
 | `5xx` | The provider failed. | Problem details or empty |
 

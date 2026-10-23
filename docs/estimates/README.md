@@ -1,7 +1,7 @@
 # Estimates
 
 - Overall effort: 387 days
-- Complete: 93%
+- Complete: 96%
 - Visual conformance: letter grade (F to A+) of the implemented UI against the HTML mocks and design system (margins, spacing, fonts, borders), from screenshots in `docs/videos/journeys/<journey>/screenshots/`. Subsystem grades are the rounded mean of their designs. The marketing page, Google sign-in and GitHub sign-in have no journey screenshots yet, so they are not graded (n/a).
 
 | Subsystem | Effort | Complete | Visual conformance |
@@ -24,11 +24,11 @@
 | [notes](notes.md) | 42 days | 98% | — |
 | [reports](reports.md) | 7 days | 100% | B |
 | [organizations](organizations.md) | 53 days | 93% | — |
-| [integrations](integrations.md) | 11 days | 0% | — |
+| [integrations](integrations.md) | 11 days | 98% | — |
 
 ## Roadmap
 
-1. integrations: build the inbound webhook, the Applications screens and their e2e fake (ADR 0042)
+1. integrations: record the Applications journey video; wrap the Data Protection key ring with Key Vault (ADR 0042)
 2. organizations: cross-org role create and narrow screens, the catalogue's indent and outdent and Member bundle, the Org Lead's Agents and Audit log tabs, and re-recorded journey videos
 3. platform: deploy behind the private-preview wall (the owner's runbook, `platform/private-preview-wall`)
 4. platform and identity: finish the remaining designs
