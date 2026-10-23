@@ -34,6 +34,18 @@ public static class IntegrationsEndpoints
             return result.ToHttp(() => Results.Created($"/api/integrations/apps/{registered!.App.Id}", registered));
         });
 
+        apps.MapPost("/{id:guid}/rotate", async (Guid id, IntegrationAppsHandler handler, CancellationToken cancellationToken) =>
+        {
+            var (result, rotated) = await handler.RotateAsync(id, cancellationToken);
+            return result.ToHttp(() => Results.Ok(rotated));
+        });
+
+        apps.MapPost("/{id:guid}/revoke", async (Guid id, IntegrationAppsHandler handler, CancellationToken cancellationToken) =>
+        {
+            var (result, revoked) = await handler.RevokeAsync(id, cancellationToken);
+            return result.ToHttp(() => Results.Ok(revoked));
+        });
+
         return app;
     }
 }

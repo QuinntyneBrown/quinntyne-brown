@@ -120,6 +120,58 @@ public class IntegrationAppsHandler(
         return (Result.Ok(), new RegisteredAppDto(await ToDtoAsync(app, cancellationToken), secret));
     }
 
+    /// <summary>A new secret, once; the one rotated out stays valid for 24 hours (L2-159).</summary>
+    public async Task<(Result Result, RotatedSecretDto? Rotated)> RotateAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var (refusal, app) = await ManageableAsync(id, cancellationToken);
+        if (refusal is not null)
+        {
+            return (refusal, null);
+        }
+
+        var now = time.GetUtcNow();
+        var secret = WebhookCredentials.NewSecret();
+        app!.Rotate(protector.Protect(secret), WebhookCredentials.Prefix(secret), now);
+        var actor = await profiles.CallerProfileIdAsync(cancellationToken) ?? Guid.Empty;
+        audit.Record(actor, "integration.secretRotated", nameof(IntegrationApp), app.Id.ToString(), null,
+            new { app.SecretPrefix, app.PreviousSecretExpiresAt }, app.OrganizationId);
+        await db.SaveChangesAsync(cancellationToken);
+        return (Result.Ok(), new RotatedSecretDto(await ToDtoAsync(app, cancellationToken), secret, app.PreviousSecretExpiresAt!.Value));
+    }
+
+    /// <summary>Permanent; requests naming the source answer 401 from now on and its events stay (L2-160).</summary>
+    public async Task<(Result Result, IntegrationAppDto? App)> RevokeAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var (refusal, app) = await ManageableAsync(id, cancellationToken);
+        if (refusal is not null)
+        {
+            return (refusal, null);
+        }
+
+        var actor = await profiles.CallerProfileIdAsync(cancellationToken) ?? Guid.Empty;
+        app!.Revoke(actor, time.GetUtcNow());
+        audit.Record(actor, "integration.revoked", nameof(IntegrationApp), app.Id.ToString(), new { Status = "Active" }, new { Status = "Revoked" }, app.OrganizationId);
+        await db.SaveChangesAsync(cancellationToken);
+        return (Result.Ok(), await ToDtoAsync(app, cancellationToken));
+    }
+
+    /// <summary>404 when not visible, 403 without integrations.manage in its org, 409 when revoked.</summary>
+    private async Task<(Result? Refusal, IntegrationApp? App)> ManageableAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var app = await VisibleAsync(id, tracked: true, cancellationToken);
+        if (app is null)
+        {
+            return (Result.NotFound(), null);
+        }
+
+        if (!current.Access.Has(app.OrganizationId, Permissions.IntegrationsManage))
+        {
+            return (Result.Forbidden(), null);
+        }
+
+        return app.IsRevoked ? (Result.Conflict(RevokedMessage), null) : (null, app);
+    }
+
     /// <summary>The application when its org is covered with the feature on and the caller holds integrations.view there.</summary>
     private async Task<IntegrationApp?> VisibleAsync(Guid id, bool tracked, CancellationToken cancellationToken)
     {
