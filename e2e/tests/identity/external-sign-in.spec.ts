@@ -2,7 +2,7 @@ import { expect, test } from '../../fixtures/app';
 import { SignInPage } from '../../pages/sign-in.page';
 import { SignUpPage } from '../../pages/sign-up.page';
 
-// Traces to: L2-111 (docs/detailed-designs/identity/github-sign-in, google-sign-in).
+// Traces to: L2-131 (docs/detailed-designs/identity/github-sign-in, google-sign-in).
 test.describe('Google and GitHub sign-in on the community app', () => {
   test('the sign-in page offers both, and a new GitHub account lands in the app', async ({
     page,

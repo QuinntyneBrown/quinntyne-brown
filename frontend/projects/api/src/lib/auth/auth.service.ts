@@ -35,7 +35,7 @@ export interface SignUpRequest {
 }
 
 /** Contract for the auth API. Pages depend on AUTH_SERVICE, never on HttpAuthService. */
-/** Where an external sign-in started, so the API returns a failure there (L2-111). */
+/** Where an external sign-in started, so the API returns a failure there (L2-131). */
 export type ExternalSignInFrom = 'marketing' | 'app';
 
 export interface AuthService {

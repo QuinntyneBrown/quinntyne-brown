@@ -51,7 +51,7 @@ public static class AccountEndpoints
         account.MapGet("/google/start", StartGoogleSignIn).AllowAnonymous();
         account.MapGet("/google/callback", CompleteGoogleSignInAsync).AllowAnonymous();
 
-        // GitHub sign-in for the marketing page (L2-110, ADR 0027): the same browser redirects, with PKCE.
+        // GitHub sign-in for the marketing page (L2-130, ADR 0032): the same browser redirects, with PKCE.
         account.MapGet("/github/start", StartGitHubSignIn).AllowAnonymous();
         account.MapGet("/github/callback", CompleteGitHubSignInAsync).AllowAnonymous();
 
@@ -189,7 +189,7 @@ public static class AccountEndpoints
     private static string RedirectUri(WebAppOptions webApp, string provider) => $"{webApp.Origin}/api/account/{provider}/callback";
 
     /// <summary>
-    /// Where a failed external sign-in returns: the community app's sign-in page when it started there (L2-111), else
+    /// Where a failed external sign-in returns: the community app's sign-in page when it started there (L2-131), else
     /// the marketing page. Without a readable cookie nobody knows where it started, so the marketing page.
     /// </summary>
     private static string Outcome(WebAppOptions webApp, MarketingOptions marketing, string provider, SignInCorrelation.Pending? pending, string outcome) =>
@@ -199,7 +199,7 @@ public static class AccountEndpoints
 
     /// <summary>
     /// Where a signed-in browser goes: an interrupted /connect/authorize request resumes, as after a password sign-in
-    /// (L2-111 AC2); anything else starts PKCE in the community app (ADR 0018).
+    /// (L2-131 AC2); anything else starts PKCE in the community app (ADR 0018).
     /// </summary>
     private static string Landing(WebAppOptions webApp, SignInCorrelation.Pending pending) =>
         pending.ReturnUrl.StartsWith("/connect/", StringComparison.Ordinal)

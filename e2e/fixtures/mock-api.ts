@@ -9,6 +9,7 @@ import { MockEvents } from './mock-events';
 import { MockGitHub } from './mock-github';
 import { MockGoogle } from './mock-google';
 import { MockNotification, MockNotifications } from './mock-notifications';
+import { MockReports } from './mock-reports';
 import { MockSearch } from './mock-search';
 import { MockWall } from './mock-wall';
 import { MockResources } from './mock-resources';
@@ -43,6 +44,8 @@ export interface MockProfile {
   bio: string | null;
   roles: string[];
   photos: MockPhoto[];
+  /** When the account was created (Profile.JoinedAtUtc); absent for members from before Reports. */
+  joinedAtUtc?: string | null;
 }
 
 /**
@@ -136,6 +139,10 @@ export class MockApi {
   readonly events = new MockEvents(
     () => this.now,
     (id) => this.profiles.get(id),
+    (email) => {
+      const account = this.accounts.get(email.toLowerCase());
+      return account?.verified ? account.profileId : undefined;
+    },
   );
   /** In-app notifications (L2-027) for the bell, the notifications page and home's Recent activity. */
   readonly notifications = new MockNotifications(() => this.now);
@@ -169,13 +176,15 @@ export class MockApi {
   readonly partners = new MockPartners(this);
   /** Resources: uploads, links, visibility and sharing (ADR 0017). */
   readonly resources = new MockResources(this);
+  /** Reports for Staff and System Admins, computed from the other fakes (ADR 0030). */
+  readonly reports = new MockReports(this);
   /** Docs & notes: pages, blocks, links and visibility (ADR 0023 to 0025). */
   readonly notes = new MockNotes(this);
   /** Global search over the other fakes, with the server's permission rules (L2-026). */
   readonly search = new MockSearch(this);
   /** Google sign-in: Google itself and the API's Google endpoints (L2-078). */
   readonly google = new MockGoogle(this, (account) => (this.session = account));
-  /** GitHub sign-in: GitHub itself and the API's GitHub endpoints (L2-110). */
+  /** GitHub sign-in: GitHub itself and the API's GitHub endpoints (L2-130). */
   readonly github = new MockGitHub(this, (account) => (this.session = account));
   /** The private-preview wall on both hosts (ADR 0026); open unless a test calls wall.lock(). */
   readonly wall: MockWall;
@@ -362,6 +371,8 @@ export class MockApi {
     if (announcements) return announcements;
     const resources = this.resources.handle(route, method, url, body, this.caller(authorization));
     if (resources) return resources;
+    const reports = this.reports.handle(route, method, url, this.caller(authorization));
+    if (reports) return reports;
     const notes = this.notes.handle(route, method, url, body, this.caller(authorization));
     if (notes) return notes;
     const search = this.search.handle(route, method, url, this.caller(authorization));

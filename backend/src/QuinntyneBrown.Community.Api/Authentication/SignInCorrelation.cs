@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.DataProtection;
 namespace QuinntyneBrown.Community.Api.Authentication;
 
 /// <summary>
-/// An external sign-in's correlation cookie (ADR 0019, ADR 0027): the state, the secret that binds the code to
+/// An external sign-in's correlation cookie (ADR 0019, ADR 0032): the state, the secret that binds the code to
 /// this browser and where to land, protected so the browser can neither read nor forge it, kept for 10 minutes
 /// and deleted when the provider sends the browser back. Each provider has its own cookie, path and purpose.
 /// </summary>
@@ -76,7 +76,7 @@ public class GoogleCorrelation(IDataProtectionProvider dataProtection, TimeProvi
     public const string CookiePath = "/api/account/google";
 }
 
-/// <summary>The GitHub sign-in correlation cookie (ADR 0027).</summary>
+/// <summary>The GitHub sign-in correlation cookie (ADR 0032).</summary>
 public class GitHubCorrelation(IDataProtectionProvider dataProtection, TimeProvider time)
     : SignInCorrelation(dataProtection, time, CookieName, CookiePath, "QuinntyneBrown.Community.GitHubSignIn")
 {

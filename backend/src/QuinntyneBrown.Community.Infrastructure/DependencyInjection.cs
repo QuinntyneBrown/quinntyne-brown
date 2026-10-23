@@ -12,6 +12,7 @@ using QuinntyneBrown.Community.Application.Resources;
 using QuinntyneBrown.Community.Application.Search;
 using QuinntyneBrown.Community.Infrastructure.Admin;
 using QuinntyneBrown.Community.Infrastructure.Calendar;
+using QuinntyneBrown.Community.Infrastructure.Csv;
 using QuinntyneBrown.Community.Infrastructure.Email;
 using QuinntyneBrown.Community.Infrastructure.Identity;
 using QuinntyneBrown.Community.Infrastructure.Invites;
@@ -80,7 +81,7 @@ public static class DependencyInjection
                 new HttpDocumentRetriever { RequireHttps = true }));
         services.AddSingleton<GoogleIdTokenValidator>();
         services.AddHttpClient<IGoogleIdentityProvider, GoogleIdentityProvider>(client => client.Timeout = TimeSpan.FromSeconds(10));
-        // GitHub sign-in (ADR 0027): OAuth 2.0 with PKCE; the person is read from GitHub's API.
+        // GitHub sign-in (ADR 0032): OAuth 2.0 with PKCE; the person is read from GitHub's API.
         services.Configure<GitHubOptions>(configuration.GetSection(GitHubOptions.Section));
         services.AddHttpClient<IGitHubIdentityProvider, GitHubIdentityProvider>(client => client.Timeout = TimeSpan.FromSeconds(10));
         services.AddScoped<IVerificationResendLog, VerificationResendLog>();
@@ -105,6 +106,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<IAuditLog, AuditLog>();
         services.AddSingleton<IIcsCalendarWriter, IcsCalendarWriter>();
+        services.AddSingleton<ICsvWriter, CsvWriter>();
 
         services.AddSingleton<IFullTextSearch, PostgresFullTextSearch>();
 

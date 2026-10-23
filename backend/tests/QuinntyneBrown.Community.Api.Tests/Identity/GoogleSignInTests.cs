@@ -1,4 +1,4 @@
-// Traces to: L2-078, L2-079, L2-111
+// Traces to: L2-078, L2-079, L2-131
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -58,6 +58,20 @@ public class GoogleSignInTests(CommunityApiFactory factory) : IClassFixture<Comm
         var user = await factory.WithDbAsync(db => db.Users.SingleAsync(u => u.Email == email));
         Assert.Null(user.PasswordHash);
         Assert.True(await factory.WithDbAsync(db => db.UserLogins.AnyAsync(l => l.UserId == user.Id && l.LoginProvider == "Google")));
+    }
+
+    // Traces to: L2-125 AC1 (docs/detailed-designs/reports/reports-dashboard): a new Google account records the
+    // join time.
+    [Fact]
+    public async Task A_new_Google_account_records_the_join_time()
+    {
+        var email = NewEmail();
+
+        await SignInWithGoogleAsync(Identity(email, name: "Leah Thompson"));
+
+        var user = await factory.WithDbAsync(db => db.Users.SingleAsync(u => u.Email == email));
+        var profile = await factory.WithDbAsync(db => db.Profiles.SingleAsync(p => p.Id == user.ProfileId));
+        Assert.Equal(factory.Time.GetUtcNow().UtcDateTime, profile.JoinedAtUtc);
     }
 
     [Fact]

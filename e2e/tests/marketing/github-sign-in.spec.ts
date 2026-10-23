@@ -1,7 +1,7 @@
 import { expect, test } from '../../fixtures/app';
 import { MarketingPage } from '../../pages/marketing.page';
 
-// Traces to: L2-110, L2-079 AC4 (docs/detailed-designs/identity/github-sign-in).
+// Traces to: L2-130, L2-079 AC4 (docs/detailed-designs/identity/github-sign-in).
 test.describe('Sign in with GitHub from the marketing page', () => {
   test('a new GitHub account gets an account with no role and lands in the community app', async ({
     page,

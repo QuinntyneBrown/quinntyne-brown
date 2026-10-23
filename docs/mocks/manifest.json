@@ -13,7 +13,7 @@
         "L2-077",
         "L2-078",
         "L2-079",
-        "L2-110"
+        "L2-130"
       ],
       "states": [
         "default",
@@ -73,8 +73,8 @@
       "requirements": [
         "L2-003",
         "L2-078",
-        "L2-110",
-        "L2-111"
+        "L2-130",
+        "L2-131"
       ],
       "states": [
         "default",
@@ -99,8 +99,8 @@
       "requirements": [
         "L2-001",
         "L2-078",
-        "L2-110",
-        "L2-111"
+        "L2-130",
+        "L2-131"
       ],
       "states": [
         "default",
@@ -356,12 +356,14 @@
       "requirements": [
         "L2-022",
         "L2-024",
-        "L2-025"
+        "L2-025",
+        "L2-121"
       ],
       "states": [
         "default",
         "rsvped",
         "lead",
+        "attendance",
         "link-copied",
         "cancelled",
         "loading",
@@ -377,16 +379,29 @@
       "title": "Event check-in",
       "route": "/events/:id/check-in",
       "requirements": [
-        "L2-022"
+        "L2-022",
+        "L2-117",
+        "L2-118",
+        "L2-119",
+        "L2-120",
+        "L2-121",
+        "L2-122"
       ],
       "states": [
         "default",
         "checked-in",
+        "walk-in-added",
+        "save-failed",
         "no-results",
         "done",
+        "read-only",
+        "not-open",
+        "cancelled",
         "loading",
         "empty",
-        "error"
+        "error",
+        "forbidden",
+        "not-found"
       ],
       "not_applicable": {}
     },
@@ -510,7 +525,8 @@
       "requirements": [
         "L2-013",
         "L2-067",
-        "L2-069"
+        "L2-069",
+        "L2-116"
       ],
       "states": [
         "default",
@@ -551,7 +567,8 @@
       "route": "/partners",
       "requirements": [
         "L2-017",
-        "L2-018"
+        "L2-018",
+        "L2-111"
       ],
       "states": [
         "default",
@@ -571,12 +588,23 @@
       "route": "/partners/:id",
       "requirements": [
         "L2-017",
-        "L2-018"
+        "L2-018",
+        "L2-110",
+        "L2-111",
+        "L2-112",
+        "L2-113",
+        "L2-114",
+        "L2-115"
       ],
       "states": [
         "default",
+        "filtered",
         "activity-empty",
         "duplicate",
+        "merged",
+        "not-the-same",
+        "archived",
+        "restored",
         "loading",
         "error"
       ],
@@ -765,10 +793,22 @@
       "kind": "page",
       "title": "Reports",
       "route": "/reports",
-      "requirements": [],
+      "requirements": [
+        "L2-123",
+        "L2-124",
+        "L2-125",
+        "L2-126",
+        "L2-127",
+        "L2-128",
+        "L2-129"
+      ],
       "states": [
         "default",
         "filtered",
+        "city",
+        "unknown-filter",
+        "exporting",
+        "export-failed",
         "loading",
         "empty",
         "error",
@@ -1239,8 +1279,8 @@
       "title": "Add walk-in",
       "opens_from": "event-check-in",
       "requirements": [
-        "L2-022",
-        "L2-023"
+        "L2-023",
+        "L2-120"
       ],
       "states": [
         "default",
@@ -1515,8 +1555,8 @@
       "title": "Log activity",
       "opens_from": "partner",
       "requirements": [
-        "L2-017",
-        "L2-018"
+        "L2-110",
+        "L2-112"
       ],
       "states": [
         "default",
@@ -1532,7 +1572,26 @@
       "title": "Merge partners",
       "opens_from": "partner",
       "requirements": [
-        "L2-017"
+        "L2-114",
+        "L2-115"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "failed",
+        "conflict"
+      ],
+      "not_applicable": {
+        "invalid": "A value is always chosen for every field; there is nothing to validate."
+      }
+    },
+    {
+      "id": "restore-partner",
+      "kind": "dialog",
+      "title": "Restore partner",
+      "opens_from": "partner",
+      "requirements": [
+        "L2-115"
       ],
       "states": [
         "default",
@@ -1540,7 +1599,7 @@
         "failed"
       ],
       "not_applicable": {
-        "invalid": "A value is always chosen for every field; there is nothing to validate."
+        "invalid": "Restore is a confirmation with nothing to fill in."
       }
     },
     {

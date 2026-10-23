@@ -207,7 +207,7 @@ describe('ButtonComponent', () => {
     expect(button.textContent?.trim()).toBe('Publish event');
   });
 
-  // Traces to: L2-110
+  // Traces to: L2-130
   it("shows GitHub's mark in the label colour on the GitHub variant, decorative to screen readers", () => {
     const { fixture, cmp, q } = setup();
     expect(q('svg.ft-button__brand')).toBeNull();

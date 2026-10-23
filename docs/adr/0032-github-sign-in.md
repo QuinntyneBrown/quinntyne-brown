@@ -1,8 +1,8 @@
-# 0027. GitHub sign-in
+# 0032. GitHub sign-in
 
 - Status: Accepted
 - Date: 2026-10-23
-- Requirements: L1-001, L2-079, L2-110
+- Requirements: L1-001, L2-079, L2-130
 - Designs: `docs/detailed-designs/identity/github-sign-in`
 
 ## Context
@@ -26,7 +26,7 @@ Google sign-in (ADR 0019) is the only external way in. Many builders already hav
 - Unlinking a provider from Settings is deferred, as it is for Google. (The community app's own sign-in page gained the buttons in the addendum below.)
 - The e2e fake plays GitHub too (`github.com` is routed), so the suite never reaches the network.
 
-## Addendum: sign-in from the community app (L2-111)
+## Addendum: sign-in from the community app (L2-131)
 
 The community app's `/sign-in` and `/sign-up` pages offer both the Google and the GitHub button, lifting the deferral above and in ADR 0019.
 

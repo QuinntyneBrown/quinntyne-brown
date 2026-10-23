@@ -22,7 +22,7 @@ public class GitHubOptions
 }
 
 /// <summary>
-/// GitHub's OAuth 2.0 authorization code flow with PKCE (ADR 0027). GitHub has no ID token, so the person is read
+/// GitHub's OAuth 2.0 authorization code flow with PKCE (ADR 0032). GitHub has no ID token, so the person is read
 /// from its REST API with the access token, which is used for those two reads and never kept.
 /// </summary>
 public class GitHubIdentityProvider(

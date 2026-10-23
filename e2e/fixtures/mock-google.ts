@@ -76,7 +76,7 @@ export class MockGoogle {
     const pending = this.pending;
     this.pending = null;
     const google = this.account;
-    // Back where the sign-in started (L2-111): the community app's /sign-in, else the marketing page.
+    // Back where the sign-in started (L2-131): the community app's /sign-in, else the marketing page.
     const failed = (outcome: string) =>
       redirect(
         route,

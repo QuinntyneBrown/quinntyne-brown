@@ -21,7 +21,7 @@ import {
 } from '@faithtech-community/components';
 import { firstValueFrom } from 'rxjs';
 
-/** Sign in with email and password (L2-003), Google or GitHub (L2-111), matching docs/mocks/pages/sign-in. */
+/** Sign in with email and password (L2-003), Google or GitHub (L2-131), matching docs/mocks/pages/sign-in. */
 @Component({
   selector: 'ft-sign-in-page',
   imports: [
@@ -52,7 +52,7 @@ export class SignInPage {
   private readonly form = viewChild(SignInFormComponent);
 
   constructor() {
-    // The API's outcome arrives once, in the URL the visitor comes back to (L2-111).
+    // The API's outcome arrives once, in the URL the visitor comes back to (L2-131).
     effect(() => {
       const google = this.google();
       const github = this.github();

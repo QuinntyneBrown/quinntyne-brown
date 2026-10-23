@@ -3,7 +3,7 @@ using QuinntyneBrown.Community.Domain.Identity;
 
 namespace QuinntyneBrown.Community.Application.Identity;
 
-/// <summary>What GitHub's API says about the person: the numeric user id, the primary email and its verified flag (ADR 0027).</summary>
+/// <summary>What GitHub's API says about the person: the numeric user id, the primary email and its verified flag (ADR 0032).</summary>
 public record GitHubIdentity(string Subject, string Email, bool EmailVerified, string? Name);
 
 /// <summary>GitHub's OAuth 2.0 provider; Infrastructure talks to GitHub, tests use a fake.</summary>
@@ -37,7 +37,7 @@ public record GitHubSignInResult(CommunityUser? User, GitHubSignInError? Error)
 }
 
 /// <summary>
-/// Signs in, links or creates an account from a GitHub identity (L2-110, ADR 0027), by the same rule as Google: a
+/// Signs in, links or creates an account from a GitHub identity (L2-130, ADR 0032), by the same rule as Google: a
 /// GitHub login is linked only to an account whose email is GitHub's verified primary email.
 /// </summary>
 public class GitHubSignInHandler(

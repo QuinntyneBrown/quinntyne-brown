@@ -150,7 +150,7 @@ describe('HttpAuthService', () => {
     );
   });
 
-  // Traces to: L2-110
+  // Traces to: L2-130
   it('sends the browser to the API to start GitHub sign-in with where to land', () => {
     service.signInWithGitHub('/events', true);
 
@@ -159,7 +159,7 @@ describe('HttpAuthService', () => {
     );
   });
 
-  // Traces to: L2-111
+  // Traces to: L2-131
   it('marks Google and GitHub sign-in started from the community app', () => {
     service.signInWithGoogle('/events', false, 'app');
     service.signInWithGitHub('/', true, 'app');

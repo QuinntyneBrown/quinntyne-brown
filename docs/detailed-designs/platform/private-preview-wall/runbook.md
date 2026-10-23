@@ -12,7 +12,7 @@ What the owner runs and supplies to put QuinntyneBrown.Community on `app.faithte
 | SMTP credentials (SendGrid: user name `apikey` and an API key) | Step 4 |
 | A PostgreSQL administrator password (32+ random characters) | Step 2, GitHub secret |
 | Optional: a Google OAuth client ID and secret (ADR 0019) | Step 4 |
-| Optional: a GitHub OAuth app client ID and secret (ADR 0027) | Step 4 |
+| Optional: a GitHub OAuth app client ID and secret (ADR 0032) | Step 4 |
 
 Never commit any of these, paste them into an issue or pull request, or pass the passphrase as a command-line argument.
 
@@ -88,7 +88,7 @@ unset SMTP_PASSWORD
 # az keyvault secret set --vault-name "$KV" --name github-client-secret --value ...
 ```
 
-The Google OAuth client's redirect URI is `https://app.faithtech.community/api/account/google/callback` (ADR 0019). The GitHub OAuth app's authorization callback URL is `https://app.faithtech.community/api/account/github/callback` (ADR 0027).
+The Google OAuth client's redirect URI is `https://app.faithtech.community/api/account/google/callback` (ADR 0019). The GitHub OAuth app's authorization callback URL is `https://app.faithtech.community/api/account/github/callback` (ADR 0032).
 
 ## 5. First full deploy
 

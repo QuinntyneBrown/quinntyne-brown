@@ -11,7 +11,7 @@ import {
 } from '@faithtech-community/components';
 import { firstValueFrom } from 'rxjs';
 
-/** Create an account (L2-001), or continue with Google or GitHub (L2-111), matching docs/mocks/pages/sign-up. */
+/** Create an account (L2-001), or continue with Google or GitHub (L2-131), matching docs/mocks/pages/sign-up. */
 @Component({
   selector: 'ft-sign-up-page',
   imports: [

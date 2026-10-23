@@ -1,4 +1,4 @@
-// Traces to: L2-074, L2-076, L2-110
+// Traces to: L2-074, L2-076, L2-130
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AUTH_SERVICE, BROWSER_REDIRECT, SignInOutcome } from '@faithtech-community/api';
@@ -119,7 +119,7 @@ describe('LandingPage', () => {
     );
   });
 
-  // Traces to: L2-110
+  // Traces to: L2-130
   it('starts GitHub sign-in with the page asked for and shows only its button busy', async () => {
     const fixture = TestBed.createComponent(LandingPage);
     fixture.componentRef.setInput('returnUrl', '/events');

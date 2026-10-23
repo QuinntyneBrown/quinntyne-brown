@@ -8,14 +8,15 @@ using Microsoft.AspNetCore.Identity;
 namespace QuinntyneBrown.Community.Application.Identity;
 
 /// <summary>
-/// The account rule every external sign-in shares (ADR 0019, ADR 0027): find the account by its provider login,
+/// The account rule every external sign-in shares (ADR 0019, ADR 0032): find the account by its provider login,
 /// else link it by an email the provider has verified, else create one with no role, a verified email and no
 /// password. Callers check the email is verified before they get here.
 /// </summary>
 public class ExternalAccounts(
     UserManager<CommunityUser> users,
     IApplicationDbContext db,
-    ContactSignedUpHandler contactSignedUp)
+    ContactSignedUpHandler contactSignedUp,
+    TimeProvider time)
 {
     public async Task<CommunityUser> FindLinkOrCreateAsync(
         string provider, string subject, string email, string? name, CancellationToken cancellationToken = default) =>
@@ -50,7 +51,7 @@ public class ExternalAccounts(
 
     private async Task<CommunityUser> CreateAsync(string provider, string subject, string email, string? name, CancellationToken cancellationToken)
     {
-        var profile = new Profile(ProfileName(email, name));
+        var profile = new Profile(ProfileName(email, name), time.GetUtcNow().UtcDateTime);
         db.Profiles.Add(profile);
         var user = new CommunityUser { UserName = email, Email = email, EmailConfirmed = true, ProfileId = profile.Id };
 

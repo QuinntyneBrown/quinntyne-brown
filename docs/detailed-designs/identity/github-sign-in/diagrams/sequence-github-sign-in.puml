@@ -24,7 +24,7 @@ ep -> ep : state, code verifier -> ftc.github cookie (protected, 10 min)
 ep --> github : 302 authorize (client_id, redirect_uri, scope read:user user:email, state, S256 code_challenge)
 actor -> github : Authorize the app
 github --> ep : 302 /api/account/github/callback?code&state
-ep -> ep : Delete cookie; state must match (L2-110 AC6)
+ep -> ep : Delete cookie; state must match (L2-130 AC6)
 ep -> h : GitHubSignInCommand(code, redirectUri, codeVerifier)
 h -> prov : ExchangeCodeAsync
 prov -> github : POST /login/oauth/access_token (client secret, code_verifier)
@@ -33,7 +33,7 @@ alt code refused
   h --> ep : InvalidToken
   ep --> page : 302 /?github=failed
 else primary email not verified
-  h --> ep : UnverifiedEmail (L2-110 AC4)
+  h --> ep : UnverifiedEmail (L2-130 AC4)
   ep --> page : 302 /?github=failed
 else
   h -> acc : FindLinkOrCreateAsync("GitHub", id, email, name)

@@ -25,7 +25,7 @@ function redirect(route: Route, location: string) {
 }
 
 /**
- * Plays GitHub and the API's GitHub endpoints (AccountEndpoints, GitHubSignInHandler; ADR 0027) so the
+ * Plays GitHub and the API's GitHub endpoints (AccountEndpoints, GitHubSignInHandler; ADR 0032) so the
  * marketing page's real redirects run without the network: start sends the browser to "GitHub" with
  * the state and an S256 challenge, which returns to the callback, which applies the server's rules
  * and lands in the community app or back on the marketing page with ?github=failed|suspended.
@@ -82,7 +82,7 @@ export class MockGitHub {
     const pending = this.pending;
     this.pending = null;
     const github = this.account;
-    // Back where the sign-in started (L2-111): the community app's /sign-in, else the marketing page.
+    // Back where the sign-in started (L2-131): the community app's /sign-in, else the marketing page.
     const failed = (outcome: string) =>
       redirect(
         route,

@@ -105,7 +105,7 @@ export class LandingPage implements OnInit {
         else if (outcome === 'failed') this.failure.set('google_failed');
       });
     });
-    // The same for GitHub (ADR 0027).
+    // The same for GitHub (ADR 0032).
     effect(() => {
       const outcome = this.github();
       untracked(() => {
