@@ -1,0 +1,12 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Catalogue and organization admin
+Person(pl, "Portfolio Lead", "Edits Org Types, catalogues and organizations")
+Person(sa, "System Admin", "May do the same, audited")
+Person(ol, "Org Lead", "Reads its org settings; may not edit catalogues")
+System(ftc, "QuinntyneBrown.Community", "Home base for the people Quinntyne Brown builds with: orgs, profiles, events, resources, notes and Agile workspaces")
+Rel(pl, ftc, "Creates orgs, edits Org Types and role catalogues in")
+Rel(sa, ftc, "Overrides in")
+Rel(ol, ftc, "Uses the catalogue of its org in")
+@enduml

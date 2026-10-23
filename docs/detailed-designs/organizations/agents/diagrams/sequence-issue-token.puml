@@ -1,0 +1,47 @@
+@startuml
+title UML sequence behaviour — Issue an agent token
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Portfolio Lead or Org Lead" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "AgentsPage / IssueTokenDialog" as page
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "AgentsEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "AgentHandlers" as h
+  participant "IAgentTokenFactory" as tok
+  participant "IAuditLog" as audit
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Name, expiry (1-90 days, default 30), orgs
+page -> ep : POST /api/agents/{id}/tokens
+ep -> h : IssueTokenAsync
+alt Org Lead names an org it does not lead
+  h --> page : 403 (L2-154 #2)
+else expiry outside 1-90, or no org
+  h --> page : 400 naming the field
+else allowed
+  h -> tok : Create()
+  tok --> h : ftca_<base64url 32 bytes>, SHA-256 hash, prefix
+  h -> db : INSERT AgentCredential (hash only)
+  h -> audit : agent.tokenIssued (issuer, orgs, expiry) (L2-154 #7)
+  h --> page : 201 { id, token, prefix, expiresAt }
+  page --> actor : Token shown once with copy field (L2-154 #2)
+end
+@enduml

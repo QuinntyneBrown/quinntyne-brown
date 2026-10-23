@@ -1,0 +1,12 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Cross-org roles
+Person(pl, "Portfolio Lead", "Defines and assigns cross-org roles")
+Person(holder, "Cross-org role holder", "Portfolio (wife, agents) or Staff (FaithTech HQ)")
+Person(owner, "Workspace owner", "Adds eligible people to a workspace")
+System(ftc, "QuinntyneBrown.Community", "Home base for the people Quinntyne Brown builds with: orgs, profiles, events, resources, notes and Agile workspaces")
+Rel(pl, ftc, "Creates, edits, assigns cross-org roles in")
+Rel(holder, ftc, "Reads covered orgs and joins their work in")
+Rel(owner, ftc, "Adds members, including cross-org holders with CanJoinWork, in")
+@enduml

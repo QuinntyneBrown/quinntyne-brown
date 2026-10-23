@@ -1,0 +1,14 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Hierarchy and permissions
+Person(sa, "System Admin", "Platform tier; anything, anywhere, audited")
+Person(pl, "Portfolio Lead", "Anything in every org of the portfolio except private items")
+Person(ol, "Org Lead", "Anything in one org except private items")
+Person(mem, "Member", "Org member with catalogue roles or none")
+System(ftc, "QuinntyneBrown.Community", "Home base for the people Quinntyne Brown builds with: orgs, profiles, events, resources, notes and Agile workspaces")
+Rel(sa, ftc, "Grants System Admin and Portfolio Lead in")
+Rel(pl, ftc, "Grants Org Lead and any catalogue role in")
+Rel(ol, ftc, "Grants catalogue roles of its org in")
+Rel(mem, ftc, "Acts with the union of its permission bundles in")
+@enduml

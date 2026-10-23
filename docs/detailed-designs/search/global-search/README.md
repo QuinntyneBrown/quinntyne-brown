@@ -26,6 +26,15 @@ Search never widens what a user may open. The server filters every group by perm
 
 The p95 target is under 500 ms with 100,000 indexed records; it needs PostgreSQL, so it is checked with `eng/load-test.js` in the isolated performance environment after `seed-search-records 100000` rather than in the backend tests (ADR 0016). Contact notes are not searched yet.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- Each `SearchSource` receives the read scope of its feature, so results come only from the active org, or from every covered org under "All orgs", and orgs whose type has the feature off are skipped (`L2-152` AC2, `L2-147` AC3).
+- People results use `ProfileVisibility.WhereVisibleTo` (shared or covered org) and leave out agents unless `includeAgents=true`; agents shown carry an "Agent" badge (`L2-152` AC3, `L2-154` AC6).
+- Each result carries `organization: { id, slug, name }`; the results page shows it as a label under "All orgs".
+- Private items keep their owner-only rule; the Portfolio Lead, Org Lead and cross-org roles never find other people's private contacts, resources or note pages.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

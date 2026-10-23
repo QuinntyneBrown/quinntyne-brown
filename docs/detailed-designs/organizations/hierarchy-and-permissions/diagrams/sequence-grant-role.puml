@@ -1,0 +1,70 @@
+@startuml
+title UML sequence behaviour — Grant a catalogue role in an org
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Granting caller" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "ProfilePage" as page
+  participant "RoleDialogComponent" as dlg
+  participant "HttpOrgRolesService" as client
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "OrgRolesEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "ChangeOrgRolesHandler" as h
+  participant "RoleGrantPolicy" as pol
+  participant "IAuditLog" as audit
+  participant "RoleChangeNotifier" as notify
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Add a role
+page -> client : grantable(orgId, profileId)
+client -> ep : GET /api/organizations/{orgId}/members/{profileId}/roles
+ep -> h : Grantable roles
+h -> pol : Roles the caller may grant in org (L2-136 #6)
+pol --> h : Catalogue roles filtered by tier or CanGrant
+h --> client : 200 { held, grantable }
+page -> dlg : Open with grantable roles
+actor -> dlg : Choose role, confirm
+dlg -> client : grant(orgId, profileId, roleId)
+client -> ep : POST /api/organizations/{orgId}/members/{profileId}/roles
+ep -> h : GrantOrgRoleCommand
+h -> db : Load org, target membership, role
+alt org not covered or target not a member
+  h --> client : 404
+else role not in org's catalogue
+  h --> client : 400 roleId
+else policy refuses
+  h -> pol : CanGrant(access, org, role)
+  pol --> h : Refused (L2-136 #3, #4, #5)
+  h --> client : 403
+else policy allows
+  h -> pol : CanGrant(access, org, role)
+  pol --> h : Allowed (tier or CanGrant + roles.grant)
+  h -> db : Insert OrgRoleAssignment
+  alt caller acts as Portfolio Lead or System Admin
+    h -> audit : role.granted (org, portfolio, before, after) (L2-136 #2)
+  else Org Lead or catalogue role
+    h -> notify : Notify and queue email (L2-136 #3, #4)
+  end
+  h -> db : SaveChanges (one unit of work)
+  h --> client : 200 held roles
+  client --> dlg : null (success)
+  dlg --> page : Close; badges update
+end
+@enduml

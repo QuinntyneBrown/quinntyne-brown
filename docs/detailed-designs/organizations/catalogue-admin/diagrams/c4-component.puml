@@ -1,0 +1,34 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Catalogue and organization admin
+Container_Boundary(web, "Web app") {
+  Component(otp, "OrgTypesPage / OrgTypePage", "organizations library", "Role tree, permission checklist by feature, CanGrant, ordering")
+  Component(orgp, "OrganizationsPage / CreateOrganizationDialog", "organizations library", "List, create, rename, slug, archive")
+  Component(svc, "ORG_TYPES_SERVICE / ORGANIZATIONS_SERVICE", "api", "HTTP clients")
+}
+Container_Boundary(api, "Community API") {
+  Component(ep1, "OrgTypesEndpoints", "Api", "/api/portfolios/{id}/org-types, /api/org-types/{id}/...")
+  Component(ep2, "OrganizationsEndpoints", "Api", "/api/portfolios/{id}/organizations, /api/organizations/{id}")
+  Component(cat, "CatalogueHandlers", "Application/Organizations", "Role create, update, reorder, delete; Member bundle")
+  Component(orgh, "OrganizationHandlers", "Application/Organizations", "Create, rename, change slug, archive, restore, Org Lead")
+  Component(val, "CatalogueValidator / SlugRules", "Application/Organizations", "Known codes, unique keys, same-catalogue CanGrant, slug format")
+  Component(pa, "PortfolioAccess", "Application/Organizations", "Portfolio Lead or System Admin; 404 outside portfolio")
+  Component(audit, "IAuditLog", "Application", "Before and after values")
+  ComponentDb(db, "CommunityDbContext", "EF Core", "")
+}
+Rel(otp, svc, "Uses")
+Rel(orgp, svc, "Uses")
+Rel(svc, ep1, "Calls", "JSON/HTTPS")
+Rel(svc, ep2, "Calls", "JSON/HTTPS")
+Rel(ep1, cat, "Dispatches")
+Rel(ep2, orgh, "Dispatches")
+Rel(cat, pa, "Authorizes")
+Rel(orgh, pa, "Authorizes")
+Rel(cat, val, "Validates")
+Rel(orgh, val, "Validates slug")
+Rel(cat, audit, "Records")
+Rel(orgh, audit, "Records")
+Rel(cat, db, "Writes")
+Rel(orgh, db, "Writes")
+@enduml

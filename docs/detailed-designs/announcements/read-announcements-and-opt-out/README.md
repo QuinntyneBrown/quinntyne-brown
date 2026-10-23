@@ -23,6 +23,12 @@ The unsubscribe endpoint is one of the anonymous endpoints listed in `L2-042`.
 
 The token works for one year (ADR 0016). It can do nothing but turn one member's announcement emails off.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- The list shows announcements of the orgs the caller covers and portfolio-wide announcements of their portfolios, each with its org label or "Portfolio" (`L2-151` AC4). The opt-out is unchanged.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

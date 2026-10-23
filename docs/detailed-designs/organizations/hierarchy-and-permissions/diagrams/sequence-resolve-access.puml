@@ -1,0 +1,66 @@
+@startuml
+title UML sequence behaviour — Resolve the caller's access for a request
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Signed-in caller" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "Feature page" as page
+  participant "Http<Feature>Service" as client
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "Authentication" as authn
+  participant "CurrentAccessMiddleware" as mw
+  participant "<Feature>Endpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "AccessResolver" as res
+  participant "<Feature>Access" as acc
+  participant "<Feature> handler" as h
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Act on a record
+page -> client : change(id, body)
+client -> authn : PUT /api/<feature>/{id} (Bearer, X-Org)
+authn -> mw : Principal (user id only; no role claims)
+mw -> res : ResolveAsync(userId)
+res -> db : Profile.IsSystemAdmin, PortfolioLead, OrgMembership,\nOrgRoleAssignment + RoleDefinition, CrossOrgAssignment + CrossOrgRole,\nOrganization + OrgType (features)
+db --> res : Rows
+res -> res : Per org: union of Member bundle, role bundles,\ncovering cross-org bundles; tiers get every enabled code;\ndrop codes of disabled features (L2-135 #1, #2)
+res --> mw : CallerAccess
+mw -> mw : HttpContext.Items[CallerAccess] (this request only, L2-135 #3)
+mw -> ep : Continue
+ep -> h : Send command
+h -> db : Load record by id
+db --> h : Record (OrganizationId)
+h -> acc : CanChange(access, record)
+alt org not covered or feature off
+  acc --> h : NotFound
+  h --> ep : Result.NotFound
+  ep --> client : 404 (L2-135 #4)
+else covered without the permission
+  acc --> h : Forbidden
+  h --> ep : Result.Forbidden
+  ep --> client : 403 (L2-135 #4)
+else access.Has(org, code)
+  acc --> h : Allowed
+  h -> db : Save change
+  h --> ep : Result.Ok
+  ep --> client : 200
+end
+client --> page : Outcome
+page --> actor : Updated view or message
+@enduml

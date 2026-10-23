@@ -1,0 +1,14 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Org-owned data and org context
+Person(caller, "Signed-in caller", "Member or covering caller")
+System_Boundary(ftc, "QuinntyneBrown.Community") {
+  Container(web, "Web app", "Angular", "Shell, organizations and feature libraries, api and components libraries")
+  Container(api, "Community API", "ASP.NET Core", "QuinntyneBrown.Community.Api with Application, Domain and Infrastructure")
+  ContainerDb(db, "Community database", "PostgreSQL", "Hierarchy, memberships, catalogues and org-owned records")
+}
+Rel(caller, web, "Opens /o/{orgSlug}/... and switches org", "HTTPS")
+Rel(web, api, "Calls feature endpoints with X-Org; GET /api/me/access; GET /api/orgs/resolve/{slug}", "JSON/HTTPS")
+Rel(api, db, "Scoped queries: WHERE OrganizationId IN scope", "EF Core")
+@enduml

@@ -1,0 +1,60 @@
+@startuml
+title UML sequence behaviour — Switch org and follow redirects
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Covering caller" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "Router guards" as guard
+  participant "ft-org-switcher" as sw
+  participant "AccessService" as acc
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "MeEndpoints" as me
+  participant "OrgsEndpoints" as orgs
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "AccessResolver" as res
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> guard : Open /events/42 (old URL)
+guard -> acc : active() or last opened org, else first org
+guard --> actor : Redirect /o/faithtech-toronto/events/42 (L2-144 #4)
+actor -> guard : Open /o/old-slug/events
+guard -> acc : Is old-slug covered?
+acc --> guard : No
+guard -> orgs : GET /api/orgs/resolve/old-slug
+orgs -> db : Organization or OrgSlugAlias by slug, covered only
+alt alias of a covered org
+  orgs --> guard : 200 { slug: "new-slug" }
+  guard --> actor : Redirect /o/new-slug/events (L2-144 #5)
+else not covered or unknown
+  orgs --> guard : 404
+  guard --> actor : Not-found page (L2-144 #6)
+end
+actor -> sw : Choose "Shelfie"
+sw -> acc : setActive("shelfie"); refresh()
+acc -> me : GET /api/me/access
+me -> res : ResolveAsync
+res -> db : Hierarchy rows
+me --> acc : 200 AccessDto (L2-155 #1)
+alt current section's feature on in Shelfie
+  sw --> actor : /o/shelfie/<same section> (L2-144 #3)
+else feature off
+  sw --> actor : /o/shelfie (org home)
+end
+note over acc : Any 403 also triggers refresh() (L2-155 #2)
+@enduml

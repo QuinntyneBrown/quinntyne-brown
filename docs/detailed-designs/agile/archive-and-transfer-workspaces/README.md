@@ -27,6 +27,18 @@ The workspace owner archives a workspace or an item and may restore it; System A
 - **`WorkspaceAccessPolicy`** — Application service shared by every agile handler. `Classify` resolves the caller as `Owner` → `Admin` (holds System Admin, even when also a member) → `Member` → `Staff` → `Outsider`; `CanManage` is Owner or Admin. Outsiders receive 404, Staff and non-owner members receive 403 on writes they lack. `AuditOverride` records only Admin writes to `IAuditLog`; the owner's own actions are not audited. `Audit` records actions only a System Admin may take, such as reassigning the owner (`L2-031`, `L2-042`, ADR 0011).
 - **`AgileNotifier`** and **`IAuditLog`** — `AgileNotifier` adds the in-app `Notification` to the unit of work and, through `QueueEmailsAsync`, queues the emails in `IEmailQueue` (the email outbox) before the save, so they commit with the change; `IAuditLog` (`Application/Admin`) is the audit abstraction. There is no `INotificationService`.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Workspace` carries a required `OrganizationId`; work items, sprints, comments, poker sessions and members belong to the workspace's org. A workspace outside the caller's coverage, or in an org with `agile` off, answers `404`.
+- `WorkspaceAccessPolicy` classifies with `CallerAccess` for the workspace's org: **Admin** is the org's Org Lead, the Portfolio Lead or a System Admin; the read-only level (formerly **Staff**) is any holder of `workspaces.readAll` there, such as the Staff and Portfolio cross-org roles; Owner, Member and Outsider are unchanged (`L2-146` AC5). The "Read-only for Staff" alert reads "Read-only".
+- Actions by an Admin who is not the owner are overrides and stay audited.
+- `CityLeadRoleRemoved` and `CityLeadRoleRemovedHandler` are replaced by `WorkspaceCreatorPermissionLost(ProfileId, OrganizationId)` and its handler. It is raised whenever an owner stops holding `workspaces.create` in a workspace's org (role removal, catalogue edit or leaving the org).
+- `NeedsNewOwner` is set for a live workspace whose owner no longer holds `workspaces.create` in its org. The org's Org Leads and the Portfolio Lead are notified (formerly every System Admin), and any Admin may reassign (`L2-146` AC4).
+- `ReassignOwnerAsync` accepts a new owner who holds `workspaces.create` in the workspace's org or is its Org Lead (formerly "a City Lead"); the old owner stays a member while still eligible.
+- Details are in [cross-org roles](../../organizations/cross-org-roles/README.md).
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

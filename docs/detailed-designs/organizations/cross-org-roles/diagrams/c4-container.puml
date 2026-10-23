@@ -1,0 +1,14 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Cross-org roles
+Person(caller, "Portfolio Lead, holder or owner", "")
+System_Boundary(ftc, "QuinntyneBrown.Community") {
+  Container(web, "Web app", "Angular", "Shell, organizations and feature libraries, api and components libraries")
+  Container(api, "Community API", "ASP.NET Core", "QuinntyneBrown.Community.Api with Application, Domain and Infrastructure")
+  ContainerDb(db, "Community database", "PostgreSQL", "Hierarchy, memberships, catalogues and org-owned records")
+}
+Rel(caller, web, "Uses", "HTTPS")
+Rel(web, api, "Cross-org role and workspace member endpoints", "JSON/HTTPS")
+Rel(api, db, "CrossOrgRoles, CrossOrgAssignments, Workspaces", "EF Core")
+@enduml

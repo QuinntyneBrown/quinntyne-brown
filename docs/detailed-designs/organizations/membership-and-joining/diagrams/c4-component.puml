@@ -1,0 +1,28 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Membership and joining
+Container_Boundary(web, "Web app") {
+  Component(invui, "invites library", "Feature library", "Send invite, accept invite, My QR code, connect page")
+  Component(orgui, "organizations library: MembersPage", "Feature library", "Members list, add member, remove, roles")
+  Component(wait, "WaitingToBeAddedPage", "faithtech-community", "Shown when /api/me/access lists no org")
+}
+Container_Boundary(api, "Community API") {
+  Component(invh, "SendInviteHandler / AcceptInviteHandler", "Application/Invites", "Org-bound invite with RoleDefinitionId")
+  Component(cl, "ConnectLinkHandlers / ConnectSignUpHandler", "Application/Invites", "One link per owner per org")
+  Component(memh, "MembershipHandlers", "Application/Organizations", "Add, remove, list members")
+  Component(rgp, "RoleGrantPolicy", "Application/Organizations", "Limits pre-assigned roles")
+  Component(join, "OrgJoiner", "Application/Organizations", "Creates OrgMembership with JoinedVia and grants the role")
+  Component(owner, "WorkspaceOwnerWatch", "Application/Agile", "Flags workspaces needing a new owner")
+  ComponentDb(db, "CommunityDbContext", "EF Core", "Invites, ConnectLinks, OrgMemberships, OrgRoleAssignments")
+}
+Rel(invui, invh, "POST /api/invites, /api/invites/{token}/accept", "JSON/HTTPS")
+Rel(invui, cl, "GET /api/connect-links/mine, /api/connect/{token}", "JSON/HTTPS")
+Rel(orgui, memh, "/api/organizations/{id}/members", "JSON/HTTPS")
+Rel(invh, rgp, "Checks pre-assigned role")
+Rel(invh, join, "Joins org on accept")
+Rel(cl, join, "Joins org on verified sign-up")
+Rel(memh, join, "Adds member")
+Rel(memh, owner, "On removal")
+Rel(join, db, "Writes")
+@enduml

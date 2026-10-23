@@ -1,0 +1,41 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Seed the hierarchy
+class CommunitySeeder {
+  +SeedAsync(ct: CancellationToken): Task
+  +GrantSystemAdminAsync(email: string): Task<Result>
+  +SeedDevAccountAsync(): Task
+}
+class OrganizationSeed <<static>> {
+  +{static} Guid PortfolioId
+  +{static} Guid FaithTechCityTypeId
+  +{static} Guid StartupTypeId
+  +{static} Guid FaithTechTorontoId
+  +{static} Guid ShelfieId
+  +{static} Guid PortfolioRoleId
+  +{static} Guid StaffRoleId
+  +{static} IReadOnlyList<SeedRole> FaithTechCityCatalogue
+  +{static} IReadOnlyList<SeedRole> StartupCatalogue
+  +EnsureAsync(db: CommunityDbContext): Task
+}
+class SeedRole {
+  +Guid Id
+  +string Key
+  +string Name
+  +string? ParentKey
+  +int SortOrder
+  +string[] Permissions
+  +string[] CanGrantKeys
+}
+CommunitySeeder ..> OrganizationSeed : calls
+OrganizationSeed "1" *-- "many" SeedRole
+@enduml

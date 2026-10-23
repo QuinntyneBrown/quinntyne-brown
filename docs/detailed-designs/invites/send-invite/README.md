@@ -25,6 +25,16 @@ Any lead or System Admin may send invites. A City Lead may pre-assign only the r
 - **`InviteDto`** — `Id`, `Email`, `PreassignedRole`, `Status`, `InvitedByName`, `CreatedAt`, `ExpiresAt`, `AcceptedAt`, `RevokedAt`.
 - **`RoleAssignmentPolicy`** — concrete Application class shared with role assignment (`admin/assign-roles`); `CanChange(role)` answers which roles the caller may grant.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- "Lead or System Admin" becomes a holder of `invites.send` in the target org (the four FaithTech leads hold it), or the org's Org Lead, the Portfolio Lead or a System Admin; anyone else answers `403` (`L2-141` AC1).
+- `Invite` gains a required `OrganizationId`, taken from `X-Org` or the body's `organizationId` through `OrgScope.CreateTarget`. The email and the accept page name the org's display name.
+- The pre-assigned role is a `RoleDefinitionId` from the org's catalogue (`400` `roleId` otherwise), limited by `RoleGrantPolicy` instead of the City Lead table (`403`, `L2-141` AC2).
+- The invites page lists the active org's invites to holders of `invites.send` there, the Org Lead and the Portfolio Lead.
+- Details are in [membership and joining](../../organizations/membership-and-joining/README.md) and [ADR 0041](../../../adr/0041-org-bound-invites-and-connect-links.md).
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

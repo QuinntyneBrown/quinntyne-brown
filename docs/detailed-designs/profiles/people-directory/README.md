@@ -17,6 +17,14 @@ The directory is not the System Admin users page (`docs/detailed-designs/admin/a
 - **`ListPeopleHandler`** — Application handler in `Profiles/`. It returns `null` unless the caller holds City Lead, Staff or System Admin, then joins profiles to their accounts, matches the trimmed term case-insensitively against name or email, orders by name then id and returns 25 per page.
 - **`PersonSummary`** — `Id` (profile id), `Name`, `HomeCity`, `PhotoUrl` (the featured photo's read URL or `null`) and `Roles` (every role held, enum names). Email is matched, never returned.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- The People page requires `people.view` in the active org (the seeded City Lead, the Staff and Portfolio cross-org roles, and the tiers).
+- The list holds members of the active org, or of every covered org under "All orgs" with org labels, filtered by `ProfileVisibility.WhereVisibleTo` (`L2-140`). Agents are hidden unless "Include agents" is chosen, and carry an "Agent" badge (`L2-154` AC6).
+- Role badges show catalogue role names of the active org (`RoleRef`), not enum names.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

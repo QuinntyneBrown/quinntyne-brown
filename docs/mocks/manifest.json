@@ -219,7 +219,8 @@
       "requirements": [
         "L2-082",
         "L2-083",
-        "L2-084"
+        "L2-084",
+        "L2-141"
       ],
       "states": [
         "default",
@@ -230,7 +231,8 @@
         "email-exists",
         "signed-in",
         "pending",
-        "own-code"
+        "own-code",
+        "org"
       ],
       "not_applicable": {
         "empty": "This screen has no collection that could be empty.",
@@ -243,7 +245,11 @@
       "title": "Home",
       "route": "/",
       "requirements": [
-        "L2-049"
+        "L2-049",
+        "L2-144",
+        "L2-145",
+        "L2-147",
+        "L2-155"
       ],
       "states": [
         "default",
@@ -254,7 +260,13 @@
         "pipeline-zero",
         "pipeline-error",
         "staff",
-        "coming-up-empty"
+        "coming-up-empty",
+        "single-org",
+        "switcher-open",
+        "switcher-keyboard",
+        "long-names",
+        "all-orgs",
+        "shelfie"
       ],
       "not_applicable": {}
     },
@@ -266,7 +278,9 @@
       "requirements": [
         "L2-005",
         "L2-007",
-        "L2-040"
+        "L2-040",
+        "L2-154",
+        "L2-140"
       ],
       "states": [
         "default",
@@ -276,7 +290,8 @@
         "loading",
         "empty",
         "error",
-        "not-found"
+        "not-found",
+        "agent"
       ],
       "not_applicable": {}
     },
@@ -316,7 +331,8 @@
       "requirements": [
         "L2-026",
         "L2-065",
-        "L2-096"
+        "L2-096",
+        "L2-152"
       ],
       "states": [
         "default",
@@ -327,7 +343,8 @@
         "no-results",
         "invalid",
         "resources",
-        "notes"
+        "notes",
+        "all-orgs"
       ],
       "not_applicable": {}
     },
@@ -413,7 +430,8 @@
       "route": "/public/events/:id",
       "requirements": [
         "L2-023",
-        "L2-024"
+        "L2-024",
+        "L2-149"
       ],
       "states": [
         "default",
@@ -422,7 +440,9 @@
         "error",
         "success",
         "full",
-        "cancelled"
+        "cancelled",
+        "org",
+        "org-unbranded"
       ],
       "not_applicable": {
         "empty": "A public page always has an event."
@@ -659,7 +679,11 @@
       "route": "/people",
       "requirements": [
         "L2-009",
-        "L2-053"
+        "L2-053",
+        "L2-140",
+        "L2-143",
+        "L2-145",
+        "L2-154"
       ],
       "states": [
         "default",
@@ -668,7 +692,10 @@
         "loading",
         "error",
         "no-results",
-        "forbidden"
+        "forbidden",
+        "org",
+        "agents",
+        "all-orgs"
       ],
       "not_applicable": {
         "empty": "The list always contains at least you."
@@ -681,7 +708,8 @@
       "route": "/invites",
       "requirements": [
         "L2-010",
-        "L2-080"
+        "L2-080",
+        "L2-141"
       ],
       "states": [
         "default",
@@ -689,7 +717,8 @@
         "empty",
         "error",
         "more",
-        "more-error"
+        "more-error",
+        "org"
       ],
       "not_applicable": {}
     },
@@ -699,13 +728,15 @@
       "title": "Announcements",
       "route": "/announcements",
       "requirements": [
-        "L2-030"
+        "L2-030",
+        "L2-151"
       ],
       "states": [
         "default",
         "loading",
         "empty",
-        "error"
+        "error",
+        "org-labels"
       ],
       "not_applicable": {}
     },
@@ -715,14 +746,16 @@
       "title": "Compose announcement",
       "route": "/announcements/new",
       "requirements": [
-        "L2-029"
+        "L2-029",
+        "L2-151"
       ],
       "states": [
         "default",
         "invalid",
         "busy",
         "error",
-        "success"
+        "success",
+        "portfolio-wide"
       ],
       "not_applicable": {
         "loading": "The form needs no data before it renders.",
@@ -735,14 +768,16 @@
       "title": "Notifications",
       "route": "/notifications",
       "requirements": [
-        "L2-027"
+        "L2-027",
+        "L2-152"
       ],
       "states": [
         "default",
         "unread",
         "loading",
         "empty",
-        "error"
+        "error",
+        "org-labels"
       ],
       "not_applicable": {}
     },
@@ -801,7 +836,8 @@
         "L2-126",
         "L2-127",
         "L2-128",
-        "L2-129"
+        "L2-129",
+        "L2-150"
       ],
       "states": [
         "default",
@@ -813,7 +849,8 @@
         "loading",
         "empty",
         "error",
-        "forbidden"
+        "forbidden",
+        "org-filter"
       ],
       "not_applicable": {}
     },
@@ -823,7 +860,9 @@
       "title": "Admin · Audit log",
       "route": "/admin/audit",
       "requirements": [
-        "L2-041"
+        "L2-041",
+        "L2-153",
+        "L2-154"
       ],
       "states": [
         "default",
@@ -833,7 +872,8 @@
         "no-results",
         "exporting",
         "exported",
-        "export-failed"
+        "export-failed",
+        "portfolio"
       ],
       "not_applicable": {}
     },
@@ -910,7 +950,9 @@
       "title": "Workspaces",
       "route": "/workspaces",
       "requirements": [
-        "L2-050"
+        "L2-050",
+        "L2-145",
+        "L2-146"
       ],
       "states": [
         "default",
@@ -920,7 +962,8 @@
         "empty",
         "error",
         "empty-member",
-        "archived"
+        "archived",
+        "all-orgs"
       ],
       "not_applicable": {}
     },
@@ -999,7 +1042,8 @@
       "requirements": [
         "L2-032",
         "L2-033",
-        "L2-037"
+        "L2-037",
+        "L2-154"
       ],
       "states": [
         "default",
@@ -1009,7 +1053,8 @@
         "loading",
         "error",
         "forbidden",
-        "not-in-sprint"
+        "not-in-sprint",
+        "agent"
       ],
       "not_applicable": {}
     },
@@ -1059,13 +1104,16 @@
       "title": "Add workspace members",
       "opens_from": "workspace-settings",
       "requirements": [
-        "L2-031"
+        "L2-031",
+        "L2-146",
+        "L2-138"
       ],
       "states": [
         "default",
         "invalid",
         "busy",
-        "failed"
+        "failed",
+        "cross-org"
       ],
       "not_applicable": {}
     },
@@ -1231,13 +1279,15 @@
       "title": "Reassign workspace owner",
       "opens_from": "admin-users",
       "requirements": [
-        "L2-037"
+        "L2-037",
+        "L2-146"
       ],
       "states": [
         "default",
         "invalid",
         "busy",
-        "failed"
+        "failed",
+        "org-lead"
       ],
       "not_applicable": {}
     },
@@ -1465,14 +1515,17 @@
       "title": "Send invite",
       "opens_from": "people",
       "requirements": [
-        "L2-010"
+        "L2-010",
+        "L2-141",
+        "L2-136"
       ],
       "states": [
         "default",
         "invalid",
         "busy",
         "failed",
-        "limited"
+        "limited",
+        "org"
       ],
       "not_applicable": {}
     },
@@ -1483,7 +1536,8 @@
       "opens_from": "invites",
       "requirements": [
         "L2-080",
-        "L2-081"
+        "L2-081",
+        "L2-141"
       ],
       "states": [
         "default",
@@ -1493,7 +1547,8 @@
         "regenerate-confirm",
         "busy",
         "regenerated",
-        "error"
+        "error",
+        "org"
       ],
       "not_applicable": {
         "forbidden": "Only City Leads and System Admins see the My QR code button, so the dialog never opens for anyone else (L2-080 AC2).",
@@ -1679,7 +1734,8 @@
       "opens_from": "home",
       "requirements": [
         "L2-027",
-        "L2-061"
+        "L2-061",
+        "L2-152"
       ],
       "states": [
         "info",
@@ -1690,7 +1746,8 @@
         "agile",
         "empty",
         "resource-shared",
-        "connected"
+        "connected",
+        "org-labels"
       ],
       "not_applicable": {}
     },
@@ -1728,7 +1785,9 @@
       "requirements": [
         "L2-055",
         "L2-060",
-        "L2-066"
+        "L2-066",
+        "L2-145",
+        "L2-148"
       ],
       "states": [
         "default",
@@ -1737,7 +1796,8 @@
         "error",
         "no-results",
         "filtered",
-        "member"
+        "member",
+        "all-orgs"
       ],
       "not_applicable": {
         "forbidden": "Every signed-in member can open Resources; anonymous visitors are sent to sign in."
@@ -1799,7 +1859,9 @@
       "route": "/notes",
       "requirements": [
         "L2-085",
-        "L2-092"
+        "L2-092",
+        "L2-145",
+        "L2-148"
       ],
       "states": [
         "default",
@@ -1807,7 +1869,8 @@
         "empty",
         "error",
         "no-results",
-        "shared-with-me"
+        "shared-with-me",
+        "all-orgs"
       ],
       "not_applicable": {
         "forbidden": "Every signed-in member can open Notes and sees only the pages they may read; anonymous visitors are sent to sign in."
@@ -1887,7 +1950,8 @@
         "L2-057",
         "L2-058",
         "L2-059",
-        "L2-061"
+        "L2-061",
+        "L2-148"
       ],
       "states": [
         "default",
@@ -1897,7 +1961,9 @@
         "shared",
         "invalid",
         "busy",
-        "failed"
+        "failed",
+        "org-wide",
+        "portfolio-wide"
       ],
       "not_applicable": {}
     },
@@ -1959,14 +2025,17 @@
       "title": "Share page",
       "opens_from": "note",
       "requirements": [
-        "L2-093"
+        "L2-093",
+        "L2-148"
       ],
       "states": [
         "default",
         "shared",
         "invalid",
         "busy",
-        "failed"
+        "failed",
+        "org-wide",
+        "portfolio-wide"
       ],
       "not_applicable": {}
     },
@@ -2161,6 +2230,390 @@
         "success": "The success toasts are the restored, shared and moved states.",
         "warning": "Archiving, restoring, sharing and moving a page either succeed or fail; there is no partial outcome to warn about."
       }
+    },
+    {
+      "id": "waiting",
+      "kind": "page",
+      "title": "Waiting to be added",
+      "route": "/waiting (any app URL for someone who covers no org)",
+      "requirements": [
+        "L2-142"
+      ],
+      "states": [
+        "default",
+        "checked"
+      ],
+      "not_applicable": {
+        "loading": "Shown only after /api/me/access has answered; the shell's start-up covers loading.",
+        "empty": "This screen is itself the empty state of the app.",
+        "error": "If access fails to load, the shell shows pages/server-error."
+      }
+    },
+    {
+      "id": "organizations",
+      "kind": "page",
+      "title": "Organizations",
+      "route": "/portfolio/organizations",
+      "requirements": [
+        "L2-156",
+        "L2-134"
+      ],
+      "states": [
+        "default",
+        "created",
+        "archived",
+        "loading",
+        "empty",
+        "error",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "organization",
+      "kind": "page",
+      "title": "Organization settings",
+      "route": "/o/:orgSlug/settings",
+      "requirements": [
+        "L2-156",
+        "L2-149",
+        "L2-143",
+        "L2-144",
+        "L2-153",
+        "L2-154"
+      ],
+      "states": [
+        "default",
+        "org-lead",
+        "invalid",
+        "saved",
+        "branding",
+        "branding-invalid",
+        "branding-saved",
+        "members",
+        "members-no-results",
+        "audit-log",
+        "archived",
+        "loading",
+        "error",
+        "forbidden"
+      ],
+      "not_applicable": {
+        "empty": "Settings always have values; an org always has an Org Lead."
+      }
+    },
+    {
+      "id": "org-types",
+      "kind": "page",
+      "title": "Org Types",
+      "route": "/portfolio/org-types",
+      "requirements": [
+        "L2-134",
+        "L2-137",
+        "L2-147"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "org-type",
+      "kind": "page",
+      "title": "Org Type catalogue",
+      "route": "/portfolio/org-types/:id",
+      "requirements": [
+        "L2-134",
+        "L2-136",
+        "L2-137",
+        "L2-147"
+      ],
+      "states": [
+        "default",
+        "reorder",
+        "feature-off",
+        "remove-refused",
+        "invalid",
+        "saved",
+        "features",
+        "loading",
+        "empty",
+        "error",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "cross-org-roles",
+      "kind": "page",
+      "title": "Cross-org roles",
+      "route": "/portfolio/cross-org-roles",
+      "requirements": [
+        "L2-138",
+        "L2-136"
+      ],
+      "states": [
+        "default",
+        "editor",
+        "editor-orgs",
+        "invalid",
+        "saved",
+        "assignments",
+        "loading",
+        "empty",
+        "error",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "agents",
+      "kind": "page",
+      "title": "Agents",
+      "route": "/portfolio/agents, /o/:orgSlug/settings/agents",
+      "requirements": [
+        "L2-154"
+      ],
+      "states": [
+        "default",
+        "tokens",
+        "revoked",
+        "org-lead",
+        "loading",
+        "empty",
+        "error",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "my-work",
+      "kind": "page",
+      "title": "My work",
+      "route": "/o/all/my-work, /o/:orgSlug/my-work",
+      "requirements": [
+        "L2-145"
+      ],
+      "states": [
+        "default",
+        "org",
+        "loading",
+        "empty",
+        "error"
+      ]
+    },
+    {
+      "id": "add-member",
+      "kind": "dialog",
+      "title": "Add member",
+      "opens_from": "organization",
+      "requirements": [
+        "L2-143"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "busy",
+        "failed"
+      ]
+    },
+    {
+      "id": "remove-member",
+      "kind": "dialog",
+      "title": "Remove member",
+      "opens_from": "organization",
+      "requirements": [
+        "L2-143"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "failed",
+        "last-org-lead"
+      ],
+      "not_applicable": {
+        "invalid": "A confirmation with no inputs."
+      }
+    },
+    {
+      "id": "change-org-roles",
+      "kind": "dialog",
+      "title": "Change org roles",
+      "opens_from": "organization",
+      "requirements": [
+        "L2-136"
+      ],
+      "states": [
+        "default",
+        "org-lead",
+        "busy",
+        "failed"
+      ],
+      "not_applicable": {
+        "invalid": "Any combination of ticked roles is valid; refusals come back as failed (403)."
+      }
+    },
+    {
+      "id": "create-org",
+      "kind": "dialog",
+      "title": "New organization",
+      "opens_from": "organizations",
+      "requirements": [
+        "L2-156",
+        "L2-144"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "busy",
+        "failed"
+      ]
+    },
+    {
+      "id": "create-org-type",
+      "kind": "dialog",
+      "title": "New Org Type",
+      "opens_from": "org-types",
+      "requirements": [
+        "L2-134",
+        "L2-147"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "busy",
+        "failed"
+      ]
+    },
+    {
+      "id": "create-cross-org-role",
+      "kind": "dialog",
+      "title": "New cross-org role",
+      "opens_from": "cross-org-roles",
+      "requirements": [
+        "L2-138"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "busy",
+        "failed"
+      ]
+    },
+    {
+      "id": "assign-cross-org-role",
+      "kind": "dialog",
+      "title": "Assign cross-org role",
+      "opens_from": "cross-org-roles",
+      "requirements": [
+        "L2-138"
+      ],
+      "states": [
+        "default",
+        "narrowed",
+        "invalid",
+        "busy",
+        "failed"
+      ]
+    },
+    {
+      "id": "create-agent",
+      "kind": "dialog",
+      "title": "New agent",
+      "opens_from": "agents",
+      "requirements": [
+        "L2-154"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "busy",
+        "failed"
+      ]
+    },
+    {
+      "id": "issue-token",
+      "kind": "dialog",
+      "title": "Issue token",
+      "opens_from": "agents",
+      "requirements": [
+        "L2-154"
+      ],
+      "states": [
+        "default",
+        "org-lead",
+        "invalid",
+        "busy",
+        "failed",
+        "issued"
+      ]
+    },
+    {
+      "id": "revoke-token",
+      "kind": "dialog",
+      "title": "Revoke token",
+      "opens_from": "agents",
+      "requirements": [
+        "L2-154"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "failed"
+      ],
+      "not_applicable": {
+        "invalid": "A confirmation with no inputs."
+      }
+    },
+    {
+      "id": "remove-catalogue-role",
+      "kind": "dialog",
+      "title": "Remove catalogue role",
+      "opens_from": "org-type",
+      "requirements": [
+        "L2-137"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "refused",
+        "failed"
+      ],
+      "not_applicable": {
+        "invalid": "A confirmation with no inputs."
+      }
+    },
+    {
+      "id": "choose-org",
+      "kind": "dialog",
+      "title": "Choose an organization",
+      "opens_from": "workspaces",
+      "requirements": [
+        "L2-145",
+        "L2-139"
+      ],
+      "states": [
+        "default",
+        "invalid"
+      ],
+      "not_applicable": {
+        "busy": "Choosing only opens the create form in that org; nothing is sent."
+      }
+    },
+    {
+      "id": "org-toast",
+      "kind": "notification",
+      "title": "Org toast",
+      "opens_from": "home",
+      "requirements": [
+        "L2-143",
+        "L2-144"
+      ],
+      "states": [
+        "info",
+        "success",
+        "warning",
+        "danger"
+      ]
     }
   ]
 }

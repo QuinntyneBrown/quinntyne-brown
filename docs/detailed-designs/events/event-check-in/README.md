@@ -132,6 +132,14 @@ The page composes existing components. Three need small extensions, made in `com
 - `backend/tests/QuinntyneBrown.Community.Infrastructure.Tests/Csv/CsvWriterTests.cs` — quoting, doubled quotes, line breaks, nulls and the four guarded prefixes. The existing `RsvpTests` prove the RSVP export is unchanged.
 - `e2e/tests/events/check-in.spec.ts` and `walk-ins.spec.ts`, with page objects `e2e/pages/event-check-in.page.ts` and `e2e/pages/add-walk-in.dialog.ts` and additions to `e2e/pages/event.page.ts` — access per role, list order, search, check in and undo with toast, failed save, cancelled and not-open states, everyone's here, empty, no results, loading and error, walk-in dialog states, export, the event page count, the XS layout and an axe check on each state.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Event` carries a required `OrganizationId`; RSVPs and check-ins belong to it. Events are created in the active org. The `City` field stays a property of the event.
+- `CanCheckIn` becomes `Has(org, events.checkIn)` (the four FaithTech leads and the tiers); `CanViewCheckIn` becomes `CanCheckIn` or `Has(org, events.rsvpList)` (adds the Staff and Portfolio cross-org roles, read-only); `CanSeeGuestEmails` becomes `Has(org, events.rsvpListEmails)`. `LeadRoles` is deleted.
+- `IsCheckInOverride` becomes `Has(org, events.checkIn) && !HasByRole(org, events.checkIn)`; such writes are audited as before.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each refines a level-1 (L1) requirement, cited by identifier.

@@ -18,6 +18,14 @@ The team page lets any signed-in member see who the team is, with name, photo an
 
 Sorted by name, opening on All and All cities ([ADR 0007](../../../adr/0007-team-list-filters-and-photos.md)). Paged by [ADR 0015](../../../adr/0015-team-list-paging.md): `GET /api/team?role=&city=&after=&pageSize=` returns `{ members, cities, next, totalCount }`, 50 by default and at most 100. Filters and the order by lower-cased name, then id, run in the database before paging, and `next` is a keyset continuation. `cities` stays global. `TeamPage` shows "Showing N of M members" (`role="status"`) and *Show more members*. A failed continuation keeps the list, shows a danger `ft-alert`, "We couldn’t load more members. Try again.", and the button tries again (mock states `more` and `more-error`).
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `TeamRoles` is deleted. The team is the members of the active org whose permissions there include the marker `team.member`; the **Leads** filter matches `team.lead`, and **Volunteers** matches `team.member` without `team.lead` (seeded: the four FaithTech leads hold both, Volunteer holds `team.member`).
+- Role badges show catalogue role names. Under "All orgs" the list combines covered orgs with org labels; the `team` feature switched off answers `404`.
+- Membership is still derived on every request, so role and catalogue changes take effect at once.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

@@ -1,0 +1,49 @@
+@startuml
+title UML sequence behaviour — Create a record in an org
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Member" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "Feature dialog" as page
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "<Feature>Endpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "Create<Item>Handler" as h
+  participant "OrgScope" as scope
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Save new item
+page -> ep : POST /api/<feature> (X-Org: slug | all | none)
+ep -> h : Create<Item>Command
+h -> scope : CreateTarget(access, active, feature, code)
+alt X-Org names an uncovered or unknown org, or feature off
+  scope --> h : NotFound
+  h --> page : 404 (L2-139 #3)
+else X-Org is all or absent, and several orgs are creatable
+  scope --> h : Invalid "Choose an organization"
+  h --> page : 400 (L2-139 #4)
+else covered org without the create permission
+  scope --> h : Forbidden
+  h --> page : 403
+else one target org
+  scope --> h : orgId
+  h -> db : INSERT item (OrganizationId = orgId)
+  h --> page : 201 item with organization { id, slug, name }
+end
+@enduml

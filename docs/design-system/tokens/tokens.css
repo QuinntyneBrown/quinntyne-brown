@@ -196,6 +196,15 @@
   --color-fg-on-accent: var(--palette-white);
   --color-fg-accent: var(--palette-violet-700);     /* accent-coloured text on surfaces */
 
+  /* Org accent (ADR 0037, L2-149): a scoped pair the shell header, the org switcher's mark, org
+     labels and the public event page read. These defaults alias the brand accent; an org's
+     branding overrides both on the scoping element only (never :root), with the server-computed
+     foreground (white or #111111, whichever contrasts more). Saving is refused below 4.5:1, so
+     every pair this token ever holds passes WCAG 2.2 AA (1.4.3). Use the accent only as a fill
+     behind its foreground, never as text on a surface. */
+  --color-org-accent: var(--color-accent);
+  --color-org-accent-foreground: var(--color-fg-on-accent);
+
   --color-focus-ring: var(--palette-violet-600);
   --color-social-google-bg: var(--palette-google-light-bg);
   --color-social-google-fg: var(--palette-google-light-fg);
@@ -414,6 +423,8 @@
   --color-accent-subtle-hover: var(--palette-violet-100);
   --color-fg-on-accent: var(--palette-white);
   --color-fg-accent: var(--palette-violet-700);
+  --color-org-accent: var(--color-accent);  /* re-declared per theme so nested [data-theme] scopes recompute it */
+  --color-org-accent-foreground: var(--color-fg-on-accent);
   --color-focus-ring: var(--palette-violet-600);
   --color-social-google-bg: var(--palette-google-light-bg);
   --color-social-google-fg: var(--palette-google-light-fg);
@@ -494,6 +505,8 @@
   --color-accent-subtle-hover: var(--palette-violet-900);
   --color-fg-on-accent: var(--palette-violet-950);
   --color-fg-accent: var(--palette-violet-300);
+  --color-org-accent: var(--color-accent);  /* re-declared per theme so nested [data-theme] scopes recompute it */
+  --color-org-accent-foreground: var(--color-fg-on-accent);
 
   --color-focus-ring: var(--palette-violet-300);
   --color-social-google-bg: var(--palette-google-dark-bg);
@@ -578,6 +591,8 @@
     --color-accent-subtle-hover: var(--palette-violet-900);
     --color-fg-on-accent: var(--palette-violet-950);
     --color-fg-accent: var(--palette-violet-300);
+    --color-org-accent: var(--color-accent);  /* re-declared per theme so nested [data-theme] scopes recompute it */
+    --color-org-accent-foreground: var(--color-fg-on-accent);
     --color-focus-ring: var(--palette-violet-300);
     --color-social-google-bg: var(--palette-google-dark-bg);
     --color-social-google-fg: var(--palette-google-dark-fg);

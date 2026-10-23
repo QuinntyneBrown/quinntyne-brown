@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colour field — QuinntyneBrown.Community design system</title>
+<meta name="description" content="Colour field: swatch, hex, preview and measured contrast ratio, invalid below 4.5:1.">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+<style>
+  .demo-org-toronto { --color-org-accent: #0b6e4f; --color-org-accent-foreground: #ffffff; } /* allow-color */
+  .demo-org-shelfie { --color-org-accent: #f2b134; --color-org-accent-foreground: #111111; } /* allow-color */
+  .demo-org-long { --color-org-accent: #5b21b6; --color-org-accent-foreground: #ffffff; } /* allow-color */
+  .demo-org-fail { --color-org-accent: #1f8a70; --color-org-accent-foreground: #111111; } /* allow-color */
+  .ds-main .org-switcher__menu.menu--static { position: static; margin-top: var(--space-2); }
+  .ds-main .org-switcher { flex-direction: column; align-items: flex-start; }
+  .ds-main .org-switcher__name { display: block; }
+</style>
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">FaithTech DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details open><summary>Components</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/copy-field.html">Copy field</a></li>
+      <li><a href="../components/token-reveal.html">Token reveal</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li><li><a href="../components/checkbox-group.html">Checkbox group</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/colour-field.html">Colour field</a></li>
+      <li><a href="../components/permission-checklist.html">Permission checklist</a></li>
+      <li><a href="../components/scope-picker.html">Scope picker</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/picture-list.html">Picture list</a></li>
+      <li><a href="../components/photo-gallery.html">Photo gallery</a></li>
+      <li><a href="../components/file-dropzone.html">File drop zone</a></li>
+      <li><a href="../components/file-row.html">File row</a></li>
+      <li><a href="../components/tag-input.html">Tag input</a></li>
+      <li><a href="../components/person-picker.html">Person picker</a></li>
+      <li><a href="../components/type-icon.html">Type icon</a></li>
+      <li><a href="../components/sticker-picker.html">Estimate card picker</a></li>
+      <li><a href="../components/emoji-picker.html">Emoji picker</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+      <li><a href="../components/org-switcher.html">Org switcher</a></li>
+      <li><a href="../components/tab-bar.html">Tab bar</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/layout.html">Layout primitives</a></li>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/notification-panel.html">Notification panel</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/feed.html">Activity feed</a></li>
+      <li><a href="../components/tree.html">Backlog tree</a></li>
+      <li><a href="../components/role-tree.html">Role tree</a></li>
+      <li><a href="../components/kanban.html">Kanban board</a></li>
+      <li><a href="../components/event-card.html">Event card</a></li>
+      <li><a href="../components/person-card.html">Person card</a></li>
+      <li><a href="../components/profile-header.html">Profile header</a></li>
+      <li><a href="../components/person-summary.html">Person summary</a></li>
+      <li><a href="../components/search-results.html">Search results</a></li>
+      <li><a href="../components/note.html">Note</a></li>
+      <li><a href="../components/block-editor.html">Block editor</a></li>
+      <li><a href="../components/slash-menu.html">Slash menu</a></li>
+      <li><a href="../components/format-toolbar.html">Formatting toolbar</a></li>
+      <li><a href="../components/save-status.html">Save status</a></li>
+      <li><a href="../components/page-links.html">Page links</a></li>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/qr-code.html">QR code</a></li>
+      <li><a href="../components/logo-mark.html">Logo mark</a></li>
+      <li><a href="../components/badge.html">Badge</a></li>
+      <li><a href="../components/agent-badge.html">Agent badge</a></li>
+      <li><a href="../components/org-label.html">Org label and mark</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/sticker.html">Estimate card</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress.html">Progress</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/landing-hero.html">Landing hero</a></li>
+      <li><a href="../components/video-player.html">Video player</a></li>
+      <li><a href="../components/auth-forms.html">Sign-in and sign-up forms</a></li>
+      <li><a href="../components/site-footer.html">Site footer</a></li>
+    </ul></details>
+    <details open><summary>Patterns</summary><ul>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/navigation.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/lists-and-tables.html">Lists and tables</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/private-preview-wall.html">Private preview wall</a></li>
+    </ul></details>
+  </nav>
+
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Component · Forms</p>
+      <h1>Colour field</h1>
+      <p class="ds-lead">An org accent colour with a live contrast check against its foreground.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: new</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#anatomy">Anatomy</a></li><li><a href="#variants">Variants</a></li><li><a href="#sizes">Sizes</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive</a></li><li><a href="#theming">Theming</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don't</a></li><li><a href="#tokens">Tokens</a></li><li><a href="#code">Code</a></li><li><a href="#sources">Sources</a></li></ul>
+    </header>
+
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p>The colour field sets an org’s accent. It pairs a native colour picker with a hex text field, previews the accent behind its foreground, and shows the measured contrast ratio. The foreground is white or <code>#111111</code>, whichever contrasts more; below 4.5:1 the field is invalid and the server refuses the save.</p><div class="ds-themes"><div data-theme="light"><div style="padding: var(--space-4); background: var(--color-bg-surface);"><div class="field colour-field"><label class="field__label" for="acc">Accent colour <span class="optional">(optional)</span></label><div class="colour-field__row"><input class="colour-field__swatch" type="color" aria-label="Pick the accent colour" tabindex="-1"><input class="input colour-field__hex" id="acc" name="acc" type="text" value="#0B6E4F" inputmode="text" spellcheck="false" aria-describedby="acc-ratio acc-help"><span class="colour-field__preview demo-org-toronto" aria-hidden="true">Aa FaithTech Toronto</span></div><p class="colour-field__ratio" id="acc-ratio">Contrast with white text: <strong>6.25:1</strong> <span class="badge badge--success">Passes AA</span></p><div class="field__help" id="acc-help">Used behind your logo in the switcher and as the band on public event pages. Text on it is white or near-black, whichever reads better; it needs at least 4.5:1.</div></div></div></div><div data-theme="dark"><div style="padding: var(--space-4); background: var(--color-bg-surface);"><div class="field colour-field"><label class="field__label" for="acc">Accent colour <span class="optional">(optional)</span></label><div class="colour-field__row"><input class="colour-field__swatch" type="color" aria-label="Pick the accent colour" tabindex="-1"><input class="input colour-field__hex" id="acc" name="dark-acc" type="text" value="#0B6E4F" inputmode="text" spellcheck="false" aria-describedby="acc-ratio acc-help"><span class="colour-field__preview demo-org-toronto" aria-hidden="true">Aa FaithTech Toronto</span></div><p class="colour-field__ratio" id="acc-ratio">Contrast with white text: <strong>6.25:1</strong> <span class="badge badge--success">Passes AA</span></p><div class="field__help" id="acc-help">Used behind your logo in the switcher and as the band on public event pages. Text on it is white or near-black, whichever reads better; it needs at least 4.5:1.</div></div></div></div></div>
+    </section>
+    <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
+<div class="ds-anatomy"><figure class="ds-anatomy__figure"><div class="field colour-field"><label class="field__label" for="acc">Accent colour <span class="optional">(optional)</span></label><div class="colour-field__row"><input class="colour-field__swatch" type="color" aria-label="Pick the accent colour" tabindex="-1"><input class="input colour-field__hex" id="acc" name="acc" type="text" value="#0B6E4F" inputmode="text" spellcheck="false" aria-describedby="acc-ratio acc-help"><span class="colour-field__preview demo-org-toronto" aria-hidden="true">Aa FaithTech Toronto</span></div><p class="colour-field__ratio" id="acc-ratio">Contrast with white text: <strong>6.25:1</strong> <span class="badge badge--success">Passes AA</span></p><div class="field__help" id="acc-help">Used behind your logo in the switcher and as the band on public event pages. Text on it is white or near-black, whichever reads better; it needs at least 4.5:1.</div></div></figure><ol class="ds-anatomy__list"><li><div><b>Label</b><small>“Accent colour (optional)”.</small></div></li><li><div><b>Swatch</b><small>A native <code>input type="color"</code> named “Pick the accent colour”; it mirrors the hex field and is skipped by Tab (the hex field is the keyboard path).</small></div></li><li><div><b>Hex field</b><small>Mono, upper-case <code>#RRGGBB</code>.</small></div></li><li><div><b>Preview</b><small>“Aa {org}” on the accent pair.</small></div></li><li><div><b>Ratio</b><small>“Contrast with {white | near-black} text: 6.25:1” and a Passes AA or Below 4.5:1 badge.</small></div></li><li><div><b>Help and error</b><small>Joined to the hex field.</small></div></li></ol></div>
+    </section>
+    <section class="ds-section" id="variants" data-na="one variant"><h2><a href="#variants">Variants</a></h2>
+<p class="ds-na">One variant. The foreground choice is computed, not chosen.</p>
+    </section>
+    <section class="ds-section" id="sizes" data-na="one size"><h2><a href="#sizes">Sizes</a></h2>
+<p class="ds-na">One size: 44px controls.</p>
+    </section>
+    <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
+<div class="ds-matrix"><table><thead><tr><th scope="col">Theme</th><th scope="col">Passes, white text</th><th scope="col">Passes, dark text</th><th scope="col">Below 4.5:1</th></tr></thead><tbody><tr><th scope="row">Light</th><td data-theme="light"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><div class="field colour-field"><label class="field__label" for="acc">Accent colour <span class="optional">(optional)</span></label><div class="colour-field__row"><input class="colour-field__swatch" type="color" aria-label="Pick the accent colour" tabindex="-1"><input class="input colour-field__hex" id="acc" name="acc" type="text" value="#0B6E4F" inputmode="text" spellcheck="false" aria-describedby="acc-ratio acc-help"><span class="colour-field__preview demo-org-toronto" aria-hidden="true">Aa FaithTech Toronto</span></div><p class="colour-field__ratio" id="acc-ratio">Contrast with white text: <strong>6.25:1</strong> <span class="badge badge--success">Passes AA</span></p><div class="field__help" id="acc-help">Used behind your logo in the switcher and as the band on public event pages. Text on it is white or near-black, whichever reads better; it needs at least 4.5:1.</div></div></div></td><td data-theme="light"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><div class="field colour-field"><label class="field__label" for="acc">Accent colour <span class="optional">(optional)</span></label><div class="colour-field__row"><input class="colour-field__swatch" type="color" aria-label="Pick the accent colour" tabindex="-1"><input class="input colour-field__hex" id="acc" name="acc" type="text" value="#F2B134" inputmode="text" spellcheck="false" aria-describedby="acc-ratio acc-help"><span class="colour-field__preview demo-org-shelfie" aria-hidden="true">Aa FaithTech Toronto</span></div><p class="colour-field__ratio" id="acc-ratio">Contrast with near-black (#111111) text: <strong>9.99:1</strong> <span class="badge badge--success">Passes AA</span></p><div class="field__help" id="acc-help">Used behind your logo in the switcher and as the band on public event pages. Text on it is white or near-black, whichever reads better; it needs at least 4.5:1.</div></div></div></td><td data-theme="light"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><div class="field colour-field"><label class="field__label" for="acc">Accent colour <span class="optional">(optional)</span></label><div class="colour-field__row"><input class="colour-field__swatch" type="color" aria-label="Pick the accent colour" tabindex="-1"><input class="input colour-field__hex" id="acc" name="acc" type="text" value="#1F8A70" inputmode="text" spellcheck="false" aria-describedby="acc-ratio acc-error acc-help" aria-invalid="true"><span class="colour-field__preview demo-org-fail" aria-hidden="true">Aa FaithTech Toronto</span></div><div class="field__error" id="acc-error">This colour doesn't have enough contrast. Choose a darker or lighter shade.</div><p class="colour-field__ratio" id="acc-ratio">Contrast with near-black (#111111) text: <strong>4.43:1</strong> · 4.26:1 with white <span class="badge badge--danger">Below 4.5:1</span></p><div class="field__help" id="acc-help">Used behind your logo in the switcher and as the band on public event pages. Text on it is white or near-black, whichever reads better; it needs at least 4.5:1.</div></div></div></td></tr><tr><th scope="row">Dark</th><td data-theme="dark"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><div class="field colour-field"><label class="field__label" for="acc">Accent colour <span class="optional">(optional)</span></label><div class="colour-field__row"><input class="colour-field__swatch" type="color" aria-label="Pick the accent colour" tabindex="-1"><input class="input colour-field__hex" id="acc" name="dark-acc" type="text" value="#0B6E4F" inputmode="text" spellcheck="false" aria-describedby="acc-ratio acc-help"><span class="colour-field__preview demo-org-toronto" aria-hidden="true">Aa FaithTech Toronto</span></div><p class="colour-field__ratio" id="acc-ratio">Contrast with white text: <strong>6.25:1</strong> <span class="badge badge--success">Passes AA</span></p><div class="field__help" id="acc-help">Used behind your logo in the switcher and as the band on public event pages. Text on it is white or near-black, whichever reads better; it needs at least 4.5:1.</div></div></div></td><td data-theme="dark"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><div class="field colour-field"><label class="field__label" for="acc">Accent colour <span class="optional">(optional)</span></label><div class="colour-field__row"><input class="colour-field__swatch" type="color" aria-label="Pick the accent colour" tabindex="-1"><input class="input colour-field__hex" id="acc" name="dark-acc" type="text" value="#F2B134" inputmode="text" spellcheck="false" aria-describedby="acc-ratio acc-help"><span class="colour-field__preview demo-org-shelfie" aria-hidden="true">Aa FaithTech Toronto</span></div><p class="colour-field__ratio" id="acc-ratio">Contrast with near-black (#111111) text: <strong>9.99:1</strong> <span class="badge badge--success">Passes AA</span></p><div class="field__help" id="acc-help">Used behind your logo in the switcher and as the band on public event pages. Text on it is white or near-black, whichever reads better; it needs at least 4.5:1.</div></div></div></td><td data-theme="dark"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><div class="field colour-field"><label class="field__label" for="acc">Accent colour <span class="optional">(optional)</span></label><div class="colour-field__row"><input class="colour-field__swatch" type="color" aria-label="Pick the accent colour" tabindex="-1"><input class="input colour-field__hex" id="acc" name="dark-acc" type="text" value="#1F8A70" inputmode="text" spellcheck="false" aria-describedby="acc-ratio acc-error acc-help" aria-invalid="true"><span class="colour-field__preview demo-org-fail" aria-hidden="true">Aa FaithTech Toronto</span></div><div class="field__error" id="acc-error">This colour doesn't have enough contrast. Choose a darker or lighter shade.</div><p class="colour-field__ratio" id="acc-ratio">Contrast with near-black (#111111) text: <strong>4.43:1</strong> · 4.26:1 with white <span class="badge badge--danger">Below 4.5:1</span></p><div class="field__help" id="acc-help">Used behind your logo in the switcher and as the band on public event pages. Text on it is white or near-black, whichever reads better; it needs at least 4.5:1.</div></div></div></td></tr></tbody></table></div><p><b>Below 4.5:1</b> shows both ratios, sets <code>aria-invalid</code>, and repeats the server’s message “This colour doesn't have enough contrast. Choose a darker or lighter shade.” in the error summary. Focus, hover and disabled come from <a href="text-field.html">Text field</a>.</p>
+    </section>
+    <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
+<p>Swatch, hex and preview sit in one row that wraps; at 360px the preview moves under the inputs. The ratio line wraps after the badge.</p>
+    </section>
+    <section class="ds-section" id="theming"><h2><a href="#theming">Theming</a></h2>
+<p>The field follows the theme; the preview shows the org pair exactly as it will look, which is the same in both themes.</p>
+    </section>
+    <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
+<ul><li>The hex field is the labelled control; the ratio line, help and error are joined with <code>aria-describedby</code>, so the ratio is read with the field.</li><li>The ratio updates as a polite announcement after typing stops, not on every key.</li><li>The badge pairs a word with its colour.</li><li>The preview is <code>aria-hidden</code>; the ratio says the same thing in words.</li></ul>
+    </section>
+    <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
+<ul><li>“Contrast with white text: 6.25:1 · Passes AA”.</li><li>Failing: “Contrast with near-black (#111111) text: 4.43:1 · 4.26:1 with white · Below 4.5:1”.</li><li>Error (from the API, L2-149): “This colour doesn't have enough contrast. Choose a darker or lighter shade.”</li></ul>
+    </section>
+    <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don't</a></h2>
+<div class="ds-dodont"><figure class="ds-do"><div class="ds-example__canvas ds-example__canvas--stack"><p>Show the ratio while choosing, then let the server decide.</p></div><figcaption>Do.</figcaption></figure><figure class="ds-dont"><div class="ds-example__canvas ds-example__canvas--stack"><p>Silently darken the colour the person chose.</p></div><figcaption>Don’t.</figcaption></figure></div><div class="ds-dodont"><figure class="ds-do"><div class="ds-example__canvas ds-example__canvas--stack"><p>Use the accent only as a fill behind its foreground.</p></div><figcaption>Do.</figcaption></figure><figure class="ds-dont"><div class="ds-example__canvas ds-example__canvas--stack"><p>Use the accent as text colour on a surface.</p></div><figcaption>Don’t.</figcaption></figure></div>
+    </section>
+    <section class="ds-section" id="tokens"><h2><a href="#tokens">Tokens</a></h2>
+<table class="ds-table"><thead><tr><th scope="col">Token</th><th scope="col">Use</th></tr></thead><tbody><tr><td><code>--color-org-accent</code>, <code>--color-org-accent-foreground</code></td><td>Preview (scoped to the field’s value)</td></tr><tr><td><code>--font-family-mono</code></td><td>Hex</td></tr><tr><td><code>--color-border-strong</code>, <code>--control-height-md</code></td><td>Swatch</td></tr></tbody></table>
+    </section>
+    <section class="ds-section" id="code"><h2><a href="#code">Code</a></h2>
+<pre><code>&lt;ft-colour-field
+  label="Accent colour" [optional]="true"
+  [value]="accent"                  // '#0b6e4f'
+  previewText="FaithTech Toronto"
+  [error]="errors.accent"
+  (valueChange)="accent = $event" /&gt;</code></pre><table class="ds-table"><thead><tr><th scope="col">Input / output</th><th scope="col">Type and default</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>value</code></td><td><code>string | null</code></td><td><code>#rrggbb</code>.</td></tr><tr><td><code>minimumRatio</code></td><td><code>number, 4.5</code></td><td>The AA threshold shown in the badge.</td></tr><tr><td><code>previewText</code></td><td><code>string, ''</code></td><td>Text in the preview after “Aa”.</td></tr><tr><td><code>help</code></td><td><code>string</code></td><td>Help text.</td></tr><tr><td><code>error</code></td><td><code>string | null</code></td><td>Server or client error.</td></tr><tr><td><code>optional</code></td><td><code>boolean, false</code></td><td>Adds “(optional)”.</td></tr><tr><td><code>valueChange</code></td><td><code>output&lt;string&gt;</code></td><td>Normalised lower-case hex.</td></tr><tr><td><code>(computed)</code></td><td><code>contrastRatio(hex, fg) in components</code></td><td>The field computes both ratios and picks the foreground for feedback only; the API is the authority (ADR 0037).</td></tr></tbody></table>
+    </section>
+    <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
+<ul><li><a href="../../mocks/pages/organization/branding.html">pages/organization/branding</a></li><li><a href="../../mocks/pages/organization/branding-invalid.html">pages/organization/branding-invalid</a></li><li><a href="../../mocks/pages/organization/branding-saved.html">pages/organization/branding-saved</a></li></ul>
+    </section>
+
+    <footer class="ds-footer"><span>QuinntyneBrown.Community design system · extracted from <a href="../../mocks/index.html">docs/mocks</a> on 2026-10-21 · organizations added 2026-10-23</span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>

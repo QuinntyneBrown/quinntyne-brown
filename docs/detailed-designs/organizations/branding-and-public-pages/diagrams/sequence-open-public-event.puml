@@ -1,0 +1,48 @@
+@startuml
+title UML sequence behaviour — Open an org-addressed public event
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Anonymous visitor" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "Legacy public route" as legacy
+  participant "PublicEventPage" as page
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "PublicEventsEndpoints (AllowAnonymous)" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "PublicEventsHandler" as h
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> legacy : Open /public/events/42
+legacy -> ep : GET /api/public/events/42
+ep -> h : Load public event
+h -> db : Event (IsPublic) + Organization + aliases
+h --> legacy : 200 PublicEventDto
+legacy --> actor : Redirect /o/faithtech-toronto/events/42 (L2-149 #2)
+actor -> page : Open /o/{orgSlug}/events/42
+page -> ep : GET /api/public/events/42
+ep --> page : 200 PublicEventDto (or 404 when not public, L2-149 #7)
+alt orgSlug equals organization.slug
+  page -> page : Set --color-org-accent tokens on band (L2-149 #6)
+  page --> actor : Branded event page, guest RSVP, .ics (L2-149 #1)
+else orgSlug is an alias
+  page --> actor : Redirect to /o/{slug}/events/42
+else any other slug
+  page --> actor : Not-found page (L2-149 #3)
+end
+@enduml

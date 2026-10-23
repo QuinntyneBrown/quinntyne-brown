@@ -1,0 +1,54 @@
+@startuml
+title UML sequence behaviour — Create an organization and change its slug
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Portfolio Lead" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "CreateOrganizationDialog" as dlg
+  participant "OrganizationSettingsPage" as page
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "OrganizationsEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "OrganizationHandlers" as h
+  participant "IAuditLog" as audit
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> dlg : Name, slug, Org Type
+dlg -> ep : POST /api/portfolios/{id}/organizations
+ep -> h : CreateAsync
+alt slug fails format, length or is "all"
+  h --> dlg : 400 slug (L2-144 #7)
+else slug taken by an org or an alias
+  h --> dlg : 409 slug (L2-144 #7)
+else
+  h -> db : INSERT Organization (DisplayName = Name)
+  h -> audit : organization.created
+  h --> dlg : 201 OrganizationDto (L2-156 #1)
+end
+actor -> page : Change slug
+page -> ep : PUT /api/organizations/{id} { name, slug }
+ep -> h : UpdateAsync
+alt caller is the Org Lead only
+  h --> page : 403 (L2-156 #4)
+else
+  h -> db : INSERT OrgSlugAlias(old slug); Organization.Slug = new
+  h -> audit : organization.updated (before, after)
+  h --> page : 200 (old slug redirects, L2-144 #5)
+end
+@enduml

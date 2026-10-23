@@ -24,6 +24,14 @@ Cancelling notifies everyone who RSVP'd: members by email and in-app notificatio
 
 The cancellation reason is at most 500 characters.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Event` carries a required `OrganizationId`; RSVPs and check-ins belong to it. Events are created in the active org. The `City` field stays a property of the event.
+- **Event manager** becomes a holder of `events.manage` in the event's org (the seeded City Lead and Event Lead), or a tier (Org Lead, Portfolio Lead, System Admin).
+- An *override* is now an action allowed by a tier (Org Lead, Portfolio Lead, System Admin) but not by any role: `CallerAccess.Has(org, code)` without `HasByRole(org, code)`. Overrides on other people's items are audited, replacing "a System Admin without a lead role". This replaces "a System Admin who holds neither Event Lead nor City Lead".
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

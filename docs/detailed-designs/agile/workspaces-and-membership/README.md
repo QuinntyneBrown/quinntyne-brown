@@ -37,6 +37,18 @@ The slice runs from the workspaces pages in the `agile` feature library to the C
 - **`IAuditLog`** — Application abstraction (`Application/Admin`) implemented in Infrastructure; `Record(actorId, action, targetType, targetId, before, after)`.
 - **`CommunityDbContext`** — EF Core context in Infrastructure that persists workspaces and members to PostgreSQL; a global query filter hides archived workspaces and items.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Workspace` carries a required `OrganizationId`; work items, sprints, comments, poker sessions and members belong to the workspace's org. A workspace outside the caller's coverage, or in an org with `agile` off, answers `404`.
+- `WorkspaceAccessPolicy` classifies with `CallerAccess` for the workspace's org: **Admin** is the org's Org Lead, the Portfolio Lead or a System Admin; the read-only level (formerly **Staff**) is any holder of `workspaces.readAll` there, such as the Staff and Portfolio cross-org roles; Owner, Member and Outsider are unchanged (`L2-146` AC5). The "Read-only for Staff" alert reads "Read-only".
+- Actions by an Admin who is not the owner are overrides and stay audited.
+- **Create** requires `workspaces.create` in the target org (the seeded City Lead), or the org's Org Lead or the Portfolio Lead (`L2-146` AC1). The workspace is created in the active org.
+- **Members**: `TeamRoles.IsTeamMember` is replaced by eligibility in the workspace's org: a member holding `workspaces.join` there, or a holder of a covering cross-org role with `CanJoinWork`; others answer `400` (`L2-146` AC2). The member picker uses `GET /api/workspaces/{id}/eligible-members` and marks cross-org people.
+- **Lists** are scoped to the active org; under "All orgs" they combine every covered org with org labels (`L2-145`). Holders of `workspaces.readAll`, the Org Lead, the Portfolio Lead and System Admin list every workspace of the orgs they cover (`L2-146` AC3).
+- Details are in [cross-org roles](../../organizations/cross-org-roles/README.md) and [ADR 0035](../../../adr/0035-cross-org-roles.md).
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

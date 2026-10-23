@@ -1,0 +1,28 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Branding and public pages
+Container_Boundary(web, "Web app") {
+  Component(bp, "OrgBrandingPage", "organizations library", "Display name, logo, colour field with contrast check")
+  Component(pub, "PublicEventPage (/o/:orgSlug/events/:id)", "events library", "Branded band; redirects alias slug")
+  Component(legacy, "Legacy public route /public/events/:id", "faithtech-community", "Loads event, redirects to org URL")
+  Component(tokens, "Org accent tokens", "components", "--color-org-accent, --color-org-accent-foreground")
+}
+Container_Boundary(api, "Community API") {
+  Component(bep, "OrganizationBrandingEndpoints", "Api", "PUT branding, PUT/DELETE logo")
+  Component(bh, "SaveBrandingHandler / OrgLogoHandler", "Application/Organizations", "Org Lead or Portfolio Lead")
+  Component(con, "AccentContrast", "Application/Organizations", "WCAG ratio; chooses white or #111111")
+  Component(img, "IImageProcessor / IPhotoStorage", "Application/Profiles abstractions", "Validate, resize, store logos")
+  Component(pe, "PublicEventsHandler", "Application/Events", "Event + organization branding")
+  ComponentDb(db, "CommunityDbContext", "EF Core", "")
+}
+Rel(bp, bep, "Calls", "JSON/HTTPS")
+Rel(bep, bh, "Dispatches")
+Rel(bh, con, "Checks accent")
+Rel(bh, img, "Stores logo")
+Rel(bh, db, "Writes")
+Rel(pub, pe, "GET /api/public/events/{id}", "JSON/HTTPS")
+Rel(legacy, pe, "GET /api/public/events/{id}", "JSON/HTTPS")
+Rel(pub, tokens, "Sets scoped tokens")
+Rel(pe, db, "Reads event, org, aliases")
+@enduml

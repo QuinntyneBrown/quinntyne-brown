@@ -1,0 +1,16 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Membership and joining
+Person(caller, "Inviter, lead or newcomer", "")
+System_Boundary(ftc, "QuinntyneBrown.Community") {
+  Container(web, "Web app", "Angular", "Shell, organizations and feature libraries, api and components libraries")
+  Container(api, "Community API", "ASP.NET Core", "QuinntyneBrown.Community.Api with Application, Domain and Infrastructure")
+  ContainerDb(db, "Community database", "PostgreSQL", "Hierarchy, memberships, catalogues and org-owned records")
+}
+System_Ext(email, "Email provider", "SMTP / SendGrid")
+Rel(caller, web, "Uses", "HTTPS")
+Rel(web, api, "Invites, connect links, members endpoints", "JSON/HTTPS")
+Rel(api, db, "Invite, ConnectLink, OrgMembership rows", "EF Core")
+Rel(api, email, "Sends", "SMTP")
+@enduml

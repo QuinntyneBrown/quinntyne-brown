@@ -1,0 +1,16 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Agents
+Person(pl, "Portfolio Lead or Org Lead", "")
+System_Boundary(ftc, "QuinntyneBrown.Community") {
+  Container(web, "Web app", "Angular", "Shell, organizations and feature libraries, api and components libraries")
+  Container(api, "Community API", "ASP.NET Core", "QuinntyneBrown.Community.Api with Application, Domain and Infrastructure")
+  ContainerDb(db, "Community database", "PostgreSQL", "Hierarchy, memberships, catalogues and org-owned records")
+}
+System_Ext(agent, "AI agent", "API client")
+Rel(pl, web, "Uses Agents page", "HTTPS")
+Rel(web, api, "/api/agents endpoints", "JSON/HTTPS")
+Rel(agent, api, "Feature endpoints with Bearer ftca_...", "JSON/HTTPS")
+Rel(api, db, "Profiles (Kind Agent), AgentCredentials", "EF Core")
+@enduml

@@ -1,0 +1,54 @@
+@startuml
+title UML sequence behaviour — Resolve cross-org coverage
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Staff holder" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "Partners page" as page
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "CurrentAccessMiddleware" as mw
+  participant "PartnersEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "AccessResolver" as res
+  participant "CrossOrgScopeResolver" as scope
+  participant "PartnerAccess" as acc
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Open /o/faithtech-ottawa/partners
+page -> mw : GET /api/partners (X-Org: faithtech-ottawa)
+mw -> res : ResolveAsync(userId)
+res -> db : CrossOrgAssignments + CrossOrgRole
+res -> scope : Resolve(Staff, assignment)
+scope -> db : SELECT Id FROM Organizations\nWHERE OrgTypeId = FaithTech City AND ArchivedAt IS NULL
+note right of scope : Resolved on every request, so an org\ncreated yesterday is covered now (L2-138 #2)
+scope --> res : role orgs ∩ NarrowedOrgIds (when any)
+res --> mw : CallerAccess (Staff bundle in each covered org)
+mw -> ep : Continue
+ep -> acc : Read scope for partners
+alt org outside narrowed scope
+  acc --> page : 404 (L2-138 #4)
+else covered, partners.read held
+  ep -> db : Partners WHERE OrganizationId = org
+  ep --> page : 200 read-only list (L2-138 #1)
+end
+actor -> page : Move a partner card
+page -> ep : POST /api/partners/{id}/move
+ep -> acc : Has(org, partners.write)?
+acc --> page : 403 (L2-138 #1)
+@enduml

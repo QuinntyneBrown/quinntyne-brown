@@ -29,6 +29,14 @@ An event may have an optional capacity (`L2-020` AC5); `Event.IsFull` refuses RS
 
 Since [event check-in](../event-check-in/README.md), an `Rsvp` row also records a check-in (`CheckedInAt`, `CheckedInById`) and may be a walk-in added at the door (`IsWalkIn`, [ADR 0029](../../../adr/0029-check-in-storage-on-the-rsvp.md)). `RsvpCount`, `IsFull`, the RSVP list on the event page and the RSVP CSV leave walk-ins out, so this feature's behaviour is unchanged. Leads, Staff and System Admin also see "{n} checked in" beside the RSVP count once anyone is checked in (`L2-121`).
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Event` carries a required `OrganizationId`; RSVPs and check-ins belong to it. Events are created in the active org. The `City` field stays a property of the event.
+- The full RSVP list goes to holders of `events.rsvpList` in the event's org (the four FaithTech leads, Staff and Portfolio cross-org roles) and the tiers. Guest emails and the CSV export go to holders of `events.rsvpListEmails` (the four leads) and the tiers. Everyone else sees the count.
+- The host's role label comes from the catalogue role name in the event's org.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

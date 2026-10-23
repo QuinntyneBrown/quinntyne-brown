@@ -1,0 +1,14 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Membership and joining
+Person(inv, "Inviter", "invites.send holder, Org Lead or Portfolio Lead")
+Person(lead, "Org Lead or Portfolio Lead", "Adds and removes members")
+Person(new, "Newcomer", "Joins through an invite or connect link, or waits to be added")
+System(ftc, "QuinntyneBrown.Community", "Home base for the people Quinntyne Brown builds with: orgs, profiles, events, resources, notes and Agile workspaces")
+System_Ext(email, "Email provider", "SMTP / SendGrid")
+Rel(inv, ftc, "Sends org invites and shares connect QR codes using")
+Rel(lead, ftc, "Adds and removes members of an org in")
+Rel(new, ftc, "Accepts an invite, signs up through a link, or signs up alone on")
+Rel(ftc, email, "Sends invite emails and member notifications via", "SMTP")
+@enduml

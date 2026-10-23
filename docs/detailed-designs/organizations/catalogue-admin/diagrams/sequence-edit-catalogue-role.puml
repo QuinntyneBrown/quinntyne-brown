@@ -1,0 +1,55 @@
+@startuml
+title UML sequence behaviour — Edit a catalogue role
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Portfolio Lead" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "OrgTypePage" as page
+  participant "HttpOrgTypesService" as client
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "OrgTypesEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "CatalogueHandlers" as h
+  participant "PortfolioAccess" as pa
+  participant "CatalogueValidator" as val
+  participant "IAuditLog" as audit
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Tick permissions, choose CanGrant, save
+page -> client : updateRole(typeId, roleId, body)
+client -> ep : PUT /api/org-types/{typeId}/roles/{roleId}
+ep -> h : UpdateRoleAsync
+h -> pa : Is Portfolio Lead of type's portfolio or System Admin?
+alt portfolio not covered
+  pa --> client : 404
+else Org Lead or other member
+  pa --> client : 403 (L2-137 #2)
+else allowed
+  h -> val : Known codes, unique key, CanGrant in same catalogue
+  alt invalid
+    val --> client : 400 naming the field (L2-134 #5)
+  else valid
+    h -> db : Update RoleDefinition
+    h -> audit : catalogue.roleChanged (before, after) (L2-137 #1)
+    h -> db : SaveChanges
+    h --> client : 200 RoleDefinitionDto
+    note over db : Every org of the type uses the new bundle on its next request (L2-137 #5)
+  end
+end
+@enduml

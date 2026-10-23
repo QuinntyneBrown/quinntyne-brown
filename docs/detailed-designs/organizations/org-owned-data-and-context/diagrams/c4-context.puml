@@ -1,0 +1,10 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Org-owned data and org context
+Person(mem, "Member", "Belongs to one or several orgs")
+Person(cov, "Covering caller", "Portfolio Lead or cross-org role holder over several orgs")
+System(ftc, "QuinntyneBrown.Community", "Home base for the people Quinntyne Brown builds with: orgs, profiles, events, resources, notes and Agile workspaces")
+Rel(mem, ftc, "Works in the active org at /o/{orgSlug}/... of")
+Rel(cov, ftc, "Reads combined, org-labelled lists at /o/all/... of")
+@enduml

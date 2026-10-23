@@ -1,0 +1,56 @@
+@startuml
+title UML sequence behaviour — List records in the active org
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Member" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "Feature page" as page
+  participant "orgHeaderInterceptor" as intc
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "CurrentAccessMiddleware" as mw
+  participant "<Feature>Endpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "List<Items>Handler" as h
+  participant "OrgScope" as scope
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Open /o/faithtech-toronto/events
+page -> intc : GET /api/events
+intc -> mw : GET /api/events, X-Org: faithtech-toronto (L2-144 #1)
+mw -> mw : CallerAccess (per request) and ActiveOrg from X-Org
+mw -> ep : Continue
+ep -> h : ListEventsQuery
+h -> scope : Read(access, active, "events")
+alt X-Org names an org not covered or unknown
+  scope --> h : empty scope
+  h --> ep : empty page (L2-139 #3)
+else X-Org names a covered org with the feature off
+  scope --> h : NotFound
+  h --> ep : 404 (L2-147 #2)
+else X-Org is all, or absent on a read
+  scope --> h : every covered org with the feature on (L2-145 #1)
+else X-Org names a covered org
+  scope --> h : { orgId }
+end
+h -> db : SELECT ... WHERE OrganizationId IN (scope) AND <feature rules>
+db --> h : Rows with Organization (id, slug, name)
+h --> ep : Page of items, each with organization (L2-139 #5)
+ep --> page : 200
+page --> actor : Rows (org label under All orgs)
+@enduml

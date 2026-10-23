@@ -22,6 +22,13 @@ The edit happens on the dedicated `edit-profile` screen at `/people/me/edit`, no
 - **`UpdateProfileHandler`** — Application handler. It returns forbidden unless the caller owns the profile or is System Admin, calls `Profile.Update(name, homeCity, bio)`, saves, and writes an audit entry through `IAuditLog` when the caller is a System Admin editing another profile.
 - **`IAuditLog`** — Application abstraction implemented by `AuditLog` in Infrastructure; it adds an `AuditEntry` (actor, action `profile.updated`, target, before and after JSON, UTC time, IP address) saved with the change (L2-041).
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- Only the owner or a System Admin edits a profile, as before; profiles are global, so the Portfolio Lead and Org Leads have no override on them.
+- `ICurrentUser` exposes `Access` instead of roles; `ProfileAccess` reads `Access.IsSystemAdmin`.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

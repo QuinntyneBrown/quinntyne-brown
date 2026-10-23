@@ -1,0 +1,83 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Catalogue and organization admin
+class OrgType {
+  +Guid Id
+  +string Key
+  +string Name
+  +IReadOnlySet<string> EnabledFeatures
+  +IReadOnlySet<string> MemberPermissions
+  +AddRole(role: RoleDefinition): void
+  +RemoveRole(roleId: Guid): void
+}
+class RoleDefinition {
+  +Guid Id
+  +string Key
+  +string Name
+  +string Description
+  +Guid? ParentRoleId
+  +int SortOrder
+  +IReadOnlySet<string> Permissions
+  +IReadOnlySet<Guid> CanGrant
+}
+class Organization {
+  +Guid Id
+  +string Name
+  +string Slug
+  +DateTime? ArchivedAt
+  +Rename(name: string): void
+  +ChangeSlug(slug: string): OrgSlugAlias
+  +Archive(now: DateTime): void
+  +Restore(): void
+}
+class OrgSlugAlias {
+  +string Slug
+  +Guid OrganizationId
+  +DateTime CreatedAt
+}
+class CatalogueValidator {
+  +Validate(type: OrgType, req: RoleDefinitionRequest): ValidationResult
+}
+class SlugRules <<static>> {
+  +{static} Regex Pattern
+  +{static} string Reserved
+  +{static} IsValid(slug: string): bool
+}
+class CatalogueHandlers {
+  +CreateRoleAsync(typeId: Guid, req: RoleDefinitionRequest): Task<Result<RoleDefinitionDto>>
+  +UpdateRoleAsync(typeId: Guid, roleId: Guid, req: RoleDefinitionRequest): Task<Result<RoleDefinitionDto>>
+  +ReorderAsync(typeId: Guid, req: ReorderRolesRequest): Task<Result>
+  +DeleteRoleAsync(typeId: Guid, roleId: Guid): Task<Result<RoleHoldersDto>>
+}
+class OrganizationHandlers {
+  +CreateAsync(portfolioId: Guid, req: CreateOrganizationRequest): Task<Result<OrganizationDto>>
+  +UpdateAsync(id: Guid, req: UpdateOrganizationRequest): Task<Result<OrganizationDto>>
+  +ArchiveAsync(id: Guid): Task<Result>
+  +RestoreAsync(id: Guid): Task<Result>
+  +SetOrgLeadAsync(id: Guid, profileId: Guid, isLead: bool): Task<Result>
+}
+class RoleDefinitionRequest {
+  +string Key
+  +string Name
+  +string Description
+  +Guid? ParentRoleId
+  +string[] Permissions
+  +Guid[] CanGrant
+}
+OrgType "1" *-- "many" RoleDefinition
+Organization "1" *-- "many" OrgSlugAlias
+CatalogueHandlers --> OrgType : mutates
+CatalogueHandlers ..> CatalogueValidator
+CatalogueHandlers ..> RoleDefinitionRequest
+OrganizationHandlers --> Organization : mutates
+OrganizationHandlers ..> SlugRules
+@enduml

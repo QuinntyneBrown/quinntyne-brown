@@ -1,0 +1,26 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Agents
+Container_Boundary(api, "Community API") {
+  Component(ps, "Bearer policy scheme", "ASP.NET Core authentication", "ftca_ prefix -> AgentToken, else OpenIddict validation")
+  Component(ath, "AgentTokenAuthenticationHandler", "Api/Authentication", "SHA-256 lookup; revoked, expired, suspended -> 401")
+  Component(oidc, "OpenIddict validation", "OpenIddict", "People's access tokens")
+  Component(mw, "CurrentAccessMiddleware", "Api", "CallerAccess with credential scope")
+  Component(res, "AccessResolver", "Application/Organizations", "Intersects agent coverage with credential OrgIds")
+  Component(ep, "AgentsEndpoints", "Api", "/api/agents, /api/agents/{id}/tokens")
+  Component(h, "AgentHandlers", "Application/Organizations", "Create agent, issue, list, revoke")
+  Component(tok, "IAgentTokenFactory", "Infrastructure", "ftca_ + 32 random bytes; hash; prefix")
+  Component(audit, "IAuditLog", "Application", "Actor = agent; Detail names credential and issuer")
+  ComponentDb(db, "CommunityDbContext", "EF Core", "")
+}
+Rel(ps, ath, "Forwards ftca_ tokens")
+Rel(ps, oidc, "Forwards other bearer tokens")
+Rel(ath, db, "Looks up credential; throttled LastUsedAt")
+Rel(ath, mw, "Principal: sub, credential_id")
+Rel(mw, res, "ResolveAsync(userId, credentialId)")
+Rel(ep, h, "Dispatches")
+Rel(h, tok, "Generates token")
+Rel(h, audit, "agent.tokenIssued / revoked")
+Rel(h, db, "Writes")
+@enduml

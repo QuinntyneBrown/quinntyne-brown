@@ -1,0 +1,26 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Cross-org roles
+Container_Boundary(web, "Web app") {
+  Component(ui, "CrossOrgRolesPage / editor / assign dialog", "organizations library", "Scope picker, bundle checklist, narrowing")
+  Component(wm, "Workspace member picker", "agile library", "Cross-org members marked")
+}
+Container_Boundary(api, "Community API") {
+  Component(ep, "CrossOrgRolesEndpoints", "Api", "/api/portfolios/{id}/cross-org-roles, /api/cross-org-roles/{id}/...")
+  Component(h, "CrossOrgRoleHandlers", "Application/Organizations", "Create, edit, delete, assign, unassign; audit before and after")
+  Component(scope, "CrossOrgScopeResolver", "Application/Organizations", "Orgs | OrgType | Portfolio resolved live, intersected with narrowing")
+  Component(res, "AccessResolver", "Application/Organizations", "Adds covering bundles and CanJoinWork per org")
+  Component(wa, "WorkspaceAccess / Members handler", "Application/Agile", "Eligibility: workspaces.join member or CanJoinWork holder")
+  Component(audit, "IAuditLog", "Application", "crossOrgRole.* entries")
+  ComponentDb(db, "CommunityDbContext", "EF Core", "")
+}
+Rel(ui, ep, "Calls", "JSON/HTTPS")
+Rel(ep, h, "Dispatches")
+Rel(h, audit, "Records")
+Rel(h, db, "Writes")
+Rel(res, scope, "Resolves scope")
+Rel(scope, db, "Reads orgs by type / portfolio")
+Rel(wm, wa, "POST /api/workspaces/{id}/members", "JSON/HTTPS")
+Rel(wa, res, "Reads CanJoinWork via CallerAccess / target access")
+@enduml

@@ -1,0 +1,59 @@
+@startuml
+title UML sequence behaviour — Add and remove a member
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Org Lead or Portfolio Lead" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "MembersPage" as page
+  participant "AddMemberDialog" as dlg
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "OrganizationMembersEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "MembershipHandlers" as h
+  participant "WorkspaceOwnerWatch" as watch
+  participant "IAuditLog / notifier" as audit
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> dlg : Email address
+dlg -> ep : POST /api/organizations/{id}/members { email }
+ep -> h : AddAsync
+alt caller is not Org Lead of org nor its Portfolio Lead
+  h --> dlg : 403 (404 outside coverage) (L2-143 #5)
+else no account uses email
+  h --> dlg : 404 "No account uses that email. Send an invite instead." (L2-143 #2)
+else already a member
+  h --> dlg : 409
+else
+  h -> db : INSERT OrgMembership (AddedByLead)
+  h -> audit : Notify person; audit if Portfolio Lead or System Admin
+  h --> dlg : 201 MemberDto (L2-143 #1)
+end
+actor -> page : Remove member
+page -> ep : DELETE /api/organizations/{id}/members/{profileId}
+ep -> h : RemoveAsync
+alt target is last Org Lead and caller is an Org Lead
+  h --> page : 409 (L2-143 #4)
+else
+  h -> db : DELETE OrgRoleAssignments and OrgMembership in org
+  h -> watch : Owner left org
+  watch -> db : Flag owned workspaces "needs a new owner"; notify Org Lead and Portfolio Lead (L2-146 #4)
+  h -> audit : Audit / notify
+  h --> page : 204 (L2-143 #3)
+end
+@enduml

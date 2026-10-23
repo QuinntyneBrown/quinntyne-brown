@@ -30,6 +30,18 @@ The slice runs from the profile page in the web app to the `ProfileRole` rows in
 
 The visible role options in the dialog are a convenience; the server returns `403` for any change the caller is not permitted to make.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- Roles are held per org and defined as data in each Org Type's catalogue (`L2-136`, which supersedes the role tables of `L2-008` and `L2-009`; their notification, audit and last-System-Admin rules stand).
+- `Role`, `ProfileRole`, `RoleAssignmentPolicy`, `RoleLabels`, `CityLeadRoles`, and the frontend `assignableRoles`, `ROLE_LABELS` and `ROLE_DESCRIPTIONS` are deleted. **`RoleGrantPolicy`** decides grants by tier and by each role's `CanGrant` list; **`ChangeOrgRolesHandler`** replaces `ChangeRolesHandler`.
+- Routes move to `GET`, `POST /api/organizations/{orgId}/members/{profileId}/roles` and `DELETE …/roles/{roleId}`. System Admin and Portfolio Lead are granted through `PUT`/`DELETE /api/profiles/{id}/system-admin` and `/api/portfolios/{portfolioId}/leads/{profileId}`, both System Admin only; Org Lead through `/api/organizations/{orgId}/members/{profileId}/org-lead` ([membership and joining](../../organizations/membership-and-joining/README.md)).
+- The City Lead limit becomes data: the seeded City Lead role holds `roles.grant` with `CanGrant` set to the other six FaithTech City roles. Staff is no longer granted here; it is a cross-org assignment ([cross-org roles](../../organizations/cross-org-roles/README.md)).
+- `RoleDialogComponent` is unchanged. `ProfilePage` fills it for the active org with the `grantable` list from `ORG_ROLES_SERVICE`, labelled with the catalogue's names (`L2-136` AC6).
+- The owner is notified when an Org Lead or a catalogue-role holder changes their roles; changes by the Portfolio Lead or a System Admin are audited with the org and portfolio. `SystemAdminRoster` and last-System-Admin protection are unchanged (`L2-136` AC7).
+- `CityLeadRoleRemoved` is replaced by `WorkspaceCreatorPermissionLost(ProfileId, OrganizationId)` ([cross-org roles](../../organizations/cross-org-roles/README.md)).
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

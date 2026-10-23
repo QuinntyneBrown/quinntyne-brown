@@ -1,0 +1,21 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Seed the hierarchy
+Container_Boundary(cli, "Community Cli") {
+  Component(cmds, "ResetCommand / SeedCommand / GrantAdminCommand", "Cli commands", "Entry points")
+}
+Container_Boundary(infra, "Infrastructure") {
+  Component(mig, "Squashed initial migration", "EF Core migration", "Whole schema incl. OrganizationId columns")
+  Component(seeder, "CommunitySeeder", "Infrastructure/Persistence", "Idempotent, fixed ids")
+  Component(os, "OrganizationSeed", "Infrastructure/Persistence", "Portfolio, Org Types, catalogues, orgs, cross-org roles")
+  Component(demo, "Demo-data seeders", "Infrastructure/Persistence", "load-users, report-records, search-records into FaithTech Toronto")
+  ComponentDb(db, "CommunityDbContext", "EF Core", "")
+}
+Rel(cmds, mig, "Applies (reset, migrate)")
+Rel(cmds, seeder, "SeedAsync / GrantSystemAdminAsync")
+Rel(seeder, os, "Upserts structure")
+Rel(cmds, demo, "Runs demo-data commands")
+Rel(os, db, "Insert-if-missing by fixed id")
+Rel(demo, db, "Writes org-owned records")
+@enduml

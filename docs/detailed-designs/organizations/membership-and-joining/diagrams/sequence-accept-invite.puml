@@ -1,0 +1,48 @@
+@startuml
+title UML sequence behaviour — Accept an org invite
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Invitee" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "AcceptInvitePage" as page
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "InvitesEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "AcceptInviteHandler" as h
+  participant "OrgJoiner" as join
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Open /accept-invite?token=...
+page -> ep : GET /api/invites/{token}
+ep -> h : Lookup
+h -> db : Invite + Organization
+h --> page : 200 { orgDisplayName, email, roleName? }
+actor -> page : Create account or sign in, accept
+page -> ep : POST /api/invites/{token}/accept
+ep -> h : AcceptInviteCommand
+alt expired or used
+  h --> page : Refused as before (L2-010)
+else valid
+  h -> join : JoinAsync(org, profile, Invite, roleId)
+  join -> db : INSERT OrgMembership (JoinedVia = Invite)\nINSERT OrgRoleAssignment when role pre-assigned (L2-141 #3)
+  h -> db : Invite.AcceptedAt = now; SaveChanges
+  h --> page : 200 { orgSlug }
+  page --> actor : Redirect /o/{orgSlug}
+end
+@enduml

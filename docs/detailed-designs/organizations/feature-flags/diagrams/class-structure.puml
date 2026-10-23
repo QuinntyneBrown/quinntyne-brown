@@ -1,0 +1,47 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Feature flags per Org Type
+class Feature <<static>> {
+  +{static} string Profiles
+  +{static} string Notes
+  +{static} string Contacts
+  +{static} string Partners
+  +{static} string Team
+  +{static} string Events
+  +{static} string Announcements
+  +{static} string Invites
+  +{static} string Resources
+  +{static} string Agile
+  +{static} string Reports
+  +{static} IReadOnlySet<string> AlwaysOn
+  +{static} IReadOnlySet<string> Switchable
+}
+class Permissions <<static>> {
+  +{static} IReadOnlyDictionary<string, string> FeatureByCode
+}
+class OrgType {
+  +IReadOnlySet<string> EnabledFeatures
+  +SetFeatures(features: IEnumerable<string>): void
+  +IsEnabled(feature: string): bool
+}
+class SetOrgTypeFeaturesHandler {
+  +HandleAsync(orgTypeId: Guid, features: string[]): Task<Result<OrgTypeDto>>
+}
+class CallerAccess {
+  +Covers(org: Guid, feature: string): bool
+  +ReadScope(feature: string): IReadOnlySet<Guid>
+}
+OrgType ..> Feature : validated by
+Permissions ..> Feature : each code belongs to one
+SetOrgTypeFeaturesHandler --> OrgType : mutates
+CallerAccess ..> Feature : filters by
+@enduml

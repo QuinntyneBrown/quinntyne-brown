@@ -28,6 +28,14 @@ Any workspace member starts a session for one or more stories and becomes its fa
 - **`IPokerBroadcaster`** — Application abstraction, implemented in the Api by `SignalRAgileNotifier` over `IHubContext<AgileHub>`, that sends `PokerChanged(sessionId)` to `poker:{sessionId}` after each saved change. It carries no votes.
 - A workspace has at most one open session (`409` otherwise). A session closes after its last story gets its points or when the facilitator ends it; there is no automatic expiry in v1. Only the facilitator and invitees vote; other members, Staff and a System Admin who is not a participant watch.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Workspace` carries a required `OrganizationId`; work items, sprints, comments, poker sessions and members belong to the workspace's org. A workspace outside the caller's coverage, or in an org with `agile` off, answers `404`.
+- `WorkspaceAccessPolicy` classifies with `CallerAccess` for the workspace's org: **Admin** is the org's Org Lead, the Portfolio Lead or a System Admin; the read-only level (formerly **Staff**) is any holder of `workspaces.readAll` there, such as the Staff and Portfolio cross-org roles; Owner, Member and Outsider are unchanged (`L2-146` AC5). The "Read-only for Staff" alert reads "Read-only".
+- Actions by an Admin who is not the owner are overrides and stay audited.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

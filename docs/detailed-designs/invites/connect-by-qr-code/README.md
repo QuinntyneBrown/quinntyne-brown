@@ -36,6 +36,16 @@ Frontend:
 - **`MyQrCodeDialog`** (`invites/src/lib/dialogs/my-qr-code/`) — CDK dialog opened from **`InvitesPage`**'s *My QR code* button, which shows only for City Leads and System Admins. It loads the link, shows the QR code and the copy field, downloads `faithtech-qr-code.png`, and has a second confirm step for *Make a new code*.
 - **`ConnectPage`** (`invites/src/lib/pages/connect/`) — routed at `/meet/:token` by **`CONNECT_ROUTES`**, lazy-loaded from the app shell outside the auth guard. `/meet` is used because `/connect/*` already belongs to the identity server on the same origin. Anonymous visitors see the lead and the form; signed-in members are connected on arrival; *Sign in to connect* returns to the page after sign-in. Someone who signed up with Google from the marketing page ([Google sign-in](../../identity/google-sign-in/README.md), ADR 0019) and then opens the link is connected like any signed-in member.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- "City Lead or System Admin" becomes a holder of `connectLink.own` in the org (the seeded City Lead), the org's Org Lead or the Portfolio Lead (`L2-141` AC4).
+- `ConnectLink` gains a required `OrganizationId`; the unique index is (`OwnerId`, `OrganizationId`), so a person has one link per org. `GET /api/connect-links/mine` uses the active org (`X-Org`).
+- The lookup returns the org's display name, and answers as unknown when the owner no longer may own a link in that org (`L2-141` AC6).
+- Signing up through the link makes the person a member of the link's org (`JoinedVia = ConnectLink`) when they verify their email, together with the contact link, with no role (`L2-141` AC5).
+- Details are in [membership and joining](../../organizations/membership-and-joining/README.md) and [ADR 0041](../../../adr/0041-org-bound-invites-and-connect-links.md), which supersedes ADR 0021 in part.
+
 ## Requirements
 
 | L2 ID | Refines (L1) | Requirement |

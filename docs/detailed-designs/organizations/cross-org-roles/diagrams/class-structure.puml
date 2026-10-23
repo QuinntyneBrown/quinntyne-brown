@@ -1,0 +1,69 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Cross-org roles
+enum ScopeKind {
+  Orgs
+  OrgType
+  Portfolio
+}
+class CrossOrgRole {
+  +Guid Id
+  +Guid PortfolioId
+  +string Name
+  +string Description
+  +IReadOnlySet<string> Permissions
+  +bool CanJoinWork
+  +ScopeKind ScopeKind
+  +Guid? ScopeOrgTypeId
+  +IReadOnlySet<Guid> ScopeOrgIds
+}
+class CrossOrgAssignment {
+  +Guid CrossOrgRoleId
+  +Guid ProfileId
+  +IReadOnlySet<Guid> NarrowedOrgIds
+  +Guid GrantedById
+  +DateTime GrantedAt
+}
+class CrossOrgScopeResolver {
+  +ResolveAsync(role: CrossOrgRole, assignment: CrossOrgAssignment): Task<IReadOnlySet<Guid>>
+}
+class CrossOrgRoleHandlers {
+  +CreateAsync(portfolioId: Guid, req: CrossOrgRoleRequest): Task<Result<CrossOrgRoleDto>>
+  +UpdateAsync(id: Guid, req: CrossOrgRoleRequest): Task<Result<CrossOrgRoleDto>>
+  +DeleteAsync(id: Guid): Task<Result>
+  +AssignAsync(id: Guid, req: AssignCrossOrgRoleRequest): Task<Result<CrossOrgAssignmentDto>>
+  +UnassignAsync(id: Guid, profileId: Guid): Task<Result>
+}
+class CrossOrgRoleRequest {
+  +string Name
+  +string Description
+  +string[] Permissions
+  +bool CanJoinWork
+  +ScopeDto Scope
+}
+class ScopeDto {
+  +ScopeKind Kind
+  +Guid? OrgTypeId
+  +Guid[] OrgIds
+}
+class AssignCrossOrgRoleRequest {
+  +Guid ProfileId
+  +Guid[] NarrowedOrgIds
+}
+CrossOrgRole --> ScopeKind
+CrossOrgRole "1" *-- "many" CrossOrgAssignment
+CrossOrgScopeResolver ..> CrossOrgRole : reads
+CrossOrgScopeResolver ..> CrossOrgAssignment : narrows by
+CrossOrgRoleHandlers ..> CrossOrgRoleRequest
+CrossOrgRoleRequest --> ScopeDto
+CrossOrgRoleHandlers ..> AssignCrossOrgRoleRequest
+@enduml

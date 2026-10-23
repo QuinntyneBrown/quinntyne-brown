@@ -51,6 +51,17 @@ The archive and restore dialogs are `ft-dialog` confirmations; the archive dialo
 
 Search applies visibility before the text match in one SQL statement, so a hidden page is never ranked, counted or returned. Archive is reversible and leaves the audit trail intact.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `NotePage` carries a required `OrganizationId`; blocks, links, shares and images belong to it. A page and its parent shall belong to the same org; moving a page under a parent in another org answers `400`.
+- Creating requires `notes.create` in the target org, which every member holds through the Member bundle of both seeded Org Types, and the Staff cross-org role holds in its bundle. Pages are created in the active org; the default stays Private.
+- Visibility levels are Private, Shared, **Org-wide** (was Global) and **Portfolio-wide** ([ADR 0039](../../../adr/0039-org-wide-and-portfolio-wide-visibility.md), `L2-148`). Only the Portfolio Lead or a System Admin may choose Portfolio-wide (`403` otherwise). Shared audiences store a `RoleDefinitionId` or `CrossOrgRoleId` instead of a `Role`.
+- ADR 0025's Staff rule becomes: a cross-org role covering the page's org reads its Org-wide and role-shared pages ([ADR 0035](../../../adr/0035-cross-org-roles.md)). Staff still edit only their own pages.
+- Private pages stay visible only to their owner and to System Admin, audited; the Portfolio Lead, Org Lead and cross-org roles never see them. Children, page links and backlinks follow the same rule, so a Portfolio-wide parent never reveals a Private child, and a link to a page the reader cannot see renders as unavailable.
+- Lists and search are scoped to the active org, or to every covered org under "All orgs", with org labels.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier. The acceptance criteria are in `docs/specs/L2.md`.
