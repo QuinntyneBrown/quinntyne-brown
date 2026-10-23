@@ -1,0 +1,8 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Applications and their events
+Person(viewer, "Covering member", "Org Lead, Portfolio Lead, System Admin, Staff or Portfolio: holds integrations.view")
+System(ftc, "QuinntyneBrown.Community", "Lists applications and their events within the caller's coverage")
+Rel(viewer, ftc, "Reads applications and events in", "HTTPS")
+@enduml

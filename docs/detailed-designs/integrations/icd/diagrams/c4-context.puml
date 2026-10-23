@@ -1,0 +1,12 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Inbound webhook (publisher view)
+Person(lead, "Org Lead or Portfolio Lead", "Registers the application and hands its source ID and secret to the publisher's operators")
+Person(viewer, "Covering member", "Org Lead, Portfolio Lead, Staff, Portfolio or System Admin; reads the events")
+System_Ext(goodwork, "Goodwork (goodwork.rocks)", "Publisher: a separate .NET site that posts contact requests")
+System(ftc, "QuinntyneBrown.Community", "Receives signed events at POST /api/webhooks/events and shows them on the Applications dashboard")
+Rel(lead, ftc, "Registers, rotates and revokes applications in", "HTTPS")
+Rel(goodwork, ftc, "POSTs signed JSON events to", "HTTPS, HMAC-SHA256")
+Rel(viewer, ftc, "Reads application events in", "HTTPS")
+@enduml

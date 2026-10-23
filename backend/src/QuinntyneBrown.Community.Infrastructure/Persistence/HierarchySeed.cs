@@ -62,7 +62,7 @@ public static class HierarchySeed
     public static OrgType FaithTechCity() => new(PortfolioId, "faithtech-city", "FaithTech City", Features.Switchable, [NotesCreate], FaithTechCityTypeId);
 
     public static OrgType Startup() => new(
-        PortfolioId, "startup", "Startup", [Features.Invites, Features.Resources, Features.Agile], [NotesCreate], StartupTypeId);
+        PortfolioId, "startup", "Startup", [Features.Invites, Features.Resources, Features.Agile, Features.Integrations], [NotesCreate], StartupTypeId);
 
     public static Organization Toronto() => new(PortfolioId, FaithTechCityTypeId, "FaithTech Toronto", TorontoSlug, TorontoId);
 
@@ -71,14 +71,14 @@ public static class HierarchySeed
     /// <summary>Reads everything in the portfolio except private items, and can be assigned work (ADR 0035).</summary>
     public static CrossOrgRole PortfolioRole() => new(
         PortfolioId, "portfolio", "Portfolio", "Reads every org in the portfolio and can be assigned work",
-        [PeopleView, PartnersRead, EventsRsvpList, WorkspacesReadAll, ReportsView], canJoinWork: true, PortfolioRoleId);
+        [PeopleView, PartnersRead, EventsRsvpList, WorkspacesReadAll, ReportsView, IntegrationsView], canJoinWork: true, PortfolioRoleId);
 
     /// <summary>Today's Staff: read nearly everything in every FaithTech City org, write own resources and pages (ADR 0035).</summary>
     public static CrossOrgRole StaffRole()
     {
         var staff = new CrossOrgRole(
             PortfolioId, "staff", "Staff", "Read-only oversight across FaithTech",
-            [PeopleView, PartnersRead, EventsRsvpList, WorkspacesReadAll, ReportsView, ResourcesCreate, NotesCreate], canJoinWork: false, StaffRoleId);
+            [PeopleView, PartnersRead, EventsRsvpList, WorkspacesReadAll, ReportsView, IntegrationsView, ResourcesCreate, NotesCreate], canJoinWork: false, StaffRoleId);
         staff.ScopeToOrgType(FaithTechCityTypeId);
         return staff;
     }

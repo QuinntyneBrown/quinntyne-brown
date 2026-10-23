@@ -1463,3 +1463,29 @@ fieldset:has(input[aria-invalid="true"]) .chip-group label.chip:not(:has(input:c
 .icon-tile[class*="cover--"] { background: var(--cover); color: var(--color-fg-on-cover); }
 /* A wrapping list of badges, such as an idea's stage, audience and topics. */
 .badge-list { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+
+/* ---------- Integrations (L2-158 to L2-166): secret field and event entries --------------------------- */
+/* Secret field (ft-secret-field): a signing secret shown once with Copy; once copied, or when reopened, only its prefix. */
+.secret-field { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border: var(--border-width-hairline) solid var(--color-warning-border); border-radius: var(--radius-md); background: var(--color-warning-bg); color: var(--color-fg-default); }
+.secret-field p { margin: 0; }
+.secret-field__title { display: flex; gap: var(--space-2); align-items: center; font: var(--text-label); }
+.secret-field__title .icon { color: var(--color-warning-icon); }
+.secret-field .copy-field .input { background: var(--color-bg-surface); }
+.secret-field--masked { gap: var(--space-1); padding: var(--space-3) var(--space-4); border-color: var(--color-border-default); background: var(--color-bg-surface-sunken); }
+.secret-field--masked .secret-field__title .icon { color: var(--color-fg-muted); }
+/* Event entry (ft-event-entry): one received event in a list, a disclosure whose body shows its fields or raw JSON. */
+.event-list { display: flex; flex-direction: column; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+.event-entry { border: var(--border-width-hairline) solid var(--color-border-default); border-radius: var(--radius-lg); background: var(--color-bg-surface); }
+.event-entry__heading { margin: 0; font: inherit; }
+.event-entry__toggle { display: grid; grid-template-columns: 1fr auto; gap: var(--space-1) var(--space-3); width: 100%; padding: var(--space-3) var(--space-4); border: 0; border-radius: var(--radius-lg); background: none; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.event-entry__toggle:hover { box-shadow: inset 0 0 0 var(--border-width-hairline) var(--color-border-strong); }
+.event-entry__toggle:focus-visible { outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset); }
+.event-entry__title { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font: var(--text-label); min-width: 0; overflow-wrap: anywhere; }
+.event-entry__meta, .event-entry__preview { grid-column: 1; font: var(--text-body-sm); color: var(--color-fg-muted); overflow-wrap: anywhere; }
+.event-entry__chevron { grid-column: 2; grid-row: 1 / span 3; align-self: center; color: var(--color-fg-muted); transition: transform var(--duration-fast) var(--ease-standard); }
+.event-entry--open .event-entry__chevron { transform: rotate(180deg); }
+.event-entry__body { display: flex; flex-direction: column; gap: var(--space-3); padding: 0 var(--space-4) var(--space-4); }
+.event-entry__message { white-space: pre-line; }
+.facts > .facts__wide { grid-template-columns: 1fr; gap: var(--space-1); }
+@media (prefers-reduced-motion: reduce) { .event-entry__chevron { transition: none; } }
+.dialog__body .text-caption .mono { overflow-wrap: anywhere; }

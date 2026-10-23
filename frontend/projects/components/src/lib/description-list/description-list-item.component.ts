@@ -4,7 +4,7 @@ import { DescriptionListComponent } from './description-list.component';
 
 /**
  * One term and its definition. The value is projected so it can hold links or badges.
- * Set `missing` for an optional fact with no value: the row stays and reads "Not added".
+ * Set `mono` for an identifier and `multiline` to keep a message's line breaks. Set `missing` for an optional fact with no value: the row stays and reads "Not added".
  * Inside a loading `ft-description-list` the value is a skeleton line.
  */
 @Component({
@@ -19,6 +19,10 @@ export class DescriptionListItemComponent {
 
   readonly label = input.required<string>();
   readonly missing = input(false);
+  /** Monospaced value, for identifiers such as a source ID or an event ID. */
+  readonly mono = input(false);
+  /** Keeps the value's line breaks, for a message someone wrote. */
+  readonly multiline = input(false);
 
   protected readonly loading = computed(() => this.list?.loading() ?? false);
 }

@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Applications and their events (web app)
+Container_Boundary(web, "Community web app") {
+  Component(nav, "shell/navigation.ts", "App", "Applications when integrations is on and integrations.view is held")
+  Component(list, "ApplicationsPage", "integrations library", "Table of applications, Register for managers")
+  Component(page, "ApplicationPage", "integrations library", "Connection card, event entries, Load more, Rotate and Revoke")
+  Component(dialogs, "Register / Rotate / Revoke dialogs", "integrations library", "CDK dialogs over DialogService")
+  Component(svc, "INTEGRATIONS_SERVICE", "api library", "IntegrationsService contract + HttpIntegrationsService")
+  Component(lib, "components", "components library", "TableComponent, EventEntryComponent, SecretFieldComponent, CopyFieldComponent, DialogComponent, ...")
+}
+Rel(nav, list, "Links to")
+Rel(list, svc, "Lists through")
+Rel(page, svc, "Reads events through")
+Rel(dialogs, svc, "Registers, rotates and revokes through")
+Rel(list, lib, "Composes")
+Rel(page, lib, "Composes")
+Rel(dialogs, lib, "Composes")
+@enduml

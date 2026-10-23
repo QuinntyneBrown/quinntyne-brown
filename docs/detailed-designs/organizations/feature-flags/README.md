@@ -6,7 +6,7 @@ A start-up in QuinntyneBrown.Community has no partner pipeline, City Lead or hac
 
 - **feature** — named area of the product that owns endpoints and permission codes, for example `events`
 - **always-on feature** — `profiles` and `notes`; cannot be switched off
-- **switchable feature** — `contacts`, `partners`, `team`, `events`, `announcements`, `invites`, `resources`, `agile` and `reports`
+- **switchable feature** — `contacts`, `partners`, `team`, `events`, `announcements`, `invites`, `resources`, `agile`, `reports` and `integrations` (application integrations, [ADR 0042](../../../adr/0042-inbound-webhooks-for-integrations.md); on for both seeded types)
 - **enabled features** — switchable features that are on for an Org Type; there are no per-org overrides
 
 Turning a feature off keeps its data. Turning it back on shows the data again.

@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Manage applications
+Container_Boundary(api, "Community API") {
+  Component(ep, "IntegrationsEndpoints", "Minimal API", "GET/POST /api/integrations/apps, /{id}, /{id}/rotate, /{id}/revoke")
+  Component(h, "IntegrationAppsHandler", "Application", "Coverage, permission and state rules; DTOs")
+  Component(creds, "WebhookCredentials", "Application", "Source IDs, secrets, prefixes")
+  Component(prot, "DataProtectionSecretProtector", "Infrastructure", "ISecretProtector over IDataProtector (purpose SigningSecret.v1)")
+  Component(access, "CallerAccess", "Application", "Covers, Has(integrations.view / manage), CreateTarget")
+  Component(audit, "IAuditLog", "Application", "integration.registered, secretRotated, revoked")
+}
+ContainerDb(db, "Community database", "PostgreSQL")
+Rel(ep, h, "Calls")
+Rel(h, access, "Asks")
+Rel(h, creds, "Generates with")
+Rel(h, prot, "Encrypts secrets with")
+Rel(h, audit, "Records")
+Rel(h, db, "Reads and writes IntegrationApps")
+@enduml

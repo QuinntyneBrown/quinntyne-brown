@@ -24,6 +24,10 @@ public static class Permissions
     public const string WorkspacesJoin = "workspaces.join";
     public const string WorkspacesReadAll = "workspaces.readAll";
     public const string ReportsView = "reports.view";
+    /// <summary>Read the org's applications and their events (L2-165, L2-166).</summary>
+    public const string IntegrationsView = "integrations.view";
+    /// <summary>Register applications, rotate their secrets and revoke them (L2-158 to L2-160).</summary>
+    public const string IntegrationsManage = "integrations.manage";
     /// <summary>A marker: listed on the org's Team page (L2-019).</summary>
     public const string TeamMember = "team.member";
     /// <summary>A marker: matched by the Team page's Leads filter (L2-019).</summary>
@@ -50,6 +54,8 @@ public static class Permissions
         [WorkspacesJoin] = Features.Agile,
         [WorkspacesReadAll] = Features.Agile,
         [ReportsView] = Features.Reports,
+        [IntegrationsView] = Features.Integrations,
+        [IntegrationsManage] = Features.Integrations,
         [TeamMember] = Features.Team,
         [TeamLead] = Features.Team,
     };

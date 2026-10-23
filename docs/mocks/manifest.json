@@ -2408,6 +2408,45 @@
       ]
     },
     {
+      "id": "applications",
+      "kind": "page",
+      "title": "Applications",
+      "route": "/o/:orgSlug/applications",
+      "requirements": [
+        "L2-158",
+        "L2-165"
+      ],
+      "states": [
+        "default",
+        "read-only",
+        "loading",
+        "empty",
+        "error",
+        "forbidden"
+      ]
+    },
+    {
+      "id": "application",
+      "kind": "page",
+      "title": "Application events",
+      "route": "/o/:orgSlug/applications/:id",
+      "requirements": [
+        "L2-159",
+        "L2-160",
+        "L2-166"
+      ],
+      "states": [
+        "default",
+        "more",
+        "read-only",
+        "revoked",
+        "loading",
+        "empty",
+        "error",
+        "not-found"
+      ]
+    },
+    {
       "id": "my-work",
       "kind": "page",
       "title": "My work",
@@ -2576,6 +2615,61 @@
       "opens_from": "agents",
       "requirements": [
         "L2-154"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "failed"
+      ],
+      "not_applicable": {
+        "invalid": "A confirmation with no inputs."
+      }
+    },
+    {
+      "id": "register-application",
+      "kind": "dialog",
+      "title": "Register application",
+      "opens_from": "applications",
+      "requirements": [
+        "L2-158",
+        "L2-167"
+      ],
+      "states": [
+        "default",
+        "invalid",
+        "busy",
+        "failed",
+        "registered",
+        "copied"
+      ]
+    },
+    {
+      "id": "rotate-secret",
+      "kind": "dialog",
+      "title": "Rotate secret",
+      "opens_from": "application",
+      "requirements": [
+        "L2-159",
+        "L2-167"
+      ],
+      "states": [
+        "default",
+        "busy",
+        "failed",
+        "rotated"
+      ],
+      "not_applicable": {
+        "invalid": "A confirmation with no inputs."
+      }
+    },
+    {
+      "id": "revoke-application",
+      "kind": "dialog",
+      "title": "Revoke application",
+      "opens_from": "application",
+      "requirements": [
+        "L2-160",
+        "L2-167"
       ],
       "states": [
         "default",

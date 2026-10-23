@@ -1,0 +1,49 @@
+@startuml
+title UML sequence behaviour — Receive one event (L2-161 to L2-164)
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+participant "Publisher (Goodwork)" as pub
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "Rate limiter (webhook policy)" as rl
+  participant "WebhookEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application" #ECFDF3
+  participant "ReceiveEventHandler" as h
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+pub -> pub : body = JSON envelope\nts = unix seconds\nsig = "sha256=" + hex(HMAC-SHA256(secret, ts + "." + body))
+pub -> rl : POST /api/webhooks/events\nX-Webhook-Source, X-Webhook-Timestamp, X-Webhook-Signature
+alt more than 60 requests this minute for the source
+  rl --> pub : 429 + Retry-After
+else within the limit
+  rl -> ep : request
+  ep -> ep : read raw body (at most 64 KB)
+  alt body over 65,536 bytes
+    ep --> pub : 413
+  else
+    ep -> h : source, timestamp, signature, raw body
+    h -> db : find source (active, org feature on)
+    alt unknown or revoked source, timestamp more than 300 s off, or no secret matches
+      h --> pub : 401 (one neutral problem)
+    else signature valid (current secret, or previous secret within 24 h)
+      h -> h : parse and validate envelope and data
+      alt invalid JSON or fields
+        h --> pub : 400 with per-field errors
+      else eventId already stored for this application
+        h --> pub : 200 { status: "duplicate" } (first payload kept)
+      else new event
+        h -> db : INSERT IntegrationEvent
+        h --> pub : 202 { status: "accepted" }
+      end
+    end
+  end
+end
+alt 5xx or timeout
+  pub -> pub : retry with exponential backoff, same eventId
+end
+@enduml

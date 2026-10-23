@@ -1,0 +1,12 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Receive events
+System_Ext(pub, "Publisher (Goodwork)")
+System_Boundary(ftc, "QuinntyneBrown.Community") {
+  Container(api, "Community API", "ASP.NET Core", "Private-preview gate exemption, webhook rate limit policy, WebhookEndpoints, ReceiveEventHandler")
+  ContainerDb(db, "Community database", "PostgreSQL", "IntegrationApps, IntegrationEvents, DataProtectionKeys")
+}
+Rel(pub, api, "Posts signed events to", "HTTPS")
+Rel(api, db, "Looks up sources and stores events", "EF Core")
+@enduml

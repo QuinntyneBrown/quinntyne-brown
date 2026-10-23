@@ -24,7 +24,7 @@ public class SeedHierarchyTests
         var types = await db.OrgTypes.OrderBy(t => t.Name).ToListAsync();
         Assert.Equal(["FaithTech City", "Startup"], types.Select(t => t.Name));
         Assert.Equal(Features.Switchable, types[0].EnabledFeatures);
-        Assert.Equal([Features.Invites, Features.Resources, Features.Agile], types[1].EnabledFeatures);
+        Assert.Equal([Features.Invites, Features.Resources, Features.Agile, Features.Integrations], types[1].EnabledFeatures);
         Assert.Equal(
             [("faithtech-toronto", "FaithTech Toronto", HierarchySeed.FaithTechCityTypeId), ("shelfie", "Shelfie", HierarchySeed.StartupTypeId)],
             (await db.Organizations.OrderBy(o => o.Slug).ToListAsync()).Select(o => (o.Slug, o.Name, o.OrgTypeId)));

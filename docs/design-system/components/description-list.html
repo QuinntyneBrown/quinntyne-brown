@@ -36,6 +36,8 @@
       <li><a href="../components/text-field.html">Text field</a></li>
       <li><a href="../components/copy-field.html">Copy field</a></li>
       <li><a href="../components/token-reveal.html">Token reveal</a></li>
+      <li><a href="../components/secret-field.html">Secret field</a></li>
+      <li><a href="../components/event-entry.html">Event entry</a></li>
       <li><a href="../components/textarea.html">Textarea</a></li>
       <li><a href="../components/select.html">Select</a></li>
       <li><a href="../components/radio-group.html">Radio group</a></li><li><a href="../components/checkbox-group.html">Checkbox group</a></li>
@@ -186,7 +188,7 @@
   &lt;div&gt;&lt;dt&gt;Email&lt;/dt&gt;&lt;dd&gt;&lt;a href="mailto:tomas.ortega@example.org"&gt;tomas.ortega@example.org&lt;/a&gt;&lt;/dd&gt;&lt;/div&gt;
   &lt;div&gt;&lt;dt&gt;Phone&lt;/dt&gt;&lt;dd&gt;416-555-0142&lt;/dd&gt;&lt;/div&gt;
   &lt;div&gt;&lt;dt&gt;Organisation&lt;/dt&gt;&lt;dd&gt;Harbour Light Shelter&lt;/dd&gt;&lt;/div&gt;
-&lt;/dl&gt;</code></pre><table class="ds-table"><thead><tr><th scope="col">Class / attribute</th><th scope="col">Effect</th></tr></thead><tbody><tr><td><code>.facts</code></td><td>Description list grid.</td></tr><tr><td><code>.facts &gt; div</code></td><td>One term/description pair in two columns.</td></tr><tr><td><code>dd &gt; .text-muted</code></td><td>&ldquo;Not added&rdquo; for an optional fact with no value. Angular: <code>&lt;ft-description-list-item label="Phone" [missing]="!contact.phone"&gt;</code>.</td></tr></tbody></table>
+&lt;/dl&gt;</code></pre><table class="ds-table"><thead><tr><th scope="col">Class / attribute</th><th scope="col">Effect</th></tr></thead><tbody><tr><td><code>.facts</code></td><td>Description list grid.</td></tr><tr><td><code>.facts &gt; div</code></td><td>One term/description pair in two columns.</td></tr><tr><td><code>dd &gt; .text-muted</code></td><td>&ldquo;Not added&rdquo; for an optional fact with no value. Angular: <code>&lt;ft-description-list-item label="Phone" [missing]="!contact.phone"&gt;</code>.</td></tr></tbody></table></table><p><b>Identifiers and messages (integrations).</b> <code>ft-description-list-item</code> takes <code>mono</code> for an identifier (source ID, event ID, endpoint) and <code>multiline</code> to keep a message’s line breaks (<code>white-space: pre-line</code>), as on the application page.</p>
     </section>
     <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
       <p>Extracted from these mocks:</p>

@@ -1,0 +1,146 @@
+@switch (state()) {
+  @case ('not-found') {
+    <h1 class="visually-hidden">Application not found</h1>
+    <ft-empty-state
+      icon="error"
+      heading="We couldn’t find that application"
+      text="It may be in an organization you don’t cover, or the link is wrong."
+    >
+      <ft-button actions variant="primary" href="../applications">Go to Applications</ft-button>
+    </ft-empty-state>
+  }
+  @case ('error') {
+    <h1 class="visually-hidden">Application</h1>
+    <ft-empty-state
+      variant="error"
+      heading="We couldn’t load events"
+      text="Check your connection and try again. If it keeps happening, we’ve already been told about it."
+    >
+      <ft-button actions variant="primary" (click)="load()">
+        <ft-icon name="try-again" /> Try again
+      </ft-button>
+    </ft-empty-state>
+  }
+  @case ('loading') {
+    <h1 class="visually-hidden">Application</h1>
+    <ft-list-skeleton label="Loading events" [rows]="3" />
+  }
+  @default {
+    @if (app(); as app) {
+      <ft-breadcrumb>
+        <ft-breadcrumb-item [href]="listHref()">Applications</ft-breadcrumb-item>
+        <ft-breadcrumb-item>{{ app.name }}</ft-breadcrumb-item>
+      </ft-breadcrumb>
+      <ft-page-header [title]="app.name" [subtitle]="subtitle()">
+        <ft-cluster ftPageHeaderActions gap="2">
+          <ft-badge [variant]="app.status === 'Active' ? 'success' : 'danger'">{{
+            app.status
+          }}</ft-badge>
+          @if (app.canManage && app.status === 'Active') {
+            <ft-button (click)="rotate(app)"><ft-icon name="refresh" /> Rotate secret</ft-button>
+            <ft-button variant="danger" (click)="revoke(app)">
+              <ft-icon name="revoke" /> Revoke
+            </ft-button>
+          }
+        </ft-cluster>
+      </ft-page-header>
+      <ft-stack>
+        @if (app.status === 'Revoked') {
+          <ft-alert status="info" polite heading="This application is revoked">
+            Its requests are refused. Revoking can’t be undone; register a new application to
+            receive events again. Its events stay here.
+          </ft-alert>
+        }
+        <ft-card heading="Connection">
+          <ft-description-list>
+            <ft-description-list-item label="Source ID" [mono]="true">{{
+              app.sourceId
+            }}</ft-description-list-item>
+            <ft-description-list-item label="Signing secret">
+              <ft-secret-field label="Signing secret" [value]="null" [prefix]="app.secretPrefix" />
+            </ft-description-list-item>
+            <ft-description-list-item label="Send events to" [mono]="true">{{
+              endpoint
+            }}</ft-description-list-item>
+          </ft-description-list>
+        </ft-card>
+
+        <section aria-labelledby="events-title">
+          <ft-stack gap="3">
+            <h2 id="events-title">Events</h2>
+            @if (!events().length) {
+              <ft-empty-state
+                icon="applications"
+                heading="No events yet"
+                [text]="
+                  'When ' +
+                  app.name +
+                  ' sends an event, it appears here. Give its developers the source ID, the secret you copied and the integration guide.'
+                "
+              />
+            } @else {
+              <ft-stack gap="3" role="list" aria-labelledby="events-title">
+                @for (item of events(); track item.event.id) {
+                  <ft-event-entry
+                    role="listitem"
+                    [kind]="item.contact ? 'Contact request' : 'Other event'"
+                    [kindTone]="item.contact ? 'info' : 'neutral'"
+                    [title]="item.title"
+                    [titleMono]="!item.contact"
+                    [meta]="item.meta"
+                    [preview]="item.preview"
+                    [json]="item.json"
+                  >
+                    @if (item.contact; as contact) {
+                      <ft-description-list>
+                        <ft-description-list-item label="Name">{{
+                          contact.name
+                        }}</ft-description-list-item>
+                        <ft-description-list-item label="Email">
+                          <ft-link [href]="'mailto:' + contact.email">{{ contact.email }}</ft-link>
+                        </ft-description-list-item>
+                        @if (contact.organization) {
+                          <ft-description-list-item label="Organization">{{
+                            contact.organization
+                          }}</ft-description-list-item>
+                        }
+                        @if (contact.phone) {
+                          <ft-description-list-item label="Phone">
+                            <ft-link [href]="'tel:' + contact.phone">{{ contact.phone }}</ft-link>
+                          </ft-description-list-item>
+                        }
+                        <ft-description-list-item label="Message" [multiline]="true">{{
+                          contact.message
+                        }}</ft-description-list-item>
+                        <ft-description-list-item label="Received">{{
+                          item.received
+                        }}</ft-description-list-item>
+                        <ft-description-list-item [label]="'Sent by ' + app.name">{{
+                          item.occurred
+                        }}</ft-description-list-item>
+                        <ft-description-list-item label="Event ID" [mono]="true">{{
+                          item.event.eventId
+                        }}</ft-description-list-item>
+                      </ft-description-list>
+                    }
+                  </ft-event-entry>
+                }
+              </ft-stack>
+              <p class="text-caption">{{ countLine() }}</p>
+              @if (moreFailed()) {
+                <ft-alert status="danger" heading="We couldn’t load more events">
+                  Try again.
+                </ft-alert>
+              }
+              @if (events().length < total()) {
+                <ft-button [loading]="loadingMore()" (click)="loadMore()">
+                  {{ loadingMore() ? 'Loading…' : 'Load more' }}
+                </ft-button>
+              }
+            }
+          </ft-stack>
+        </section>
+      </ft-stack>
+    }
+  }
+}

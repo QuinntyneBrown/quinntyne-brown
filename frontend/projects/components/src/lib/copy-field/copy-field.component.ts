@@ -40,6 +40,10 @@ export class CopyFieldComponent {
   readonly value = input.required<string>();
   readonly help = input('');
   readonly copyLabel = input('Copy link');
+  /** Announced after a copy. */
+  readonly copiedMessage = input('Link copied to the clipboard.');
+  /** Shown when the clipboard is refused. */
+  readonly refusedMessage = input('Select the link and copy it.');
   readonly disabled = input(false);
   /** Emits after the value reached the clipboard. */
   readonly copied = output<void>();

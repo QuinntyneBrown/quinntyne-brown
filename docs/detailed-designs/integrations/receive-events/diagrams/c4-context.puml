@@ -1,0 +1,8 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Receive events
+System_Ext(pub, "Publisher (Goodwork)", "Signs and posts events")
+System(ftc, "QuinntyneBrown.Community", "Verifies, validates and stores events once")
+Rel(pub, ftc, "POST /api/webhooks/events", "HTTPS, HMAC-SHA256")
+@enduml

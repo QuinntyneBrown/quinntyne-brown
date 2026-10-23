@@ -1,0 +1,38 @@
+@startuml
+title UML sequence behaviour — Rotate and revoke
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Org Lead" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "ApplicationPage / dialogs" as page
+end box
+box "Backend — QuinntyneBrown.Community.Api and Application" #D1FADF
+  participant "IntegrationsEndpoints" as ep
+  participant "IntegrationAppsHandler" as h
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Rotate secret
+page -> ep : POST /api/integrations/apps/{id}/rotate
+ep -> h : RotateAsync
+alt revoked
+  h --> page : 409 (L2-159 #3)
+else active
+  h -> db : previous = current, expires now + 24 h; current = new ciphertext
+  h -> db : audit integration.secretRotated (L2-167)
+  h --> page : 200 { app, secret, previousSecretExpiresAt } (L2-159 #1)
+end
+actor -> page : Revoke, then confirm
+page -> ep : POST /api/integrations/apps/{id}/revoke
+ep -> h : RevokeAsync
+alt already revoked
+  h --> page : 409 (L2-160 #3)
+else active
+  h -> db : RevokedAt, RevokedById; audit integration.revoked
+  h --> page : 200 app (Revoked) (L2-160 #1)
+end
+@enduml

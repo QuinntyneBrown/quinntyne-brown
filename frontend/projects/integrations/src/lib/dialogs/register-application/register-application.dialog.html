@@ -1,0 +1,69 @@
+@if (registered(); as result) {
+  <ft-dialog
+    icon="applications"
+    [heading]="result.app.name + ' is registered'"
+    description="Give these to its developers. The secret is shown only now."
+    (closed)="ref.close(result)"
+  >
+    <ft-stack>
+      <ft-copy-field
+        label="Source ID"
+        copyLabel="Copy source ID"
+        copiedMessage="Source ID copied to the clipboard."
+        refusedMessage="Select the source ID and copy it."
+        [value]="result.app.sourceId"
+      />
+      <ft-secret-field
+        [label]="'Signing secret for ' + result.app.name"
+        [value]="result.secret"
+        [prefix]="result.app.secretPrefix"
+        (copied)="secretCopied.set(true)"
+      />
+      <p class="text-caption">
+        It sends events to <span class="mono">POST /api/webhooks/events</span> with
+        <span class="mono">X-Webhook-Source</span>,
+        <span class="mono">X-Webhook-Timestamp</span> and
+        <span class="mono">X-Webhook-Signature</span>, as the integration guide describes.
+      </p>
+    </ft-stack>
+    <ft-button ftDialogFooter variant="primary" (click)="ref.close(result)">
+      {{ secretCopied() ? 'Done' : 'I’ve copied it' }}
+    </ft-button>
+  </ft-dialog>
+} @else {
+  <ft-dialog
+    icon="applications"
+    heading="Register an application"
+    [description]="
+      'It will belong to ' + orgName() + '. You’ll get its source ID and signing secret next.'
+    "
+    [busy]="busy()"
+    (closed)="ref.close()"
+  >
+    <form [formGroup]="form" (submit)="$event.preventDefault(); register()">
+      <ft-stack>
+        @if (failure(); as message) {
+          <ft-alert status="danger" heading="We couldn’t register the application">
+            {{ message }}
+          </ft-alert>
+        }
+        <ft-form-field
+          required
+          label="Name"
+          help="Shown on the Applications page. 80 characters or fewer."
+          [error]="nameError()"
+        >
+          <ft-text-field formControlName="name" initialFocus [readonly]="busy()" />
+        </ft-form-field>
+        <p class="text-caption">
+          Organization: <strong>{{ orgName() }}</strong
+          >. Its Org Leads, the Portfolio Lead and the people who oversee it will see the events.
+        </p>
+      </ft-stack>
+    </form>
+    <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+    <ft-button ftDialogFooter variant="primary" [loading]="busy()" (click)="register()">
+      {{ busy() ? 'Registering…' : 'Register' }}
+    </ft-button>
+  </ft-dialog>
+}

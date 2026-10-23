@@ -34,6 +34,7 @@ public class CurrentAccessMiddleware(RequestDelegate next)
         ("/api/poker-sessions", Features.Agile),
         ("/api/work", Features.Agile),
         ("/api/reports", Features.Reports),
+        ("/api/integrations", Features.Integrations),
         ("/api/people", Features.Profiles),
     ];
 

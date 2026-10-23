@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Receive events
+Container_Boundary(api, "Community API") {
+  Component(gate, "PrivatePreviewGateMiddleware", "Middleware", "Lets POST /api/webhooks/events through by exact path (ADR 0042)")
+  Component(rl, "Rate limiter policy 'webhook'", "ASP.NET Core rate limiting", "Fixed window per X-Webhook-Source, Retry-After")
+  Component(ep, "WebhookEndpoints", "Minimal API", "Anonymous; reads at most 64 KB of raw body; maps the outcome to 202/200/400/401/413")
+  Component(h, "ReceiveEventHandler", "Application", "Source lookup, timestamp window, signature, envelope rules, duplicate check")
+  Component(sig, "WebhookSignature", "Application", "HMAC-SHA256 over timestamp.body; FixedTimeEquals")
+  Component(prot, "ISecretProtector", "Infrastructure", "Unprotects the current and previous secrets")
+}
+ContainerDb(db, "Community database", "PostgreSQL")
+Rel(gate, rl, "Passes to")
+Rel(rl, ep, "Passes to")
+Rel(ep, h, "Calls")
+Rel(h, sig, "Verifies with")
+Rel(h, prot, "Decrypts with")
+Rel(h, db, "Reads IntegrationApps, inserts IntegrationEvents")
+@enduml

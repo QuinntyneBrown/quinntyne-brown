@@ -1,0 +1,26 @@
+<ft-dialog
+  icon="revoke"
+  tone="danger"
+  [heading]="'Revoke ' + app.name + '?'"
+  [description]="
+    'You can’t undo this. Register a new application if ' +
+    app.name +
+    ' needs to send events again.'
+  "
+  [busy]="busy()"
+  (closed)="ref.close()"
+>
+  @if (failed()) {
+    <ft-alert status="danger" [heading]="'We couldn’t revoke ' + app.name">
+      It’s still active. Try again.
+    </ft-alert>
+  }
+  <p>
+    {{ app.name }}’s requests will be refused straight away, whichever secret signs them. Its
+    {{ app.eventCount }} event{{ app.eventCount === 1 ? '' : 's' }} stay on this page.
+  </p>
+  <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+  <ft-button ftDialogFooter variant="danger" [loading]="busy()" (click)="revoke()">
+    {{ busy() ? 'Revoking…' : 'Revoke application' }}
+  </ft-button>
+</ft-dialog>

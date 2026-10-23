@@ -13,6 +13,7 @@ export * from './config';
 export * from './contacts';
 export * from './errors';
 export * from './events';
+export * from './integrations';
 export * from './invites';
 export * from './notes';
 export * from './notifications';

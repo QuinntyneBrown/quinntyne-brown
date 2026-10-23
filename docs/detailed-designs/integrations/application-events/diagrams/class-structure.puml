@@ -1,0 +1,33 @@
+@startuml
+title Class structure — Applications and their events
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+interface IntegrationsService {
+  +list() : Observable<IntegrationApp[]>
+  +get(id) : Observable<IntegrationApp>
+  +register(name) : Observable<RegisteredApp>
+  +rotate(id) : Observable<RotatedSecret>
+  +revoke(id) : Observable<IntegrationApp>
+  +events(id, page) : Observable<Page<IntegrationEvent>>
+}
+class HttpIntegrationsService
+class ApplicationsPage
+class ApplicationPage
+class RegisterApplicationDialog
+class RotateSecretDialog
+class RevokeApplicationDialog
+class IntegrationAppsHandler {
+  +ListAsync()
+  +GetAsync(id)
+  +ListEventsAsync(id, PageRequest)
+}
+HttpIntegrationsService ..|> IntegrationsService
+ApplicationsPage ..> IntegrationsService : INTEGRATIONS_SERVICE
+ApplicationPage ..> IntegrationsService : INTEGRATIONS_SERVICE
+RegisterApplicationDialog ..> IntegrationsService
+RotateSecretDialog ..> IntegrationsService
+RevokeApplicationDialog ..> IntegrationsService
+HttpIntegrationsService ..> IntegrationAppsHandler : HTTP
+@enduml

@@ -1,0 +1,73 @@
+<ng-template #nameCell let-app>
+  <ft-link [href]="link(app)">{{ app.name }}</ft-link>
+</ng-template>
+<ng-template #statusCell let-app>
+  <ft-badge [variant]="app.status === 'Active' ? 'success' : 'danger'">{{ app.status }}</ft-badge>
+</ng-template>
+<ng-template #actionsCell let-app>
+  <ft-button size="sm" [href]="link(app)" [label]="'Events for ' + app.name">Events</ft-button>
+</ng-template>
+
+@if (state() === 'forbidden') {
+  <h1 class="visually-hidden">Applications</h1>
+  <ft-empty-state
+    icon="locked"
+    heading="Applications are for Org Leads and the people who oversee them"
+    text="Ask your org’s Org Lead if you need to see what your website sends."
+  >
+    <ft-button actions variant="primary" href="/">Go to Home</ft-button>
+  </ft-empty-state>
+} @else {
+  <ft-page-header title="Applications" [subtitle]="subtitle()">
+    @if (canManage()) {
+      <ft-button ftPageHeaderActions variant="primary" (click)="register()">
+        <ft-icon name="add" /> Register application
+      </ft-button>
+    }
+  </ft-page-header>
+  <ft-stack>
+    @switch (state()) {
+      @case ('loading') {
+        <ft-list-skeleton label="Loading applications" [rows]="2" />
+      }
+      @case ('error') {
+        <ft-empty-state
+          variant="error"
+          heading="We couldn’t load applications"
+          text="Check your connection and try again. If it keeps happening, we’ve already been told about it."
+        >
+          <ft-button actions variant="primary" (click)="load()">
+            <ft-icon name="try-again" /> Try again
+          </ft-button>
+        </ft-empty-state>
+      }
+      @default {
+        @if (!apps().length) {
+          <ft-empty-state
+            icon="applications"
+            heading="No applications yet"
+            text="Register a site or service, such as your website’s contact form, to see the events it sends here."
+          >
+            @if (canManage()) {
+              <ft-button actions variant="primary" (click)="register()">
+                <ft-icon name="add" /> Register application
+              </ft-button>
+            }
+          </ft-empty-state>
+        } @else {
+          @if (!canManage()) {
+            <p class="text-muted">
+              You can read these applications and their events. Org Leads and the Portfolio Lead
+              register, rotate and revoke them.
+            </p>
+          }
+          <ft-table
+            [caption]="'Applications in ' + (org()?.branding?.displayName ?? 'your org')"
+            [columns]="columns()"
+            [rows]="rows()"
+          />
+        }
+      }
+    }
+  </ft-stack>
+}

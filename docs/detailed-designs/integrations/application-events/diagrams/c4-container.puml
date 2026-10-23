@@ -1,0 +1,14 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Applications and their events
+Person(viewer, "Covering member")
+System_Boundary(ftc, "QuinntyneBrown.Community") {
+  Container(web, "Community web app", "Angular", "Shell navigation; integrations library: ApplicationsPage, ApplicationPage")
+  Container(api, "Community API", "ASP.NET Core", "IntegrationsEndpoints, IntegrationAppsHandler")
+  ContainerDb(db, "Community database", "PostgreSQL", "IntegrationApps, IntegrationEvents")
+}
+Rel(viewer, web, "Uses", "HTTPS")
+Rel(web, api, "GET /api/integrations/apps, /{id}, /{id}/events?page=", "JSON/HTTPS")
+Rel(api, db, "Reads", "EF Core")
+@enduml

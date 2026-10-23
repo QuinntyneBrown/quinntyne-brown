@@ -1,0 +1,46 @@
+@startuml
+title Class structure — Receive events
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+class IntegrationEvent {
+  +Id : Guid
+  +IntegrationAppId : Guid
+  +OrganizationId : Guid
+  +EventId : Guid
+  +EventType : string
+  +OccurredAt : DateTimeOffset
+  +ReceivedAt : DateTimeOffset
+  +DataJson : string
+}
+class IntegrationApp
+class ReceiveEventHandler {
+  +HandleAsync(WebhookDelivery) : WebhookOutcome
+}
+class WebhookDelivery <<record>> {
+  +Source : string?
+  +Timestamp : string?
+  +Signature : string?
+  +ContentType : string?
+  +Body : byte[]
+}
+class WebhookOutcome <<record>> {
+  +Kind : Accepted | Duplicate | Unauthorized | Invalid
+  +EventId : Guid?
+  +Errors : dictionary?
+}
+class WebhookSignature <<static>> {
+  +Compute(secret, timestamp, body) : byte[]
+  +Matches(header, expected) : bool
+}
+class EnvelopeValidator <<static>> {
+  +Validate(body) : (Envelope?, errors)
+}
+IntegrationEvent "*" --> "1" IntegrationApp : unique (IntegrationAppId, EventId)
+ReceiveEventHandler ..> WebhookDelivery
+ReceiveEventHandler ..> WebhookOutcome
+ReceiveEventHandler ..> WebhookSignature
+ReceiveEventHandler ..> EnvelopeValidator
+ReceiveEventHandler ..> IntegrationEvent
+@enduml

@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 using OpenIddict.Abstractions;
 
 namespace QuinntyneBrown.Community.Api.Middleware;
@@ -8,6 +9,7 @@ public static class WebProtectionSetup
     public const string WebAppCorsPolicy = "web-app";
     public const string AuthRateLimitPolicy = "auth";
     public const string GuestRsvpRateLimitPolicy = "guest-rsvp";
+    public const string WebhookRateLimitPolicy = "webhook";
 
     public static IServiceCollection AddWebProtections(this IServiceCollection services, IConfiguration configuration)
     {
@@ -48,6 +50,28 @@ public static class WebProtectionSetup
                 RateLimitPartition.GetFixedWindowLimiter(
                     $"guest-rsvp:{context.Connection.RemoteIpAddress}",
                     _ => new FixedWindowRateLimiterOptions { PermitLimit = guestPermitLimit, Window = TimeSpan.FromHours(1), QueueLimit = 0 }));
+
+            // 60 webhook requests a minute per X-Webhook-Source (L2-164, ADR 0042); unknown or oversized values share one partition.
+            var webhookPermitLimit = configuration.GetValue("RateLimits:WebhookPerMinute", 60);
+            options.AddPolicy(WebhookRateLimitPolicy, context =>
+            {
+                var source = context.Request.Headers["X-Webhook-Source"].ToString();
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    source.Length is > 0 and <= 100 ? $"webhook:{source}" : "webhook:",
+                    _ => Window(webhookPermitLimit));
+            });
+
+            // A publisher is told when to retry (ICD); other limited responses are unchanged.
+            options.OnRejected = (context, _) =>
+            {
+                if (context.HttpContext.GetEndpoint()?.Metadata.GetMetadata<EnableRateLimitingAttribute>()?.PolicyName == WebhookRateLimitPolicy
+                    && context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+                {
+                    context.HttpContext.Response.Headers.RetryAfter = Math.Max(1, (int)Math.Ceiling(retryAfter.TotalSeconds)).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                }
+
+                return ValueTask.CompletedTask;
+            };
         });
         return services;
     }

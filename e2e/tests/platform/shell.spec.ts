@@ -75,6 +75,8 @@ test.describe('App shell', () => {
         'Notes',
         'People',
         'Reports',
+        // Staff read applications across FaithTech City orgs (L2-165).
+        'Applications',
       ],
       tabs: ['Home', 'Events', 'Search', 'Partners'],
     },
@@ -109,6 +111,7 @@ test.describe('App shell', () => {
         'Notes',
         'People',
         'Reports',
+        'Applications',
         'Organization',
         'Portfolio',
         'Admin',

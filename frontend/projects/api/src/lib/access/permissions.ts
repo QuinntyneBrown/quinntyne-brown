@@ -18,6 +18,8 @@ export const Permission = {
   WorkspacesJoin: 'workspaces.join',
   WorkspacesReadAll: 'workspaces.readAll',
   ReportsView: 'reports.view',
+  IntegrationsView: 'integrations.view',
+  IntegrationsManage: 'integrations.manage',
   TeamMember: 'team.member',
   TeamLead: 'team.lead',
 } as const;
@@ -37,6 +39,7 @@ export const Feature = {
   Resources: 'resources',
   Agile: 'agile',
   Reports: 'reports',
+  Integrations: 'integrations',
 } as const;
 
 export type Feature = (typeof Feature)[keyof typeof Feature];
@@ -54,6 +57,10 @@ export const FEATURE_LABELS: Record<Feature, { name: string; description: string
   resources: { name: 'Resources', description: 'Uploaded files and links.' },
   agile: { name: 'Workspaces', description: 'Agile workspaces, boards and Planning Poker.' },
   reports: { name: 'Reports', description: 'The read-only Reports page.' },
+  integrations: {
+    name: 'Applications',
+    description: 'Signed events from other applications, such as contact requests.',
+  },
 };
 
 /** Profiles and Docs & notes cannot be switched off (L2-147 AC4). */
@@ -81,4 +88,6 @@ export const PERMISSION_LABELS: Record<string, string> = {
   'workspaces.join': 'Be added to the org’s workspaces',
   'workspaces.readAll': 'Read every workspace of the org',
   'reports.view': 'Open the Reports page for the org',
+  'integrations.view': 'Read the org’s applications and their events',
+  'integrations.manage': 'Register applications, rotate their secrets and revoke them',
 };
