@@ -35,7 +35,12 @@ export class MockGitHub {
   account: MockGitHubAccount | null = null;
   /** Every authorization URL the start endpoint sent the browser to. */
   readonly authorizeUrls: string[] = [];
-  private pending: { state: string; returnUrl: string; keepSignedIn: string } | null = null;
+  private pending: {
+    state: string;
+    returnUrl: string;
+    keepSignedIn: string;
+    fromApp: boolean;
+  } | null = null;
 
   constructor(
     private readonly api: MockApi,
@@ -49,6 +54,7 @@ export class MockGitHub {
       state: `state-${Date.now()}`,
       returnUrl: returnUrl.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : '/',
       keepSignedIn: url.searchParams.get('keepSignedIn') === 'true' ? '1' : '0',
+      fromApp: url.searchParams.get('from') === 'app',
     };
     const github = new URL(AUTHORIZE);
     github.searchParams.set('client_id', 'github-client-id');
@@ -76,7 +82,14 @@ export class MockGitHub {
     const pending = this.pending;
     this.pending = null;
     const github = this.account;
-    const failed = (outcome: string) => redirect(route, `${MARKETING}/?github=${outcome}`);
+    // Back where the sign-in started (L2-111): the community app's /sign-in, else the marketing page.
+    const failed = (outcome: string) =>
+      redirect(
+        route,
+        pending?.fromApp
+          ? `${COMMUNITY}/sign-in?github=${outcome}&returnUrl=${encodeURIComponent(pending.returnUrl)}`
+          : `${MARKETING}/?github=${outcome}`,
+      );
     if (!pending || url.searchParams.get('state') !== pending.state || !github) {
       return failed('failed');
     }
@@ -92,6 +105,10 @@ export class MockGitHub {
     account.verified = true;
     if (account.suspended) return failed('suspended');
     this.signIn(account);
+    // An interrupted authorization request resumes, as after a password sign-in.
+    if (pending.returnUrl.startsWith('/connect/')) {
+      return redirect(route, `${COMMUNITY}${pending.returnUrl}`);
+    }
     const query = new URLSearchParams({
       returnUrl: pending.returnUrl,
       keepSignedIn: pending.keepSignedIn,

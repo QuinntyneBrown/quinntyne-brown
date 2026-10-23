@@ -291,7 +291,7 @@ export class MockApi {
     await this.page.goto(`/sign-in?returnUrl=${encodeURIComponent(path)}`);
     await this.page.getByLabel('Email').fill(account.email);
     await this.page.getByLabel('Password', { exact: true }).fill(account.password);
-    await this.page.getByRole('button', { name: 'Sign in' }).click();
+    await this.page.getByRole('button', { name: 'Sign in', exact: true }).click();
     await this.page.waitForURL((url) => url.pathname === path);
   }
 

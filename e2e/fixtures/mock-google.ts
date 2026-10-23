@@ -34,7 +34,12 @@ function redirect(route: Route, location: string) {
 export class MockGoogle {
   /** Who signs in at Google. Set it before pressing the button; null plays "Cancel". */
   account: MockGoogleAccount | null = null;
-  private pending: { state: string; returnUrl: string; keepSignedIn: string } | null = null;
+  private pending: {
+    state: string;
+    returnUrl: string;
+    keepSignedIn: string;
+    fromApp: boolean;
+  } | null = null;
 
   constructor(
     private readonly api: MockApi,
@@ -48,6 +53,7 @@ export class MockGoogle {
       state: `state-${Date.now()}`,
       returnUrl: returnUrl.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : '/',
       keepSignedIn: url.searchParams.get('keepSignedIn') === 'true' ? '1' : '0',
+      fromApp: url.searchParams.get('from') === 'app',
     };
     const google = new URL(AUTHORIZE);
     google.searchParams.set('state', this.pending.state);
@@ -70,7 +76,14 @@ export class MockGoogle {
     const pending = this.pending;
     this.pending = null;
     const google = this.account;
-    const failed = (outcome: string) => redirect(route, `${MARKETING}/?google=${outcome}`);
+    // Back where the sign-in started (L2-111): the community app's /sign-in, else the marketing page.
+    const failed = (outcome: string) =>
+      redirect(
+        route,
+        pending?.fromApp
+          ? `${COMMUNITY}/sign-in?google=${outcome}&returnUrl=${encodeURIComponent(pending.returnUrl)}`
+          : `${MARKETING}/?google=${outcome}`,
+      );
     if (!pending || url.searchParams.get('state') !== pending.state || !google) {
       return failed('failed');
     }
@@ -81,6 +94,10 @@ export class MockGoogle {
     account.verified = true;
     if (account.suspended) return failed('suspended');
     this.signIn(account);
+    // An interrupted authorization request resumes, as after a password sign-in.
+    if (pending.returnUrl.startsWith('/connect/')) {
+      return redirect(route, `${COMMUNITY}${pending.returnUrl}`);
+    }
     const query = new URLSearchParams({
       returnUrl: pending.returnUrl,
       keepSignedIn: pending.keepSignedIn,

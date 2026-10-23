@@ -13,6 +13,8 @@ export class SignUpPage {
   readonly emailError: Locator;
   readonly passwordError: Locator;
   readonly checkInbox: Locator;
+  readonly signUpWithGoogle: Locator;
+  readonly signUpWithGitHub: Locator;
 
   constructor(private readonly page: Page) {
     this.heading = page.getByRole('heading', { level: 1, name: 'Join FaithTech' });
@@ -25,6 +27,8 @@ export class SignUpPage {
     this.emailError = fieldError(page, 'Email');
     this.passwordError = fieldError(page, 'Password');
     this.checkInbox = page.getByRole('heading', { level: 1, name: 'Check your inbox' });
+    this.signUpWithGoogle = page.getByRole('button', { name: 'Sign up with Google' });
+    this.signUpWithGitHub = page.getByRole('button', { name: 'Sign up with GitHub' });
   }
 
   async open(): Promise<void> {
