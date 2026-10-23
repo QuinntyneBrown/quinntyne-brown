@@ -1,6 +1,6 @@
 # 0009. Shell navigation follows one rule by role
 
-- Status: Accepted
+- Status: Accepted; superseded in part by ADR 0037 (navigation follows permission codes and features per org)
 - Date: 2026-10-21
 - Requirements: L2-045 AC4, L2-012, L2-017, L2-019, L2-030, L2-040, L2-053, L2-123
 - Designs: `docs/detailed-designs/platform/responsive-layout-and-theming`

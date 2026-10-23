@@ -1,6 +1,6 @@
 # 0005. Role dialogs live in components, role calls in api
 
-- Status: Accepted
+- Status: Accepted; superseded in part by ADR 0033 (grantable roles come from the catalogue, not a fixed table)
 - Date: 2026-10-21
 - Requirements: L2-008, L2-009 AC2, AC5
 - Designs: `docs/detailed-designs/admin/assign-roles`, `docs/detailed-designs/admin/admin-users-and-override`

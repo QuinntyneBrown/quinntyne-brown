@@ -1,6 +1,6 @@
 # 0025. Notes: access, links and the Staff rule
 
-- Status: Accepted
+- Status: Accepted; superseded in part by ADR 0035 (Staff is a cross-org role) and ADR 0039 (Global becomes Org-wide; Portfolio-wide)
 - Date: 2026-10-22
 - Requirements: L1-022, L2-085, L2-090, L2-091, L2-092, L2-093, L2-095, L2-098
 - Designs: `docs/detailed-designs/notes/share-and-visibility`, `docs/detailed-designs/notes/links-and-backlinks`, `docs/detailed-designs/notes/archive-and-search`, `docs/detailed-designs/notes/pages-and-list`

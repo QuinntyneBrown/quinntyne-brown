@@ -1,6 +1,6 @@
 # 0006. Invite tokens and acceptance
 
-- Status: Accepted
+- Status: Accepted; superseded in part by ADR 0041 (invites belong to one org)
 - Date: 2026-10-21
 - Requirements: L2-002 AC3, L2-009, L2-010, L2-011, L2-041 AC1
 - Designs: `docs/detailed-designs/invites/send-invite`, `docs/detailed-designs/invites/accept-invite`
