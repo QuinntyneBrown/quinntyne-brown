@@ -7,6 +7,9 @@ using Npgsql;
 
 namespace QuinntyneBrown.Community.Cli;
 
+/// <summary>The local development account seed creates; configured only in the Development environment.</summary>
+public record DevAccount(string Email, string Password);
+
 public static class CliApp
 {
     /// <summary>The environment variable that carries the load-test members' password, never the command line.</summary>
@@ -20,7 +23,8 @@ public static class CliApp
         string webAppOrigin,
         Func<string, string?>? environment = null,
         TextReader? input = null,
-        TextWriter? output = null)
+        TextWriter? output = null,
+        DevAccount? devAccount = null)
     {
         environment ??= Environment.GetEnvironmentVariable;
         input ??= Console.In;
@@ -40,7 +44,13 @@ public static class CliApp
                 await CreateSchemaAsync(db);
                 return 0;
             case "seed":
-                await scope.ServiceProvider.GetRequiredService<CommunitySeeder>().SeedAsync(webAppOrigin);
+                var seeder = scope.ServiceProvider.GetRequiredService<CommunitySeeder>();
+                if (devAccount is not null)
+                {
+                    await seeder.SeedDevAccountAsync(devAccount.Email, devAccount.Password);
+                }
+
+                await seeder.SeedAsync(webAppOrigin);
                 return 0;
             case "grant-admin" when args.Length == 2:
                 if (await scope.ServiceProvider.GetRequiredService<CommunitySeeder>().GrantSystemAdminAsync(args[1]))

@@ -7,9 +7,11 @@ internal static class Program
 {
     private static async Task<int> Main(string[] args)
     {
+        var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
         var configuration = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: true)
+            .AddJsonFile($"appsettings.{environment}.json", optional: true)
             .AddEnvironmentVariables()
             .Build();
 
@@ -19,6 +21,9 @@ internal static class Program
         return await CliApp.RunAsync(
             args,
             options => options.UseNpgsql(connectionString),
-            configuration["WebApp:Origin"] ?? "http://localhost:4200");
+            configuration["WebApp:Origin"] ?? "http://localhost:4200",
+            devAccount: environment == "Development" && configuration["DevAccount:Email"] is { } email && configuration["DevAccount:Password"] is { } password
+                ? new DevAccount(email, password)
+                : null);
     }
 }

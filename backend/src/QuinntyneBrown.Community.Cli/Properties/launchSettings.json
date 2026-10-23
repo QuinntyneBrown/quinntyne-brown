@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "QuinntyneBrown.Community.Cli": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

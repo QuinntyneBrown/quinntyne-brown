@@ -57,6 +57,32 @@ public class SeedCommandTests
         Assert.Empty(await db.Resources.ToListAsync());
     }
 
+    [Fact]
+    public async Task Seed_creates_the_configured_local_account_once_as_a_verified_system_admin()
+    {
+        var account = new DevAccount("dev@faithtech.test", "P@ssw0rd");
+        Assert.Equal(0, await CliApp.RunAsync(["seed"], options => options.UseInMemoryDatabase(_name, _root), Origin, devAccount: account));
+        Assert.Equal(0, await CliApp.RunAsync(["seed"], options => options.UseInMemoryDatabase(_name, _root), Origin, devAccount: account));
+
+        await using var db = Db();
+        var user = await db.Users.SingleAsync();
+        Assert.True(user.EmailConfirmed);
+        Assert.Equal("DEV@FAITHTECH.TEST", user.NormalizedEmail);
+        var hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<QuinntyneBrown.Community.Application.Identity.CommunityUser>();
+        Assert.NotEqual(Microsoft.AspNetCore.Identity.PasswordVerificationResult.Failed, hasher.VerifyHashedPassword(user, user.PasswordHash!, "P@ssw0rd"));
+        var profile = await db.Profiles.SingleAsync(p => p.Id == user.ProfileId);
+        Assert.True(profile.HasRole(QuinntyneBrown.Community.Domain.Profiles.Role.SystemAdmin));
+    }
+
+    [Fact]
+    public async Task Seed_creates_no_account_when_none_is_configured()
+    {
+        Assert.Equal(0, await Run("seed"));
+
+        await using var db = Db();
+        Assert.Empty(await db.Users.ToListAsync());
+    }
+
     private CommunityDbContext Db() =>
         new(new DbContextOptionsBuilder<CommunityDbContext>().UseInMemoryDatabase(_name, _root).UseOpenIddict().Options);
 
