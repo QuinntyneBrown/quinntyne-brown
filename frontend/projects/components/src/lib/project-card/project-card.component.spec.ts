@@ -31,6 +31,23 @@ describe('ProjectCardComponent', () => {
     expect(setup(shelfie).querySelector('.project-card__language')?.textContent).toBe('TypeScript');
   });
 
+  it('shows the one-line description after the language when one is given', () => {
+    const body = setup({
+      ...shelfie,
+      description: 'A reading habit tracker for a young reader, with parent rewards.',
+    }).querySelector('.project-card__body')!;
+
+    const description = body.querySelector('.project-card__description')!;
+    expect(description.textContent).toBe(
+      'A reading habit tracker for a young reader, with parent rewards.',
+    );
+    expect(description.previousElementSibling?.classList).toContain('project-card__language');
+  });
+
+  it('shows no description element when none is given', () => {
+    expect(setup(shelfie).querySelector('.project-card__description')).toBeNull();
+  });
+
   it('shows a decorative tile with the initial when there is no thumbnail', () => {
     const thumb = setup(shelfie).querySelector('.project-card__thumb')!;
 

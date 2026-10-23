@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 /**
- * One project in a grid of projects (marketing page, Things I’m building): a decorative thumbnail,
- * the name as the card's only link, stretched over the card, and the main language. Without an
- * `image` the thumbnail is a tinted tile with the name's initial. Place inside a `<ul>`.
+ * One project in a grid of projects (marketing page, What I’m building in the open): a decorative
+ * thumbnail, the name as the card's only link, stretched over the card, the main language and an
+ * optional one-line description. Without an `image` the thumbnail is a tinted tile with the name's
+ * initial. Place inside a `<ul>`.
  */
 @Component({
   selector: 'ft-project-card',
@@ -18,6 +19,8 @@ export class ProjectCardComponent {
   readonly language = input<string | null>(null);
   /** A screenshot served by the app; decorative, since the name says what the project is. */
   readonly image = input<string | null>(null);
+  /** One line on what the project is, under the name and language. */
+  readonly description = input<string | null>(null);
 
   protected readonly initial = computed(() => this.name().charAt(0).toUpperCase());
 }

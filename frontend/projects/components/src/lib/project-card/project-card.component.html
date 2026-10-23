@@ -10,4 +10,7 @@
   @if (language(); as text) {
     <span class="project-card__language">{{ text }}</span>
   }
+  @if (description(); as text) {
+    <p class="project-card__description">{{ text }}</p>
+  }
 </div>
