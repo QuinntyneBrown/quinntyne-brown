@@ -90,5 +90,9 @@ public interface IApplicationDbContext
 
     DbSet<AgentCredential> AgentCredentials { get; }
 
+    DbSet<Domain.Integrations.IntegrationApp> IntegrationApps { get; }
+
+    DbSet<Domain.Integrations.IntegrationEvent> IntegrationEvents { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

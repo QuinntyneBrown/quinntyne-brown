@@ -60,7 +60,7 @@ public class MyAccessTests(CommunityApiFactory factory) : IClassFixture<Communit
 
         var shelfie = (await factory.ClientFor(engineer).GetFromJsonAsync<Access>("/api/me/access"))!.Orgs.Single();
 
-        Assert.Equal(["agile", "invites", "notes", "profiles", "resources"], shelfie.Features);
+        Assert.Equal(["agile", "integrations", "invites", "notes", "profiles", "resources"], shelfie.Features);
         Assert.DoesNotContain("events.manage", shelfie.Permissions);
     }
 }

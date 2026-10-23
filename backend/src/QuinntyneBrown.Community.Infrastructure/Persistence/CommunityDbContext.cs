@@ -17,13 +17,15 @@ using QuinntyneBrown.Community.Infrastructure.Identity;
 using QuinntyneBrown.Community.Infrastructure.Search;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using QuinntyneBrown.Community.Domain.Integrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace QuinntyneBrown.Community.Infrastructure.Persistence;
 
 public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
-    : IdentityDbContext<CommunityUser, IdentityRole<Guid>, Guid>(options), IApplicationDbContext
+    : IdentityDbContext<CommunityUser, IdentityRole<Guid>, Guid>(options), IApplicationDbContext, IDataProtectionKeyContext
 {
     public DbSet<Profile> Profiles => Set<Profile>();
 
@@ -99,6 +101,13 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
     public DbSet<CrossOrgAssignment> CrossOrgAssignments => Set<CrossOrgAssignment>();
 
     public DbSet<AgentCredential> AgentCredentials => Set<AgentCredential>();
+
+    public DbSet<IntegrationApp> IntegrationApps => Set<IntegrationApp>();
+
+    public DbSet<IntegrationEvent> IntegrationEvents => Set<IntegrationEvent>();
+
+    /// <summary>The ASP.NET Data Protection key ring, so protected secrets survive restarts (ADR 0042).</summary>
+    public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -683,6 +692,27 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
             credential.HasIndex(c => c.TokenHash).IsUnique();
             credential.Property(c => c.Prefix).HasMaxLength(16);
             credential.HasIndex(c => c.AgentProfileId);
+        });
+
+        builder.Entity<IntegrationApp>(app =>
+        {
+            app.Property(a => a.Id).ValueGeneratedNever();
+            app.Property(a => a.Name).HasMaxLength(IntegrationApp.NameMaxLength);
+            app.Property(a => a.SourceId).HasMaxLength(40);
+            app.HasIndex(a => a.SourceId).IsUnique();
+            app.Property(a => a.SecretPrefix).HasMaxLength(16);
+            app.HasIndex(a => a.OrganizationId);
+            app.Ignore(a => a.IsRevoked);
+        });
+
+        builder.Entity<IntegrationEvent>(evt =>
+        {
+            evt.Property(e => e.Id).ValueGeneratedNever();
+            evt.Property(e => e.EventType).HasMaxLength(IntegrationEvent.EventTypeMaxLength);
+            evt.Property(e => e.DataJson).HasColumnType("jsonb");
+            evt.HasIndex(e => new { e.IntegrationAppId, e.EventId }).IsUnique();
+            evt.HasIndex(e => new { e.IntegrationAppId, e.ReceivedAt });
+            evt.HasIndex(e => e.OrganizationId);
         });
 
         builder.Entity<Event>().HasIndex(e => e.OrganizationId);

@@ -61,7 +61,11 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<CommunityDbContext>()
             .AddTokenProvider<EmailConfirmationTokenProvider<CommunityUser>>(EmailConfirmationTokenProvider<CommunityUser>.Name)
             .AddTokenProvider<PasswordResetTokenProvider<CommunityUser>>(PasswordResetTokenProvider<CommunityUser>.Name);
-        services.AddDataProtection();
+        // One key ring for the API and the Cli, kept in the database so integration secrets survive restarts (ADR 0042).
+        services.AddDataProtection()
+            .SetApplicationName("QuinntyneBrown.Community")
+            .PersistKeysToDbContext<CommunityDbContext>();
+        services.AddSingleton<Application.Integrations.ISecretProtector, Integrations.DataProtectionSecretProtector>();
         services.AddSingleton<IPassphraseHasher, Pbkdf2PassphraseHasher>();
         services.AddSingleton<Application.Organizations.IAgentTokenFactory, Organizations.AgentTokenFactory>();
         services.AddSingleton<IUnlockTokens, HmacUnlockTokens>();

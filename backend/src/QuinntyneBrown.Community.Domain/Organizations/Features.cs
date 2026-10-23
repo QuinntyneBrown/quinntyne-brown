@@ -17,11 +17,13 @@ public static class Features
     public const string Resources = "resources";
     public const string Agile = "agile";
     public const string Reports = "reports";
+    /// <summary>Application integrations: inbound webhooks and the Applications screens (ADR 0042).</summary>
+    public const string Integrations = "integrations";
 
     public static IReadOnlyList<string> AlwaysOn { get; } = [Profiles, Notes];
 
     public static IReadOnlyList<string> Switchable { get; } =
-        [Contacts, Partners, Team, Events, Announcements, Invites, Resources, Agile, Reports];
+        [Contacts, Partners, Team, Events, Announcements, Invites, Resources, Agile, Reports, Integrations];
 
     public static IReadOnlyList<string> All { get; } = [.. AlwaysOn, .. Switchable];
 
