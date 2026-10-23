@@ -12,6 +12,7 @@ using QuinntyneBrown.Community.Application.Resources;
 using QuinntyneBrown.Community.Application.Search;
 using QuinntyneBrown.Community.Infrastructure.Admin;
 using QuinntyneBrown.Community.Infrastructure.Calendar;
+using QuinntyneBrown.Community.Infrastructure.Csv;
 using QuinntyneBrown.Community.Infrastructure.Email;
 using QuinntyneBrown.Community.Infrastructure.Identity;
 using QuinntyneBrown.Community.Infrastructure.Invites;
@@ -102,6 +103,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<IAuditLog, AuditLog>();
         services.AddSingleton<IIcsCalendarWriter, IcsCalendarWriter>();
+        services.AddSingleton<ICsvWriter, CsvWriter>();
 
         services.AddSingleton<IFullTextSearch, PostgresFullTextSearch>();
 
