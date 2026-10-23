@@ -1,0 +1,48 @@
+@startuml
+title Class structure — Manage applications
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+class IntegrationApp {
+  +Id : Guid
+  +OrganizationId : Guid
+  +Name : string
+  +SourceId : string
+  +SecretCiphertext : string
+  +SecretPrefix : string
+  +PreviousSecretCiphertext : string?
+  +PreviousSecretExpiresAt : DateTimeOffset?
+  +CreatedById : Guid
+  +CreatedAt : DateTimeOffset
+  +RotatedAt : DateTimeOffset?
+  +RevokedAt : DateTimeOffset?
+  +RevokedById : Guid?
+  +IsRevoked : bool
+  +Rotate(ciphertext, prefix, now)
+  +Revoke(by, now)
+}
+class IntegrationAppsHandler {
+  +ListAsync() : IntegrationAppDto[]
+  +GetAsync(id) : IntegrationAppDto
+  +RegisterAsync(RegisterAppCommand) : RegisteredAppDto
+  +RotateAsync(id) : RotatedSecretDto
+  +RevokeAsync(id) : IntegrationAppDto
+}
+class WebhookCredentials <<static>> {
+  +NewSourceId() : string
+  +NewSecret() : string
+  +Prefix(secret) : string
+}
+interface ISecretProtector {
+  +Protect(secret) : string
+  +Unprotect(ciphertext) : string
+}
+class DataProtectionSecretProtector
+class Organization
+IntegrationApp "*" --> "1" Organization : belongs to
+IntegrationAppsHandler ..> IntegrationApp
+IntegrationAppsHandler ..> WebhookCredentials
+IntegrationAppsHandler ..> ISecretProtector
+DataProtectionSecretProtector ..|> ISecretProtector
+@enduml

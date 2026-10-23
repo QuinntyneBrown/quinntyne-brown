@@ -1,0 +1,14 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Manage applications
+Person(lead, "Org Lead or Portfolio Lead")
+System_Boundary(ftc, "QuinntyneBrown.Community") {
+  Container(web, "Community web app", "Angular", "integrations feature library: Applications page, register, rotate and revoke dialogs")
+  Container(api, "Community API", "ASP.NET Core", "IntegrationsEndpoints, IntegrationAppsHandler")
+  ContainerDb(db, "Community database", "PostgreSQL", "IntegrationApps, AuditEntries, DataProtectionKeys")
+}
+Rel(lead, web, "Uses", "HTTPS")
+Rel(web, api, "Calls /api/integrations/apps with X-Org", "JSON/HTTPS")
+Rel(api, db, "Reads and writes", "EF Core")
+@enduml

@@ -1,0 +1,10 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Manage applications
+Person(lead, "Org Lead or Portfolio Lead", "Holds integrations.manage in the org")
+System(ftc, "QuinntyneBrown.Community", "Registers applications, issues and rotates their signing secrets, revokes them")
+System_Ext(pub, "Publisher (Goodwork)", "Receives the source ID and secret from its operators")
+Rel(lead, ftc, "Registers, rotates and revokes applications in", "HTTPS")
+Rel(lead, pub, "Hands the source ID and secret to the operators of", "out of band")
+@enduml

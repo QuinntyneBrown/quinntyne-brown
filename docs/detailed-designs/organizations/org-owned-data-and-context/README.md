@@ -118,6 +118,7 @@ A caller who covers no org gets `"orgs": []`, and the shell shows "Waiting to be
   | Contacts | `contacts.private` |
   | Partners | `partners.read` |
   | Reports | `reports.view` |
+  | Applications | `integrations.view` in the active org, not under "All orgs" ([integrations](../../integrations/application-events/README.md)) |
   | Workspaces | any of `workspaces.create`, `workspaces.join`, `workspaces.readAll`, or `canJoinWork` |
   | Admin | `isSystemAdmin` |
   | Organization settings | Org Lead or Portfolio Lead of the active org |

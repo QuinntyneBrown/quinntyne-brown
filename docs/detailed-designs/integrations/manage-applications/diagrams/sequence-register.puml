@@ -1,0 +1,40 @@
+@startuml
+title UML sequence behaviour — Register an application
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Org Lead" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "ApplicationsPage / RegisterApplicationDialog" as page
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "IntegrationsEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application" #ECFDF3
+  participant "IntegrationAppsHandler" as h
+  participant "ISecretProtector" as prot
+  participant "IAuditLog" as audit
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Name "Goodwork"
+page -> ep : POST /api/integrations/apps (X-Org: faithtech-toronto)
+ep -> h : RegisterAsync
+alt org not covered or integrations off
+  h --> page : 404 (L2-158 #4)
+else no integrations.manage in the org
+  h --> page : 403 (L2-158 #4)
+else name empty or over 80
+  h --> page : 400 name (L2-158 #3)
+else allowed
+  h -> h : src_ + 32 hex, whsec_ + 32 random bytes
+  h -> prot : Protect(secret)
+  h -> db : INSERT IntegrationApp (ciphertext, prefix)
+  h -> audit : integration.registered (L2-167)
+  h --> page : 201 { app, secret } (L2-158 #1)
+  page --> actor : source ID and secret field, shown once (L2-158 #5)
+end
+@enduml

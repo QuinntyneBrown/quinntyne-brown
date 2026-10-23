@@ -1,0 +1,35 @@
+@startuml
+title UML sequence behaviour — Read an application's events
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Covering member" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "ApplicationPage" as page
+  participant "HttpIntegrationsService" as svc
+end box
+box "Backend — QuinntyneBrown.Community.Api and Application" #D1FADF
+  participant "IntegrationsEndpoints" as ep
+  participant "IntegrationAppsHandler" as h
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : open /o/faithtech-toronto/applications/{id}
+page -> svc : get(id), events(id, 1)
+svc -> ep : GET /api/integrations/apps/{id}, /events?page=1&pageSize=25
+ep -> h : GetAsync, ListEventsAsync
+alt org not covered, feature off, or no integrations.view there
+  h --> page : 404 (L2-166 #3)
+else
+  h -> db : events WHERE app ORDER BY ReceivedAt DESC, Id DESC LIMIT 25
+  h --> page : 200 app; 200 { items, page, pageSize, totalCount }
+  page --> actor : connection card, event entries newest first (L2-166 #1, #2)
+end
+actor -> page : Load more
+page -> svc : events(id, 2)
+svc -> ep : GET ...?page=2&pageSize=25
+ep --> page : next 25; focus moves to the first new entry
+@enduml

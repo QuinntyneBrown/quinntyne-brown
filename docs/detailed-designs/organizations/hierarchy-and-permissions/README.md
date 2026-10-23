@@ -54,6 +54,8 @@ Related designs: [org-owned data and context](../org-owned-data-and-context/READ
 | `workspaces.join` | agile | Being added to the org's workspaces |
 | `workspaces.readAll` | agile | Reading every workspace of the org |
 | `reports.view` | reports | The Reports page for the org |
+| `integrations.view` | integrations | Read the org's applications and their events ([integrations](../../integrations/README.md)); seeded on the Staff and Portfolio cross-org roles |
+| `integrations.manage` | integrations | Register applications, rotate their secrets and revoke them; tiers only by default |
 | `team.member` | team | Being listed on the org's Team page (marker) |
 | `team.lead` | team | Matching the Team page's "Leads" filter (marker) |
 
