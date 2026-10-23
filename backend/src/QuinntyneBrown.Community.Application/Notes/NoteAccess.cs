@@ -40,7 +40,11 @@ public class NoteAccess(IApplicationDbContext db, ICurrentUser current)
     /// <summary>Org-wide pages, their own, or Shared with them or a role they hold in the page's org now.</summary>
     public IQueryable<NotePage> VisibleIn(IQueryable<NotePage> pages, Guid caller, IReadOnlyList<Guid> orgs)
     {
-        var active = pages.Where(p => p.ArchivedAt == null && orgs.Contains(p.OrganizationId));
+        // A Portfolio-wide item of any org in the scope's portfolios is shown wherever the scope is read (ADR 0039).
+        var portfolios = PortfolioWide.PortfoliosOf(Access, orgs);
+        var portfolioOrgs = db.Organizations.Where(o => portfolios.Contains(o.PortfolioId)).Select(o => o.Id);
+        var active = pages.Where(p => p.ArchivedAt == null
+            && (orgs.Contains(p.OrganizationId) || (p.Visibility == NoteVisibility.PortfolioWide && portfolioOrgs.Contains(p.OrganizationId))));
         if (IsSystemAdmin)
         {
             return active;
@@ -48,7 +52,8 @@ public class NoteAccess(IApplicationDbContext db, ICurrentUser current)
 
         var heldRole = ShareRoles.HeldIn<NotePage>(Access, p => p.OrganizationId, p => p.SharedRoles.Select(x => x.RoleId));
         Expression<Func<NotePage, bool>> open = p =>
-            p.Visibility == NoteVisibility.Global
+            p.Visibility == NoteVisibility.OrgWide
+            || p.Visibility == NoteVisibility.PortfolioWide
             || p.OwnerId == caller
             || (p.Visibility == NoteVisibility.Shared && p.SharedMembers.Any(m => m.ProfileId == caller));
         Expression<Func<NotePage, bool>> shared = p => p.Visibility == NoteVisibility.Shared;

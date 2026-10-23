@@ -5,5 +5,9 @@ public enum NoteVisibility
 {
     Private,
     Shared,
-    Global,
+    /// <summary>Everyone who covers the item's org (was Global, ADR 0039).</summary>
+    OrgWide,
+
+    /// <summary>Everyone who covers any org of the item's portfolio; set by the Portfolio Lead only.</summary>
+    PortfolioWide,
 }

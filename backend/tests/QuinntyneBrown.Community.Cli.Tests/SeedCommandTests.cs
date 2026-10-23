@@ -45,7 +45,7 @@ public class SeedCommandTests
         var resources = await db.Resources.ToListAsync();
         Assert.Equal(CommunitySeeder.StarterResources.Count, resources.Count);
         Assert.All(resources, r => Assert.Equal(
-            (admin.Id, QuinntyneBrown.Community.Domain.Resources.ResourceVisibility.Global, HierarchySeed.TorontoId),
+            (admin.Id, QuinntyneBrown.Community.Domain.Resources.ResourceVisibility.OrgWide, HierarchySeed.TorontoId),
             (r.OwnerId, r.Visibility, r.OrganizationId)));
         Assert.All(resources, r => Assert.StartsWith("https://", r.LinkUrl));
     }

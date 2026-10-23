@@ -32,7 +32,9 @@ test.describe('The resource page', () => {
     await expect(resource.subtitle).toHaveText('Deck · added Wed 21 Oct by you');
     await expect(resource.download).toContainText('PPTX, 24.6 MB');
     await expect(resource.detail('File')).toContainText('city-launch-deck.pptx · PPTX · 24.6 MB');
-    await expect(resource.detail('Visibility')).toContainText('Global — every signed-in member');
+    await expect(resource.detail('Visibility')).toContainText(
+      'Org-wide — everyone in the organization',
+    );
     await expect(resource.detail('Tags')).toContainText('launch, city-team');
     await expect(resource.detail('Owner')).toContainText('Grace Okonkwo (you)');
     await expect(resource.edit).toBeVisible();

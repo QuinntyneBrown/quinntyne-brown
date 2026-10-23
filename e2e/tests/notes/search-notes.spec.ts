@@ -22,7 +22,7 @@ test('global search has a Notes group with only the pages the member may open', 
   api.notes.add({
     title: 'Run sheet',
     ownerId: marcus.profileId,
-    visibility: 'Global',
+    visibility: 'OrgWide',
     blocks: [
       { id: 'b', type: 'paragraph', text: [{ text: 'Confirm the room with Kestrel Labs' }] },
     ],

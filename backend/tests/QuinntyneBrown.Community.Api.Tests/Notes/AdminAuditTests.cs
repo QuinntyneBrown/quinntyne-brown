@@ -20,7 +20,7 @@ public class AdminAuditTests(CommunityApiFactory factory) : IClassFixture<Commun
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var secret = await factory.AddNoteAsync(grace, "Partner meeting notes");
-        var open = await factory.AddNoteAsync(grace, "Playbook", "Global");
+        var open = await factory.AddNoteAsync(grace, "Playbook", "OrgWide");
         var priya = await factory.AddMemberAsync("Priya Shah");
         var admin = factory.ClientFor(priya, SeededRole.SystemAdmin);
 
@@ -36,8 +36,8 @@ public class AdminAuditTests(CommunityApiFactory factory) : IClassFixture<Commun
     public async Task Every_change_a_System_Admin_makes_to_someone_elses_page_is_audited()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var page = await factory.AddNoteAsync(grace, "Run sheet", "Global");
-        var parent = await factory.AddNoteAsync(grace, "Playbook", "Global");
+        var page = await factory.AddNoteAsync(grace, "Run sheet", "OrgWide");
+        var parent = await factory.AddNoteAsync(grace, "Playbook", "OrgWide");
         var priya = await factory.AddMemberAsync("Priya Shah");
         var admin = factory.ClientFor(priya, SeededRole.SystemAdmin);
 
@@ -71,7 +71,7 @@ public class AdminAuditTests(CommunityApiFactory factory) : IClassFixture<Commun
     public async Task A_lead_cannot_change_another_members_page()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var page = await factory.AddNoteAsync(grace, "Playbook", "Global");
+        var page = await factory.AddNoteAsync(grace, "Playbook", "OrgWide");
         var lead = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead, SeededRole.EventLead, SeededRole.CommunicationsLead);
 
         Assert.Equal(HttpStatusCode.Forbidden, (await lead.SaveNoteAsync(page, [Paragraph("Mine")])).StatusCode);

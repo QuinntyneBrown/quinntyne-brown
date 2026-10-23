@@ -11,7 +11,7 @@ namespace QuinntyneBrown.Community.Api.Tests.Resources;
 public class AddLinkTests(CommunityApiFactory factory) : IClassFixture<CommunityApiFactory>
 {
     private static object Link(string? url, string? title = "Event poster template", string type = "Template") =>
-        new { Url = url, Title = title, Description = "Canva template", Type = type, Tags = new[] { "Events" }, Visibility = "Global" };
+        new { Url = url, Title = title, Description = "Canva template", Type = type, Tags = new[] { "Events" }, Visibility = "OrgWide" };
 
     [Fact]
     public async Task A_lead_adds_an_https_link_and_its_host_is_derived()

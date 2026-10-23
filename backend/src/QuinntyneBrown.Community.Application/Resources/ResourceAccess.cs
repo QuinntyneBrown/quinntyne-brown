@@ -42,7 +42,11 @@ public class ResourceAccess(IApplicationDbContext db, ICurrentUser current)
     /// </summary>
     public IQueryable<Resource> VisibleIn(IQueryable<Resource> resources, Guid caller, IReadOnlyList<Guid> orgs)
     {
-        var active = resources.Where(r => r.ArchivedAt == null && orgs.Contains(r.OrganizationId));
+        // A Portfolio-wide item of any org in the scope's portfolios is shown wherever the scope is read (ADR 0039).
+        var portfolios = PortfolioWide.PortfoliosOf(Access, orgs);
+        var portfolioOrgs = db.Organizations.Where(o => portfolios.Contains(o.PortfolioId)).Select(o => o.Id);
+        var active = resources.Where(r => r.ArchivedAt == null
+            && (orgs.Contains(r.OrganizationId) || (r.Visibility == ResourceVisibility.PortfolioWide && portfolioOrgs.Contains(r.OrganizationId))));
         if (IsSystemAdmin)
         {
             return active;
@@ -50,7 +54,8 @@ public class ResourceAccess(IApplicationDbContext db, ICurrentUser current)
 
         var heldRole = ShareRoles.HeldIn<Resource>(Access, r => r.OrganizationId, r => r.SharedRoles.Select(x => x.RoleId));
         Expression<Func<Resource, bool>> open = r =>
-            r.Visibility == ResourceVisibility.Global
+            r.Visibility == ResourceVisibility.OrgWide
+            || r.Visibility == ResourceVisibility.PortfolioWide
             || r.OwnerId == caller
             || (r.Visibility == ResourceVisibility.Shared && r.SharedMembers.Any(m => m.ProfileId == caller));
         Expression<Func<Resource, bool>> shared = r => r.Visibility == ResourceVisibility.Shared;

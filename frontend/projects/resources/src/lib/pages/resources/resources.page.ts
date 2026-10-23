@@ -292,9 +292,11 @@ function plural(n: number): string {
 }
 
 export function addedText(resource: ResourceDto): string {
-  return resource.visibility === 'Global'
-    ? 'Every signed-in member can find it now.'
-    : resource.visibility === 'Private'
-      ? 'Only you can see it.'
-      : 'Everyone you shared it with can find it now.';
+  return resource.visibility === 'OrgWide'
+    ? 'Everyone in the organization can find it now.'
+    : resource.visibility === 'PortfolioWide'
+      ? 'Everyone in the portfolio can find it now.'
+      : resource.visibility === 'Private'
+        ? 'Only you can see it.'
+        : 'Everyone you shared it with can find it now.';
 }

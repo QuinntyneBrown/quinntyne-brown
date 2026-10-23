@@ -250,9 +250,11 @@ export class NotePage {
           text:
             shared.visibility === 'Private'
               ? 'Only you can see it now.'
-              : shared.visibility === 'Global'
-                ? 'Every signed-in member can find it now.'
-                : 'The people you chose can read it now.',
+              : shared.visibility === 'OrgWide'
+                ? 'Everyone in the organization can find it now.'
+                : shared.visibility === 'PortfolioWide'
+                  ? 'Everyone in the portfolio can find it now.'
+                  : 'The people you chose can read it now.',
         });
       });
   }

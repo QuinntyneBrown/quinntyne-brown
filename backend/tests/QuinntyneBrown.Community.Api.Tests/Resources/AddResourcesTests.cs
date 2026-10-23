@@ -23,7 +23,7 @@ public class AddResourcesTests(CommunityApiFactory factory) : IClassFixture<Comm
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var added = Assert.Single((await response.Content.ReadFromJsonAsync<Detail[]>())!);
-        Assert.Equal(("city-launch-deck", "Deck", "Global", grace.ProfileId), (added.Title, added.Type, added.Visibility, added.OwnerId));
+        Assert.Equal(("city-launch-deck", "Deck", "OrgWide", grace.ProfileId), (added.Title, added.Type, added.Visibility, added.OwnerId));
         Assert.Equal(("city-launch-deck.pptx", "pptx", (long)Zip.Length), (added.FileName, added.Extension, added.Size));
         Assert.Equal(["launch", "brand"], added.Tags);
         Assert.Equal(factory.Time.GetUtcNow(), added.AddedAt);

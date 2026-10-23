@@ -59,7 +59,7 @@ public class ResourceVisibilityTests(CommunityApiFactory factory) : IClassFixtur
 
         var row = (await volunteer.ListResourcesAsync()).Items.Single(r => r.Id == deck.Id);
 
-        Assert.Equal(("Grace Okonkwo", false, "Global", false), (row.OwnerName, row.IsOwn, row.Visibility, row.SharedWithYou));
+        Assert.Equal(("Grace Okonkwo", false, "OrgWide", false), (row.OwnerName, row.IsOwn, row.Visibility, row.SharedWithYou));
         var page = (await volunteer.GetFromJsonAsync<Detail>($"/api/resources/{deck.Id}"))!;
         Assert.False(page.CanEdit || page.CanTransfer);
     }

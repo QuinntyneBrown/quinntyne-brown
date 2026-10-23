@@ -15,7 +15,7 @@ test.describe('Notes: archive and restore', () => {
     const sheet = api.notes.add({
       title: 'Builders Night run sheet',
       ownerId: grace.profileId,
-      visibility: 'Global',
+      visibility: 'OrgWide',
     });
     await api.signInAs(grace, `/notes/${sheet.id}`);
     const note = new NotePage(page);

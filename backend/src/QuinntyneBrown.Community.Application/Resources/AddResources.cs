@@ -63,6 +63,11 @@ public class AddResourcesHandler(
             return (ResourceResults.Invalid(new() { ["Files"] = [.. refused] }), null);
         }
 
+        if (rules.RefusesVisibility(orgId, command.Fields))
+        {
+            return (Result.Forbidden(), null);
+        }
+
         var (fields, errors) = await rules.CheckAsync(orgId, command.Fields, titleRequired: false, cancellationToken);
         if (fields is null)
         {
@@ -145,6 +150,11 @@ public class AddLinkHandler(
         if (refusal is not null)
         {
             return (refusal, null);
+        }
+
+        if (rules.RefusesVisibility(orgId, command.Fields))
+        {
+            return (Result.Forbidden(), null);
         }
 
         var (fields, errors) = await rules.CheckAsync(orgId, command.Fields, titleRequired: true, cancellationToken);

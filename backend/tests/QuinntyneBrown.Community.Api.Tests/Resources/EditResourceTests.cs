@@ -32,10 +32,10 @@ public class EditResourceTests(CommunityApiFactory factory) : IClassFixture<Comm
 
     public static TheoryData<string, object> Invalid() => new()
     {
-        { "Title", new { Title = "   ", Type = "Deck", Visibility = "Global" } },
-        { "Title", new { Title = new string('a', 121), Type = "Deck", Visibility = "Global" } },
-        { "Description", new { Title = "Deck", Description = new string('a', 1001), Type = "Deck", Visibility = "Global" } },
-        { "Type", new { Title = "Deck", Type = "Spreadsheet", Visibility = "Global" } },
+        { "Title", new { Title = "   ", Type = "Deck", Visibility = "OrgWide" } },
+        { "Title", new { Title = new string('a', 121), Type = "Deck", Visibility = "OrgWide" } },
+        { "Description", new { Title = "Deck", Description = new string('a', 1001), Type = "Deck", Visibility = "OrgWide" } },
+        { "Type", new { Title = "Deck", Type = "Spreadsheet", Visibility = "OrgWide" } },
         { "Visibility", new { Title = "Deck", Type = "Deck", Visibility = "City" } },
         { "Visibility", new { Title = "Deck", Type = "Deck", Visibility = "Shared" } },
     };
@@ -151,6 +151,6 @@ public class EditResourceTests(CommunityApiFactory factory) : IClassFixture<Comm
 
         var page = (await admin.GetFromJsonAsync<Detail>($"/api/resources/{deck.Id}"))!;
 
-        Assert.Equal((grace.ProfileId, "Global", "City Lead"), (page.OwnerId, page.Visibility, page.OwnerLostRole));
+        Assert.Equal((grace.ProfileId, "OrgWide", "City Lead"), (page.OwnerId, page.Visibility, page.OwnerLostRole));
     }
 }

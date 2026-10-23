@@ -23,8 +23,8 @@ public class SearchNotesTests(CommunityApiFactory factory) : IClassFixture<Commu
         var word = Word();
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var marcus = await factory.AddMemberAsync("Marcus Lee");
-        var byTitle = await factory.AddNoteAsync(grace, $"Booking {word} for Builders Night", "Global");
-        var byText = await factory.AddNoteAsync(marcus, "Run sheet", "Global");
+        var byTitle = await factory.AddNoteAsync(grace, $"Booking {word} for Builders Night", "OrgWide");
+        var byText = await factory.AddNoteAsync(marcus, "Run sheet", "OrgWide");
         (await factory.ClientFor(marcus).SaveNoteAsync(byText, [Paragraph($"Confirm the room with {word} labs")])).EnsureSuccessStatusCode();
         var shared = await factory.AddNoteAsync(marcus, $"{word} contract notes");
         await factory.ShareInDbAsync(shared.Id, [grace.ProfileId], []);
@@ -46,7 +46,7 @@ public class SearchNotesTests(CommunityApiFactory factory) : IClassFixture<Commu
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var hannah = await factory.AddMemberAsync("Hannah Kim");
         await factory.AddNoteAsync(hannah, $"{word} private plan");
-        var archived = await factory.AddNoteAsync(grace, $"{word} old notes", "Global");
+        var archived = await factory.AddNoteAsync(grace, $"{word} old notes", "OrgWide");
         await factory.ClientFor(grace).PostAsync($"/api/notes/{archived.Id}/archive", null);
         var staff = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), SeededRole.Staff);
 
@@ -59,8 +59,8 @@ public class SearchNotesTests(CommunityApiFactory factory) : IClassFixture<Commu
     {
         var word = Word();
         var hannah = await factory.AddMemberAsync("Hannah Kim");
-        var target = await factory.AddNoteAsync(hannah, $"{word} secret", "Global");
-        var linking = await factory.AddNoteAsync(hannah, "Index", "Global");
+        var target = await factory.AddNoteAsync(hannah, $"{word} secret", "OrgWide");
+        var linking = await factory.AddNoteAsync(hannah, "Index", "OrgWide");
         (await factory.ClientFor(hannah).SaveNoteAsync(linking, [Block("paragraph", [PageLink(target.Id)])])).EnsureSuccessStatusCode();
 
         var found = await NotesFoundAsync(factory.ClientFor(await factory.AddMemberAsync("Marcus Lee")), word);

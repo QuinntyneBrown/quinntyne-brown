@@ -19,7 +19,7 @@ public class GetNoteHandler(IApplicationDbContext db, NoteAccess access, NoteVie
             return null;
         }
 
-        if (access.IsOverride(page, caller) && (page.Visibility != NoteVisibility.Global || page.IsArchived))
+        if (access.IsOverride(page, caller) && (page.Visibility is not (NoteVisibility.OrgWide or NoteVisibility.PortfolioWide) || page.IsArchived))
         {
             audit.Record(caller, "note.opened", nameof(NotePage), page.Id.ToString(), null, new { page.Title, Visibility = page.Visibility.ToString() });
             await db.SaveChangesAsync(cancellationToken);

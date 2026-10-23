@@ -24,7 +24,7 @@ function row(overrides: Partial<ResourceSummary> = {}): ResourceSummary {
     ownerId: 'p1',
     ownerName: 'Grace Okonkwo',
     isOwn: false,
-    visibility: 'Global',
+    visibility: 'OrgWide',
     sharedWithYou: false,
     hasThumbnail: false,
     isStored: true,

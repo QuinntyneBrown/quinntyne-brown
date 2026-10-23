@@ -18,7 +18,9 @@ public record ResourceAudience
 
     public static ResourceAudience Private() => new(ResourceVisibility.Private, new HashSet<Guid>(), new HashSet<Guid>());
 
-    public static ResourceAudience Global() => new(ResourceVisibility.Global, new HashSet<Guid>(), new HashSet<Guid>());
+    public static ResourceAudience OrgWide() => new(ResourceVisibility.OrgWide, new HashSet<Guid>(), new HashSet<Guid>());
+
+    public static ResourceAudience PortfolioWide() => new(ResourceVisibility.PortfolioWide, new HashSet<Guid>(), new HashSet<Guid>());
 
     public static ResourceAudience Shared(IEnumerable<Guid> members, IEnumerable<Guid> roles)
     {

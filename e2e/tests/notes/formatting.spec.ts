@@ -84,7 +84,7 @@ test.describe('Notes: inline formatting and hyperlinks', () => {
     const playbook = api.notes.add({
       title: 'Playbook',
       ownerId: grace.profileId,
-      visibility: 'Global',
+      visibility: 'OrgWide',
       blocks: [
         {
           id: 'b1',

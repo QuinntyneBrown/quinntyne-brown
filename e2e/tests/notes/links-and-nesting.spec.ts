@@ -57,7 +57,7 @@ test.describe('Notes: page links, backlinks and nesting', () => {
       title: 'Partner meeting notes',
       ownerId: grace.profileId,
       parentId: plans.id,
-      visibility: 'Global',
+      visibility: 'OrgWide',
       blocks: [
         {
           id: 'b',

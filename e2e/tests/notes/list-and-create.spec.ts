@@ -47,7 +47,7 @@ test.describe('Notes: list and create', () => {
       roles: ['Staff'],
     });
     api.notes.add(
-      { title: 'Hackathon judging how-to', ownerId: marcus.profileId, visibility: 'Global' },
+      { title: 'Hackathon judging how-to', ownerId: marcus.profileId, visibility: 'OrgWide' },
       3,
     );
     api.notes.add(

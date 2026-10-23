@@ -33,7 +33,7 @@ public class ImageBlockTests(CommunityApiFactory factory) : IClassFixture<Commun
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var owner = factory.ClientFor(grace);
-        var page = await factory.AddNoteAsync(grace, "Builders Night", "Global");
+        var page = await factory.AddNoteAsync(grace, "Builders Night", "OrgWide");
 
         var response = await UploadAsync(owner, page.Id, "whiteboard.png", TestImages.Png(800, 600));
 
@@ -56,7 +56,7 @@ public class ImageBlockTests(CommunityApiFactory factory) : IClassFixture<Commun
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var page = await factory.AddNoteAsync(grace, "Private plan");
         var image = (await (await UploadAsync(factory.ClientFor(grace), page.Id, "plan.jpg", TestImages.Jpeg())).Content.ReadFromJsonAsync<Uploaded>())!;
-        var global = await factory.AddNoteAsync(grace, "Playbook", "Global");
+        var global = await factory.AddNoteAsync(grace, "Playbook", "OrgWide");
         var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead);
 
         Assert.Equal(HttpStatusCode.NotFound, (await marcus.GetAsync($"/api/notes/{page.Id}/images/{image.ImageId}")).StatusCode);

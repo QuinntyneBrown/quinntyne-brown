@@ -65,7 +65,7 @@ test.describe('Notes: image blocks', () => {
     const sheet = api.notes.add({
       title: 'Builders Night',
       ownerId: grace.profileId,
-      visibility: 'Global',
+      visibility: 'OrgWide',
     });
     const image = api.notes.addImage(sheet);
     sheet.blocks = [{ id: 'i', type: 'image', imageId: image, alt: 'The room set up for 40' }];

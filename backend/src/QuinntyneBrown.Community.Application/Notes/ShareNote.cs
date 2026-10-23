@@ -11,7 +11,7 @@ namespace QuinntyneBrown.Community.Application.Notes;
 public record ShareNoteCommand(string? Visibility, IReadOnlyList<Guid>? MemberIds, IReadOnlyList<string>? Roles);
 
 /// <summary>
-/// Who can see a page (L2-093): Private, Shared with members and roles, or Global. Only the owner or a System
+/// Who can see a page (L2-093): Private, Shared with members and roles, Org-wide or Portfolio-wide. Only the owner or a System
 /// Admin; the new recipients are told in-app and by email in the same save (L2-093 AC5, AC6).
 /// </summary>
 public class ShareNoteHandler(IApplicationDbContext db, NoteAccess access, NoteViews views, NoteShareNotifier notifier, ShareRoles shareRoles, IAuditLog audit)
@@ -40,6 +40,11 @@ public class ShareNoteHandler(IApplicationDbContext db, NoteAccess access, NoteV
         if (!Enum.TryParse<NoteVisibility>(command.Visibility, out var visibility) || int.TryParse(command.Visibility, out _) || !Enum.IsDefined(visibility))
         {
             return (Result.Invalid("Visibility", "Choose who can see it."), null);
+        }
+
+        if (visibility == NoteVisibility.PortfolioWide && !PortfolioWide.MayPublish(access.Access, page.OrganizationId))
+        {
+            return (Result.Forbidden(), null);
         }
 
         var members = visibility == NoteVisibility.Shared ? (command.MemberIds ?? []).Distinct().ToList() : [];

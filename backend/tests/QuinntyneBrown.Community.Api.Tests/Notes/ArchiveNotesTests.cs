@@ -16,8 +16,8 @@ public class ArchiveNotesTests(CommunityApiFactory factory) : IClassFixture<Comm
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var owner = factory.ClientFor(grace);
-        var playbook = await factory.AddNoteAsync(grace, "Toronto playbook", "Global");
-        var sheet = await factory.AddNoteAsync(grace, "Builders Night run sheet", "Global");
+        var playbook = await factory.AddNoteAsync(grace, "Toronto playbook", "OrgWide");
+        var sheet = await factory.AddNoteAsync(grace, "Builders Night run sheet", "OrgWide");
         (await owner.SaveNoteAsync(playbook, [Block("paragraph", [PageLink(sheet.Id)])])).EnsureSuccessStatusCode();
         var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"));
 
@@ -63,7 +63,7 @@ public class ArchiveNotesTests(CommunityApiFactory factory) : IClassFixture<Comm
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var owner = factory.ClientFor(grace);
-        var playbook = await factory.AddNoteAsync(grace, "Playbook", "Global");
+        var playbook = await factory.AddNoteAsync(grace, "Playbook", "OrgWide");
         var child = await owner.CreateNoteAsync("Run sheet", playbook.Id);
         var staff = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), SeededRole.Staff);
 

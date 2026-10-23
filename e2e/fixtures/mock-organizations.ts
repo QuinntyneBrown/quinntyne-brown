@@ -437,6 +437,11 @@ export class MockOrganizations {
     return refs;
   }
 
+  /** Portfolio-wide is the Portfolio Lead's and System Admin's to set (PortfolioWide.MayPublish). */
+  mayPublishPortfolioWide(member: OrgMember): boolean {
+    return member.roles.includes('SystemAdmin') || !!member.portfolioLead;
+  }
+
   /** The catalogue roles the caller may grant in the org (RoleGrantPolicy). */
   grantable(member: OrgMember, covered: CoveredOrg): MockRoleOption[] {
     const catalogue = CATALOGUES[covered.org.typeName] ?? [];

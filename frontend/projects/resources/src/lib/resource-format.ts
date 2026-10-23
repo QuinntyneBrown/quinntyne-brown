@@ -90,13 +90,14 @@ export function metaLine(resource: ResourceSummary): string {
   ].join(' · ');
 }
 
-/** The visibility badge from the viewer's side (L2-055 AC3); none for Global. */
+/** The visibility badge from the viewer's side (L2-055 AC3); none for Org-wide. */
 export function badgeOf(
   resource: Pick<ResourceSummary, 'visibility' | 'sharedWithYou'>,
 ): { text: string; variant: BadgeVariant } | null {
   if (resource.visibility === 'Private') return { text: 'Private', variant: 'neutral' };
   if (resource.visibility === 'Shared')
     return { text: resource.sharedWithYou ? 'Shared with you' : 'Shared', variant: 'info' };
+  if (resource.visibility === 'PortfolioWide') return { text: 'Portfolio', variant: 'info' };
   return null;
 }
 
@@ -110,7 +111,8 @@ export function openLabel(resource: Pick<ResourceSummary, 'title' | 'linkHost'>)
 
 export function visibilityLine(visibility: ResourceVisibility): string {
   return {
-    Global: 'Global — every signed-in member',
+    OrgWide: 'Org-wide — everyone in the organization',
+    PortfolioWide: 'Portfolio-wide — everyone in the portfolio',
     Private: 'Private — only you',
     Shared: 'Shared — the people and roles below',
   }[visibility];

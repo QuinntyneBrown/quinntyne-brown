@@ -52,6 +52,14 @@ export class ShareNoteDialog {
   private readonly access = inject(ACCESS_SERVICE);
 
   protected readonly title = titleOf(this.page);
+  private readonly org =
+    this.access.orgs().find((o) => o.slug === this.page.organization?.slug) ??
+    this.access.homeOrg();
+  /** "Everyone in FaithTech Toronto", the Org-wide choice (ADR 0039). */
+  protected readonly orgName = this.org?.branding.displayName ?? 'this organization';
+  /** Only the Portfolio Lead, or a System Admin, publishes to the whole portfolio (L2-148 AC4). */
+  protected readonly mayPublishPortfolioWide =
+    this.access.isSystemAdmin() || !!this.org?.isPortfolioLead;
   /** The page's org's roles and the cross-org roles covering it (ADR 0039). */
   protected readonly roles = this.access
     .shareRoles(this.page.organization?.slug)

@@ -19,10 +19,14 @@ public record ResourceFieldsInput(
 public record ResourceFields(string? Title, string? Description, ResourceType? Type, IReadOnlyList<string> Tags, ResourceAudience Audience);
 
 /// <summary>The field rules shared by the add and edit dialogs and the API (L2-059).</summary>
-public class ResourceFieldRules(IApplicationDbContext db, ShareRoles shareRoles)
+public class ResourceFieldRules(IApplicationDbContext db, ShareRoles shareRoles, ICurrentUser current)
 {
     public const string TitleMessage = "Give it a title so people can find it.";
     public const string AudienceMessage = "Choose at least one person or role, or pick another visibility.";
+
+    /// <summary>Portfolio-wide is the Portfolio Lead's and System Admin's to set (L2-148 AC4): anyone else is refused.</summary>
+    public bool RefusesVisibility(Guid orgId, ResourceFieldsInput input) =>
+        input.Visibility == nameof(ResourceVisibility.PortfolioWide) && !PortfolioWide.MayPublish(current.Access, orgId);
 
     /// <param name="titleRequired">False for uploads, where a missing title comes from the file name.</param>
     /// <param name="orgId">The resource's org: shared roles are its catalogue roles and covering cross-org roles.</param>
@@ -76,7 +80,7 @@ public class ResourceFieldRules(IApplicationDbContext db, ShareRoles shareRoles)
 
     private async Task<ResourceAudience?> AudienceAsync(Guid orgId, ResourceFieldsInput input, Dictionary<string, string[]> errors, CancellationToken cancellationToken)
     {
-        var visibility = string.IsNullOrWhiteSpace(input.Visibility) ? nameof(ResourceVisibility.Global) : input.Visibility;
+        var visibility = string.IsNullOrWhiteSpace(input.Visibility) ? nameof(ResourceVisibility.OrgWide) : input.Visibility;
         if (!IsName<ResourceVisibility>(visibility, out var parsed))
         {
             errors["Visibility"] = ["Choose who can see it."];
@@ -85,7 +89,12 @@ public class ResourceFieldRules(IApplicationDbContext db, ShareRoles shareRoles)
 
         if (parsed != ResourceVisibility.Shared)
         {
-            return parsed == ResourceVisibility.Private ? ResourceAudience.Private() : ResourceAudience.Global();
+            return parsed switch
+            {
+                ResourceVisibility.Private => ResourceAudience.Private(),
+                ResourceVisibility.PortfolioWide => ResourceAudience.PortfolioWide(),
+                _ => ResourceAudience.OrgWide(),
+            };
         }
 
         if (await shareRoles.ResolveAsync(orgId, input.Roles ?? [], cancellationToken) is not { } roles)

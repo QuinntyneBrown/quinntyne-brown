@@ -23,7 +23,7 @@ export function detailsForm(resource?: ResourceDto): ResourceDetailsForm {
     description: new FormControl(resource?.description ?? '', { nonNullable: true }),
     type: new FormControl<ResourceType | ''>(resource?.type ?? '', { nonNullable: true }),
     tags: new FormControl<string[]>(resource?.tags ?? [], { nonNullable: true }),
-    visibility: new FormControl<ResourceVisibility>(resource?.visibility ?? 'Global', {
+    visibility: new FormControl<ResourceVisibility>(resource?.visibility ?? 'OrgWide', {
       nonNullable: true,
     }),
     members: new FormControl<PersonOption[]>(

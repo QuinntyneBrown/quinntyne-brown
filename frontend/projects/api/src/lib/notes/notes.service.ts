@@ -3,7 +3,8 @@ import { Observable } from 'rxjs';
 
 import { OrgLabel, PagedResult } from '../shared';
 
-export type NoteVisibility = 'Private' | 'Shared' | 'Global';
+/** Who can see a page (ADR 0039): Portfolio-wide is the Portfolio Lead's to set. */
+export type NoteVisibility = 'Private' | 'Shared' | 'OrgWide' | 'PortfolioWide';
 
 /** The block types and their wire names (L2-087). */
 export const NOTE_BLOCK_TYPES = [

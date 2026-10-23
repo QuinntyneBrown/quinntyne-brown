@@ -149,7 +149,7 @@ public class CommunitySeeder(IOpenIddictApplicationManager applications, Communi
             var resource = Resource.ForLink(HierarchySeed.TorontoId, starter.Title, starter.Description, starter.Type, ownerId, new Uri(starter.Url), time.GetUtcNow(), starter.Id);
             resource.SetOwner(ownerId, "System Admin");
             resource.SetTags(starter.Tags);
-            resource.SetAudience(ResourceAudience.Global());
+            resource.SetAudience(ResourceAudience.OrgWide());
             db.Resources.Add(resource);
         }
 

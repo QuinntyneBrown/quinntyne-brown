@@ -126,12 +126,12 @@ public class ShareResourceTests : IAsyncLifetime
         var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         await client.PutAsJsonAsync($"/api/resources/{pitch.Id}", EditBody(pitch, visibility: "Shared", memberIds: [daniel.ProfileId, hannah.ProfileId]));
-        var global = await client.PutAsJsonAsync($"/api/resources/{pitch.Id}", EditBody(pitch, visibility: "Global"));
+        var global = await client.PutAsJsonAsync($"/api/resources/{pitch.Id}", EditBody(pitch, visibility: "OrgWide"));
 
         Assert.Single(await NotificationsAsync(daniel));
         Assert.Single(await NotificationsAsync(hannah));
         var after = (await global.Content.ReadFromJsonAsync<Detail>())!;
-        Assert.Equal(("Global", 0), (after.Visibility, after.Audience.Members.Length));
+        Assert.Equal(("OrgWide", 0), (after.Visibility, after.Audience.Members.Length));
     }
 
     [Fact]

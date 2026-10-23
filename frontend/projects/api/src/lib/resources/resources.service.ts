@@ -14,7 +14,8 @@ export const RESOURCE_TYPES = [
 ] as const;
 export type ResourceType = (typeof RESOURCE_TYPES)[number];
 
-export type ResourceVisibility = 'Private' | 'Shared' | 'Global';
+/** Who can see a resource (ADR 0039): Portfolio-wide is the Portfolio Lead's to set. */
+export type ResourceVisibility = 'Private' | 'Shared' | 'OrgWide' | 'PortfolioWide';
 
 /** A row of the Resources list (L2-055). A link has `linkUrl` and `linkHost`; a file the rest. */
 export interface ResourceSummary {

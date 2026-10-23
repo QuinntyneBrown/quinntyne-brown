@@ -77,6 +77,18 @@ export class ResourceDetailsComponent implements OnInit {
   readonly org = input<string | null>(null);
 
   private readonly access = inject(ACCESS_SERVICE);
+  private readonly orgAccess = computed(() => {
+    const slug = this.org();
+    return (slug && this.access.orgs().find((o) => o.slug === slug)) || this.access.homeOrg();
+  });
+  /** "Everyone in FaithTech Toronto", the Org-wide choice (ADR 0039). */
+  protected readonly orgName = computed(
+    () => this.orgAccess()?.branding.displayName ?? 'this organization',
+  );
+  /** Only the Portfolio Lead, or a System Admin, publishes to the whole portfolio (L2-148 AC4). */
+  protected readonly mayPublishPortfolioWide = computed(
+    () => this.access.isSystemAdmin() || !!this.orgAccess()?.isPortfolioLead,
+  );
   protected readonly roles = computed(() =>
     this.access.shareRoles(this.org()).map((r) => ({ value: r.key, label: r.name })),
   );
@@ -84,7 +96,7 @@ export class ResourceDetailsComponent implements OnInit {
   protected readonly people = signal<PersonOption[]>([]);
   protected readonly searching = signal(false);
 
-  protected readonly visibility = signal('Global');
+  protected readonly visibility = signal('OrgWide');
   protected readonly titleLength = signal(0);
 
   ngOnInit(): void {

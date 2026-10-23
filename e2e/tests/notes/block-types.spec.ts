@@ -135,7 +135,7 @@ test.describe('Notes: block types, shortcuts and the slash menu', () => {
     const playbook = api.notes.add({
       title: 'Playbook',
       ownerId: grace.profileId,
-      visibility: 'Global',
+      visibility: 'OrgWide',
       blocks: [
         { id: 'h', type: 'heading1', text: [{ text: 'Our rhythm' }] },
         { id: 'n1', type: 'numbered', text: [{ text: 'Confirm the room' }] },

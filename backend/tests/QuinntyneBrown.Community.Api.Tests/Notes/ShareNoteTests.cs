@@ -82,7 +82,7 @@ public class ShareNoteTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Going_Global_or_Private_clears_the_audience_and_tells_nobody()
+    public async Task Going_org_wide_or_private_clears_the_audience_and_tells_nobody()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var hannah = await factory.AddMemberAsync("Hannah Kim");
@@ -90,10 +90,10 @@ public class ShareNoteTests : IAsyncLifetime
         var page = await client.CreateNoteAsync("Playbook");
         (await ShareAsync(client, page.Id, "Shared", [hannah.ProfileId])).EnsureSuccessStatusCode();
 
-        var global = (await (await ShareAsync(client, page.Id, "Global", [hannah.ProfileId])).Content.ReadFromJsonAsync<Detail>())!;
+        var global = (await (await ShareAsync(client, page.Id, "OrgWide", [hannah.ProfileId])).Content.ReadFromJsonAsync<Detail>())!;
         var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"));
 
-        Assert.Equal(("Global", 0), (global.Visibility, global.Audience.Members.Length));
+        Assert.Equal(("OrgWide", 0), (global.Visibility, global.Audience.Members.Length));
         Assert.Equal(HttpStatusCode.OK, (await marcus.GetAsync($"/api/notes/{page.Id}")).StatusCode);
         Assert.Single(await NotificationsAsync(hannah));
         (await ShareAsync(client, page.Id, "Private")).EnsureSuccessStatusCode();
@@ -123,12 +123,12 @@ public class ShareNoteTests : IAsyncLifetime
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var hannah = await factory.AddMemberAsync("Hannah Kim");
         var esther = await factory.AddMemberAsync("Esther Nakamura");
-        var page = await factory.AddNoteAsync(grace, "Playbook", "Global");
+        var page = await factory.AddNoteAsync(grace, "Playbook", "OrgWide");
         await factory.ShareInDbAsync(page.Id, [hannah.ProfileId], []);
 
-        Assert.Equal(HttpStatusCode.Forbidden, (await ShareAsync(factory.ClientFor(hannah), page.Id, "Global")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await ShareAsync(factory.ClientFor(hannah), page.Id, "OrgWide")).StatusCode);
         await factory.ShareInDbAsync(page.Id, [], [SeededRole.Staff]);
-        Assert.Equal(HttpStatusCode.Forbidden, (await ShareAsync(factory.ClientFor(esther, SeededRole.Staff), page.Id, "Global")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await ShareAsync(factory.ClientFor(esther, SeededRole.Staff), page.Id, "OrgWide")).StatusCode);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class ShareNoteTests : IAsyncLifetime
         var page = await staff.CreateNoteAsync("Staff handbook");
 
         Assert.Equal(HttpStatusCode.OK, (await staff.SaveNoteAsync(page, [Paragraph("Welcome")])).StatusCode);
-        Assert.Equal(HttpStatusCode.OK, (await ShareAsync(staff, page.Id, "Global")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await ShareAsync(staff, page.Id, "OrgWide")).StatusCode);
     }
 
     [Fact]
