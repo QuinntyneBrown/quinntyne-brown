@@ -1,0 +1,81 @@
+# Deploys QuinntyneBrown.Community to Azure Container Apps (ADR 0026) by running eng/deploy.sh, which creates or
+# updates the shared resources, pushes both images, runs migrate and seed as Container Apps jobs, then rolls out the
+# API. Signs in to Azure with OpenID Connect (no client secret): the app registration from runbook.md trusts the
+# "production" environment of this repository.
+#
+# Runs on demand (Actions → Deploy → Run workflow) and, once the repository variable DEPLOY_ENABLED is "true", after
+# every successful CI run on main. Repository variables steer the stages (runbook.md):
+#   AZURE_RESOURCE_GROUP      the resource group (required)
+#   CUSTOM_DOMAINS_STAGE      none | issue | bound
+#   PRIVATE_PREVIEW_ENABLED   true | false (lift the wall)
+#   GOOGLE_SIGN_IN_ENABLED    true once google-client-id/secret are in Key Vault
+#   GH_SIGN_IN_ENABLED        true once github-client-id/secret are in Key Vault
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      shared_only:
+        description: Create only the shared resources (first run, before the secrets exist)
+        type: boolean
+        default: false
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy to Azure
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && vars.DEPLOY_ENABLED == 'true')
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://${{ vars.WWW_HOST || 'www.quinntynebrown.com' }}
+    env:
+      RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+      CUSTOM_DOMAINS_STAGE: ${{ vars.CUSTOM_DOMAINS_STAGE || 'none' }}
+      PRIVATE_PREVIEW_ENABLED: ${{ vars.PRIVATE_PREVIEW_ENABLED || 'true' }}
+      GOOGLE_SIGN_IN_ENABLED: ${{ vars.GOOGLE_SIGN_IN_ENABLED || 'false' }}
+      GITHUB_SIGN_IN_ENABLED: ${{ vars.GH_SIGN_IN_ENABLED || 'false' }}
+      SHARED_ONLY: ${{ inputs.shared_only && 'true' || 'false' }}
+      IMAGE_TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Sign in to Azure (OpenID Connect)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: actions/setup-dotnet@v4
+        if: ${{ !inputs.shared_only }}
+        with:
+          global-json-file: backend/global.json
+
+      - name: Backend tests
+        if: ${{ !inputs.shared_only }}
+        run: dotnet test backend/QuinntyneBrown.Community.sln --configuration Release
+
+      - uses: docker/setup-buildx-action@v3
+        if: ${{ !inputs.shared_only }}
+
+      - name: Deploy
+        env:
+          POSTGRES_ADMIN_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
+        run: |
+          IMAGE_TAG="${IMAGE_TAG:0:12}" bash eng/deploy.sh

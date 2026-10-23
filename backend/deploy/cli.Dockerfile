@@ -2,7 +2,7 @@
 # The Cli image: database migrate and seed before each rollout (the API never migrates itself), plus the wall's
 # wall-hash and wall-key. Build from the repository root:
 #   docker build -f backend/deploy/cli.Dockerfile -t faithtech-community-cli .
-#   docker run --rm -e ConnectionStrings__Community=... -e WebApp__Origin=https://app.faithtech.community faithtech-community-cli migrate
+#   docker run --rm -e ConnectionStrings__Community=... -e WebApp__Origin=https://app.quinntynebrown.com faithtech-community-cli migrate
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend
 WORKDIR /src/backend

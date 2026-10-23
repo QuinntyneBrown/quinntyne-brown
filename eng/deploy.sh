@@ -3,7 +3,7 @@
 # Run by .github/workflows/deploy.yml, or by the owner from a shell signed in with `az login`.
 #
 # Required environment:
-#   RESOURCE_GROUP            existing resource group, for example rg-faithtech-community
+#   RESOURCE_GROUP            existing resource group, for example rg-quinntynebrown-community
 #   POSTGRES_ADMIN_PASSWORD   PostgreSQL administrator password (kept in Key Vault by the template)
 # Optional:
 #   IMAGE_TAG                 image tag (default: the current commit)
