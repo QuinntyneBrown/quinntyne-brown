@@ -20,6 +20,29 @@ test.describe('App shell', () => {
     await axe.check();
   });
 
+  // The brand name never wraps, and with every section the nav scrolls inside the capsule rather
+  // than crushing search or spilling past the bar (L2-045 AC2).
+  for (const name of ['lg', 'xl'] as const) {
+    test(`at ${name} the brand stays on one line beside every section and search`, async ({
+      page,
+      api,
+      axe,
+    }) => {
+      await page.setViewportSize(BREAKPOINTS[name]);
+      const shell = new AppShell(page);
+      await api.signInAs(api.addAccount({ email: 'ada@example.org', roles: ['SystemAdmin'] }));
+
+      await expect(shell.navLink('Admin')).toBeAttached();
+      expect(await shell.brandLines()).toBe(1);
+      expect((await shell.topSearch.boundingBox())!.width).toBeGreaterThan(160);
+      expect(await shell.topBarSpills()).toBe(false);
+
+      await shell.navLink('Admin').focus();
+      await expect.poll(() => shell.inNavView(shell.navLink('Admin'))).toBe(true);
+      await axe.check();
+    });
+  }
+
   // One rule for every role (docs/adr/0009-shell-navigation-by-role.md); Reports for Staff and System Admin
   // only (L2-123 AC4, L2-045 AC4).
   const byRole: { roles: string[]; nav: string[]; tabs: string[] }[] = [

@@ -147,7 +147,7 @@
           <span class="ds-callout" style="left: 48%; top: 80%;" aria-hidden="true">6</span>
         </figure>
         <ol class="ds-anatomy__list">
-          <li><div><b>Brand</b><small><code>.topbar__brand</code>: the logo mark (<code>img.topbar__mark</code>, <code>assets/logo.svg</code>) and "FaithTech" in <code>--text-h4</code>; links to Home.</small></div></li>
+          <li><div><b>Brand</b><small><code>.topbar__brand</code>: the logo mark (<code>img.topbar__mark</code>, <code>assets/logo.svg</code>) and "Quinntyne Brown" in <code>--text-h4</code> on one line that never wraps or shrinks; links to Home.</small></div></li>
           <li><div><b>Nav</b><small><code>nav.topbar__nav</code> of <code>.nav-link</code>s; the current page has <code>aria-current="page"</code>. <code>.nav-link--secondary</code> (Team, Announcements, People) hides between 768px and 1023px. The whole nav hides below 768px.</small></div></li>
           <li><div><b>Search</b><small><code>form.topbar__search[role=search]</code> with a visually hidden label and an <code>.input--sm</code>; <code>--layout-topbar-search-width</code> (14rem) wide, shown from 1024px.</small></div></li>
           <li><div><b>Bell</b><small><code>.bell-anchor</code> holds a ghost icon button with a <code>.badge--count</code>; the anchor positions the <code>.bell-panel</code> when it opens.</small></div></li>
@@ -309,7 +309,7 @@
 
     <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
       <ul>
-        <li>The brand is always "FaithTech"; no page titles in the bar (the page header has the <code>&lt;h1&gt;</code>).</li>
+        <li>The brand is always "Quinntyne Brown", on one line. When every section does not fit, the nav scrolls sideways inside the capsule, fading at the edge that has more links; search, the bell and the avatar keep their size; no page titles in the bar (the page header has the <code>&lt;h1&gt;</code>).</li>
         <li>Nav labels are one word each, always in this order: Home, Events, Contacts, Partners, Workspaces, Team, Announcements, People. A link the person may not use is left out, not disabled.</li>
         <li>Search placeholder: "Search people, events, partners".</li>
         <li>Avatars show initials ("GO" for Grace Okonkwo); never a photo in the bar.</li>
@@ -357,7 +357,7 @@
       <table class="ds-table"><thead><tr><th scope="col">Class / attribute</th><th scope="col">Effect</th></tr></thead><tbody>
         <tr><td><code>.topbar</code></td><td>Floating sticky capsule: flex row, 56px tall, translucent blurred surface, hairline border, <code>--radius-full</code>, <code>--shadow-2</code>.</td></tr>
         <tr><td><code>.topbar__brand</code></td><td>Brand link with mark.</td></tr>
-        <tr><td><code>.topbar__mark</code></td><td>The logo artwork (<code>assets/logo.svg</code>) at <code>--size-avatar-sm</code> with <code>--radius-md</code>; <code>alt=""</code>. In Angular, <code>&lt;ft-logo-mark label=""&gt;</code>.</td></tr>
+        <tr><td><code>.topbar__mark</code></td><td>The logo artwork (<code>assets/logo.svg</code>) at <code>--size-avatar-md</code> in a <code>--radius-full</code> circle, inset <code>--space-2</code> so it is concentric with the capsule&rsquo;s rounded end; <code>alt=""</code>. In Angular, <code>&lt;ft-logo-mark label=""&gt;</code>.</td></tr>
         <tr><td><code>.topbar__nav</code></td><td>Primary nav; hidden below 768px; links never wrap.</td></tr>
         <tr><td><code>.nav-link</code> + <code>aria-current="page"</code></td><td>A nav link; current page highlighted.</td></tr>
         <tr><td><code>.nav-link--secondary</code></td><td>Team, Announcements, People; hidden from 768px to 1023px.</td></tr>

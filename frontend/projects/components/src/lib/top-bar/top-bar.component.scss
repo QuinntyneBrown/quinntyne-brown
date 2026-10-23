@@ -18,7 +18,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding-inline: var(--space-3);
+  // The mark sits --space-2 in from the start, so its circle is concentric with the capsule's end.
+  padding-inline: var(--space-2) var(--space-3);
   border: var(--border-width-hairline) solid var(--color-border-default);
   border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--color-bg-surface) 90%, transparent);
@@ -26,29 +27,75 @@
   box-shadow: var(--shadow-2);
 }
 
+// The brand never shrinks or wraps; the nav gives up room first.
 .top-bar__brand {
+  flex: none;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   min-block-size: var(--target-comfortable);
   color: var(--color-fg-default);
   font: var(--text-h4);
+  white-space: nowrap;
   text-decoration: none;
   border-radius: var(--radius-full);
 }
 
 .top-bar__mark {
-  inline-size: var(--size-avatar-sm);
-  block-size: var(--size-avatar-sm);
-  border-radius: var(--radius-md);
+  inline-size: var(--size-avatar-md);
+  block-size: var(--size-avatar-md);
+  border-radius: var(--radius-full);
   box-shadow: none;
 }
 
+// With every section the links can outgrow the capsule, so the nav scrolls sideways inside it
+// rather than crushing search or spilling past the bar. Its block padding keeps focus rings clear
+// of the clip; scroll padding keeps a focused link clear of the edge fades.
 .top-bar__nav {
   display: none;
+  flex: 0 1 auto;
+  min-inline-size: 0;
   align-items: center;
   gap: var(--space-1);
   margin-inline-start: var(--space-2);
+  padding: var(--space-1);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--space-8);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// Where scroll-driven animation is supported the nav fades out at whichever edge has more links.
+@supports (animation-timeline: scroll()) {
+  .top-bar__nav {
+    animation: top-bar-nav-edges linear both;
+    animation-timeline: scroll(self inline);
+  }
+}
+
+@keyframes top-bar-nav-edges {
+  0% {
+    mask-image: linear-gradient(to right, #000 calc(100% - var(--space-8)), transparent);
+  }
+
+  1%,
+  99% {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 var(--space-8),
+      #000 calc(100% - var(--space-8)),
+      transparent
+    );
+  }
+
+  100% {
+    mask-image: linear-gradient(to right, transparent, #000 var(--space-8));
+  }
 }
 
 .top-bar__link {
@@ -90,11 +137,13 @@
 }
 
 .top-bar__search {
+  flex: none;
   display: none;
   inline-size: var(--layout-topbar-search-width);
 }
 
 .top-bar__actions {
+  flex: none;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -140,7 +189,7 @@ a:focus-visible,
   }
 }
 
-// Every link fits from 1024px, Workspaces and Admin included: tighter links until 1280px.
+// Every link shows from 1024px, Workspaces and Admin included: tighter links until 1280px.
 @media (min-width: 64rem) and (max-width: 79.99rem) {
   .top-bar__link {
     padding-inline: var(--space-2);

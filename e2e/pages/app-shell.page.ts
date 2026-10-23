@@ -49,6 +49,40 @@ export class AppShell {
     return this.page.locator('header').getByRole('search').getByRole('searchbox');
   }
 
+  /** The top bar's brand link home. */
+  get brand(): Locator {
+    return this.page.locator('header').getByRole('link', { name: 'Quinntyne Brown' });
+  }
+
+  /** How many lines the brand name takes in the top bar. */
+  brandLines(): Promise<number> {
+    return this.brand.evaluate((link) => {
+      const walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT);
+      let text: Node | null;
+      while ((text = walker.nextNode()) && !text.textContent?.trim());
+      const range = document.createRange();
+      range.selectNodeContents(text!);
+      const tops = new Set([...range.getClientRects()].map((r) => Math.round(r.top)));
+      return tops.size;
+    });
+  }
+
+  /** True when something in the top bar spills past the capsule's edges. */
+  topBarSpills(): Promise<boolean> {
+    return this.page
+      .locator('header.top-bar')
+      .evaluate((bar) => bar.scrollWidth > bar.clientWidth + 1);
+  }
+
+  /** True when the element sits fully inside the visible part of the primary nav. */
+  inNavView(link: Locator): Promise<boolean> {
+    return link.evaluate((el) => {
+      const nav = el.closest('nav')!.getBoundingClientRect();
+      const box = el.getBoundingClientRect();
+      return box.left >= nav.left - 1 && box.right <= nav.right + 1;
+    });
+  }
+
   /** Searches from the top bar, as a member does from any page. */
   async searchFromTopBar(term: string): Promise<void> {
     await this.topSearch.fill(term);
