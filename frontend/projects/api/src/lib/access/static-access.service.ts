@@ -132,6 +132,7 @@ function fullOrg(org: StaticOrg): MyOrg {
       'resources',
       'agile',
       'reports',
+      'integrations',
     ],
     roles: [],
     grantableRoles: [],

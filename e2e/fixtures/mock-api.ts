@@ -10,6 +10,7 @@ import { MockGitHub } from './mock-github';
 import { MockGoogle } from './mock-google';
 import { MockNotification, MockNotifications } from './mock-notifications';
 import { MockReports } from './mock-reports';
+import { MockIntegrations } from './mock-integrations';
 import { MockSearch } from './mock-search';
 import { MockWall } from './mock-wall';
 import { MockResources } from './mock-resources';
@@ -131,6 +132,7 @@ const ORG_SECTIONS = [
   'announcements',
   'resources',
   'reports',
+  'applications',
   'notes',
   'invites',
 ];
@@ -220,6 +222,8 @@ export class MockApi {
   readonly resources = new MockResources(this);
   /** Reports for Staff and System Admins, computed from the other fakes (ADR 0030). */
   readonly reports = new MockReports(this);
+  /** Applications and their events (ADR 0042): register, rotate, revoke and read; `deliver` adds an event. */
+  readonly integrations = new MockIntegrations(this);
   /** Docs & notes: pages, blocks, links and visibility (ADR 0023 to 0025). */
   readonly notes = new MockNotes(this);
   /** Global search over the other fakes, with the server's permission rules (L2-026). */
@@ -465,6 +469,14 @@ export class MockApi {
     if (resources) return resources;
     const reports = this.reports.handle(route, method, url, this.caller(authorization));
     if (reports) return reports;
+    const integrations = this.integrations.handle(
+      route,
+      method,
+      url,
+      body,
+      this.caller(authorization),
+    );
+    if (integrations) return integrations;
     const notes = this.notes.handle(route, method, url, body, this.caller(authorization));
     if (notes) return notes;
     const search = this.search.handle(route, method, url, this.caller(authorization));

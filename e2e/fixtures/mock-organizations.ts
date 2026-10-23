@@ -79,6 +79,7 @@ const ALL_FEATURES = [
   'resources',
   'agile',
   'reports',
+  'integrations',
 ];
 
 /** Each code's feature (Permissions.FeatureOf). */
@@ -101,6 +102,8 @@ export const FEATURE_OF: Record<string, string> = {
   'workspaces.join': 'agile',
   'workspaces.readAll': 'agile',
   'reports.view': 'reports',
+  'integrations.view': 'integrations',
+  'integrations.manage': 'integrations',
   'team.member': 'team',
   'team.lead': 'team',
 };
@@ -235,6 +238,7 @@ const CROSS_ORG: CrossOrgRole[] = [
       'events.rsvpList',
       'workspaces.readAll',
       'reports.view',
+      'integrations.view',
     ],
     typeName: null,
     canJoinWork: true,
@@ -248,6 +252,7 @@ const CROSS_ORG: CrossOrgRole[] = [
       'events.rsvpList',
       'workspaces.readAll',
       'reports.view',
+      'integrations.view',
       'resources.create',
       'notes.create',
     ],
@@ -302,7 +307,7 @@ export class MockOrganizations {
       slug: SHELFIE,
       name: 'Shelfie',
       typeName: 'Startup',
-      features: ['profiles', 'notes', 'invites', 'resources', 'agile'],
+      features: ['profiles', 'notes', 'invites', 'resources', 'agile', 'integrations'],
       aliases: [],
     },
   ];
@@ -576,6 +581,7 @@ export class MockOrganizations {
       ['/api/poker-sessions', 'agile'],
       ['/api/work', 'agile'],
       ['/api/reports', 'reports'],
+      ['/api/integrations', 'integrations'],
       ['/api/people', 'profiles'],
     ];
     return prefixes.find(([prefix]) => path === prefix || path.startsWith(`${prefix}/`))?.[1];

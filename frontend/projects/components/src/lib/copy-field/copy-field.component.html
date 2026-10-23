@@ -10,10 +10,10 @@
 <p class="ft-copy-field__status" role="status">
   @switch (state()) {
     @case ('copied') {
-      Link copied to the clipboard.
+      {{ copiedMessage() }}
     }
     @case ('refused') {
-      Select the link and copy it.
+      {{ refusedMessage() }}
     }
   }
 </p>
