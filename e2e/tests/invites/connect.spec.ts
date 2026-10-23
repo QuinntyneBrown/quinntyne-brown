@@ -128,7 +128,7 @@ test.describe('Connect page', () => {
     await axe.check();
   });
 
-  test('a lookup that cannot reach FaithTech offers Try again', async ({ page, api, axe }) => {
+  test('a lookup that cannot reach Quinntyne Brown offers Try again', async ({ page, api, axe }) => {
     const grace = api.addAccount({ email: 'grace@example.org', roles: ['CityLead'] });
     const link = api.connect.addLink(grace.profileId);
     let fail = true;

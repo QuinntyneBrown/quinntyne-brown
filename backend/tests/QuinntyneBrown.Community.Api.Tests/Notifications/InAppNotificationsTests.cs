@@ -43,7 +43,7 @@ public class InAppNotificationsTests(CommunityApiFactory factory) : IClassFixtur
     public async Task Opening_a_notification_marks_it_read_and_keeps_its_link()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var id = await AddAsync(grace, "Tomás Ortega just joined FaithTech", factory.Time.GetUtcNow(), "/contacts/42");
+        var id = await AddAsync(grace, "Tomás Ortega just joined Quinntyne Brown", factory.Time.GetUtcNow(), "/contacts/42");
         var client = factory.ClientFor(grace);
 
         var response = await client.PostAsync($"/api/notifications/{id}/read", null);

@@ -21,7 +21,7 @@ public class IcsCalendarWriter(TimeProvider time) : IIcsCalendarWriter
         {
             "BEGIN:VCALENDAR",
             "VERSION:2.0",
-            "PRODID:-//FaithTech Community//Events//EN",
+            "PRODID:-//Quinntyne Brown//Events//EN",
             "CALSCALE:GREGORIAN",
             "METHOD:PUBLISH",
             "BEGIN:VEVENT",

@@ -28,7 +28,7 @@ public class IcsCalendarWriterTests
         var lines = Lines(ics);
         Assert.Equal("BEGIN:VCALENDAR", lines[0]);
         Assert.Contains("VERSION:2.0", lines);
-        Assert.Contains("PRODID:-//FaithTech Community//Events//EN", lines);
+        Assert.Contains("PRODID:-//Quinntyne Brown//Events//EN", lines);
         Assert.Contains("BEGIN:VEVENT", lines);
         Assert.Contains($"UID:{e.Id}@faithtech.community", lines);
         Assert.Contains("DTSTAMP:20261021T120000Z", lines);

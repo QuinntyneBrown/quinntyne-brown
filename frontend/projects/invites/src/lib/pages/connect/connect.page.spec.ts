@@ -143,7 +143,7 @@ describe('ConnectPage', () => {
     expect(button('Create an account')!.getAttribute('href')).toBe('/sign-up');
   });
 
-  it('offers Try again when the lookup cannot reach FaithTech', async () => {
+  it('offers Try again when the lookup cannot reach Quinntyne Brown', async () => {
     const { host, connect, button, settle } = await setup(() =>
       throwError(() => new HttpErrorResponse({ status: 0 })),
     );

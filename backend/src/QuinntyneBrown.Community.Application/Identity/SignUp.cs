@@ -88,7 +88,7 @@ public class VerificationEmails(UserManager<CommunityUser> users, IEmailSender e
         var link = $"{webApp.Value.Origin}/verify-email?userId={user.Id}&token={Uri.EscapeDataString(token)}";
         await email.SendAsync(new EmailMessage(
             user.Email!,
-            "Verify your FaithTech Community email",
+            "Verify your Quinntyne Brown email",
             $"Confirm your email address to finish setting up your account:\n\n{link}\n\nThis link expires in 24 hours."),
             cancellationToken);
     }

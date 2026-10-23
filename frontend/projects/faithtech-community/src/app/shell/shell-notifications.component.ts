@@ -98,7 +98,7 @@ export class ShellNotificationsComponent {
 function toNotice(n: NotificationDto): Notice {
   return {
     id: n.id,
-    name: n.actorName ?? 'FaithTech',
+    name: n.actorName ?? 'Quinntyne Brown',
     color: avatarColorFor(n.actorId),
     text: '',
     linkText: n.title,

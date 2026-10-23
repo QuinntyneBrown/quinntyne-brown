@@ -69,7 +69,7 @@ describe('SignInFormComponent', () => {
     ['invalid_credentials', 'We couldn’t sign you in'],
     ['locked_out', 'Too many attempts'],
     ['suspended', 'This account is suspended'],
-    ['unreachable', 'We couldn’t reach FaithTech'],
+    ['unreachable', 'We couldn’t reach Quinntyne Brown'],
     ['google_failed', 'Google sign-in didn’t finish'],
     ['github_failed', 'GitHub sign-in didn’t finish'],
   ])('shows the %s failure', (failure, heading) => {

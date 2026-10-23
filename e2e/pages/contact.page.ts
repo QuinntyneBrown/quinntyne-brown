@@ -29,7 +29,7 @@ export class ContactPage {
     this.notFound = page.getByRole('heading', { name: 'We couldn’t find that contact' });
     this.addNote = page.getByRole('button', { name: 'Add note' });
     this.archive = page.getByRole('button', { name: 'Archive' });
-    this.matchAlert = page.locator('ft-alert', { hasText: 'has joined FaithTech' });
+    this.matchAlert = page.locator('ft-alert', { hasText: 'has joined Quinntyne Brown' });
     this.linkToProfile = page.getByRole('button', { name: 'Link to their profile' });
     this.notThem = page.getByRole('button', { name: 'Not them' });
     this.linkedAlert = page.locator('ft-alert', { hasText: 'member profile' });

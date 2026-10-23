@@ -102,7 +102,7 @@ public class ResourceFieldRules(IApplicationDbContext db)
         var members = (input.MemberIds ?? []).Distinct().ToList();
         if (members.Count > 0 && await db.Profiles.CountAsync(p => members.Contains(p.Id), cancellationToken) != members.Count)
         {
-            errors["MemberIds"] = ["Choose members who are on FaithTech."];
+            errors["MemberIds"] = ["Choose members who are on Quinntyne Brown."];
             return null;
         }
 

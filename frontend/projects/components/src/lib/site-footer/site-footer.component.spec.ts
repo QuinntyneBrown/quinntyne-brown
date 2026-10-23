@@ -5,7 +5,7 @@ import { SiteFooterComponent } from './site-footer.component';
 
 @Component({
   imports: [SiteFooterComponent],
-  template: `<ft-site-footer copyright="© 2026 FaithTech"
+  template: `<ft-site-footer copyright="© 2026 Quinntyne Brown"
     ><li><a href="#join">Join now</a></li></ft-site-footer
   >`,
 })
@@ -17,7 +17,7 @@ describe('SiteFooterComponent', () => {
     fixture.detectChanges();
     const footer = (fixture.nativeElement as HTMLElement).querySelector('footer')!;
 
-    expect(footer.textContent).toContain('© 2026 FaithTech');
+    expect(footer.textContent).toContain('© 2026 Quinntyne Brown');
     expect(footer.querySelector('ul li a')?.textContent).toBe('Join now');
   });
 });

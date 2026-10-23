@@ -115,7 +115,7 @@ describe('AcceptInvitePage', () => {
   it('asks an existing member to sign in to accept', async () => {
     const { host, auth, button } = await setup(() => of({ ...invite, hasAccount: true }));
 
-    expect(host.textContent).toContain('already has a FaithTech account');
+    expect(host.textContent).toContain('already has a Quinntyne Brown account');
     button('Sign in to accept')!.click();
     expect(auth.signIn).toHaveBeenCalledWith('/accept-invite/tok');
   });

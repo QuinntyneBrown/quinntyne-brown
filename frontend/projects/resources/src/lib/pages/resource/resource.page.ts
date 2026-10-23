@@ -123,7 +123,7 @@ export class ResourcePage {
         text:
           error instanceof HttpErrorResponse && error.status === 409
             ? 'This file is still uploading. Try again in a minute.'
-            : 'We couldn’t reach FaithTech. Try again.',
+            : 'We couldn’t reach Quinntyne Brown. Try again.',
       });
     }
   }
@@ -186,7 +186,7 @@ export class ResourcePage {
       this.toasts.show({
         variant: 'danger',
         heading: `${r.title} wasn’t restored`,
-        text: 'We couldn’t reach FaithTech. It’s still archived.',
+        text: 'We couldn’t reach Quinntyne Brown. It’s still archived.',
         actionLabel: 'Try again',
         onAction: () => void this.restore(),
       });

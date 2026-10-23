@@ -111,7 +111,7 @@ test.describe('Global search', () => {
     const search = new SearchPage(page);
     await api.signInAs(api.addAccount({ email: 'grace@example.org' }), '/search');
 
-    await expect(search.emptyState).toContainText('Search all of FaithTech');
+    await expect(search.emptyState).toContainText('Search all of Quinntyne Brown');
     await axe.check();
   });
 });

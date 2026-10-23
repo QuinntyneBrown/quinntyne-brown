@@ -11,7 +11,7 @@ export class SendInviteDialog {
   readonly refusal: Locator;
 
   constructor(page: Page) {
-    this.dialog = page.getByRole('dialog', { name: 'Invite someone to FaithTech' });
+    this.dialog = page.getByRole('dialog', { name: 'Invite someone to Quinntyne Brown' });
     this.email = this.dialog.getByLabel('Email');
     this.role = this.dialog.getByLabel('Join with role');
     this.note = this.dialog.getByLabel(/Personal note/);

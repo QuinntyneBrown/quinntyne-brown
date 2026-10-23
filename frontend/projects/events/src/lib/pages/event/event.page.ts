@@ -183,7 +183,7 @@ export class EventPage {
       this.refusal.set(
         error instanceof HttpErrorResponse && error.status === 409
           ? (problemDetails(error)?.detail ?? 'This event isn’t taking RSVPs.')
-          : 'We couldn’t reach FaithTech, so you’re not on the list yet. Try again.',
+          : 'We couldn’t reach Quinntyne Brown, so you’re not on the list yet. Try again.',
       );
     } finally {
       this.rsvping.set(false);

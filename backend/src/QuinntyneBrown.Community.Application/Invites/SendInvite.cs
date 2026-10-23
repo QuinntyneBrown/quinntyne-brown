@@ -99,8 +99,8 @@ public class InviteSender(
         var personal = note is null ? string.Empty : $"\n\n“{note}”\n— {sender.Name}";
         emails.Enqueue(new EmailMessage(
             address,
-            $"{sender.Name} invited you to FaithTech Community",
-            $"{sender.Name} invited you to join FaithTech Community{asRole}.{personal}\n\n" +
+            $"{sender.Name} invited you to Quinntyne Brown",
+            $"{sender.Name} invited you to join Quinntyne Brown{asRole}.{personal}\n\n" +
             $"Accept the invite:\n\n{webApp.Value.Origin}/accept-invite/{token}\n\n" +
             "This link works once and expires in 14 days."));
         await db.SaveChangesAsync(cancellationToken);

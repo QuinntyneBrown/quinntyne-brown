@@ -17,7 +17,7 @@ export class SignUpPage {
   readonly signUpWithGitHub: Locator;
 
   constructor(private readonly page: Page) {
-    this.heading = page.getByRole('heading', { level: 1, name: 'Join FaithTech' });
+    this.heading = page.getByRole('heading', { level: 1, name: 'Join Quinntyne Brown' });
     this.name = page.getByLabel('Full name');
     this.email = page.getByLabel('Email');
     this.password = page.getByLabel('Password', { exact: true });

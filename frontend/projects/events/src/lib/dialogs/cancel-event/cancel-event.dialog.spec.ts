@@ -107,7 +107,7 @@ describe('CancelEventDialog', () => {
     await settle();
     expect(host.textContent).toContain('Event not cancelled');
     expect(host.textContent).toContain(
-      'We couldn’t reach FaithTech. Nothing was changed — try again.',
+      'We couldn’t reach Quinntyne Brown. Nothing was changed — try again.',
     );
     expect(ref.close).not.toHaveBeenCalled();
   });

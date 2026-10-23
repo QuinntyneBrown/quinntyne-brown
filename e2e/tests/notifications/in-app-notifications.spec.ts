@@ -14,7 +14,7 @@ test.describe('In-app notifications', () => {
     api.notifications.add(
       {
         recipientId: grace.profileId,
-        title: 'Tomás Ortega just joined FaithTech',
+        title: 'Tomás Ortega just joined Quinntyne Brown',
         actorName: 'Tomás Ortega',
         actorId: 'profile-9',
       },
@@ -29,7 +29,7 @@ test.describe('In-app notifications', () => {
     await shell.bell.click();
     await expect(shell.notificationPanel).toBeVisible();
     await expect(shell.notificationPanel.getByRole('link')).toHaveText([
-      'Tomás Ortega just joined FaithTech',
+      'Tomás Ortega just joined Quinntyne Brown',
       'Older notice',
       'See all',
     ]);

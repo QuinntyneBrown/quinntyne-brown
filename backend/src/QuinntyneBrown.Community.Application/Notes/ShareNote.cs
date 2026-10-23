@@ -56,7 +56,7 @@ public class ShareNoteHandler(IApplicationDbContext db, NoteAccess access, NoteV
 
         if (members.Count > 0 && await db.Profiles.CountAsync(p => members.Contains(p.Id), cancellationToken) != members.Count)
         {
-            return (Result.Invalid("MemberIds", "Choose members who are on FaithTech."), null);
+            return (Result.Invalid("MemberIds", "Choose members who are on Quinntyne Brown."), null);
         }
 
         if (visibility == NoteVisibility.Shared && members.Count == 0 && roles.Count == 0)

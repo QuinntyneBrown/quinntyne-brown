@@ -53,7 +53,7 @@ export class MarketingPage {
       level: 1,
       name: 'Build with people who share your faith',
     });
-    this.eyebrow = page.getByText('FaithTech Community', { exact: true });
+    this.eyebrow = page.getByText('Quinntyne Brown', { exact: true });
     this.lead = page.getByText(/^Meet the builders, leads and volunteers in your city/);
     this.topBar = page.getByRole('banner');
     this.topBarJoin = this.topBar.getByRole('button', { name: 'Join now' });
@@ -83,7 +83,7 @@ export class MarketingPage {
     this.passwordError = fieldError(page, 'Password');
     this.resetPassword = this.panel.getByRole('link', { name: 'Reset password' });
     this.handOff = page.getByRole('heading', { level: 2, name: 'Signing you in…' });
-    this.joinHeading = page.getByRole('heading', { level: 2, name: 'Join FaithTech' });
+    this.joinHeading = page.getByRole('heading', { level: 2, name: 'Join Quinntyne Brown' });
     this.panelJoin = this.panel.getByRole('button', { name: 'Join now' });
     this.panelSignIn = this.panel.getByRole('button', { name: 'Sign in', exact: true });
     this.name = this.panel.getByLabel('Full name');

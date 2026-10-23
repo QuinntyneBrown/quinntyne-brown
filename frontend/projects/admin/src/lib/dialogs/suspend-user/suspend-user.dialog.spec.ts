@@ -97,7 +97,7 @@ describe('SuspendUserDialog', () => {
     expect(host.querySelector('ft-alert')!.textContent).toContain('Account not suspended');
   });
 
-  it('says it didn’t work when FaithTech can’t be reached', async () => {
+  it('says it didn’t work when Quinntyne Brown can’t be reached', async () => {
     const { host, button, type, settle } = setup(() => throwError(() => new Error('offline')));
     type('Spam');
     button('Suspend').click();

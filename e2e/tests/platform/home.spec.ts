@@ -78,7 +78,7 @@ function addGrace(api: MockApi) {
     {
       recipientId: grace.profileId,
       kind: 'ContactSignedUp',
-      title: 'Tomás Ortega just joined FaithTech',
+      title: 'Tomás Ortega just joined Quinntyne Brown',
       linkPath: '/contacts/contact-9',
     },
     240,
@@ -145,10 +145,10 @@ test.describe('Home', () => {
     await expect(home.openBoard).toHaveAttribute('href', '/partners');
 
     await expect(home.activityItems).toHaveCount(2);
-    await expect(home.activityItems.nth(0)).toContainText('Tomás Ortega just joined FaithTech');
+    await expect(home.activityItems.nth(0)).toContainText('Tomás Ortega just joined Quinntyne Brown');
     await expect(home.activityItems.nth(0)).toContainText('Today, 11:42 am');
     await expect(home.activityItems.nth(1)).toContainText('Sun 18 Oct');
-    await expect(home.activityLink('Tomás Ortega just joined FaithTech')).toHaveAttribute(
+    await expect(home.activityLink('Tomás Ortega just joined Quinntyne Brown')).toHaveAttribute(
       'href',
       '/contacts/contact-9',
     );
@@ -225,7 +225,7 @@ test.describe('Home', () => {
 
     await expect(home.heading).toHaveText('Welcome, Leah');
     await expect(home.subtitle).toHaveText(
-      'You’re part of the FaithTech community. Here’s how to get started.',
+      'You’re part of the Quinntyne Brown community. Here’s how to get started.',
     );
     await expect(
       home.onboardingCard('Finish your profile').getByRole('link', { name: 'Edit profile' }),

@@ -378,7 +378,7 @@ describe('ContactPage', () => {
       () => of(contactDto({ match, noteCount: 2 })),
       { dialogResult: linked },
     );
-    expect(text()).toContain('Tomás Ortega has joined FaithTech');
+    expect(text()).toContain('Tomás Ortega has joined Quinntyne Brown');
 
     button('Link to their profile')!.click();
     await settle();
@@ -397,7 +397,7 @@ describe('ContactPage', () => {
     button('Not them')!.click();
     await settle();
 
-    expect(text()).not.toContain('has joined FaithTech');
+    expect(text()).not.toContain('has joined Quinntyne Brown');
   });
 
   it('keeps a missing fact’s row and says it was not added', async () => {

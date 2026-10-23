@@ -52,7 +52,7 @@ public class ContactSignedUpHandler(
             emails.Enqueue(new EmailMessage(
                 address,
                 Title(contact.Name),
-                $"{contact.Name}, one of your private contacts, just joined FaithTech Community.\n\n" +
+                $"{contact.Name}, one of your private contacts, just joined Quinntyne Brown.\n\n" +
                 $"Link them to their new profile and keep your notes:\n\n{webApp.Value.Origin}/contacts/{contact.Id}\n\n" +
                 "Your notes stay private to you."));
         }
@@ -61,7 +61,7 @@ public class ContactSignedUpHandler(
         await db.SaveChangesAsync(cancellationToken);
     }
 
-    private static string Title(string name) => $"{name} just joined FaithTech";
+    private static string Title(string name) => $"{name} just joined Quinntyne Brown";
 }
 
 /// <summary>Links a private contact to the member's real profile (L2-015 AC2, AC5); notes stay private.</summary>

@@ -61,7 +61,7 @@ export class RestorePartnerDialog {
       );
     } catch (error) {
       this.failure.set(
-        problemDetails(error)?.detail ?? 'We couldn’t reach FaithTech. Nothing was changed.',
+        problemDetails(error)?.detail ?? 'We couldn’t reach Quinntyne Brown. Nothing was changed.',
       );
     } finally {
       this.busy.set(false);

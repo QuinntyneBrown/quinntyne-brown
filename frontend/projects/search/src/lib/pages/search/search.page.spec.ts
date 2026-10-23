@@ -107,7 +107,7 @@ describe('SearchPage', () => {
 
     expect(host.querySelector('h1')!.textContent).toContain('Search');
     expect(host.querySelector('form[role="search"]')).not.toBeNull();
-    expect(host.textContent).toContain('Search all of FaithTech');
+    expect(host.textContent).toContain('Search all of Quinntyne Brown');
     expect(service.search).not.toHaveBeenCalled();
   });
 

@@ -24,7 +24,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { points } from '../../work-item-labels';
 
-const GENERIC_FAILURE = 'We couldn’t reach FaithTech. Nothing was changed — try again.';
+const GENERIC_FAILURE = 'We couldn’t reach Quinntyne Brown. Nothing was changed — try again.';
 
 export interface StartPokerData {
   workspace: WorkspaceDto;

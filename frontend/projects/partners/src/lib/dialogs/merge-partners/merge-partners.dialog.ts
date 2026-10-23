@@ -151,7 +151,7 @@ export class MergePartnersDialog {
       this.failure.set(
         problem?.detail ??
           Object.values(problem?.errors ?? {})[0]?.[0] ??
-          'We couldn’t reach FaithTech. Nothing was changed.',
+          'We couldn’t reach Quinntyne Brown. Nothing was changed.',
       );
     } finally {
       this.busy.set(false);

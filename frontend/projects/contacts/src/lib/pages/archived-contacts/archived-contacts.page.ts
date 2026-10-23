@@ -80,7 +80,7 @@ export class ArchivedContactsPage {
       this.toasts.show({
         variant: 'danger',
         heading: 'Contact not restored',
-        text: `We couldn’t reach FaithTech, so ${contact.name} is still archived. Try again.`,
+        text: `We couldn’t reach Quinntyne Brown, so ${contact.name} is still archived. Try again.`,
       });
     } finally {
       this.restoring.set(null);

@@ -30,7 +30,7 @@ export class TopBarComponent {
   readonly homeHref = input('/');
   readonly anonymous = input(false);
   readonly navLabel = input('Primary');
-  readonly searchLabel = input('Search FaithTech');
+  readonly searchLabel = input('Search Quinntyne Brown');
   readonly searchPlaceholder = input('Search people, events, partners');
   /** Emits the trimmed query when the search form is submitted. */
   readonly searchSubmit = output<string>();

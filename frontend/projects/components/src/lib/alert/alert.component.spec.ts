@@ -12,7 +12,7 @@ import { AlertComponent, AlertStatus } from './alert.component';
       [focusable]="focusable()"
       (dismissed)="dismissals = dismissals + 1"
     >
-      We could not reach FaithTech.
+      We could not reach Quinntyne Brown.
       <button ftAlertActions type="button">Try again</button>
     </ft-alert>
   `,
@@ -36,7 +36,7 @@ describe('AlertComponent', () => {
     const { host } = setup();
     expect(host.querySelector('.alert__title')?.textContent).toContain('That did not work');
     expect(host.querySelector('.alert__text')?.textContent).toContain(
-      'We could not reach FaithTech.',
+      'We could not reach Quinntyne Brown.',
     );
     expect(host.querySelector('.alert__actions button')?.textContent).toBe('Try again');
   });

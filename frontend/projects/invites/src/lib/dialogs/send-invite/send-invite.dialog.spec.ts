@@ -142,7 +142,7 @@ describe('SendInviteDialog', () => {
     expect(host.textContent).toContain('You’ve sent 50 invites in the last 24 hours.');
   });
 
-  it('says it didn’t work when FaithTech can’t be reached', async () => {
+  it('says it didn’t work when Quinntyne Brown can’t be reached', async () => {
     const { host, set, send } = setup(() => throwError(() => new Error('offline')));
     set('input[type="email"]', 'nate@example.org');
     await send();

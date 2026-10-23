@@ -41,7 +41,7 @@ describe('TopBarComponent', () => {
     expect(q('header')).toBeTruthy();
     const brand = q<HTMLAnchorElement>('.top-bar__brand');
     expect(brand.getAttribute('href')).toBe('/');
-    expect(brand.textContent).toContain('FaithTech');
+    expect(brand.textContent).toContain('Quinntyne Brown');
   });
 
   it('renders a labelled primary nav with aria-current on the current link', () => {
@@ -62,7 +62,7 @@ describe('TopBarComponent', () => {
     const { fixture, cmp, q } = setup();
     expect(q('form').getAttribute('role')).toBe('search');
     const input = q<HTMLInputElement>('input[type=search]');
-    expect(q<HTMLLabelElement>('label').textContent).toContain('Search FaithTech');
+    expect(q<HTMLLabelElement>('label').textContent).toContain('Search Quinntyne Brown');
     expect(q<HTMLLabelElement>('label').htmlFor).toBe(input.id);
     input.value = 'toronto';
     q<HTMLFormElement>('form').dispatchEvent(new Event('submit', { cancelable: true }));

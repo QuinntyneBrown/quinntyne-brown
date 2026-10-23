@@ -202,7 +202,7 @@ export class ResourcesPage {
         text:
           error instanceof HttpErrorResponse && error.status === 409
             ? 'This file is still uploading. Try again in a minute.'
-            : 'We couldn’t reach FaithTech. Try again.',
+            : 'We couldn’t reach Quinntyne Brown. Try again.',
       });
     }
   }

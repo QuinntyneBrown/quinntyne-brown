@@ -23,7 +23,7 @@ public class CommunitySeeder(IOpenIddictApplicationManager applications, Communi
             ClientId = WebClientId,
             ClientType = ClientTypes.Public,
             ConsentType = ConsentTypes.Implicit,
-            DisplayName = "FaithTech Community web app",
+            DisplayName = "Quinntyne Brown web app",
             RedirectUris = { new Uri($"{webAppOrigin}/auth/callback") },
             PostLogoutRedirectUris = { new Uri($"{webAppOrigin}/") },
             Permissions =

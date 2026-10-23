@@ -91,7 +91,7 @@ export class ArchivedResourcesPage {
       this.toasts.show({
         variant: 'danger',
         heading: `${resource.title} wasn’t restored`,
-        text: 'We couldn’t reach FaithTech. It’s still archived.',
+        text: 'We couldn’t reach Quinntyne Brown. It’s still archived.',
         actionLabel: 'Try again',
         onAction: () => void this.restore(resource),
       });
