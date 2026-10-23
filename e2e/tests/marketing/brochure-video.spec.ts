@@ -12,7 +12,7 @@ test.describe('Brochure video', () => {
     await marketing.open();
 
     await expect(marketing.video).toBeVisible();
-    await expect(marketing.video).toHaveAccessibleName(/FaithTech Community in \d+ seconds/);
+    await expect(marketing.video).toHaveAccessibleName(/Quinntyne Brown in \d+ seconds/);
     const state = await marketing.videoState();
     expect(state).toMatchObject({ paused: true, autoplay: false, controls: true });
     expect(state.poster).toMatch(/brochure-poster\.jpg$/);
