@@ -45,6 +45,8 @@ export class MarketingPage {
   readonly sendAgain: Locator;
   readonly signInWithGoogle: Locator;
   readonly signUpWithGoogle: Locator;
+  readonly signInWithGitHub: Locator;
+  readonly signUpWithGitHub: Locator;
 
   constructor(private readonly page: Page) {
     this.heading = page.getByRole('heading', {
@@ -93,6 +95,8 @@ export class MarketingPage {
     this.sendAgain = this.panel.getByRole('link', { name: 'send it again' });
     this.signInWithGoogle = this.panel.getByRole('button', { name: 'Sign in with Google' });
     this.signUpWithGoogle = this.panel.getByRole('button', { name: 'Sign up with Google' });
+    this.signInWithGitHub = this.panel.getByRole('button', { name: 'Sign in with GitHub' });
+    this.signUpWithGitHub = this.panel.getByRole('button', { name: 'Sign up with GitHub' });
   }
 
   /** Signs in from the hero panel and waits for the API's answer. */

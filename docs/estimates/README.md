@@ -1,13 +1,13 @@
 # Estimates
 
-- Overall effort: 291 days
+- Overall effort: 295 days
 - Complete: 97%
-- Visual conformance: letter grade (F to A+) of the implemented UI against the HTML mocks and design system (margins, spacing, fonts, borders), from screenshots in `docs/videos/journeys/<journey>/screenshots/`. Subsystem grades are the rounded mean of their designs. The marketing page and Google sign-in have no journey screenshots yet, so they are not graded (n/a).
+- Visual conformance: letter grade (F to A+) of the implemented UI against the HTML mocks and design system (margins, spacing, fonts, borders), from screenshots in `docs/videos/journeys/<journey>/screenshots/`. Subsystem grades are the rounded mean of their designs. The marketing page, Google sign-in and GitHub sign-in have no journey screenshots yet, so they are not graded (n/a).
 
 | Subsystem | Effort | Complete | Visual conformance |
 |---|---|---|---|
 | [platform](platform.md) | 33 days | 84% | C+ |
-| [identity](identity.md) | 23 days | 98% | A- |
+| [identity](identity.md) | 27 days | 98% | A- |
 | [profiles](profiles.md) | 13 days | 100% | B- |
 | [admin](admin.md) | 17 days | 99% | B |
 | [invites](invites.md) | 14 days | 100% | A- |
