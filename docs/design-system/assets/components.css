@@ -1048,7 +1048,7 @@ mark { background: var(--color-warning-bg); color: inherit; border-radius: var(-
 .btn--google .icon--brand { width: 1.125em; height: 1.125em; }
 .btn--google[aria-busy="true"]::after { border-color: var(--color-social-google-fg); border-right-color: transparent; }
 /* GitHub's "Sign in with GitHub" button: GitHub's dark fill in light, its light fill in dark; the mark takes the label colour. */
-.btn--github { --btn-bg: var(--color-social-github-bg); --btn-fg: var(--color-social-github-fg); --btn-border: var(--color-social-github-border); --btn-bg-hover: color-mix(in srgb, var(--color-social-github-fg) 12%, var(--color-social-github-bg)); --btn-bg-active: color-mix(in srgb, var(--color-social-github-fg) 18%, var(--color-social-github-bg)); font-weight: var(--font-weight-medium); }
+.btn--github { --btn-bg: var(--color-social-github-bg); --btn-fg: var(--color-social-github-fg); --btn-border: var(--color-social-github-border); --btn-bg-hover: color-mix(in srgb, var(--color-social-github-fg) 8%, var(--color-social-github-bg)); --btn-bg-active: color-mix(in srgb, var(--color-social-github-fg) 12%, var(--color-social-github-bg)); font-weight: var(--font-weight-medium); }
 .btn--github .icon--brand { width: 1.125em; height: 1.125em; fill: currentColor; }
 .btn--github[aria-busy="true"]::after { border-color: var(--color-social-github-fg); border-right-color: transparent; }
 

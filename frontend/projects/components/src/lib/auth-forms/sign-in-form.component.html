@@ -30,6 +30,12 @@
           password.
         </ft-alert>
       }
+      @case ('github_failed') {
+        <ft-alert status="danger" heading="GitHub sign-in didn’t finish" [focusable]="true">
+          We couldn’t confirm your GitHub account. Try again, or sign in with your email and
+          password.
+        </ft-alert>
+      }
     }
     <ng-content select="[ftAuthAlternatives]" />
     @if (divider(); as text) {

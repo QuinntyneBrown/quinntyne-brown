@@ -52,6 +52,11 @@ export interface AuthService {
    * Google, and lands in the community app at returnUrl, or back here with ?google=failed|suspended.
    */
   signInWithGoogle(returnUrl?: string, keepSignedIn?: boolean): void;
+  /**
+   * Starts GitHub sign-in (one flow for signing in and signing up): the browser leaves for the API, then
+   * GitHub, and lands in the community app at returnUrl, or back here with ?github=failed|suspended.
+   */
+  signInWithGitHub(returnUrl?: string, keepSignedIn?: boolean): void;
   signOut(): Observable<void>;
   /**
    * True when the community app keeps a "Keep me signed in" session on this device (the session hint,

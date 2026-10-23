@@ -69,6 +69,11 @@ export class HttpAuthService implements AuthService {
     this.redirect(`${this.base}/account/google/start?${query}`);
   }
 
+  signInWithGitHub(returnUrl = '/', keepSignedIn = false): void {
+    const query = new URLSearchParams({ returnUrl, keepSignedIn: String(keepSignedIn) });
+    this.redirect(`${this.base}/account/github/start?${query}`);
+  }
+
   hasKeptSession(): boolean {
     return hasSessionHint();
   }

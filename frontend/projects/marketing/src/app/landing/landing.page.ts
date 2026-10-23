@@ -79,6 +79,8 @@ export class LandingPage implements OnInit {
   readonly join = input<string>();
   /** How Google sign-in ended when the API sent the visitor back (`?google=failed|suspended`). */
   readonly google = input<string>();
+  /** How GitHub sign-in ended when the API sent the visitor back (`?github=failed|suspended`). */
+  readonly github = input<string>();
 
   protected readonly joining = computed(() => this.join() !== undefined);
   protected readonly busy = signal(false);
@@ -89,6 +91,7 @@ export class LandingPage implements OnInit {
   protected readonly serverErrors = signal<SignUpFieldErrors>({});
   protected readonly sentTo = signal<string | null>(null);
   protected readonly googleBusy = signal(false);
+  protected readonly githubBusy = signal(false);
   private readonly panelHeading = viewChild<ElementRef<HTMLElement>>('panelHeading');
   private readonly signInForm = viewChild(SignInFormComponent);
 
@@ -100,6 +103,14 @@ export class LandingPage implements OnInit {
       untracked(() => {
         if (outcome === 'suspended') this.failure.set('suspended');
         else if (outcome === 'failed') this.failure.set('google_failed');
+      });
+    });
+    // The same for GitHub (ADR 0027).
+    effect(() => {
+      const outcome = this.github();
+      untracked(() => {
+        if (outcome === 'suspended') this.failure.set('suspended');
+        else if (outcome === 'failed') this.failure.set('github_failed');
       });
     });
     let first = true;
@@ -133,6 +144,16 @@ export class LandingPage implements OnInit {
     if (this.googleBusy()) return;
     this.googleBusy.set(true);
     this.auth.signInWithGoogle(
+      appPath(this.returnUrl()),
+      this.signInForm()?.keepSignedIn() ?? false,
+    );
+  }
+
+  /** One flow for "Sign in with GitHub" and "Sign up with GitHub": the browser leaves for GitHub. */
+  protected continueWithGitHub(): void {
+    if (this.githubBusy()) return;
+    this.githubBusy.set(true);
+    this.auth.signInWithGitHub(
       appPath(this.returnUrl()),
       this.signInForm()?.keepSignedIn() ?? false,
     );

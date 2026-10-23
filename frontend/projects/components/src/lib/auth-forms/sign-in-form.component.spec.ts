@@ -71,6 +71,7 @@ describe('SignInFormComponent', () => {
     ['suspended', 'This account is suspended'],
     ['unreachable', 'We couldn’t reach FaithTech'],
     ['google_failed', 'Google sign-in didn’t finish'],
+    ['github_failed', 'GitHub sign-in didn’t finish'],
   ])('shows the %s failure', (failure, heading) => {
     const { fixture, el, host } = setup();
 
