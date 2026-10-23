@@ -172,4 +172,35 @@ test.describe('Portfolio administration', () => {
     await portfolio.open('organizations');
     await expect(portfolio.forbidden).toBeVisible();
   });
+
+  test('the Portfolio Lead changes an org’s address, and an Org Lead sees it read-only', async ({
+    page,
+    api,
+    axe,
+  }) => {
+    const portfolio = new PortfolioPage(page);
+    await api.signInAs(portfolioLead(api), '/o/faithtech-toronto/settings/general');
+
+    await expect(page.getByRole('main')).toContainText('/o/faithtech-toronto');
+    await axe.check();
+    await portfolio.button('Edit name and address').click();
+    const edit = new PortfolioDialog(page, 'Edit FaithTech Toronto');
+    await edit.field(/^Slug/).fill('toronto');
+    await edit.button('Save changes').click();
+
+    await expect(page).toHaveURL('/o/toronto/settings/general');
+    await expect(page.getByRole('main')).toContainText('faithtech-toronto');
+  });
+
+  test('an Org Lead sees the org’s general settings read-only', async ({ page, api }) => {
+    const olivia = api.addAccount({
+      email: 'olivia@example.org',
+      roles: ['Volunteer'],
+      orgLead: ['faithtech-toronto'],
+    });
+    await api.signInAs(olivia, '/o/faithtech-toronto/settings/general');
+
+    await expect(page.getByRole('main')).toContainText('Only the Portfolio Lead changes the name');
+    await expect(new PortfolioPage(page).button('Edit name and address')).toHaveCount(0);
+  });
 });

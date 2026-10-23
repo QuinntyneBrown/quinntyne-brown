@@ -60,6 +60,7 @@
     </ft-cluster>
   </ft-page-header>
   <ft-tabs label="Organization settings">
+    <ft-tab label="General" [href]="'/o/' + (org()?.slug ?? '') + '/settings/general'" />
     <ft-tab
       label="Members"
       [href]="'/o/' + (org()?.slug ?? '') + '/settings/members'"

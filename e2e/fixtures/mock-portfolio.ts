@@ -103,7 +103,15 @@ export class MockPortfolio {
     const agent = match(/^\/api\/agents(?:\/([^/]+)\/tokens(?:\/([^/]+))?)?$/);
     if (!portfolio && !type && !org && !crossOrg && !agent) return null;
     if (!caller) return route.fulfill({ status: 401 });
-    const refusal = this.refusal(caller);
+    // An Org Lead reads their own org's settings (OrganizationAdminHandler.GetAsync).
+    const leadsOrg =
+      !!org &&
+      !org[2] &&
+      method === 'GET' &&
+      this.organizations()
+        .covered(caller)
+        .some((c) => c.org.id === org[1] && c.isOrgLead);
+    const refusal = leadsOrg ? null : this.refusal(caller);
     if (refusal && !(agent && this.leadsAny(caller))) return route.fulfill({ status: refusal });
 
     if (portfolio) return this.portfolio(route, method, portfolio[2], url, body, caller);

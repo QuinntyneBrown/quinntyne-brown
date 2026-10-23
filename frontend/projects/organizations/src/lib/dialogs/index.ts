@@ -3,6 +3,7 @@ export * from './assign-cross-org';
 export * from './confirm-action';
 export * from './create-agent';
 export * from './create-organization';
+export * from './edit-organization';
 export * from './issue-token';
 export * from './org-type';
 export * from './remove-member';

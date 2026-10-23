@@ -6,7 +6,6 @@
 >
   @if (issued(); as token) {
     <ft-token-reveal [token]="token.token" />
-    <ft-button ftDialogFooter variant="primary" (click)="ref.close(token)">Done</ft-button>
   } @else {
     <form [formGroup]="form" (submit)="$event.preventDefault(); issue()">
       <ft-stack>
@@ -42,7 +41,14 @@
         </ft-checkbox-group>
       </ft-stack>
     </form>
+  }
+  @if (issued(); as token) {
+    <ft-button ftDialogFooter variant="primary" (click)="ref.close(token)">Done</ft-button>
+  }
+  @if (!issued()) {
     <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+  }
+  @if (!issued()) {
     <ft-button ftDialogFooter variant="primary" [loading]="busy()" (click)="issue()">
       Issue token
     </ft-button>
