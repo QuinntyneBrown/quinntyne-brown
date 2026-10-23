@@ -763,6 +763,28 @@
       }
     },
     {
+      "id": "submit-idea",
+      "kind": "page",
+      "title": "Submit an idea",
+      "route": "/ideas/new",
+      "requirements": [],
+      "states": [
+        "default",
+        "invalid",
+        "idea",
+        "shape",
+        "people",
+        "review",
+        "busy",
+        "error",
+        "success"
+      ],
+      "not_applicable": {
+        "loading": "The wizard needs no data before it renders; resuming a saved draft is not drawn yet.",
+        "empty": "A form, not a collection."
+      }
+    },
+    {
       "id": "notifications",
       "kind": "page",
       "title": "Notifications",

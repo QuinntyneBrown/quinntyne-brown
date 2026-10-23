@@ -1394,3 +1394,72 @@ a.page-link:hover, a.page-link[data-state="hover"] { background: var(--color-acc
 /* With the switcher in the bar, the nav gives up room first and scrolls sideways inside the capsule, as ft-top-bar does. */
 .topbar:has(.org-switcher) .topbar__nav { min-width: 0; overflow-x: auto; scrollbar-width: none; }
 .topbar:has(.org-switcher) .topbar__brand { flex: none; }
+
+/* ---------- Wizard: step list, tile choices, checkbox chips (Submit an idea) -----
+   A multi-step form in one card: a step list beside it on large screens (a compact
+   "Step n of 5" with a progress bar on smaller ones), an optional preview column
+   from 1280px, and Back / Continue in the card footer. Any feature may use them. */
+.wizard-layout { display: grid; gap: var(--layout-gutter); grid-template-columns: minmax(0, 1fr); align-items: start; margin-top: var(--space-4); }
+@media (min-width: 64rem) { .wizard-layout { grid-template-columns: 13.5rem minmax(0, 1fr); } }
+@media (min-width: 80rem) { .wizard-layout--preview { grid-template-columns: 13.5rem minmax(0, 1fr) 20rem; } }
+.wizard-layout__preview { display: none; }
+@media (min-width: 80rem) { .wizard-layout__preview { display: flex; } }
+.wizard-card { padding: 0; }
+.wizard-card__body { padding: var(--space-6); }
+.wizard-card__footer { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-4) var(--space-6); border-top: var(--border-width-hairline) solid var(--color-border-default); }
+.wizard-card__footer > :only-child { margin-inline-start: auto; }
+.wizard-card h2:first-child { font: var(--text-h3); }
+/* Compact progress below 1024px; the step list replaces it from 1024px. */
+.wizard-progress { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; }
+.wizard-progress__label { font: var(--text-label); color: var(--color-fg-default); }
+.wizard-progress__label span { margin-inline-start: var(--space-2); color: var(--color-fg-muted); font-weight: var(--font-weight-regular); }
+@media (min-width: 64rem) { .wizard-progress { display: none; } }
+/* Vertical step list: a numbered marker per step joined by a rail; done steps show a tick and stay reachable. */
+.wizard-steps { display: none; list-style: none; margin: 0; padding: 0; }
+@media (min-width: 64rem) { .wizard-steps { display: flex; flex-direction: column; gap: var(--space-6); } }
+.wizard-steps--static { display: flex; flex-direction: column; gap: var(--space-6); }
+.wizard-steps > li { position: relative; }
+.wizard-steps > li:not(:last-child)::after { content: ""; position: absolute; left: calc(var(--size-avatar-sm) / 2 - var(--border-width-thick) / 2); top: calc(var(--size-avatar-sm) + var(--space-1)); bottom: calc(-1 * var(--space-6) + var(--space-1)); width: var(--border-width-thick); border-radius: var(--radius-full); background: var(--color-border-default); }
+.wizard-steps > li[data-done]:not(:last-child)::after { background: var(--color-accent); }
+.wizard-steps__step { display: flex; align-items: flex-start; gap: var(--space-3); width: 100%; padding: 0; border: 0; border-radius: var(--radius-md); background: none; color: inherit; font: inherit; text-align: left; text-decoration: none; cursor: pointer; }
+.wizard-steps__step:disabled, .wizard-steps__step[aria-disabled="true"] { cursor: default; }
+.wizard-steps__marker { display: grid; place-items: center; flex: none; width: var(--size-avatar-sm); height: var(--size-avatar-sm); border: var(--border-width-thick) solid var(--color-border-default); border-radius: var(--radius-full); background: var(--color-bg-surface); color: var(--color-fg-muted); font: var(--text-label); font-weight: var(--font-weight-bold); transition: background-color var(--duration-fast) var(--ease-standard); }
+.wizard-steps__marker .icon { width: var(--size-icon-sm); height: var(--size-icon-sm); stroke-width: 3; }
+.wizard-steps__text { display: flex; flex-direction: column; gap: var(--space-0-5); padding-top: var(--space-1); }
+.wizard-steps__title { font: var(--text-label); font-weight: var(--font-weight-semibold); color: var(--color-fg-default); }
+.wizard-steps__step:disabled .wizard-steps__title { color: var(--color-fg-muted); }
+.wizard-steps__summary { font: var(--text-caption); color: var(--color-fg-muted); }
+.wizard-steps__step[aria-current="step"] .wizard-steps__marker { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-fg-on-accent); }
+li[data-done] .wizard-steps__marker { border-color: var(--color-accent); color: var(--color-fg-accent); }
+li[data-done] .wizard-steps__step:hover .wizard-steps__marker, li[data-done] .wizard-steps__step[data-state="hover"] .wizard-steps__marker { background: var(--color-accent-subtle); }
+.wizard-steps--static .wizard-steps__marker { border-color: var(--color-accent-subtle); background: var(--color-accent-subtle); color: var(--color-fg-accent); }
+/* Tile choice: a .choice drawn as a bordered tile, for options with a description. */
+.choice-tiles { display: grid; gap: var(--space-3); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 40rem) { .choice-tiles--pair { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.choice--tile { padding: var(--space-3) var(--space-4); border: var(--border-width-hairline) solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-bg-surface); transition: background-color var(--duration-fast) var(--ease-standard), border-color var(--duration-fast) var(--ease-standard); }
+.choice--tile:hover, .choice--tile[data-state="hover"] { background: var(--color-bg-subtle); }
+.choice--tile:has(input:checked) { border-color: var(--color-accent); background: var(--color-accent-subtle); }
+.choice--tile:has(input[aria-invalid="true"]) { border-color: var(--color-danger-border); }
+.choice--tile:has(input:focus-visible) { outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset); }
+.choice--tile input:focus-visible { outline: none; }
+.choice--tile .choice__text { font-weight: var(--font-weight-semibold); }
+.choice--tile .choice__text small { font: var(--text-body-sm); }
+/* Checkbox chip: a <label class="chip"> wrapping a visually hidden checkbox, for multi-select from a short list. */
+label.chip { position: relative; user-select: none; }
+label.chip:has(input:checked) { background: var(--color-accent-subtle); border-color: var(--color-accent); color: var(--color-fg-accent); }
+label.chip:has(input:checked):hover { background: var(--color-accent-subtle-hover); }
+label.chip:has(input:disabled) { border-color: var(--color-border-default); color: var(--color-fg-disabled); cursor: not-allowed; }
+label.chip:has(input:focus-visible) { outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset); }
+label.chip .icon { width: var(--size-icon-sm); height: var(--size-icon-sm); margin-inline-start: calc(-1 * var(--space-1)); }
+.chip-group { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-1); }
+fieldset:has(input[aria-invalid="true"]) .chip-group label.chip:not(:has(input:checked)) { border-color: var(--color-danger-border); }
+/* Review: one bordered block per wizard section, each with an Edit button. */
+.review-sections { border: var(--border-width-hairline) solid var(--color-border-default); border-radius: var(--radius-md); }
+.review-sections > section { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-4) var(--space-5); }
+.review-sections > section + section { border-top: var(--border-width-hairline) solid var(--color-border-default); }
+.review-sections h3 { font: var(--text-body); font-weight: var(--font-weight-bold); }
+.review-sections dd { white-space: pre-line; }
+/* An icon tile on a cover colour: the idea preview's lightbulb (sun) and the submitted tick (sage). */
+.icon-tile[class*="cover--"] { background: var(--cover); color: var(--color-fg-on-cover); }
+/* A wrapping list of badges, such as an idea's stage, audience and topics. */
+.badge-list { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
