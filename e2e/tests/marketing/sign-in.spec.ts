@@ -18,7 +18,7 @@ test.describe('Sign in from the marketing page', () => {
 
     await marketing.signIn(account.email, account.password);
 
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
     const exchange = api.callsTo('POST', '/connect/token')[0];
     expect(exchange.body['grant_type']).toBe('authorization_code');
     expect(String(exchange.body['code_verifier'])).toMatch(/^[A-Za-z0-9_-]{43,}$/);
@@ -31,7 +31,7 @@ test.describe('Sign in from the marketing page', () => {
 
     await marketing.signIn(account.email, account.password);
 
-    await expect(page).toHaveURL('http://localhost:4200/events');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto/events');
   });
 
   test('wrong credentials show the generic error and keep the details', async ({
@@ -109,7 +109,7 @@ test.describe('Sign in from the marketing page', () => {
 
     await marketing.signIn(account.email, account.password);
 
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
     const appSignIn = new SignInPage(page);
     expect(await appSignIn.storedRefreshToken('sessionStorage')).toBe('refresh-token');
     expect(await appSignIn.storedRefreshToken('localStorage')).toBeNull();
@@ -122,7 +122,7 @@ test.describe('Sign in from the marketing page', () => {
 
     await marketing.signIn(account.email, account.password, { keepSignedIn: true });
 
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
     expect(await new SignInPage(page).storedRefreshToken('localStorage')).toBe('refresh-token');
   });
 
@@ -167,6 +167,6 @@ test.describe('Sign in from the marketing page', () => {
 
     await expect(marketing.signInButton).toHaveAttribute('aria-busy', 'true');
     release();
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
   });
 });

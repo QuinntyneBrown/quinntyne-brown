@@ -43,7 +43,7 @@ test.describe('Possible duplicate contact', () => {
     await axe.check();
 
     await form.openDuplicate('Nadia Petrov').click();
-    await expect(page).toHaveURL(`/contacts/${nadia.id}`);
+    await expect(page).toHaveURL(`/o/faithtech-toronto/contacts/${nadia.id}`);
     await expect(new ContactPage(page).heading).toHaveText('Nadia Petrov');
   });
 

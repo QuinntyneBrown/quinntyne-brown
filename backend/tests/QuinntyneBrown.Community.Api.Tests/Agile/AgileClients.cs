@@ -27,13 +27,19 @@ public static class AgileClients
             }
         });
 
-    /// <summary>Stores a workspace owned by <paramref name="owner"/> with the given members.</summary>
+    /// <summary>Stores a FaithTech Toronto workspace owned by <paramref name="owner"/> with the given members.</summary>
     public static Task<Guid> AddWorkspaceAsync(
         this CommunityApiFactory factory, ProfileClients.Member owner, string name = "Toronto team",
         WorkspaceMethod method = WorkspaceMethod.Scrum, params ProfileClients.Member[] members) =>
+        factory.AddWorkspaceInAsync(Infrastructure.Persistence.HierarchySeed.TorontoId, owner, name, method, members);
+
+    /// <summary>Stores a workspace of the org, owned by <paramref name="owner"/>, with the given members.</summary>
+    public static Task<Guid> AddWorkspaceInAsync(
+        this CommunityApiFactory factory, Guid organizationId, ProfileClients.Member owner, string name,
+        WorkspaceMethod method = WorkspaceMethod.Scrum, params ProfileClients.Member[] members) =>
         factory.WithDbAsync(async db =>
         {
-            var workspace = new Workspace(Infrastructure.Persistence.HierarchySeed.TorontoId, name, method, owner.ProfileId);
+            var workspace = new Workspace(organizationId, name, method, owner.ProfileId);
             foreach (var member in members)
             {
                 workspace.AddMember(await db.Profiles.SingleAsync(p => p.Id == member.ProfileId), eligible: true, factory.Time.GetUtcNow());

@@ -1,8 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Role } from '../shared';
-
 export type WorkspaceMethod = 'Scrum' | 'Kanban';
 
 /** How the caller relates to a workspace (ADR 0011). */
@@ -28,7 +26,8 @@ export interface WorkspaceSummaryDto {
 export interface WorkspaceMemberDto {
   profileId: string;
   name: string;
-  roles: Role[];
+  /** Role names, for display. */
+  roles: string[];
   isOwner: boolean;
   /** Stories and tasks assigned to them, which removing them unassigns (L2-031 AC8). */
   assignedStories: number;
@@ -58,7 +57,8 @@ export interface WorkspaceDto {
 export interface MemberCandidateDto {
   profileId: string;
   name: string;
-  roles: Role[];
+  /** Role names, for display. */
+  roles: string[];
 }
 
 export type WorkItemKind = 'Initiative' | 'Epic' | 'Story' | 'Task';

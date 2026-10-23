@@ -1,8 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Role } from '../shared';
-
 /** Leads are City, Event, Create and Communications Lead; Volunteers hold the Volunteer role (ADR 0007). */
 export type TeamRoleFilter = 'Leads' | 'Volunteers';
 
@@ -18,8 +16,8 @@ export interface TeamMemberDto {
   homeCity: string | null;
   /** The featured photo, or null when the member has none. */
   photoUrl: string | null;
-  /** Every role the member holds, not only the team roles. */
-  roles: Role[];
+  /** The names of the catalogue roles the member holds in the org. */
+  roles: string[];
 }
 
 /** Members sorted by name, and every team member's home city whatever the filters. */

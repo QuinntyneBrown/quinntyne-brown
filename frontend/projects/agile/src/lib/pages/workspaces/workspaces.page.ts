@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import {
   AGILE_SERVICE,
-  AUTH_SERVICE,
+  ACCESS_SERVICE,
+  Permission,
   WorkspaceDto,
   WorkspaceSummaryDto,
 } from '@faithtech-community/api';
@@ -51,7 +52,7 @@ type State = 'loading' | 'loaded' | 'error';
 })
 export class WorkspacesPage {
   private readonly agile = inject(AGILE_SERVICE);
-  private readonly roles = inject(AUTH_SERVICE).roles;
+  private readonly access = inject(ACCESS_SERVICE);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
 
@@ -61,16 +62,17 @@ export class WorkspacesPage {
   /** Listed only to their owner and System Admin, who may restore them (L2-037 AC1). */
   protected readonly archived = computed(() => this.all().filter((w) => w.isArchived));
 
-  /** City Leads and System Admins create workspaces (L2-031 AC1). */
-  protected readonly canCreate = computed(() =>
-    this.roles().some((r) => r === 'CityLead' || r === 'SystemAdmin'),
-  );
+  /** Holders of workspaces.create make workspaces in the org (L2-031 AC1, ADR 0033). */
+  protected readonly canCreate = computed(() => this.access.can(Permission.WorkspacesCreate));
+  /** Reading every workspace without making them is the read-only oversight (Staff, ADR 0035). */
   protected readonly isStaff = computed(
-    () => this.roles().includes('Staff') && !this.roles().includes('SystemAdmin'),
+    () =>
+      this.access.can(Permission.WorkspacesReadAll) &&
+      !this.access.can(Permission.WorkspacesCreate),
   );
   protected readonly subtitle = computed(() => {
     if (this.isStaff()) return 'Every workspace, read-only';
-    if (this.roles().includes('SystemAdmin')) return 'Every workspace';
+    if (this.access.isSystemAdmin()) return 'Every workspace';
     return this.canCreate() ? 'Workspaces you own or belong to' : 'Workspaces you’ve been added to';
   });
 

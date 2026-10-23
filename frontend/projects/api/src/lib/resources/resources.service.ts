@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { PagedResult, Role } from '../shared';
+import { OrgLabel, PagedResult } from '../shared';
 
 export const RESOURCE_TYPES = [
   'Deck',
@@ -15,27 +15,6 @@ export const RESOURCE_TYPES = [
 export type ResourceType = (typeof RESOURCE_TYPES)[number];
 
 export type ResourceVisibility = 'Private' | 'Shared' | 'Global';
-
-/** The roles a resource can be shared with (L2-061 AC1). */
-export const SHAREABLE_ROLES: Role[] = [
-  'CityLead',
-  'EventLead',
-  'CreateLead',
-  'CommunicationsLead',
-  'Volunteer',
-  'ProductEngineer',
-  'Staff',
-];
-
-/** The roles that may add and own resources (L2-057, ADR 0017: Staff is the carve-out). */
-export const RESOURCE_CONTRIBUTOR_ROLES: Role[] = [
-  'CityLead',
-  'EventLead',
-  'CreateLead',
-  'CommunicationsLead',
-  'Staff',
-  'SystemAdmin',
-];
 
 /** A row of the Resources list (L2-055). A link has `linkUrl` and `linkHost`; a file the rest. */
 export interface ResourceSummary {
@@ -56,6 +35,8 @@ export interface ResourceSummary {
   /** False while the file waits for storage (ADR 0017). */
   isStored: boolean;
   addedAt: string;
+  /** The org the resource belongs to (ADR 0034). */
+  organization?: OrgLabel | null;
 }
 
 export interface ResourceAudienceMember {
@@ -65,7 +46,9 @@ export interface ResourceAudienceMember {
 }
 
 export interface ResourceAudienceRole {
-  role: Role;
+  /** The role's key, and its name to show. */
+  role: string;
+  name?: string | null;
   /** Members holding the role today. */
   count: number;
 }
@@ -86,7 +69,7 @@ export interface ResourceDto extends ResourceSummary {
   canEdit: boolean;
   canTransfer: boolean;
   /** The contributing role the owner no longer holds, for System Admin (L2-064 AC2). */
-  ownerLostRole: Role | null;
+  ownerLostRole: string | null;
 }
 
 export interface ArchivedResource {
@@ -110,7 +93,8 @@ export interface ResourceMember {
   id: string;
   name: string;
   city: string | null;
-  roles: Role[];
+  /** Role names, for display. */
+  roles: string[];
 }
 
 export interface ResourceQuery {
@@ -128,7 +112,8 @@ export interface ResourceFields {
   tags: string[];
   visibility: ResourceVisibility;
   memberIds: string[];
-  roles: Role[];
+  /** Role keys from the org's share roles (ACCESS_SERVICE). */
+  roles: string[];
 }
 
 export interface ResourceLinkRequest extends ResourceFields {

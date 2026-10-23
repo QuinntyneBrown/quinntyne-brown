@@ -5,6 +5,15 @@
   (more)="menuOpen.set(true)"
   (searchSubmit)="search($event)"
 >
+  @if (activeSlug(); as active) {
+    <ft-org-switcher
+      ftTopBarOrg
+      [orgs]="switcherOrgs()"
+      [active]="active"
+      [portfolioName]="portfolioName()"
+      (orgChange)="switchOrg($event)"
+    />
+  }
   <div ftTopBarActions class="actions">
     @if (user(); as me) {
       <ft-shell-notifications />

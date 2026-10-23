@@ -1,13 +1,11 @@
 // Traces to: L2-021
-import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import {
-  AUTH_SERVICE,
   EVENTS_SERVICE,
   EventFilter,
   EventListDto,
   EventSummaryDto,
-  Role,
+  provideStaticAccess,
 } from '@faithtech-community/api';
 import { Observable, of, throwError } from 'rxjs';
 
@@ -58,13 +56,13 @@ const none: EventListDto = { events: [], cities: [] };
 
 async function setup(
   list: (filter: EventFilter) => Observable<EventListDto>,
-  roles: Role[] = ['EventLead'],
+  permissions: string[] = ['events.manage'],
 ) {
   const service = { listEvents: vi.fn(list) };
   TestBed.configureTestingModule({
     providers: [
       { provide: EVENTS_SERVICE, useValue: service },
-      { provide: AUTH_SERVICE, useValue: { roles: signal(roles) } },
+      provideStaticAccess({ permissions }),
     ],
   });
   const fixture = TestBed.createComponent(EventsPage);
@@ -163,7 +161,7 @@ describe('EventsPage', () => {
   });
 
   it('hides New event from members who cannot manage events', async () => {
-    const { host, link } = await setup(() => of(none), ['Attendee']);
+    const { host, link } = await setup(() => of(none), []);
 
     expect(host.textContent).toContain('No events yet');
     expect(link('New event')).toBeUndefined();

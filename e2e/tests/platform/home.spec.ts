@@ -145,7 +145,9 @@ test.describe('Home', () => {
     await expect(home.openBoard).toHaveAttribute('href', '/partners');
 
     await expect(home.activityItems).toHaveCount(2);
-    await expect(home.activityItems.nth(0)).toContainText('Tomás Ortega just joined Quinntyne Brown');
+    await expect(home.activityItems.nth(0)).toContainText(
+      'Tomás Ortega just joined Quinntyne Brown',
+    );
     await expect(home.activityItems.nth(0)).toContainText('Today, 11:42 am');
     await expect(home.activityItems.nth(1)).toContainText('Sun 18 Oct');
     await expect(home.activityLink('Tomás Ortega just joined Quinntyne Brown')).toHaveAttribute(
@@ -155,7 +157,7 @@ test.describe('Home', () => {
     await axe.check();
 
     await home.comingUpLink('City Team Prayer & Planning').click();
-    await expect(page).toHaveURL(`/events/${prayer.id}`);
+    await expect(page).toHaveURL(`/o/faithtech-toronto/events/${prayer.id}`);
   });
 
   test('Staff see the read-only banner, no write actions and none of a lead’s private activity', async ({

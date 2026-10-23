@@ -5,7 +5,6 @@ import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {
   AGILE_SERVICE,
   MemberCandidateDto,
-  ROLE_LABELS,
   WorkspaceDto,
   WorkspaceMethod,
   problemDetails,
@@ -69,7 +68,7 @@ export class CreateWorkspaceDialog {
   }
 
   protected roles(candidate: MemberCandidateDto): string {
-    return candidate.roles.map((r) => ROLE_LABELS[r]).join(', ');
+    return candidate.roles.join(', ');
   }
 
   protected async create(): Promise<void> {

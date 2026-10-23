@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   ElementRef,
   OnInit,
@@ -11,12 +12,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
-import {
-  RESOURCE_TYPES,
-  RESOURCES_SERVICE,
-  ROLE_LABELS,
-  SHAREABLE_ROLES,
-} from '@faithtech-community/api';
+import { RESOURCE_TYPES, RESOURCES_SERVICE, ACCESS_SERVICE } from '@faithtech-community/api';
 import {
   CheckboxComponent,
   CheckboxGroupComponent,
@@ -77,7 +73,13 @@ export class ResourceDetailsComponent implements OnInit {
     value: t,
     label: t,
   }));
-  protected readonly roles = SHAREABLE_ROLES.map((r) => ({ value: r, label: ROLE_LABELS[r] }));
+  /** The org the resource is in, for its share roles; the active org when absent. */
+  readonly org = input<string | null>(null);
+
+  private readonly access = inject(ACCESS_SERVICE);
+  protected readonly roles = computed(() =>
+    this.access.shareRoles(this.org()).map((r) => ({ value: r.key, label: r.name })),
+  );
   protected readonly tagSuggestions = signal<TagSuggestion[]>([]);
   protected readonly people = signal<PersonOption[]>([]);
   protected readonly searching = signal(false);
@@ -126,9 +128,7 @@ export class ResourceDetailsComponent implements OnInit {
         members.map((m) => ({
           id: m.id,
           name: m.name,
-          detail: [m.roles.map((r) => ROLE_LABELS[r]).join(', '), m.city]
-            .filter(Boolean)
-            .join(' · '),
+          detail: [m.roles.join(', '), m.city].filter(Boolean).join(' · '),
         })),
       );
     } catch {

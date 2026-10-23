@@ -1,65 +1,22 @@
-/** The nine global roles (L2-008), serialised by the API as these strings. */
-export const ROLES = [
-  'CityLead',
-  'EventLead',
-  'CreateLead',
-  'CommunicationsLead',
-  'Staff',
-  'Volunteer',
-  'ProductEngineer',
-  'Attendee',
-  'SystemAdmin',
-] as const;
-
-export type Role = (typeof ROLES)[number];
-
-export const ROLE_LABELS: Record<Role, string> = {
-  CityLead: 'City Lead',
-  EventLead: 'Event Lead',
-  CreateLead: 'Create Lead',
-  CommunicationsLead: 'Communications Lead',
-  Staff: 'Staff',
-  Volunteer: 'Volunteer',
-  ProductEngineer: 'Product Engineer',
-  Attendee: 'Attendee',
-  SystemAdmin: 'System Admin',
-};
-
-/** One line on what each role does, shown beside the role in the role dialog. */
-export const ROLE_DESCRIPTIONS: Record<Role, string> = {
-  CityLead: 'Leads a city team and manages its roles',
-  EventLead: 'Creates and manages events',
-  CreateLead: 'Runs hackathon builders and projects',
-  CommunicationsLead: 'Sends announcements',
-  Staff: 'Read-only oversight across FaithTech',
-  Volunteer: 'Joins the city team',
-  ProductEngineer: 'Builds at hackathons',
-  Attendee: 'Comes to events',
-  SystemAdmin: 'Full administration and the audit log',
-};
-
-const CITY_LEAD_ROLES: readonly Role[] = [
-  'EventLead',
-  'CreateLead',
-  'CommunicationsLead',
-  'Volunteer',
-  'ProductEngineer',
-  'Attendee',
-];
-
-const LEAD_ROLES: readonly Role[] = ['CityLead', 'EventLead', 'CreateLead', 'CommunicationsLead'];
+/** Where a role comes from (ADR 0033): an org's catalogue, a built-in tier or a cross-org role. */
+export type RoleKind = 'catalogue' | 'tier' | 'crossOrg';
 
 /**
- * The roles a caller holding `callerRoles` may grant or remove (L2-009), mirroring the server's
- * RoleAssignmentPolicy (ADR 0005). The server stays the authority and answers 403 for the rest.
+ * A role as the API returns it (RoleDto). Catalogue roles are data, so the UI shows `name` and
+ * sends `key`; it never decides what a role may do (ADR 0037).
  */
-export function assignableRoles(callerRoles: readonly Role[]): Role[] {
-  if (callerRoles.includes('SystemAdmin')) return [...ROLES];
-  if (callerRoles.includes('CityLead')) return [...CITY_LEAD_ROLES];
-  return [];
+export interface RoleRef {
+  key: string;
+  name: string;
+  kind: RoleKind;
+  /** The org a catalogue role or Org Lead is held in; null for platform tiers and cross-org roles. */
+  organizationId: string | null;
+  organizationName: string | null;
 }
 
-/** Leads and System Admins may send invites (L2-010). */
-export function isLead(callerRoles: readonly Role[]): boolean {
-  return callerRoles.some((r) => r === 'SystemAdmin' || LEAD_ROLES.includes(r));
-}
+/** The built-in tiers' keys (RoleKeys.cs). */
+export const TierKey = {
+  SystemAdmin: 'system-admin',
+  PortfolioLead: 'portfolio-lead',
+  OrgLead: 'org-lead',
+} as const;

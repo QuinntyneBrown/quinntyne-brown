@@ -13,7 +13,7 @@ public class MyAccessTests(CommunityApiFactory factory) : IClassFixture<Communit
 
     public sealed record Org(
         string Slug, string Name, string TypeName, bool IsMember, bool IsOrgLead, bool IsPortfolioLead, bool CanJoinWork,
-        string[] Features, string[] Permissions, RoleOption[] GrantableRoles, RoleOption[] ShareRoles, Branding Branding);
+        string[] Features, string[] Permissions, string[] Roles, RoleOption[] GrantableRoles, RoleOption[] ShareRoles, Branding Branding);
 
     public sealed record Access(bool IsSystemAdmin, Org[] Orgs);
 
@@ -28,6 +28,7 @@ public class MyAccessTests(CommunityApiFactory factory) : IClassFixture<Communit
         Assert.Equal(("faithtech-toronto", "FaithTech City", "FaithTech Toronto"), (toronto.Slug, toronto.TypeName, toronto.Branding.DisplayName));
         Assert.Contains("partners", toronto.Features);
         Assert.Contains("people.view", toronto.Permissions);
+        Assert.Equal(["City Lead"], toronto.Roles);
         Assert.Equal(
             ["event-lead", "create-lead", "communications-lead", "volunteer", "product-engineer", "attendee"],
             toronto.GrantableRoles.Select(r => r.Key));
@@ -47,6 +48,8 @@ public class MyAccessTests(CommunityApiFactory factory) : IClassFixture<Communit
         Assert.Empty(asMember.GrantableRoles);
         Assert.Equal(["notes.create"], asMember.Permissions);
         Assert.Equal(7, asLead.GrantableRoles.Length);
+        Assert.Empty(asMember.Roles);
+        Assert.Equal(["Org Lead"], asLead.Roles);
         Assert.True(asLead.IsOrgLead);
     }
 

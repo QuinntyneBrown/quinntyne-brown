@@ -10,13 +10,11 @@ import {
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
-  AUTH_SERVICE,
+  ACCESS_SERVICE,
   PEOPLE_SERVICE,
   PersonSummary,
   ROLES_SERVICE,
-  ROLE_LABELS,
-  Role,
-  assignableRoles,
+  RoleRef,
 } from '@faithtech-community/api';
 import {
   avatarColorFor,
@@ -36,7 +34,15 @@ import {
 } from '@faithtech-community/components';
 import { firstValueFrom } from 'rxjs';
 
-import { RoleMode, addableRoles, openRoleDialog, removableRoles } from '../../role-actions';
+import {
+  RoleMode,
+  addableRoles,
+  holdsLockedRole,
+  managesRoles,
+  openRoleDialog,
+  removableRoles,
+  roleLabel,
+} from '../../role-actions';
 
 type State = 'loading' | 'loaded' | 'error' | 'forbidden';
 
@@ -76,7 +82,8 @@ export class PeoplePage {
   private readonly people = inject(PEOPLE_SERVICE);
   private readonly rolesService = inject(ROLES_SERVICE);
   private readonly dialogs = inject(DialogService);
-  private readonly callerRoles = inject(AUTH_SERVICE).roles;
+  private readonly access = inject(ACCESS_SERVICE);
+  private readonly org = this.access.homeOrg;
 
   private readonly memberCell = viewChild.required<TemplateRef<unknown>>('memberCell');
   private readonly rolesCell = viewChild.required<TemplateRef<unknown>>('rolesCell');
@@ -98,28 +105,25 @@ export class PeoplePage {
   private readonly page = signal(1);
   private request = 0;
 
-  /** City Leads and System Admins manage roles; Staff read only (L2-053 AC2). */
-  protected readonly canManage = computed(() => assignableRoles(this.callerRoles()).length > 0);
+  /** People with roles they may grant in the org manage roles; the rest read (L2-053 AC2, L2-136). */
+  protected readonly canManage = computed(() => managesRoles(this.access, this.org()));
   protected readonly subtitle = computed(() => {
-    const roles = this.callerRoles();
-    if (roles.includes('SystemAdmin')) {
-      return 'As System Admin you can assign any role, including Staff and System Admin.';
+    if (this.access.isSystemAdmin()) {
+      return 'As System Admin you can assign any role, including Portfolio Lead and System Admin.';
     }
-    if (roles.includes('CityLead')) {
-      return 'You can add or remove Lead, Volunteer, Product Engineer and Attendee roles.';
-    }
+    const names = (this.org()?.grantableRoles ?? []).map((r) => r.name);
+    if (names.length) return `You can add or remove the ${listOf(names)} roles.`;
     return 'Read-only for Staff.';
   });
 
   protected readonly rows = computed(() => {
-    const caller = this.callerRoles();
+    const org = this.org();
     const manage = this.canManage();
-    const assignable = assignableRoles(caller);
     return this.list().map<PersonRow>((p) => ({
       ...p,
-      canAdd: addableRoles(caller, p).length > 0,
-      canRemove: removableRoles(caller, p).length > 0,
-      locked: manage && p.roles.some((r) => !assignable.includes(r)),
+      canAdd: addableRoles(this.access, org, p).length > 0,
+      canRemove: removableRoles(this.access, org, p).length > 0,
+      locked: manage && holdsLockedRole(this.access, org, p),
     })) as unknown as Record<string, unknown>[];
   });
   protected readonly hasMore = computed(() => this.list().length < this.total());
@@ -132,8 +136,8 @@ export class PeoplePage {
     return avatarColorFor(person.id);
   }
 
-  protected roleLabel(role: Role): string {
-    return ROLE_LABELS[role];
+  protected roleLabel(role: RoleRef): string {
+    return roleLabel(role, this.org());
   }
 
   protected search(): void {
@@ -146,8 +150,15 @@ export class PeoplePage {
   }
 
   protected changeRoles(person: PersonSummary, mode: RoleMode): void {
-    openRoleDialog(this.dialogs, this.rolesService, this.callerRoles(), person, mode, (roles) =>
-      this.list.update((list) => list.map((p) => (p.id === person.id ? { ...p, roles } : p))),
+    openRoleDialog(
+      this.dialogs,
+      this.rolesService,
+      this.access,
+      this.org(),
+      person,
+      mode,
+      (roles) =>
+        this.list.update((list) => list.map((p) => (p.id === person.id ? { ...p, roles } : p))),
     );
   }
 
@@ -184,4 +195,9 @@ export class PeoplePage {
       this.state.set(forbidden ? 'forbidden' : 'error');
     }
   }
+}
+
+/** "A, B and C". */
+function listOf(names: string[]): string {
+  return names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`;
 }

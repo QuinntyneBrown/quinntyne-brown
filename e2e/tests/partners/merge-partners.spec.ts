@@ -206,7 +206,7 @@ test.describe('Merge partners', () => {
     await axe.check();
 
     await partner.openKept('Kestrel Labs').click();
-    await expect(page).toHaveURL('/partners/partner-1');
+    await expect(page).toHaveURL('/o/faithtech-toronto/partners/partner-1');
     await expect(partner.heading).toHaveText('Kestrel Labs');
   });
 

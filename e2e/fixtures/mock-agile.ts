@@ -1,3 +1,4 @@
+import { roleNameOf } from './mock-organizations';
 import { Route, WebSocketRoute } from '@playwright/test';
 
 import type { MockAccount, MockProfile } from './mock-api';
@@ -415,7 +416,7 @@ export class MockAgile {
           json: [...this.profiles.values()]
             .filter((p) => p.id !== workspace.ownerId && p.roles.includes('CityLead'))
             .sort((a, b) => a.name.localeCompare(b.name))
-            .map((p) => ({ profileId: p.id, name: p.name, roles: p.roles })),
+            .map((p) => ({ profileId: p.id, name: p.name, roles: p.roles.map(roleNameOf) })),
         });
       case 'PUT /owner': {
         if (!caller.roles.includes('SystemAdmin')) return route.fulfill({ status: 403 });
@@ -1059,7 +1060,7 @@ export class MockAgile {
       .map((id) => ({
         profileId: id,
         name: this.profiles.get(id)?.name ?? 'A former member',
-        roles: this.profiles.get(id)?.roles ?? [],
+        roles: (this.profiles.get(id)?.roles ?? []).map(roleNameOf),
         isOwner: id === workspace.ownerId,
         assignedStories: this.assigned(workspace, id, false),
         assignedTasks: this.assigned(workspace, id, true),
@@ -1086,7 +1087,7 @@ export class MockAgile {
     return [...this.profiles.values()]
       .filter((p) => !excluded.includes(p.id) && this.onTeam(p.id))
       .sort((a, b) => a.name.localeCompare(b.name))
-      .map((p) => ({ profileId: p.id, name: p.name, roles: p.roles }));
+      .map((p) => ({ profileId: p.id, name: p.name, roles: p.roles.map(roleNameOf) }));
   }
 
   private onTeam(profileId: string): boolean {

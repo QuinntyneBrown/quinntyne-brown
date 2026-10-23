@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { PagedResult, Role } from '../shared';
+import { PagedResult, RoleRef } from '../shared';
 
 export type UserStatus = 'Active' | 'Suspended' | 'Unverified';
 
@@ -10,7 +10,9 @@ export interface AdminUserSummary {
   id: string;
   name: string;
   email: string;
-  roles: Role[];
+  roles: RoleRef[];
+  /** An agent profile (ADR 0036). */
+  isAgent?: boolean;
   status: UserStatus;
 }
 

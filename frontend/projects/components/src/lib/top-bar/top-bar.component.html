@@ -3,6 +3,7 @@
     <ft-logo-mark class="top-bar__mark" label="" />
     <span class="top-bar__name">Quinntyne Brown</span>
   </a>
+  <div class="top-bar__org"><ng-content select="[ftTopBarOrg]" /></div>
   @if (!anonymous()) {
     <nav class="top-bar__nav" [attr.aria-label]="navLabel()" (wheel)="onNavWheel($event)">
       @for (link of links(); track link.href) {

@@ -124,21 +124,20 @@ describe('HttpAuthService', () => {
     await expect(service.restoreSession()).resolves.toBe(false);
   });
 
-  it('loads the current user and exposes the roles', () => {
+  it('loads the current user', () => {
     const me = {
       id: 'u1',
       profileId: 'p1',
       name: 'Ada',
       email: 'a@b.c',
       emailVerified: false,
-      roles: ['Lead', 'Volunteer'],
+      isSystemAdmin: false,
     };
     service.loadCurrentUser().subscribe();
 
     controller.expectOne('/api/me').flush(me);
 
     expect(service.currentUser()).toEqual(me);
-    expect(service.roles()).toEqual(['Lead', 'Volunteer']);
   });
 
   // Traces to: L2-078

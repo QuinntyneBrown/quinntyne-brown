@@ -5,7 +5,6 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
   AGILE_SERVICE,
   MemberCandidateDto,
-  ROLE_LABELS,
   WorkspaceDto,
   problemDetails,
 } from '@faithtech-community/api';
@@ -51,7 +50,7 @@ export class AddWorkspaceMembersDialog {
   }
 
   protected roles(candidate: MemberCandidateDto): string {
-    return candidate.roles.map((r) => ROLE_LABELS[r]).join(', ');
+    return candidate.roles.join(', ');
   }
 
   protected async add(): Promise<void> {

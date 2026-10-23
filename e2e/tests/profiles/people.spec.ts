@@ -43,7 +43,7 @@ test.describe('People and roles', () => {
 
     await expect(people.heading).toHaveText('People and roles');
     await expect(people.subtitle).toHaveText(
-      'You can add or remove Lead, Volunteer, Product Engineer and Attendee roles.',
+      'You can add or remove the Event Lead, Create Lead, Communications Lead, Volunteer, Product Engineer and Attendee roles.',
     );
     await expect
       .poll(() => people.names())
@@ -56,7 +56,7 @@ test.describe('People and roles', () => {
     await expect(people.row('Marcus Lee')).toContainText('Event Lead');
     await expect(people.row('Marcus Lee')).toContainText('Toronto');
     await expect(people.row('Leah Thompson')).toContainText('No role yet');
-    await expect(people.row('Daniel Reyes')).toContainText('Only System Admin can change');
+    await expect(people.row('Daniel Reyes')).toContainText('Only an Org Lead or above can change');
     await expect(people.removeRole('Daniel Reyes')).toHaveCount(0);
     await expect(people.inviteSomeone).toHaveAttribute('href', '/invites');
     await axe.check();
@@ -113,8 +113,12 @@ test.describe('People and roles', () => {
     await api.signInAs(priya, '/people');
 
     await expect(people.subtitle).toContainText('As System Admin you can assign any role');
-    await expect(people.removeRole('Daniel Reyes')).toBeVisible();
-    await expect(people.row('Daniel Reyes')).not.toContainText('Only System Admin can change');
+    await expect(people.removeRole('Grace Okonkwo')).toBeVisible();
+    await expect(people.row('Grace Okonkwo')).not.toContainText(
+      'Only an Org Lead or above can change',
+    );
+    // Staff is a cross-org role, assigned on the cross-org roles screen rather than here (ADR 0035).
+    await expect(people.removeRole('Daniel Reyes')).toHaveCount(0);
   });
 
   test('Staff see the list read-only, in light and dark', async ({ page, api, axe }) => {

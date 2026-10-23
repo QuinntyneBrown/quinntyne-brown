@@ -2,7 +2,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { AUTH_SERVICE, ROLE_LABELS } from '@faithtech-community/api';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { ACCESS_SERVICE, ALL_ORGS, AUTH_SERVICE } from '@faithtech-community/api';
 import {
   avatarColorFor,
   AvatarComponent,
@@ -14,6 +15,8 @@ import {
   MenuEntry,
   NavDrawerComponent,
   NavDrawerLink,
+  OrgSwitcherComponent,
+  OrgSwitcherOption,
   SkipLinkComponent,
   TabBarComponent,
   TabBarItem,
@@ -22,7 +25,7 @@ import {
 } from '@faithtech-community/components';
 import { filter, firstValueFrom, map } from 'rxjs';
 
-import { Section, sectionsFor, tabsFor } from './navigation';
+import { SECTIONS, Section, hrefFor, sectionOf, sectionsFor, tabsFor } from './navigation';
 import { ShellNotificationsComponent } from './shell-notifications.component';
 
 /** The signed-in chrome around every member page (docs/design-system/patterns/navigation.html). */
@@ -39,6 +42,7 @@ import { ShellNotificationsComponent } from './shell-notifications.component';
     ButtonComponent,
     ContainerComponent,
     MenuComponent,
+    OrgSwitcherComponent,
     ShellNotificationsComponent,
   ],
   templateUrl: './app-shell.component.html',
@@ -47,6 +51,8 @@ import { ShellNotificationsComponent } from './shell-notifications.component';
 })
 export class AppShellComponent {
   private readonly auth = inject(AUTH_SERVICE);
+  private readonly access = inject(ACCESS_SERVICE);
+  private readonly announcer = inject(LiveAnnouncer);
   private readonly router = inject(Router);
   private readonly breakpoint = inject(BreakpointService);
 
@@ -70,8 +76,24 @@ export class AppShellComponent {
     { initialValue: this.router.url.split(/[?#]/)[0] },
   );
 
-  /** One rule for every role builds the top bar, the tab bar and the menu (ADR 0009). */
-  private readonly sections = computed(() => sectionsFor(this.auth.roles()));
+  /** The org in the URL, or the last one opened on personal pages. */
+  protected readonly activeSlug = computed(() => this.access.activeSlug());
+  protected readonly portfolioName = computed(
+    () => this.access.access()?.portfolios[0]?.name ?? '',
+  );
+  protected readonly switcherOrgs = computed<OrgSwitcherOption[]>(() =>
+    this.access.orgs().map((o) => ({
+      slug: o.slug,
+      name: o.branding.displayName || o.name,
+      typeName: o.typeName,
+      logoUrl: o.branding.logoUrl,
+      accent: o.branding.accent,
+      accentForeground: o.branding.accentForeground,
+    })),
+  );
+
+  /** One rule builds the top bar, the tab bar and the menu from the caller's access (ADR 0037). */
+  private readonly sections = computed(() => sectionsFor(this.access, this.activeSlug()));
 
   protected readonly topLinks = computed<TopBarLink[]>(() =>
     this.sections().map((s) => ({ ...this.link(s), secondary: s.secondary })),
@@ -84,11 +106,7 @@ export class AppShellComponent {
     {
       kind: 'header',
       title: this.user()?.name ?? '',
-      caption:
-        this.auth
-          .roles()
-          .map((r) => ROLE_LABELS[r] ?? r)
-          .join(', ') || 'No role yet',
+      caption: this.roleCaption(),
     },
     { kind: 'divider' },
     { kind: 'item', id: 'profile', label: 'Your profile', icon: 'team', href: '/people/me' },
@@ -97,13 +115,41 @@ export class AppShellComponent {
     { kind: 'item', id: 'sign-out', label: 'Sign out', icon: 'sign-out' },
   ]);
   protected readonly tabs = computed<TabBarItem[]>(() =>
-    tabsFor(this.auth.roles()).map((s) => ({ ...this.link(s), icon: s.icon })),
+    tabsFor(this.access, this.activeSlug()).map((s) => ({ ...this.link(s), icon: s.icon })),
   );
   /** More is the current tab while the page is outside the link tabs (design system, tab bar). */
   protected readonly moreCurrent = computed(() => !this.tabs().some((t) => t.current));
 
   protected search(query: string): void {
-    void this.router.navigate(['/search'], { queryParams: query ? { q: query } : {} });
+    const org = this.activeSlug();
+    void this.router.navigate(org ? ['/o', org, 'search'] : ['/search'], {
+      queryParams: query ? { q: query } : {},
+    });
+  }
+
+  /**
+   * Opens the same section in the chosen org when it has it, else the org's home (L2-147), with
+   * the caller's access refreshed and the switch announced.
+   */
+  protected async switchOrg(slug: string): Promise<void> {
+    await this.access.refresh();
+    const section = SECTIONS.find((s) => !s.orgless && s.path === sectionOf(this.path()));
+    const keep = section && section.opens(this.access, slug) ? section.path : '';
+    await this.router.navigateByUrl(keep ? `/o/${slug}/${keep}` : `/o/${slug}`);
+    const name =
+      slug === ALL_ORGS ? 'All orgs' : this.switcherOrgs().find((o) => o.slug === slug)?.name;
+    void this.announcer.announce(`Switched to ${name}`);
+  }
+
+  /** The caller's roles in the active org, or System Admin. */
+  private roleCaption(): string {
+    const org = this.access.activeOrg();
+    const roles = [
+      ...(this.access.isSystemAdmin() ? ['System Admin'] : []),
+      ...(org?.isPortfolioLead && !this.access.isSystemAdmin() ? ['Portfolio Lead'] : []),
+      ...(org?.roles ?? []),
+    ];
+    return roles.join(', ') || 'No role yet';
   }
 
   protected async accountAction(id: string): Promise<void> {
@@ -124,11 +170,13 @@ export class AppShellComponent {
   }
 
   private link(section: Section) {
-    return { label: section.label, href: section.href, current: this.isCurrent(section.href) };
+    const href = hrefFor(section, this.activeSlug());
+    return { label: section.label, href, current: this.isCurrent(section, href) };
   }
 
-  private isCurrent(href: string): boolean {
+  private isCurrent(section: Section, href: string): boolean {
     const path = this.path();
-    return href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`);
+    if (!section.orgless && section.path === '') return path === href;
+    return path === href || path.startsWith(`${href}/`);
   }
 }

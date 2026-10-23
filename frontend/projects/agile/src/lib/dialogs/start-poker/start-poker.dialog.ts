@@ -6,7 +6,6 @@ import {
   AGILE_SERVICE,
   BacklogNodeDto,
   PokerSessionDto,
-  ROLE_LABELS,
   WorkspaceDto,
   WorkspaceMemberDto,
   problemDetails,
@@ -74,7 +73,7 @@ export class StartPokerDialog {
   }
 
   protected roles(member: WorkspaceMemberDto): string {
-    return member.roles.map((r) => ROLE_LABELS[r]).join(', ');
+    return member.roles.join(', ');
   }
 
   protected async start(): Promise<void> {

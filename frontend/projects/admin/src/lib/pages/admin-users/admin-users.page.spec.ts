@@ -18,7 +18,15 @@ const grace: AdminUserSummary = {
   id: 'p1',
   name: 'Grace Okonkwo',
   email: 'grace@example.org',
-  roles: ['CityLead'],
+  roles: [
+    {
+      key: 'city-lead',
+      name: 'City Lead',
+      kind: 'catalogue',
+      organizationId: 'org-toronto',
+      organizationName: 'FaithTech Toronto',
+    },
+  ],
   status: 'Active',
 };
 const victor: AdminUserSummary = {
@@ -205,7 +213,11 @@ describe('AdminUsersPage', () => {
       c.textContent!.trim(),
     );
     expect(cells[0]).toContain('Grace Okonkwo');
-    expect(cells.slice(1, 4)).toEqual(['grace@example.org', 'City Lead', 'Active']);
+    expect(cells.slice(1, 4)).toEqual([
+      'grace@example.org',
+      'City Lead · FaithTech Toronto',
+      'Active',
+    ]);
     expect(row('Grace Okonkwo').querySelector('a')!.getAttribute('href')).toBe('/people/p1');
     expect(row('Victor Kane').textContent).toContain('No role');
     expect(row('Victor Kane').textContent).toContain('Suspended');

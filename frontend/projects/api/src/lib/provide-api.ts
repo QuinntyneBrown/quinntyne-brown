@@ -8,6 +8,7 @@ import { EnvironmentProviders, Provider, makeEnvironmentProviders } from '@angul
 
 import { API_BASE_URL, AUTH_CONFIG, AuthConfig, defaultAuthConfig } from './config';
 import { authInterceptor } from './auth';
+import { ACCESS_SERVICE, HttpAccessService, orgInterceptor } from './access';
 import { httpErrorInterceptor } from './errors';
 import { AUTH_SERVICE, HttpAuthService } from './auth';
 import {
@@ -60,6 +61,7 @@ export function provideApi(baseUrl: string, auth: Partial<AuthConfig> = {}): Env
       useFactory: () => ({ ...defaultAuthConfig(window.location.origin), ...auth }),
     },
     { provide: AUTH_SERVICE, useClass: HttpAuthService },
+    { provide: ACCESS_SERVICE, useClass: HttpAccessService },
     { provide: PROFILES_SERVICE, useClass: HttpProfilesService },
     { provide: PEOPLE_SERVICE, useClass: HttpPeopleService },
     { provide: CONTACTS_SERVICE, useClass: HttpContactsService },
@@ -83,7 +85,7 @@ export function provideApi(baseUrl: string, auth: Partial<AuthConfig> = {}): Env
     { provide: AGILE_LIVE_SERVICE, useClass: SignalRAgileLiveService },
   ];
   return makeEnvironmentProviders([
-    provideHttpClient(withInterceptors([authInterceptor, httpErrorInterceptor])),
+    provideHttpClient(withInterceptors([orgInterceptor, authInterceptor, httpErrorInterceptor])),
     ...providers,
   ]);
 }

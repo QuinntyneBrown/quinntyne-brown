@@ -42,7 +42,7 @@ test.describe('Archive and ownership', () => {
     await dialog.confirm.click();
 
     const backlog = new BacklogPage(page);
-    await expect(page).toHaveURL(`/workspaces/${ws.id}/backlog`);
+    await expect(page).toHaveURL(`/o/faithtech-toronto/workspaces/${ws.id}/backlog`);
     await expect(backlog.toast).toContainText('“Shelter problem briefs” archived');
     expect(task.isArchived).toBe(true);
 
@@ -102,7 +102,7 @@ test.describe('Archive and ownership', () => {
     await dialog.confirm.click();
 
     const workspaces = new WorkspacesPage(page);
-    await expect(page).toHaveURL('/workspaces');
+    await expect(page).toHaveURL('/o/faithtech-toronto/workspaces');
     await expect(workspaces.toast).toContainText('Toronto team archived');
     await expect(workspaces.items).toHaveCount(1);
     await expect(workspaces.archived).toHaveCount(1);
@@ -142,7 +142,7 @@ test.describe('Archive and ownership', () => {
     await admin.workspaceSettings('Toronto team').click();
 
     const settings = new WorkspaceSettingsPage(page);
-    await expect(page).toHaveURL(`/workspaces/${ws.id}/settings`);
+    await expect(page).toHaveURL(`/o/faithtech-toronto/workspaces/${ws.id}/settings`);
     await expect(settings.needsOwner).toBeVisible();
     await axe.check();
     await settings.reassignOwner.click();

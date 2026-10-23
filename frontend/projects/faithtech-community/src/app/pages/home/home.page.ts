@@ -1,15 +1,16 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import {
+  ACCESS_SERVICE,
   ACTIVITY_SERVICE,
+  ALL_ORGS,
   AUTH_SERVICE,
   ActivityItemDto,
   EVENTS_SERVICE,
   EventSummaryDto,
   PARTNERS_SERVICE,
   PARTNER_STAGE_LABELS,
-  canManageEvents,
-  isLead,
+  Permission,
 } from '@faithtech-community/api';
 import {
   AlertComponent,
@@ -108,26 +109,39 @@ const LONG_DATE = new Intl.DateTimeFormat('en-GB', {
 })
 export class HomePage {
   private readonly auth = inject(AUTH_SERVICE);
+  private readonly access = inject(ACCESS_SERVICE);
   private readonly events = inject(EVENTS_SERVICE);
   private readonly partners = inject(PARTNERS_SERVICE);
   private readonly activity = inject(ACTIVITY_SERVICE);
 
   protected readonly actor = SYSTEM_ACTOR;
-  private readonly roles = this.auth.roles;
   private readonly firstName = computed(
     () => (this.auth.currentUser()?.name ?? '').trim().split(/\s+/)[0] ?? '',
   );
 
-  protected readonly hasRole = computed(() => this.roles().length > 0);
-  protected readonly canCreateEvents = computed(() => canManageEvents(this.roles()));
-  protected readonly canAddContacts = computed(() => isLead(this.roles()));
+  /** The orgs the page is about: the active org, or every covered org in "All orgs". */
+  private readonly scope = computed(() => {
+    const active = this.access.activeOrg();
+    return active ? [active] : this.access.activeSlug() === ALL_ORGS ? this.access.orgs() : [];
+  });
+  protected readonly hasRole = computed(
+    () =>
+      this.access.isSystemAdmin() ||
+      this.scope().some((o) => o.roles.length > 0 || o.isOrgLead || o.isPortfolioLead),
+  );
+  protected readonly canCreateEvents = computed(() => this.access.can(Permission.EventsManage));
+  protected readonly canAddContacts = computed(() => this.access.can(Permission.ContactsPrivate));
+  /** Read-only oversight: reports without a hand in the pipeline (Staff, ADR 0035). */
   protected readonly isStaffOnly = computed(
-    () => this.roles().includes('Staff') && !isLead(this.roles()),
+    () =>
+      !this.access.isSystemAdmin() &&
+      this.access.can(Permission.ReportsView) &&
+      !this.access.can(Permission.PartnersWrite),
   );
-  /** Leads, Staff and System Admin may open partners (ADR 0009). */
-  protected readonly seesPipeline = computed(
-    () => isLead(this.roles()) || this.roles().includes('Staff'),
-  );
+  /** Whoever may read partners sees the pipeline (ADR 0033). */
+  protected readonly seesPipeline = computed(() => this.access.can(Permission.PartnersRead));
+  /** Events load only where the org has them (ADR 0038). */
+  private readonly hasEvents = computed(() => this.access.feature('events'));
 
   protected readonly title = computed(() => {
     const name = this.firstName();
@@ -182,7 +196,8 @@ export class HomePage {
 
   private loadAll(): void {
     if (this.hasRole()) {
-      void this.loadEvents();
+      if (this.hasEvents()) void this.loadEvents();
+      else this.eventsState.set('loaded');
       if (this.seesPipeline()) void this.loadPipeline();
     }
     void this.loadFeed();

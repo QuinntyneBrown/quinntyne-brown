@@ -96,7 +96,7 @@ test.describe('Toasts', () => {
   }) => {
     const grace = api.addAccount({ email: 'grace@example.org', roles: ['CityLead'] });
     api.addInvite(
-      { email: 'felix.wu@example.org', invitedBy: grace.profileId, preassignedRole: 'Attendee' },
+      { email: 'felix.wu@example.org', invitedBy: grace.profileId, preassignedRole: 'attendee' },
       20,
     );
     const shell = new AppShell(page);

@@ -1,12 +1,10 @@
 // Traces to: L2-030
-import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import {
   ANNOUNCEMENTS_SERVICE,
-  AUTH_SERVICE,
   AnnouncementDto,
   PagedResult,
-  Role,
+  provideStaticAccess,
 } from '@faithtech-community/api';
 import { Observable, of, throwError } from 'rxjs';
 
@@ -33,13 +31,13 @@ function page(items: AnnouncementDto[], extra: Partial<PagedResult<AnnouncementD
 
 async function setup(
   list: (page: number) => Observable<PagedResult<AnnouncementDto>>,
-  roles: Role[] = [],
+  permissions: string[] = [],
 ) {
   const service = { list: vi.fn(list) };
   TestBed.configureTestingModule({
     providers: [
       { provide: ANNOUNCEMENTS_SERVICE, useValue: service },
-      { provide: AUTH_SERVICE, useValue: { roles: signal(roles) } },
+      provideStaticAccess({ permissions }),
     ],
   });
   const fixture = TestBed.createComponent(AnnouncementsPage);
@@ -65,7 +63,7 @@ describe('AnnouncementsPage', () => {
             subject: 'November hackathon: teams are forming',
             body: 'Team formation opens Monday.',
             audienceKind: 'Roles',
-            roles: ['ProductEngineer'],
+            roles: ['Product Engineer'],
             recipientCount: 41,
           }),
           announcement('a', {
@@ -94,7 +92,7 @@ describe('AnnouncementsPage', () => {
     expect(member.host.querySelector('a[href="/announcements/new"]')).toBeNull();
     TestBed.resetTestingModule();
 
-    const lead = await setup(() => of(page([announcement('a')])), ['CommunicationsLead']);
+    const lead = await setup(() => of(page([announcement('a')])), ['announcements.send']);
     expect(lead.host.querySelector('a[href="/announcements/new"]')).not.toBeNull();
   });
 

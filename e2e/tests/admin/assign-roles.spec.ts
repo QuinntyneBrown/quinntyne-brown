@@ -30,7 +30,10 @@ test.describe('Assign roles', () => {
 
     await expect(dialog.dialog).toBeHidden();
     await expect(profile.roles).toHaveText(['Product Engineer', 'Attendee', 'Volunteer']);
-    expect(api.callsTo('POST', '/api/profiles/jonah/roles')[0].body).toEqual({ role: 'Volunteer' });
+    expect(api.callsTo('POST', '/api/profiles/jonah/roles')[0].body).toEqual({
+      role: 'volunteer',
+      organizationId: 'org-toronto',
+    });
   });
 
   test('a City Lead removes a role', async ({ page, api }) => {

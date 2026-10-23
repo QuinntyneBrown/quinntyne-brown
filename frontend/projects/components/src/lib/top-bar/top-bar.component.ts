@@ -14,9 +14,9 @@ export interface TopBarLink {
 let nextId = 0;
 
 /**
- * The floating capsule across the top of every page: brand, primary nav, global search and an
- * actions slot (`ftTopBarActions`) for the notification bell and profile avatar. Anonymous
- * visitors get the brand and actions only.
+ * The floating capsule across the top of every page: brand, an org slot (`ftTopBarOrg`) for the
+ * org switcher, primary nav, global search and an actions slot (`ftTopBarActions`) for the
+ * notification bell and profile avatar. Anonymous visitors get the brand and actions only.
  */
 @Component({
   selector: 'ft-top-bar',

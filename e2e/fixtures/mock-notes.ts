@@ -1,3 +1,4 @@
+import { legacyRoleOf, roleKeyOf, roleNameOf } from './mock-organizations';
 import { Route } from '@playwright/test';
 
 import type { MockAccount, MockProfile } from './mock-api';
@@ -388,7 +389,8 @@ export class MockNotes {
     if (!['Private', 'Shared', 'Global'].includes(visibility))
       return this.invalid(route, { Visibility: ['Choose who can see it.'] });
     const memberIds = visibility === 'Shared' ? ((body['memberIds'] as string[]) ?? []) : [];
-    const roles = visibility === 'Shared' ? ((body['roles'] as string[]) ?? []) : [];
+    const roles =
+      visibility === 'Shared' ? ((body['roles'] as string[]) ?? []).map(legacyRoleOf) : [];
     if (roles.some((r) => !SHAREABLE.includes(r)))
       return this.invalid(route, { Roles: ['Choose roles from the list.'] });
     if (visibility === 'Shared' && memberIds.length === 0 && roles.length === 0)
@@ -430,7 +432,7 @@ export class MockNotes {
         id: a.profileId,
         name: a.name,
         city: this.context.profiles.get(a.profileId)?.homeCity ?? null,
-        roles: [...a.roles].sort(),
+        roles: a.roles.map(roleNameOf).sort(),
       }));
     return this.json(route, 200, people);
   }
@@ -563,7 +565,7 @@ export class MockNotes {
         ? null
         : n.memberIds.includes(caller.profileId)
           ? 'you'
-          : (n.roles.find((r) => caller.roles.includes(r)) ?? null);
+          : (n.roles.filter((r) => caller.roles.includes(r)).map(roleKeyOf)[0] ?? null);
     return {
       ...this.summary(n, caller),
       parentId: n.parentId,
@@ -576,7 +578,8 @@ export class MockNotes {
           city: this.context.profiles.get(id)?.homeCity ?? null,
         })),
         roles: n.roles.map((role) => ({
-          role,
+          role: roleKeyOf(role),
+          name: roleNameOf(role),
           count: [...this.context.accounts.values()].filter((a) => a.roles.includes(role)).length,
         })),
       },

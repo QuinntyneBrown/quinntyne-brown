@@ -1,19 +1,48 @@
 // Traces to: L2-053, L2-009
 import { HttpErrorResponse } from '@angular/common/http';
-import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import {
-  AUTH_SERVICE,
   PEOPLE_SERVICE,
   PagedResult,
   PersonSummary,
   ROLES_SERVICE,
-  Role,
+  RoleOption,
+  RoleRef,
+  StaticOrg,
+  provideStaticAccess,
 } from '@faithtech-community/api';
 import { DialogService, RoleDialogData } from '@faithtech-community/components';
 import { Observable, of, throwError } from 'rxjs';
 
 import { PeoplePage } from './people.page';
+
+const ORG = 'org-faithtech-toronto';
+const role = (key: string, name: string): RoleRef => ({
+  key,
+  name,
+  kind: 'catalogue',
+  organizationId: ORG,
+  organizationName: 'FaithTech Toronto',
+});
+const option = (key: string, name: string): RoleOption => ({
+  key,
+  name,
+  description: null,
+  isCrossOrg: false,
+});
+/** What a City Lead may grant in the org, as /api/me/access says (RoleGrantPolicy). */
+const CITY_LEAD: StaticOrg = {
+  permissions: ['roles.grant', 'people.view', 'invites.send'],
+  grantableRoles: [
+    option('event-lead', 'Event Lead'),
+    option('create-lead', 'Create Lead'),
+    option('communications-lead', 'Communications Lead'),
+    option('volunteer', 'Volunteer'),
+    option('product-engineer', 'Product Engineer'),
+    option('attendee', 'Attendee'),
+  ],
+};
+const STAFF: StaticOrg = { permissions: ['people.view', 'reports.view'] };
 
 function person(overrides: Partial<PersonSummary>): PersonSummary {
   return {
@@ -21,7 +50,7 @@ function person(overrides: Partial<PersonSummary>): PersonSummary {
     name: 'Grace Okonkwo',
     homeCity: 'Toronto',
     photoUrl: null,
-    roles: ['CityLead'],
+    roles: [role('city-lead', 'City Lead')],
     ...overrides,
   };
 }
@@ -30,7 +59,7 @@ const grace = person({});
 const marcus = person({
   id: 'p2',
   name: 'Marcus Lee',
-  roles: ['EventLead'],
+  roles: [role('event-lead', 'Event Lead')],
   photoUrl: 'https://photos.example/marcus.jpg',
 });
 const leah = person({ id: 'p3', name: 'Leah Thompson', roles: [] });
@@ -41,12 +70,15 @@ function page(items: PersonSummary[], totalCount = items.length): PagedResult<Pe
 
 async function setup(
   search: (term: string, page?: number) => Observable<PagedResult<PersonSummary>>,
-  callerRoles: Role[] = ['CityLead'],
+  caller: StaticOrg = CITY_LEAD,
+  isSystemAdmin = false,
 ) {
   const service = { search: vi.fn(search) };
   const roles = {
-    addRole: vi.fn((_id: string, role: Role) => of<Role[]>(['EventLead', role])),
-    removeRole: vi.fn(() => of<Role[]>([])),
+    addRole: vi.fn((_id: string, key: string) =>
+      of<RoleRef[]>([role('event-lead', 'Event Lead'), role(key, 'Volunteer')]),
+    ),
+    removeRole: vi.fn(() => of<RoleRef[]>([])),
   };
   let opened: RoleDialogData | null = null;
   const dialogs = {
@@ -59,7 +91,7 @@ async function setup(
     providers: [
       { provide: PEOPLE_SERVICE, useValue: service },
       { provide: ROLES_SERVICE, useValue: roles },
-      { provide: AUTH_SERVICE, useValue: { roles: signal(callerRoles) } },
+      provideStaticAccess(caller, { isSystemAdmin }),
       { provide: DialogService, useValue: dialogs },
     ],
   });
@@ -116,37 +148,41 @@ describe('PeoplePage', () => {
     expect(row('Leah Thompson').textContent).toContain('No role yet');
   });
 
-  it('gives a City Lead the actions L2-009 allows on each row', async () => {
+  it('gives a City Lead the actions their grantable roles allow on each row', async () => {
     const { host, row, button } = await setup(() => of(page([grace, marcus, leah])));
 
     expect(host.textContent).toContain(
-      'You can add or remove Lead, Volunteer, Product Engineer and Attendee roles.',
+      'You can add or remove the Event Lead, Create Lead, Communications Lead, Volunteer, Product Engineer and Attendee roles.',
     );
     expect(button(host, 'Invite someone')!.getAttribute('href')).toBe('/invites');
     expect(button(row('Marcus Lee'), 'Add role to Marcus Lee')).toBeDefined();
     expect(button(row('Marcus Lee'), 'Remove a role from Marcus Lee')).toBeDefined();
-    expect(row('Marcus Lee').textContent).not.toContain('Only System Admin can change');
+    expect(row('Marcus Lee').textContent).not.toContain('Only an Org Lead or above can change');
     expect(button(row('Grace Okonkwo'), 'Add role to Grace Okonkwo')).toBeDefined();
     expect(button(row('Grace Okonkwo'), 'Remove a role from Grace Okonkwo')).toBeUndefined();
-    expect(row('Grace Okonkwo').textContent).toContain('Only System Admin can change');
+    expect(row('Grace Okonkwo').textContent).toContain('Only an Org Lead or above can change');
     expect(button(row('Leah Thompson'), 'Remove a role from Leah Thompson')).toBeUndefined();
   });
 
   it('lets a System Admin change every role', async () => {
-    const { host, row, button } = await setup(() => of(page([grace])), ['SystemAdmin']);
+    const admin: StaticOrg = {
+      ...CITY_LEAD,
+      grantableRoles: [option('city-lead', 'City Lead'), ...CITY_LEAD.grantableRoles!],
+    };
+    const { host, row, button } = await setup(() => of(page([grace])), admin, true);
 
     expect(host.textContent).toContain('As System Admin you can assign any role');
     expect(button(row('Grace Okonkwo'), 'Remove a role from Grace Okonkwo')).toBeDefined();
-    expect(row('Grace Okonkwo').textContent).not.toContain('Only System Admin can change');
+    expect(row('Grace Okonkwo').textContent).not.toContain('Only an Org Lead or above can change');
   });
 
   it('shows Staff the list read-only', async () => {
-    const { host, row, button } = await setup(() => of(page([grace, marcus])), ['Staff']);
+    const { host, row, button } = await setup(() => of(page([grace, marcus])), STAFF);
 
     expect(host.textContent).toContain('Read-only for Staff.');
     expect(button(host, 'Invite someone')).toBeUndefined();
     expect(row('Marcus Lee').querySelectorAll('button')).toHaveLength(0);
-    expect(row('Grace Okonkwo').textContent).not.toContain('Only System Admin can change');
+    expect(row('Grace Okonkwo').textContent).not.toContain('Only an Org Lead or above can change');
   });
 
   it('adds a role from a row and updates its badges without a reload', async () => {
@@ -156,12 +192,12 @@ describe('PeoplePage', () => {
     const data = opened();
     expect(data.mode).toBe('add');
     expect(data.name).toBe('Marcus Lee');
-    expect(data.options.map((o) => o.value)).not.toContain('CityLead');
-    expect(data.options.map((o) => o.value)).not.toContain('EventLead');
-    expect(await data.submit('Volunteer')).toBeNull();
+    expect(data.options.map((o) => o.value)).not.toContain('city-lead');
+    expect(data.options.map((o) => o.value)).not.toContain('event-lead');
+    expect(await data.submit('volunteer')).toBeNull();
     await settle();
 
-    expect(roles.addRole).toHaveBeenCalledWith('p2', 'Volunteer');
+    expect(roles.addRole).toHaveBeenCalledWith('p2', 'volunteer', ORG);
     expect(row('Marcus Lee').textContent).toContain('Volunteer');
     expect(service.search).toHaveBeenCalledTimes(1);
   });
@@ -171,11 +207,11 @@ describe('PeoplePage', () => {
 
     button(row('Marcus Lee'), 'Remove a role from Marcus Lee')!.click();
     expect(opened().mode).toBe('remove');
-    expect(opened().options.map((o) => o.value)).toEqual(['EventLead']);
-    await opened().submit('EventLead');
+    expect(opened().options.map((o) => o.value)).toEqual(['event-lead']);
+    await opened().submit('event-lead');
     await settle();
 
-    expect(roles.removeRole).toHaveBeenCalledWith('p2', 'EventLead');
+    expect(roles.removeRole).toHaveBeenCalledWith('p2', 'event-lead', ORG);
     expect(row('Marcus Lee').textContent).toContain('No role yet');
   });
 
@@ -226,7 +262,7 @@ describe('PeoplePage', () => {
   it('shows the forbidden page when the server refuses', async () => {
     const { host, button } = await setup(
       () => throwError(() => new HttpErrorResponse({ status: 403 })),
-      ['Volunteer'],
+      { permissions: ['workspaces.join'] },
     );
 
     expect(host.querySelector('h1')!.textContent).toContain('People and roles');

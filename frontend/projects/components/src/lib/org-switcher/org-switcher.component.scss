@@ -1,0 +1,197 @@
+:host {
+  --org-switcher-name-max: 10rem;
+  display: flex;
+  flex: 0 1 auto;
+  min-inline-size: 0;
+}
+
+.org-mark {
+  --org-mark-size: var(--size-avatar-sm);
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--org-mark-size);
+  block-size: var(--org-mark-size);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-org-accent);
+  color: var(--color-org-accent-foreground);
+  font: var(--text-label);
+  font-size: var(--font-size-xs);
+  line-height: 1;
+
+  &::before {
+    content: attr(data-initials);
+  }
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.org-mark--all {
+  background: var(--color-bg-subtle);
+  color: var(--color-fg-default);
+}
+
+.org-switcher__current {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  font: var(--text-label);
+  color: var(--color-fg-default);
+}
+
+.org-switcher__current-name,
+.org-switcher__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-inline-size: var(--org-switcher-name-max);
+}
+
+.org-switcher__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-block-size: var(--target-comfortable);
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
+  border: var(--border-width-hairline, 1px) solid var(--color-border-default);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-surface);
+  color: var(--color-fg-default);
+  font: var(--text-label);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-bg-subtle);
+    border-color: var(--color-border-strong);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
+
+  &[aria-expanded='true'] {
+    background: var(--color-accent-subtle);
+    border-color: var(--color-accent);
+  }
+
+  .org-mark {
+    border-radius: var(--radius-full);
+  }
+}
+
+// Below 1024px the button shows only the mark; the name stays in its accessible name.
+.org-switcher__name {
+  display: none;
+
+  @media (min-width: 64rem) {
+    display: block;
+  }
+}
+
+.org-switcher__chevron {
+  flex: none;
+  color: var(--color-fg-muted);
+  transition: rotate var(--duration-fast) var(--ease-standard);
+
+  [aria-expanded='true'] > & {
+    rotate: 180deg;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.org-switcher__menu {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-1);
+  inline-size: min(22rem, calc(100vw - 2 * var(--layout-margin, 1rem)));
+  background: var(--color-bg-surface-raised);
+  color: var(--color-fg-default);
+  border: var(--border-width-thin, 1px) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-3);
+}
+
+.org-switcher__header {
+  padding: var(--space-2) var(--space-3);
+}
+
+.org-switcher__title {
+  font: var(--text-label);
+}
+
+.org-switcher__caption,
+.org-switcher__option-type {
+  font: var(--text-caption);
+  color: var(--color-fg-muted);
+}
+
+.org-switcher__divider {
+  margin: var(--space-1) 0;
+  border-block-start: var(--border-width-thin, 1px) solid var(--color-border-default);
+}
+
+.org-switcher__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  inline-size: 100%;
+  min-block-size: var(--target-comfortable);
+  padding: var(--space-1) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font: var(--text-body);
+  text-align: start;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    background: var(--color-bg-subtle);
+    outline: none;
+  }
+
+  &:focus-visible {
+    box-shadow: var(--shadow-focus);
+  }
+
+  &[aria-checked='true'] {
+    background: var(--color-accent-subtle);
+  }
+}
+
+.org-switcher__option-text {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  flex: 1;
+}
+
+.org-switcher__option-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.org-switcher__check {
+  flex: none;
+  color: var(--color-fg-accent);
+  visibility: hidden;
+
+  [aria-checked='true'] > & {
+    visibility: visible;
+  }
+}

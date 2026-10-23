@@ -82,8 +82,8 @@
     } @else if (r.canTransfer && !r.isOwn) {
       <ft-banner status="info" heading="You’re viewing this as System Admin">
         @if (r.ownerLostRole) {
-          {{ r.ownerName }} no longer has the {{ roleLabel(r.ownerLostRole) }} role. Their resources
-          stay as they are; you can edit, archive or hand this one to someone else.
+          {{ r.ownerName }} no longer has the {{ r.ownerLostRole }} role. Their resources stay as
+          they are; you can edit, archive or hand this one to someone else.
         }
         Every change is written to the audit log.
       </ft-banner>
@@ -127,7 +127,7 @@
             <ft-list label="Shared with">
               @for (role of r.audience.roles; track role.role) {
                 <ft-list-item
-                  [label]="'Everyone with the ' + roleLabel(role.role) + ' role'"
+                  [label]="'Everyone with the ' + (role.name ?? role.role) + ' role'"
                   [meta]="
                     'Role · ' + role.count + (role.count === 1 ? ' person' : ' people') + ' today'
                   "

@@ -16,7 +16,7 @@ test.describe('Sign in with Google from the marketing page', () => {
 
     await marketing.signInWithGoogle.click();
 
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
     const account = api.accounts.get('leah@gmail.com');
     expect(account).toMatchObject({ name: 'Leah Thompson', verified: true, roles: [] });
     const exchange = api.callsTo('POST', '/connect/token')[0];
@@ -34,7 +34,7 @@ test.describe('Sign in with Google from the marketing page', () => {
 
     await marketing.signInWithGoogle.click();
 
-    await expect(page).toHaveURL('http://localhost:4200/events');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto/events');
     expect(api.accounts.size).toBe(1);
   });
 
@@ -45,7 +45,7 @@ test.describe('Sign in with Google from the marketing page', () => {
 
     await marketing.signUpWithGoogle.click();
 
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
     expect(api.callsTo('GET', '/api/account/google/start')).toHaveLength(1);
   });
 
@@ -101,7 +101,7 @@ test.describe('Sign in with Google from the marketing page', () => {
 
     await marketing.open();
     await marketing.signInWithGoogle.click();
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
 
     expect([...hosts].sort()).toEqual(['accounts.google.com', 'localhost:4200', 'localhost:4300']);
   });

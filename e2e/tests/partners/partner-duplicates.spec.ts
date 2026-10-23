@@ -51,7 +51,7 @@ test.describe('Possible duplicate partner', () => {
     await axe.check();
 
     await partner.openDuplicate('Kestrel Labs Inc.').click();
-    await expect(page).toHaveURL('/partners/partner-2');
+    await expect(page).toHaveURL('/o/faithtech-toronto/partners/partner-2');
     await expect(partner.heading).toHaveText('Kestrel Labs Inc.');
     await expect(partner.duplicateAlert).toContainText(
       'This may be the same partner as “Kestrel Labs”',

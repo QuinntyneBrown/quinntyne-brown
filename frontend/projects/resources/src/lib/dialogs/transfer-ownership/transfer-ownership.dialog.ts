@@ -2,12 +2,7 @@ import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import {
-  RESOURCES_SERVICE,
-  ROLE_LABELS,
-  ResourceDto,
-  problemDetails,
-} from '@faithtech-community/api';
+import { RESOURCES_SERVICE, ResourceDto, problemDetails } from '@faithtech-community/api';
 import {
   AlertComponent,
   ButtonComponent,
@@ -73,9 +68,7 @@ export class TransferOwnershipDialog {
           .map((m) => ({
             id: m.id,
             name: m.name,
-            detail: [m.roles.map((r) => ROLE_LABELS[r]).join(', '), m.city]
-              .filter(Boolean)
-              .join(' · '),
+            detail: [m.roles.join(', '), m.city].filter(Boolean).join(' · '),
           })),
       );
     } catch {

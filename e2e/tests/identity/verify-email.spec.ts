@@ -102,7 +102,7 @@ test.describe('Verify email', () => {
 
     await api.signInAs(account);
 
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page).toHaveURL(/\/o\/faithtech-toronto$/);
     await expect(shell.verifyBanner).toHaveCount(0);
   });
 });

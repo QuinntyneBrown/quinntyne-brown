@@ -22,6 +22,7 @@ public record MyOrgDto(
     bool CanJoinWork,
     IReadOnlyList<string> Features,
     IReadOnlyList<string> Permissions,
+    IReadOnlyList<string> Roles,
     IReadOnlyList<RoleOptionDto> GrantableRoles,
     IReadOnlyList<RoleOptionDto> ShareRoles,
     OrgBrandingDto Branding);
@@ -43,6 +44,7 @@ public class GetMyAccessHandler(IApplicationDbContext db, ICurrentUser current, 
         var portfolios = await db.Portfolios.AsNoTracking().Where(p => portfolioIds.Contains(p.Id)).OrderBy(p => p.Name).ToListAsync(cancellationToken);
         var catalogues = (await db.RoleDefinitions.AsNoTracking().ToListAsync(cancellationToken))
             .GroupBy(r => r.OrgTypeId).ToDictionary(g => g.Key, g => g.OrderBy(r => r.SortOrder).ToList());
+        var crossOrgNames = await db.CrossOrgRoles.AsNoTracking().ToDictionaryAsync(r => r.Id, r => r.Name, cancellationToken);
         var orgs = new List<MyOrgDto>();
         foreach (var o in access.Orgs.Values.OrderBy(o => !o.IsMember).ThenBy(o => o.ShownName))
         {
@@ -63,6 +65,7 @@ public class GetMyAccessHandler(IApplicationDbContext db, ICurrentUser current, 
                 o.CanJoinWork,
                 [.. o.Features.Order()],
                 [.. o.Permissions.Order()],
+                RoleNames(o, catalogue, crossOrgNames),
                 grantable,
                 share,
                 Branding(o, storage)));
@@ -74,6 +77,14 @@ public class GetMyAccessHandler(IApplicationDbContext db, ICurrentUser current, 
             [.. portfolios.Select(p => new MyPortfolioDto(p.Id, p.Name, access.LedPortfolios.Contains(p.Id)))],
             orgs);
     }
+
+    /// <summary>The caller's roles in the org, for the account menu: Org Lead, catalogue roles, then cross-org roles.</summary>
+    private static List<string> RoleNames(OrgAccess org, List<Domain.Organizations.RoleDefinition> catalogue, Dictionary<Guid, string> crossOrg) =>
+    [
+        .. org.IsOrgLead ? [RoleKeys.NameOf(RoleKeys.OrgLead)] : Array.Empty<string>(),
+        .. catalogue.Where(r => org.RoleIds.Contains(r.Id)).Select(r => r.Name),
+        .. org.CrossOrgRoleIds.Select(id => crossOrg.GetValueOrDefault(id)).OfType<string>().Order(),
+    ];
 
     public static OrgBrandingDto Branding(OrgAccess org, IPhotoStorage storage) => new(
         org.ShownName,

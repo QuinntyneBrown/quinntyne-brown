@@ -53,7 +53,7 @@ test.describe('Report filters', () => {
 
     await reports.filter('Toronto', 'Last 90 days');
 
-    await expect(page).toHaveURL('/reports?city=Toronto&period=last-90-days');
+    await expect(page).toHaveURL('/o/faithtech-toronto/reports?city=Toronto&period=last-90-days');
     await expect(reports.subtitle).toContainText('Toronto · Last 90 days');
     await expect(reports.figure('Members')).toContainText('3');
     await axe.check();
@@ -75,7 +75,7 @@ test.describe('Report filters', () => {
       await reports.open(query);
 
       await expect(reports.filterAlert).toBeVisible();
-      await expect(page).toHaveURL('/reports?city=&period=last-30-days');
+      await expect(page).toHaveURL('/o/faithtech-toronto/reports?city=&period=last-30-days');
       await expect(reports.subtitle).toContainText('All cities · Last 30 days');
       await expect(reports.figure('Members')).toContainText('9');
       await axe.check();

@@ -1,16 +1,15 @@
 // Traces to: L2-029
 import { HttpErrorResponse } from '@angular/common/http';
-import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import {
   ANNOUNCEMENTS_SERVICE,
-  AUTH_SERVICE,
   AnnouncementAudience,
   EVENTS_SERVICE,
   EventSummaryDto,
-  Role,
+  RoleOption,
   SendAnnouncementRequest,
+  provideStaticAccess,
 } from '@faithtech-community/api';
 import { Observable, of, throwError } from 'rxjs';
 
@@ -31,10 +30,22 @@ const builders: EventSummaryDto = {
 };
 
 const COUNTS: Record<string, number> = { Everyone: 612, Roles: 41, EventRsvps: 34 };
+const share = (key: string, name: string): RoleOption => ({
+  key,
+  name,
+  description: null,
+  isCrossOrg: false,
+});
+/** The org's roles an announcement may go to, from /api/me/access. */
+const SHARE_ROLES = [
+  share('city-lead', 'City Lead'),
+  share('volunteer', 'Volunteer'),
+  share('product-engineer', 'Product Engineer'),
+];
 
 async function setup(
   options: {
-    roles?: Role[];
+    permissions?: string[];
     send?: (r: SendAnnouncementRequest) => Observable<unknown>;
   } = {},
 ) {
@@ -50,10 +61,10 @@ async function setup(
     providers: [
       { provide: ANNOUNCEMENTS_SERVICE, useValue: service },
       { provide: EVENTS_SERVICE, useValue: events },
-      {
-        provide: AUTH_SERVICE,
-        useValue: { roles: signal(options.roles ?? ['CommunicationsLead']) },
-      },
+      provideStaticAccess({
+        permissions: options.permissions ?? ['announcements.send'],
+        shareRoles: SHARE_ROLES,
+      }),
     ],
   });
   const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
@@ -129,7 +140,7 @@ describe('ComposeAnnouncementPage', () => {
 
     expect(service.countRecipients).toHaveBeenLastCalledWith({
       kind: 'Roles',
-      roles: ['Volunteer', 'ProductEngineer'],
+      roles: ['volunteer', 'product-engineer'],
     });
     expect(sendButton().textContent).toContain('Send to 41 people');
   });
@@ -241,7 +252,7 @@ describe('ComposeAnnouncementPage', () => {
   });
 
   it('sends anyone who may not send announcements to the forbidden page', async () => {
-    const { navigate } = await setup({ roles: ['CityLead'] });
+    const { navigate } = await setup({ permissions: ['events.manage'] });
 
     expect(navigate).toHaveBeenCalledWith('/forbidden');
   });

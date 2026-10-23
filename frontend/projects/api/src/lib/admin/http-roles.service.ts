@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { API_BASE_URL } from '../config';
 import { HANDLES_FORBIDDEN } from '../errors';
-import { Role } from '../shared';
+import { RoleRef } from '../shared';
 import { RolesService } from './roles.service';
 
 @Injectable()
@@ -14,17 +14,25 @@ export class HttpRolesService implements RolesService {
   // The role dialog shows a refusal itself rather than leaving for the forbidden page.
   private readonly context = new HttpContext().set(HANDLES_FORBIDDEN, true);
 
-  addRole(profileId: string, role: Role): Observable<Role[]> {
-    return this.http.post<Role[]>(
+  addRole(profileId: string, role: string, organizationId?: string | null): Observable<RoleRef[]> {
+    return this.http.post<RoleRef[]>(
       `${this.base}/${encodeURIComponent(profileId)}/roles`,
-      { role },
+      organizationId ? { role, organizationId } : { role },
       { context: this.context },
     );
   }
 
-  removeRole(profileId: string, role: Role): Observable<Role[]> {
-    return this.http.delete<Role[]>(`${this.base}/${encodeURIComponent(profileId)}/roles/${role}`, {
-      context: this.context,
-    });
+  removeRole(
+    profileId: string,
+    role: string,
+    organizationId?: string | null,
+  ): Observable<RoleRef[]> {
+    return this.http.delete<RoleRef[]>(
+      `${this.base}/${encodeURIComponent(profileId)}/roles/${encodeURIComponent(role)}`,
+      {
+        context: this.context,
+        ...(organizationId ? { params: { organizationId } } : {}),
+      },
+    );
   }
 }

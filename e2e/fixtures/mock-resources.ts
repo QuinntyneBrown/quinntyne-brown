@@ -1,3 +1,4 @@
+import { legacyRoleOf, roleKeyOf, roleNameOf } from './mock-organizations';
 import { Route } from '@playwright/test';
 
 import type { MockAccount, MockProfile } from './mock-api';
@@ -396,7 +397,7 @@ export class MockResources {
         id: a.profileId,
         name: a.name,
         city: this.context.profiles.get(a.profileId)?.homeCity ?? null,
-        roles: [...a.roles].sort(),
+        roles: a.roles.map(roleNameOf).sort(),
       }));
     return this.json(route, 200, people);
   }
@@ -430,7 +431,7 @@ export class MockResources {
         type: one('type'),
         visibility: one('visibility'),
         memberIds: form.fields['memberIds'] ?? [],
-        roles: form.fields['roles'] ?? [],
+        roles: (form.fields['roles'] ?? []).map(legacyRoleOf),
       },
       false,
     );
@@ -452,7 +453,7 @@ export class MockResources {
           ...this.audience(
             one('visibility'),
             form.fields['memberIds'] ?? [],
-            form.fields['roles'] ?? [],
+            (form.fields['roles'] ?? []).map(legacyRoleOf),
           ),
         }),
       );
@@ -574,7 +575,7 @@ export class MockResources {
       type: (body['type'] as string | null) ?? null,
       visibility: (body['visibility'] as string | null) ?? null,
       memberIds: (body['memberIds'] as string[] | undefined) ?? [],
-      roles: (body['roles'] as string[] | undefined) ?? [],
+      roles: ((body['roles'] as string[] | undefined) ?? []).map(legacyRoleOf),
     };
   }
 
@@ -687,7 +688,7 @@ export class MockResources {
     const sharedVia = summary.sharedWithYou
       ? r.memberIds.includes(caller.profileId)
         ? 'you'
-        : r.roles.find((role) => caller.roles.includes(role))!
+        : roleKeyOf(r.roles.find((role) => caller.roles.includes(role))!)
       : null;
     return {
       ...summary,
@@ -701,7 +702,8 @@ export class MockResources {
           city: this.context.profiles.get(id)?.homeCity ?? null,
         })),
         roles: r.roles.map((role) => ({
-          role,
+          role: roleKeyOf(role),
+          name: roleNameOf(role),
           count: [...this.context.accounts.values()].filter(
             (a) => !a.suspended && a.roles.includes(role),
           ).length,
@@ -719,7 +721,7 @@ export class MockResources {
       canTransfer: admin,
       ownerLostRole:
         ownerAccount && !ownerAccount.roles.some((role) => CONTRIBUTORS.includes(role))
-          ? 'CityLead'
+          ? 'City Lead'
           : null,
     };
   }

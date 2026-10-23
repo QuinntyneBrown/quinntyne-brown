@@ -26,7 +26,7 @@ test.describe('Notes: list and create', () => {
     await expect(note.title).toHaveAttribute('aria-placeholder', 'Untitled');
     const created = api.notes.pages[0];
     expect(created).toMatchObject({ title: '', visibility: 'Private', ownerId: samuel.profileId });
-    await expect(page).toHaveURL(`/notes/${created.id}`);
+    await expect(page).toHaveURL(`/o/faithtech-toronto/notes/${created.id}`);
     await axe.check();
   });
 
@@ -120,7 +120,7 @@ test.describe('Notes: list and create', () => {
     await notes.newPage.click();
 
     await expect(notes.toast).toContainText('Verify your email before creating pages.');
-    await expect(page).toHaveURL('/notes');
+    await expect(page).toHaveURL('/o/faithtech-toronto/notes');
     expect(api.notes.pages).toHaveLength(0);
   });
 

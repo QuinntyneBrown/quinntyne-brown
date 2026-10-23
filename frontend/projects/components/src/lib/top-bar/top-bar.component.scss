@@ -222,3 +222,14 @@ a:focus-visible,
     transition: none;
   }
 }
+
+// The org switcher, or the single org's name, after the brand (design system: components/org-switcher).
+.top-bar__org {
+  display: flex;
+  flex: 0 1 auto;
+  min-inline-size: 0;
+
+  &:empty {
+    display: none;
+  }
+}

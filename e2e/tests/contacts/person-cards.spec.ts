@@ -87,7 +87,7 @@ test.describe('Contacts as person cards', () => {
     await axe.check();
 
     await card.viewProfile.click();
-    await expect(page).toHaveURL(`/contacts/${tomas.id}`);
+    await expect(page).toHaveURL(`/o/faithtech-toronto/contacts/${tomas.id}`);
     await expect(new ContactPage(page).heading).toHaveText('Tomás Ortega');
   });
 

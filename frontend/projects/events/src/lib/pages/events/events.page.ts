@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
-  AUTH_SERVICE,
+  ACCESS_SERVICE,
   EVENTS_SERVICE,
   EventListFilter,
   EventSummaryDto,
-  canManageEvents,
+  Permission,
 } from '@faithtech-community/api';
 import {
   ButtonComponent,
@@ -72,7 +72,7 @@ interface EventRow {
 })
 export class EventsPage {
   private readonly events = inject(EVENTS_SERVICE);
-  private readonly callerRoles = inject(AUTH_SERVICE).roles;
+  private readonly access = inject(ACCESS_SERVICE);
 
   protected readonly chips = CHIPS;
   protected readonly city = new FormControl('', { nonNullable: true });
@@ -84,7 +84,7 @@ export class EventsPage {
   private readonly selectedCity = signal<string | null>(null);
   private request = 0;
 
-  protected readonly canManage = computed(() => canManageEvents(this.callerRoles()));
+  protected readonly canManage = computed(() => this.access.can(Permission.EventsManage));
   protected readonly cityOptions = computed<SelectOption[]>(() => [
     { value: '', label: 'All cities' },
     ...this.cities().map((c) => ({ value: c, label: c })),

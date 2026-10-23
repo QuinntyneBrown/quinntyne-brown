@@ -58,6 +58,8 @@ public static class DependencyInjection
         services.AddScoped<RoleGrantPolicy>();
         services.AddScoped<AccessResolver>();
         services.AddScoped<GetMyAccessHandler>();
+        services.AddScoped<ResolveOrgSlugHandler>();
+        services.AddScoped<MyWorkHandler>();
         services.AddScoped<ProfileRoles>();
         services.AddScoped<PermissionHolders>();
         services.AddScoped<WorkEligibility>();

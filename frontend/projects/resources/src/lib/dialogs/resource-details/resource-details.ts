@@ -4,7 +4,6 @@ import {
   ResourceFields,
   ResourceType,
   ResourceVisibility,
-  Role,
 } from '@faithtech-community/api';
 import { PersonOption } from '@faithtech-community/components';
 
@@ -67,7 +66,7 @@ export function fieldsOf(form: ResourceDetailsForm, withTitleAndType: boolean): 
     tags: v.tags,
     visibility: v.visibility,
     memberIds: shared ? v.members.map((m) => m.id) : [],
-    roles: shared ? (v.roles as Role[]) : [],
+    roles: shared ? v.roles : [],
   };
 }
 

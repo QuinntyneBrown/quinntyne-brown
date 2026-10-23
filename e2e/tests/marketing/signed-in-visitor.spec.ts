@@ -13,11 +13,11 @@ test.describe('A member who is already signed in', () => {
     const marketing = new MarketingPage(page);
     await marketing.open();
     await marketing.signIn(account.email, account.password, { keepSignedIn: true });
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
 
     await marketing.open();
 
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
     await expect(new AppShell(page).primaryNav).toBeVisible();
   });
 
@@ -26,7 +26,7 @@ test.describe('A member who is already signed in', () => {
     const marketing = new MarketingPage(page);
     await marketing.open();
     await marketing.signIn(account.email, account.password);
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
 
     await marketing.open();
 
@@ -38,7 +38,7 @@ test.describe('A member who is already signed in', () => {
     const marketing = new MarketingPage(page);
     await marketing.open();
     await marketing.signIn(account.email, account.password, { keepSignedIn: true });
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
 
     await new AppShell(page).signOut('Grace Okonkwo');
     // Sign-out clears the kept-session hint before it lands on sign in; leaving earlier races it.

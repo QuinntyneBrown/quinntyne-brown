@@ -11,8 +11,8 @@ async function setup(reassign = () => of(undefined)) {
   const agile = {
     listOwnerCandidates: vi.fn(() =>
       of([
-        { profileId: 'p3', name: 'Esther Nakamura', roles: ['CityLead' as const] },
-        { profileId: 'p4', name: 'Joel Mbeki', roles: ['CityLead' as const] },
+        { profileId: 'p3', name: 'Esther Nakamura', roles: ['City Lead'] },
+        { profileId: 'p4', name: 'Joel Mbeki', roles: ['City Lead'] },
       ]),
     ),
     reassignOwner: vi.fn(reassign),

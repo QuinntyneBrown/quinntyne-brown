@@ -1,12 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import {
-  AUTH_SERVICE,
   INVITES_SERVICE,
   InviteDto,
   InvitePage,
-  Role,
+  provideStaticAccess,
 } from '@faithtech-community/api';
 import { DialogService, ToastService } from '@faithtech-community/components';
 import { Observable, of, throwError } from 'rxjs';
@@ -18,7 +16,8 @@ function invite(overrides: Partial<InviteDto>): InviteDto {
   return {
     id: 'i1',
     email: 'nate.oyelaran@example.org',
-    preassignedRole: 'ProductEngineer',
+    preassignedRole: 'product-engineer',
+    preassignedRoleName: 'Product Engineer',
     status: 'Pending',
     invitedByName: 'Grace Okonkwo',
     createdAt: '2026-10-20T12:00:00Z',
@@ -33,14 +32,16 @@ const pending = invite({});
 const accepted = invite({
   id: 'i2',
   email: 'ruth.alvarez@example.org',
-  preassignedRole: 'Volunteer',
+  preassignedRole: 'volunteer',
+  preassignedRoleName: 'Volunteer',
   status: 'Accepted',
   acceptedAt: '2026-10-18T12:00:00Z',
 });
 const expired = invite({
   id: 'i3',
   email: 'felix.wu@example.org',
-  preassignedRole: 'Attendee',
+  preassignedRole: 'attendee',
+  preassignedRoleName: 'Attendee',
   status: 'Expired',
   createdAt: '2026-09-17T12:00:00Z',
   expiresAt: '2026-10-01T12:00:00Z',
@@ -57,7 +58,7 @@ function page(
 async function setup(
   list: (after?: string | null) => Observable<InvitePage>,
   dialogResult?: InviteDto,
-  roles: Role[] = ['CityLead'],
+  permissions: string[] = ['invites.send', 'connectLink.own'],
 ) {
   const service = {
     listInvites: vi.fn(list),
@@ -70,7 +71,7 @@ async function setup(
       { provide: INVITES_SERVICE, useValue: service },
       { provide: DialogService, useValue: dialogs },
       { provide: ToastService, useValue: toasts },
-      { provide: AUTH_SERVICE, useValue: { roles: signal(roles) } },
+      provideStaticAccess({ permissions }),
     ],
   });
   const fixture = TestBed.createComponent(InvitesPage);
@@ -139,13 +140,12 @@ describe('InvitesPage', () => {
     );
   });
 
-  it.each<[Role[], boolean]>([
-    [['CityLead'], true],
-    [['SystemAdmin'], true],
-    [['EventLead'], false],
-    [['CommunicationsLead', 'Volunteer'], false],
-  ])('with roles %j shows My QR code: %s', async (roles, shown) => {
-    const { button } = await setup(() => of(page([pending])), undefined, roles);
+  it.each<[string[], boolean]>([
+    [['invites.send', 'connectLink.own'], true],
+    [['invites.send'], false],
+    [['workspaces.join'], false],
+  ])('with permissions %j shows My QR code: %s', async (permissions, shown) => {
+    const { button } = await setup(() => of(page([pending])), undefined, permissions);
     expect(button('My QR code') !== undefined).toBe(shown);
   });
 

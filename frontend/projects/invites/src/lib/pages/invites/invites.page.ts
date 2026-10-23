@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import {
-  AUTH_SERVICE,
+  ACCESS_SERVICE,
+  Permission,
   INVITES_SERVICE,
   InviteDto,
   InviteStatus,
-  ROLE_LABELS,
 } from '@faithtech-community/api';
 import {
   AlertComponent,
@@ -64,12 +64,10 @@ export class InvitesPage {
   private readonly invites = inject(INVITES_SERVICE);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
-  private readonly roles = inject(AUTH_SERVICE).roles;
+  private readonly access = inject(ACCESS_SERVICE);
 
-  /** Only City Leads and System Admins have a connect link (L2-080 AC1, AC2). */
-  protected readonly hasQrCode = computed(() =>
-    this.roles().some((role) => role === 'CityLead' || role === 'SystemAdmin'),
-  );
+  /** Holders of connectLink.own have a connect link in the org (L2-080, ADR 0041). */
+  protected readonly hasQrCode = computed(() => this.access.can(Permission.ConnectLinkOwn));
 
   protected readonly state = signal<State>('loading');
   protected readonly list = signal<InviteDto[]>([]);
@@ -93,7 +91,7 @@ export class InvitesPage {
 
   /** "Product Engineer · Sent Tue 20 Oct · expires Tue 3 Nov", worded as the mock words it. */
   protected meta(invite: InviteDto): string {
-    const role = invite.preassignedRole ? ROLE_LABELS[invite.preassignedRole] : 'No role';
+    const role = invite.preassignedRoleName ?? invite.preassignedRole ?? 'No role';
     const status = {
       Pending: `Sent ${this.day(invite.createdAt)} · expires ${this.day(invite.expiresAt)}`,
       Accepted: `Accepted ${this.day(invite.acceptedAt)}`,

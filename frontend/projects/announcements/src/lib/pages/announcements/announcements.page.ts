@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import {
   ANNOUNCEMENTS_SERVICE,
-  AUTH_SERVICE,
+  ACCESS_SERVICE,
+  Permission,
   AnnouncementDto,
-  ROLE_LABELS,
-  Role,
 } from '@faithtech-community/api';
 import {
   ButtonComponent,
@@ -21,8 +20,6 @@ import {
 import { firstValueFrom } from 'rxjs';
 
 type State = 'loading' | 'loaded' | 'error';
-
-const SENDERS: Role[] = ['CommunicationsLead', 'SystemAdmin'];
 
 /**
  * The announcements sent to the member, newest first (L2-030, mock `pages/announcements`). Communications
@@ -47,13 +44,13 @@ const SENDERS: Role[] = ['CommunicationsLead', 'SystemAdmin'];
 })
 export class AnnouncementsPage {
   private readonly service = inject(ANNOUNCEMENTS_SERVICE);
-  private readonly roles = inject(AUTH_SERVICE).roles;
+  private readonly access = inject(ACCESS_SERVICE);
 
   protected readonly state = signal<State>('loading');
   protected readonly items = signal<AnnouncementDto[]>([]);
   protected readonly hasMore = signal(false);
   protected readonly loadingMore = signal(false);
-  protected readonly canSend = computed(() => this.roles().some((r) => SENDERS.includes(r)));
+  protected readonly canSend = computed(() => this.access.can(Permission.AnnouncementsSend));
   private page = 1;
 
   constructor() {
@@ -99,7 +96,7 @@ export class AnnouncementsPage {
 function audience(a: AnnouncementDto): string {
   if (a.audienceKind === 'EventRsvps') return `RSVPs: ${a.eventTitle ?? 'an event'}`;
   if (a.audienceKind === 'Roles') {
-    return a.roles.map((r) => (r === 'Staff' ? 'Staff' : `${ROLE_LABELS[r]}s`)).join(', ');
+    return a.roles.map((r) => (r === 'Staff' ? r : `${r}s`)).join(', ');
   }
   return 'Everyone';
 }

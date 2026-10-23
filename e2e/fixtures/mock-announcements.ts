@@ -1,3 +1,4 @@
+import { legacyRoleOf, roleNameOf } from './mock-organizations';
 import { Route } from '@playwright/test';
 
 import type { MockAccount } from './mock-api';
@@ -150,7 +151,7 @@ export class MockAnnouncements {
       sentAt: a.sentAt,
       senderName: accounts.find((x) => x.profileId === a.senderId)?.name ?? '',
       audienceKind: a.audience.kind,
-      roles: a.audience.roles ?? [],
+      roles: (a.audience.roles ?? []).map(roleNameOf),
       eventTitle:
         this.context.events.events.find((e) => e.id === a.audience.eventId)?.title ?? null,
       recipientCount: a.recipientIds.length,
@@ -167,7 +168,9 @@ export class MockAnnouncements {
     const members = [...this.context.accounts.values()].filter((a) => !a.suspended);
     const kind = audience['kind' as keyof typeof audience];
     if (kind === 'Roles') {
-      const roles = (audience['roles' as keyof typeof audience] ?? []) as string[];
+      const roles = ((audience['roles' as keyof typeof audience] ?? []) as string[]).map(
+        legacyRoleOf,
+      );
       return members.filter((a) => a.roles.some((r) => roles.includes(r)));
     }
     if (kind === 'EventRsvps') {

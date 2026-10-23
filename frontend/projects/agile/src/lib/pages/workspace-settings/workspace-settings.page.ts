@@ -14,7 +14,6 @@ import { Router } from '@angular/router';
 import {
   AGILE_SERVICE,
   ArchivedItemDto,
-  ROLE_LABELS,
   WorkspaceDto,
   WorkspaceMemberDto,
   WorkspaceMethod,
@@ -145,7 +144,7 @@ export class WorkspaceSettingsPage {
   }
 
   protected roles(member: WorkspaceMemberDto): string {
-    return member.roles.map((r) => ROLE_LABELS[r]).join(', ');
+    return member.roles.join(', ');
   }
 
   protected retry(): void {

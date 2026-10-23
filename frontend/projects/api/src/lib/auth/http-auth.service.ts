@@ -9,7 +9,7 @@
  *   - docs/detailed-designs/identity/password-reset
  */
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { Observable, catchError, firstValueFrom, map, of, switchMap, tap, throwError } from 'rxjs';
 
 import { API_BASE_URL } from '../config';
@@ -37,7 +37,6 @@ export class HttpAuthService implements AuthService {
 
   readonly isAuthenticated = this.oidc.isAuthenticated;
   readonly currentUser = this.user.asReadonly();
-  readonly roles = computed(() => this.user()?.roles ?? []);
 
   signIn(returnUrl?: string, keepSignedIn?: boolean): Promise<void> {
     return this.oidc.signIn(returnUrl, keepSignedIn);

@@ -32,6 +32,7 @@ public class CurrentAccessMiddleware(RequestDelegate next)
         ("/api/workspaces", Features.Agile),
         ("/api/items", Features.Agile),
         ("/api/poker-sessions", Features.Agile),
+        ("/api/work", Features.Agile),
         ("/api/reports", Features.Reports),
         ("/api/people", Features.Profiles),
     ];

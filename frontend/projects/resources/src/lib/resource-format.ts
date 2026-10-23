@@ -1,10 +1,4 @@
-import {
-  ResourceSummary,
-  ResourceType,
-  ResourceVisibility,
-  ROLE_LABELS,
-  Role,
-} from '@faithtech-community/api';
+import { ResourceSummary, ResourceType, ResourceVisibility } from '@faithtech-community/api';
 import { BadgeVariant, formatDay, formatFileSize } from '@faithtech-community/components';
 
 /** The upload rules shown in the add dialog and checked again by the server (L2-057 AC1, AC7). */
@@ -120,10 +114,6 @@ export function visibilityLine(visibility: ResourceVisibility): string {
     Private: 'Private — only you',
     Shared: 'Shared — the people and roles below',
   }[visibility];
-}
-
-export function roleLabel(role: Role | string): string {
-  return ROLE_LABELS[role as Role] ?? role;
 }
 
 /** Hands the browser a fetched file under its own name. */
