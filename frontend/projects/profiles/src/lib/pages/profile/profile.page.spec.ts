@@ -1,18 +1,46 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import {
-  AUTH_SERVICE,
   PROFILES_SERVICE,
   ProfileDto,
   ProfilesService,
   ROLES_SERVICE,
-  Role,
+  RoleOption,
+  RoleRef,
+  StaticOrg,
+  provideStaticAccess,
 } from '@faithtech-community/api';
 import { avatarColorFor, DialogService, RoleDialogData } from '@faithtech-community/components';
 import { Observable, of, throwError } from 'rxjs';
 
 import { ProfilePage } from './profile.page';
+
+const ORG = 'org-faithtech-toronto';
+const role = (key: string, name: string): RoleRef => ({
+  key,
+  name,
+  kind: 'catalogue',
+  organizationId: ORG,
+  organizationName: 'FaithTech Toronto',
+});
+const option = (key: string, name: string): RoleOption => ({
+  key,
+  name,
+  description: null,
+  isCrossOrg: false,
+});
+/** What a City Lead may grant in the org, as /api/me/access says (RoleGrantPolicy). */
+const CITY_LEAD: StaticOrg = {
+  permissions: ['roles.grant', 'people.view'],
+  grantableRoles: [
+    option('event-lead', 'Event Lead'),
+    option('create-lead', 'Create Lead'),
+    option('communications-lead', 'Communications Lead'),
+    option('volunteer', 'Volunteer'),
+    option('product-engineer', 'Product Engineer'),
+    option('attendee', 'Attendee'),
+  ],
+};
 
 const samuel: ProfileDto = {
   id: 'p1',
@@ -21,16 +49,22 @@ const samuel: ProfileDto = {
   bio: null,
   featuredPhoto: null,
   photos: [],
-  roles: ['CreateLead'],
+  roles: [role('create-lead', 'Create Lead')],
   isOwn: false,
   canEdit: false,
 };
 
-function setup(getProfile: (id: string) => Observable<ProfileDto>, callerRoles: Role[] = []) {
+function setup(
+  getProfile: (id: string) => Observable<ProfileDto>,
+  caller: StaticOrg = {},
+  isSystemAdmin = false,
+) {
   const service: Partial<ProfilesService> = { getProfile: vi.fn(getProfile) };
   const roles = {
-    addRole: vi.fn((_id: string, role: Role) => of<Role[]>(['CreateLead', role])),
-    removeRole: vi.fn(() => of<Role[]>([])),
+    addRole: vi.fn((_id: string, key: string) =>
+      of<RoleRef[]>([role('create-lead', 'Create Lead'), role(key, 'Volunteer')]),
+    ),
+    removeRole: vi.fn(() => of<RoleRef[]>([])),
   };
   let opened: RoleDialogData | null = null;
   const dialogs = {
@@ -43,7 +77,7 @@ function setup(getProfile: (id: string) => Observable<ProfileDto>, callerRoles: 
     providers: [
       { provide: PROFILES_SERVICE, useValue: service },
       { provide: ROLES_SERVICE, useValue: roles },
-      { provide: AUTH_SERVICE, useValue: { roles: signal(callerRoles) } },
+      provideStaticAccess(caller, { isSystemAdmin }),
       { provide: DialogService, useValue: dialogs },
     ],
   });
@@ -70,7 +104,7 @@ describe('ProfilePage', () => {
 
   it('offers a System Admin Edit profile for another member, opening that member’s editor', async () => {
     // Traces to: L2-040 AC3
-    const { fixture, button } = setup(() => of({ ...samuel, canEdit: true }), ['SystemAdmin']);
+    const { fixture, button } = setup(() => of({ ...samuel, canEdit: true }), {}, true);
     await fixture.whenStable();
     fixture.detectChanges();
     expect(button('Edit profile')!.getAttribute('href')).toBe('/people/p1/edit');
@@ -100,8 +134,8 @@ describe('ProfilePage', () => {
     expect(host.textContent).not.toContain('We couldn’t load this profile');
   });
 
-  it('offers no role changes to a member without City Lead or System Admin', async () => {
-    const { fixture, button } = setup(() => of(samuel), ['EventLead']);
+  it('offers no role changes to someone with no role they may grant', async () => {
+    const { fixture, button } = setup(() => of(samuel), { permissions: ['events.manage'] });
     await fixture.whenStable();
     fixture.detectChanges();
     expect(button('Add a role')).toBeUndefined();
@@ -109,7 +143,7 @@ describe('ProfilePage', () => {
   });
 
   it('lets a City Lead add a role they may grant and updates the badges without a reload', async () => {
-    const { fixture, host, roles, dialogs, button, opened } = setup(() => of(samuel), ['CityLead']);
+    const { fixture, host, roles, dialogs, button, opened } = setup(() => of(samuel), CITY_LEAD);
     await fixture.whenStable();
     fixture.detectChanges();
 
@@ -118,36 +152,47 @@ describe('ProfilePage', () => {
     expect(dialogs.open).toHaveBeenCalled();
     expect(data.mode).toBe('add');
     expect(data.options.map((o) => o.value)).toEqual([
-      'EventLead',
-      'CommunicationsLead',
-      'Volunteer',
-      'ProductEngineer',
-      'Attendee',
+      'event-lead',
+      'communications-lead',
+      'volunteer',
+      'product-engineer',
+      'attendee',
     ]);
-    expect(await data.submit('Volunteer')).toBeNull();
+    expect(await data.submit('volunteer')).toBeNull();
     fixture.detectChanges();
 
-    expect(roles.addRole).toHaveBeenCalledWith('p1', 'Volunteer');
+    expect(roles.addRole).toHaveBeenCalledWith('p1', 'volunteer', ORG);
     expect(host.textContent).toContain('Volunteer');
   });
 
   it('lets a City Lead remove a role they may change', async () => {
-    const { fixture, host, roles, button, opened } = setup(() => of(samuel), ['CityLead']);
+    const { fixture, host, roles, button, opened } = setup(() => of(samuel), CITY_LEAD);
     await fixture.whenStable();
     fixture.detectChanges();
 
     button('Remove a role')!.click();
     expect(opened().mode).toBe('remove');
-    expect(opened().options.map((o) => o.value)).toEqual(['CreateLead']);
-    await opened().submit('CreateLead');
+    expect(opened().options.map((o) => o.value)).toEqual(['create-lead']);
+    await opened().submit('create-lead');
     fixture.detectChanges();
 
-    expect(roles.removeRole).toHaveBeenCalledWith('p1', 'CreateLead');
+    expect(roles.removeRole).toHaveBeenCalledWith('p1', 'create-lead', ORG);
     expect(host.textContent).toContain('No role yet');
   });
 
+  it('offers a System Admin Org Lead and the platform roles', async () => {
+    const { fixture, button, opened } = setup(() => of(samuel), CITY_LEAD, true);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    button('Add a role')!.click();
+    const values = opened().options.map((o) => o.value);
+    expect(values[0]).toBe('org-lead');
+    expect(values.slice(-2)).toEqual(['portfolio-lead', 'system-admin']);
+  });
+
   it('passes the server’s refusal back to the dialog', async () => {
-    const { fixture, roles, button, opened } = setup(() => of(samuel), ['SystemAdmin']);
+    const { fixture, roles, button, opened } = setup(() => of(samuel), CITY_LEAD, true);
     roles.removeRole.mockReturnValue(
       throwError(
         () =>
@@ -161,7 +206,7 @@ describe('ProfilePage', () => {
     fixture.detectChanges();
 
     button('Remove a role')!.click();
-    expect(await opened().submit('CreateLead')).toBe(
+    expect(await opened().submit('create-lead')).toBe(
       'There must always be at least one System Admin.',
     );
   });

@@ -1,13 +1,22 @@
 using QuinntyneBrown.Community.Application.Common;
-using QuinntyneBrown.Community.Domain.Profiles;
+using QuinntyneBrown.Community.Domain.Organizations;
 
 namespace QuinntyneBrown.Community.Application.Reports;
 
 /// <summary>
-/// Reports are for Staff and System Admins (L2-123); every other member, the lead roles included, is refused.
-/// Reading a report is not an admin action, so nothing is audited.
+/// Reports are for holders of <c>reports.view</c> (Staff, the Org Lead, the Portfolio Lead, System Admin), for the orgs
+/// where they hold it (L2-123, L2-150); every other member, the lead roles included, is refused. Reading a report is
+/// not an admin action, so nothing is audited.
 /// </summary>
 public class ReportAccess(ICurrentUser current)
 {
-    public bool CanRead => current.HasRole(Role.Staff) || current.HasRole(Role.SystemAdmin);
+    /// <summary>The orgs in the request's scope where the caller may read reports.</summary>
+    public IReadOnlyList<Guid> Scope =>
+        [.. current.Access.ReadScope(Features.Reports).Where(org => current.Access.Has(org, Permissions.ReportsView))];
+
+    public bool CanRead => Scope.Count > 0;
+
+    /// <summary>The orgs the report may be filtered to, by name (L2-150 AC1).</summary>
+    public IReadOnlyList<Organizations.OrgLabel> Organizations =>
+        [.. Scope.Select(org => Application.Organizations.OrgLabel.Of(current.Access.Orgs, org)).OfType<Organizations.OrgLabel>().OrderBy(o => o.Name)];
 }

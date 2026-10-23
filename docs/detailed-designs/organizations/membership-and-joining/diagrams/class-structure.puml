@@ -1,0 +1,74 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Membership and joining
+enum JoinedVia {
+  Invite
+  ConnectLink
+  AddedByLead
+  Seed
+}
+class OrgMembership {
+  +Guid OrganizationId
+  +Guid ProfileId
+  +bool IsOrgLead
+  +DateTime JoinedAt
+  +JoinedVia JoinedVia
+}
+class Invite {
+  +Guid Id
+  +Guid OrganizationId
+  +string Email
+  +Guid? RoleDefinitionId
+  +Guid InvitedById
+  +DateTime ExpiresAt
+  +DateTime? AcceptedAt
+}
+class ConnectLink {
+  +Guid Id
+  +Guid OrganizationId
+  +Guid OwnerId
+  +string TokenHash
+  +DateTime CreatedAt
+}
+class OrgJoiner {
+  +JoinAsync(orgId: Guid, profileId: Guid, via: JoinedVia, roleId: Guid?, grantedBy: Guid?): Task
+}
+class MembershipHandlers {
+  +ListAsync(orgId: Guid, q: string?, includeAgents: bool): Task<Result<MemberDto[]>>
+  +AddAsync(orgId: Guid, email: string): Task<Result<MemberDto>>
+  +RemoveAsync(orgId: Guid, profileId: Guid): Task<Result>
+}
+class AcceptInviteHandler {
+  +AcceptAsync(token: string, body: AcceptInviteRequest): Task<Result>
+}
+class ConnectSignUpHandler {
+  +CompleteOnVerifiedAsync(profileId: Guid): Task
+}
+class MemberDto {
+  +Guid ProfileId
+  +string Name
+  +string? PhotoUrl
+  +ProfileKind Kind
+  +bool IsOrgLead
+  +RoleRefDto[] Roles
+  +DateTime JoinedAt
+  +JoinedVia JoinedVia
+}
+OrgMembership --> JoinedVia
+Invite ..> OrgMembership : accepted into
+ConnectLink ..> OrgMembership : sign-up joins
+OrgJoiner ..> OrgMembership : creates
+AcceptInviteHandler ..> OrgJoiner : uses
+ConnectSignUpHandler ..> OrgJoiner : uses
+MembershipHandlers ..> OrgJoiner : uses
+MembershipHandlers ..> MemberDto : returns
+@enduml

@@ -24,6 +24,14 @@ The anonymous endpoints are opted in explicitly. A members-only event requested 
 
 Emails are trimmed and compared without regard to case; nothing else is normalised.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- The public page moves to `/o/{orgSlug}/events/{id}` with the org's display name, logo and accent band; `/public/events/{id}` redirects there, and a slug that is not the event's org (or an old slug of it) shows the not-found page (`L2-149`).
+- `GET /api/public/events/{id}` adds `organization` (`slug`, `aliases`, `displayName`, `logoUrl`, `accent`, `accentForeground`) and answers `404` when `events` is off for the event's org. Guest RSVP, guest cancel and `.ics` keep their endpoints and behaviour.
+- Details are in [branding and public pages](../../organizations/branding-and-public-pages/README.md) and [ADR 0037](../../../adr/0037-org-addressed-urls-switcher-and-branding.md).
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

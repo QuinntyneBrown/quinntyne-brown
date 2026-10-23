@@ -30,8 +30,8 @@
           <ft-stack>
             @if (ws.needsNewOwner && ws.access === 'Admin') {
               <ft-alert status="warning" heading="This workspace needs a new owner">
-                {{ ws.ownerName }} no longer holds the City Lead role, and a workspace owner must be
-                a City Lead.
+                {{ ws.ownerName }} can no longer own workspaces in this organization, so it needs a
+                new owner.
                 <ft-button ftAlertActions (click)="reassignOwner()">
                   <ft-icon name="admin" /> Reassign owner
                 </ft-button>

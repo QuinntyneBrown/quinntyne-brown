@@ -42,7 +42,7 @@ test.describe('Archive and ownership', () => {
     await dialog.confirm.click();
 
     const backlog = new BacklogPage(page);
-    await expect(page).toHaveURL(`/workspaces/${ws.id}/backlog`);
+    await expect(page).toHaveURL(`/o/faithtech-toronto/workspaces/${ws.id}/backlog`);
     await expect(backlog.toast).toContainText('“Shelter problem briefs” archived');
     expect(task.isArchived).toBe(true);
 
@@ -102,7 +102,7 @@ test.describe('Archive and ownership', () => {
     await dialog.confirm.click();
 
     const workspaces = new WorkspacesPage(page);
-    await expect(page).toHaveURL('/workspaces');
+    await expect(page).toHaveURL('/o/faithtech-toronto/workspaces');
     await expect(workspaces.toast).toContainText('Toronto team archived');
     await expect(workspaces.items).toHaveCount(1);
     await expect(workspaces.archived).toHaveCount(1);
@@ -113,6 +113,38 @@ test.describe('Archive and ownership', () => {
     await expect(workspaces.toast).toContainText('Toronto team restored');
     await expect(workspaces.archived).toHaveCount(0);
     await expect(workspaces.link('Toronto team')).toBeVisible();
+  });
+
+  // Traces to: L2-146 AC4
+  test('the Org Lead reassigns a workspace whose owner can no longer create workspaces', async ({
+    page,
+    api,
+  }) => {
+    const olivia = api.addAccount({
+      email: 'olivia@example.org',
+      name: 'Olivia Grant',
+      orgLead: ['faithtech-toronto'],
+    });
+    const ruth = api.addAccount({
+      email: 'ruth@example.org',
+      name: 'Ruth Alvarez',
+      roles: ['Volunteer'],
+    });
+    api.addAccount({ email: 'joel@example.org', name: 'Joel Mbeki', roles: ['CityLead'] });
+    api.addAccount({ email: 'jonah@example.org', name: 'Jonah Bell', roles: ['Attendee'] });
+    const ws = api.agile.addWorkspace({ name: 'Toronto volunteers', ownerId: ruth.profileId });
+    await api.signInAs(olivia, `/workspaces/${ws.id}/settings`);
+
+    const settings = new WorkspaceSettingsPage(page);
+    await expect(settings.needsOwner).toBeVisible();
+    await settings.reassignOwner.click();
+    const dialog = new ReassignOwnerDialog(page, 'Toronto volunteers');
+    await expect(dialog.owner.locator('option')).toContainText(['Joel Mbeki', 'Olivia Grant']);
+    await expect(dialog.owner.locator('option', { hasText: 'Jonah Bell' })).toHaveCount(0);
+    await dialog.owner.selectOption({ label: 'Joel Mbeki' });
+    await dialog.confirm.click();
+
+    await expect(settings.toast).toContainText('Joel Mbeki now owns Toronto volunteers');
   });
 
   test('System Admin reassigns a workspace whose owner lost City Lead', async ({
@@ -136,13 +168,13 @@ test.describe('Archive and ownership', () => {
     await api.signInAs(priya, '/admin/users');
 
     await expect(admin.needsOwner).toContainText(
-      'Grace Okonkwo no longer holds the City Lead role but owns Toronto team.',
+      'Grace Okonkwo can no longer own workspaces but owns Toronto team.',
     );
     await axe.check();
     await admin.workspaceSettings('Toronto team').click();
 
     const settings = new WorkspaceSettingsPage(page);
-    await expect(page).toHaveURL(`/workspaces/${ws.id}/settings`);
+    await expect(page).toHaveURL(`/o/faithtech-toronto/workspaces/${ws.id}/settings`);
     await expect(settings.needsOwner).toBeVisible();
     await axe.check();
     await settings.reassignOwner.click();

@@ -12,7 +12,10 @@ public class AuditEntry
         string? beforeJson,
         string? afterJson,
         DateTime occurredAtUtc,
-        string ipAddress)
+        string ipAddress,
+        Guid? organizationId = null,
+        Guid? portfolioId = null,
+        string? detail = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(action);
         ArgumentException.ThrowIfNullOrWhiteSpace(targetType);
@@ -31,6 +34,9 @@ public class AuditEntry
         AfterJson = afterJson;
         OccurredAtUtc = occurredAtUtc;
         IpAddress = ipAddress;
+        OrganizationId = organizationId;
+        PortfolioId = portfolioId;
+        Detail = detail;
     }
 
     public Guid Id { get; private set; }
@@ -50,4 +56,13 @@ public class AuditEntry
     public DateTime OccurredAtUtc { get; private set; }
 
     public string IpAddress { get; private set; } = string.Empty;
+
+    /// <summary>The org the action happened in, if any (L2-153).</summary>
+    public Guid? OrganizationId { get; private set; }
+
+    /// <summary>The portfolio the action happened in, if any; set for org and portfolio actions.</summary>
+    public Guid? PortfolioId { get; private set; }
+
+    /// <summary>Extra attribution, such as the agent token and its issuer (ADR 0036).</summary>
+    public string? Detail { get; private set; }
 }

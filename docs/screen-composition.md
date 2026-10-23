@@ -4,15 +4,16 @@ Which `@faithtech-community/components` parts build each screen, and what is bui
 
 **Local UI** is markup a feature library writes itself. It is limited to page composition: headings that belong to the page, sections and the glue between `api` services and components. Anything reusable goes into `components` first (`AGENTS.md`).
 
-**Add to components** marks a part the library does not have yet. It is built in `frontend/projects/components/` to match the named design-system page before the screen that needs it, never as local UI. No gaps are open: the Dynamics parts are all in the library now ([Summary](#summary-of-local-ui-to-build), item 14).
+**Add to components** marks a part the library does not have yet. It is built in `frontend/projects/components/` to match the named design-system page before the screen that needs it, never as local UI. Open gaps: the organization hierarchy's parts are not in the library yet; they are marked **Add to components** and listed in [Summary](#summary-of-local-ui-to-build), item 15. The Dynamics parts are all in the library now (item 14).
 
-Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the admin screens (`admin-users`, `audit-log`, `add-role`, `remove-role`, `suspend-user`), the invites screens (`invites`, `accept-invite`, `send-invite`, `my-qr-code`, `connect`), the team list (`team`), the events screens (`events`, `event-form`, `event`, `event-check-in`, `check-in-walk-in`, `cancel-rsvp`, `cancel-event`, `public-event`, `guest-cancel-rsvp`), settings (`settings`: Appearance and Email me when), the notifications screens (the bell and panel, `notifications`), the announcements screens (`announcements`, `compose-announcement`, `unsubscribe`), global search (`search`), the contacts screens (`contacts`, `contact`, `contact-form`, `archived-contacts`, `add-note`, `archive-contact`, `delete-contact`, `link-contact`, `add-contact-photo`, `edit-photo-description`, `delete-contact-photo`), the partners screens (`partners`, `partner`, `partner-form`, `add-partner`, `move-partner`, `log-activity`, `merge-partners`, `restore-partner`), Reports (`reports`) and the agile screens (`workspaces`, `team-board`, `backlog`, `work-item`, `workspace-settings`, `planning-poker` and their dialogs), the community app's `sign-in` and `sign-up` pages, the marketing app's page (`marketing`), the server-rendered private-preview wall (`private-preview`) and the resources screens (`resources`, `resource`, `archived-resources`, `add-resource`, `edit-resource`, `archive-resource`, `transfer-resource-owner`, `resource-toast`, the `resource-shared` bell and email, and the `resources` state of `search`) and the notes screens (`notes`, `note`, `archived-notes`, `share-note`, `note-settings`, `move-note`, `archive-note`, `restore-note`, `add-image`, `add-link`, `add-link-card`, `edit-alt-text`, `change-icon`, `note-toast`, the `note-shared` bell and email, and the `notes` state of `search`). Other screens are added here as their features are built.
+Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the admin screens (`admin-users`, `audit-log`, `add-role`, `remove-role`, `suspend-user`), the invites screens (`invites`, `accept-invite`, `send-invite`, `my-qr-code`, `connect`), the team list (`team`), the events screens (`events`, `event-form`, `event`, `event-check-in`, `check-in-walk-in`, `cancel-rsvp`, `cancel-event`, `public-event`, `guest-cancel-rsvp`), settings (`settings`: Appearance and Email me when), the notifications screens (the bell and panel, `notifications`), the announcements screens (`announcements`, `compose-announcement`, `unsubscribe`), global search (`search`), the contacts screens (`contacts`, `contact`, `contact-form`, `archived-contacts`, `add-note`, `archive-contact`, `delete-contact`, `link-contact`, `add-contact-photo`, `edit-photo-description`, `delete-contact-photo`), the partners screens (`partners`, `partner`, `partner-form`, `add-partner`, `move-partner`, `log-activity`, `merge-partners`, `restore-partner`), Reports (`reports`) and the agile screens (`workspaces`, `team-board`, `backlog`, `work-item`, `workspace-settings`, `planning-poker` and their dialogs), the community app's `sign-in` and `sign-up` pages, the marketing app's page (`marketing`), the server-rendered private-preview wall (`private-preview`) and the resources screens (`resources`, `resource`, `archived-resources`, `add-resource`, `edit-resource`, `archive-resource`, `transfer-resource-owner`, `resource-toast`, the `resource-shared` bell and email, and the `resources` state of `search`) the organizations screens (`waiting`, `organizations`, `organization`, `org-types`, `org-type`, `cross-org-roles`, `agents`, `my-work`, `add-member`, `remove-member`, `change-org-roles`, `create-org`, `create-org-type`, `create-cross-org-role`, `assign-cross-org-role`, `create-agent`, `issue-token`, `revoke-token`, `remove-catalogue-role`, `choose-org`, `org-toast`, and the organization states of changed screens, [Organizations](#organizations)) and the notes screens (`notes`, `note`, `archived-notes`, `share-note`, `note-settings`, `move-note`, `archive-note`, `restore-note`, `add-image`, `add-link`, `add-link-card`, `edit-alt-text`, `change-icon`, `note-toast`, the `note-shared` bell and email, and the `notes` state of `search`). Other screens are added here as their features are built.
 
 ## Shell
 
 | Part | Library | Local |
 |---|---|---|
 | App shell around `/people/**`, `/team`, `/admin/**`, `/invites`, `/contacts/**`, `/partners/**`, `/workspaces/**`, `/resources/**`, `/notes/**`, `/events/**`, `/reports` | `TopBarComponent` with the account menu (`MenuComponent` "Account menu for {name}" whose face is an `AvatarComponent`: *Your profile* → `/people/me`, *Settings* → `/settings`, *Sign out*), `NavDrawerComponent`, `TabBarComponent` (top bar, tab bar and menu all from `shell/navigation.ts`, one rule by role, ADR 0012), `SkipLinkComponent`, `ToastRegionComponent` (in `AppShellComponent`). System Admins get an **Admin** link (secondary) to `/admin`. Every signed-in member gets a **Resources** link (secondary, `IconComponent` `resources` folder icon) to `/resources`, in the top bar from 1536px (`--layout-breakpoint-2xl`), behind *More* in the `NavDrawerComponent` below that, and in the phone menu drawer; the `resources` routes are lazy-loaded behind the signed-in guard (mocks note 7). Every signed-in member also gets a **Notes** link (secondary, `IconComponent` `notes`) to `/notes`, placed right after Resources in the top bar, the *More* `NavDrawerComponent` and the phone menu drawer, with `aria-current="page"` on `/notes/**`; the `notes` routes are lazy-loaded behind the signed-in guard (L2-085). Staff and System Admin (only) get a **Reports** link (secondary, after People) to `/reports` in the top bar, the `NavDrawerComponent` and the phone menu drawer; the `reports` library is lazy-loaded behind the signed-in guard and the server answers 403 to everyone else (ADR 0009, ADR 0031). Its icon is `IconComponent` `reports` (`foundations/iconography.html`, Reports). The top bar's search box opens `/search?q=`. Before the account menu, `ShellNotificationsComponent` (in `shell/`, ADR 0016) composes `NotificationBellComponent` ("Notifications, {n} unread") holding `NotificationPanelComponent` (latest 5 notices through `NoticeListComponent` with `deferNavigation`, *Mark all read*, *See all*) with `NOTIFICATIONS_SERVICE`; it reloads on navigation and every minute, and marks an opened notice read before going to its item. | The notice mapping (actor initials and colour, `formatFeedTime` time) |
+| Org-aware shell (ADR 0037, L2-144, L2-155) | **Add to components**: `OrgSwitcherComponent` (`ft-org-switcher`: `orgs`, `active`, `showAllOrgs`, `portfolioName`, `(orgChange)`; design system `components/org-switcher.html`) in the `TopBarComponent` after the brand, which shows only the portfolio mark below 1536px; for someone who covers one org the switcher renders the static org mark and name. `OrgAccentDirective` (`[ftOrgAccent]`) sets `--color-org-accent` and `--color-org-accent-foreground` from `ACCESS_SERVICE.active().branding` on the top bar and on its `.org-strip`. `TopBarComponent` gains a scrolling nav when the switcher is present (already scrolls in Angular). The nav, `NavDrawerComponent` and `TabBarComponent` list a section only when its feature is on for the org and the caller holds its permission (`ACCESS_SERVICE.can`, `feature`); Portfolio Lead gets **Portfolio** (`IconComponent` `layers`, `/portfolio/organizations`) and Org Leads **Organization** (`building`, `/o/{slug}/settings`). Under `/o/all` the nav is Home, People, Workspaces, My work, Resources, Notes. The search box placeholder names the active org or “all your orgs”. Someone who covers no org gets the top bar with only the account menu (Your profile, Sign out) and the Waiting page. (`pages/home`: single-org, switcher-open, switcher-keyboard, long-names, all-orgs, shelfie) | `shell/navigation.ts` (feature × permission rules, `/o/{slug}` prefixes and the old-URL redirect guard), the switch handler (keep the section when the new org has the feature, else its home; refresh access; focus the `h1`; announce “Switched to {org}”) |
 
 ## Pages
 
@@ -41,19 +42,21 @@ Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the 
 
 - Library: `AuthLayoutComponent`. Starts `AUTH_SERVICE.signIn(returnUrl, keepSignedIn)` for a session the marketing page or Google sign-in created (ADR 0018).
 
-### Home — `/` (`pages/home`: default, loading, empty, error, activity-error, pipeline-zero, pipeline-error, staff, coming-up-empty)
+### Home — `/` (`pages/home`: default, loading, empty, error, activity-error, pipeline-zero, pipeline-error, staff, coming-up-empty, single-org, switcher-open, switcher-keyboard, long-names, all-orgs, shelfie)
 
 - Library: `PageHeaderComponent` (greeting and "{date} · {n} events coming up"; a `SkeletonComponent` in `ftPageHeaderSubtitle` while loading) with *New event* (`ButtonComponent` `primary`, `IconComponent` `add`) and *Add contact* (`IconComponent` `contacts`) in `ftPageHeaderActions`, `AlertComponent` info ("You’re viewing as Staff"), `SplitComponent` + `StackComponent`, `CardComponent` `flush` "Coming up" with `ListComponent` of `EventCardComponent` and `CardFooterComponent` (*All events* `LinkComponent`; "Nothing coming up yet."), `ListSkeletonComponent` `leading="date-badge"` (loading), `CardComponent` "Partner pipeline" with *Open board* `LinkComponent` in `ftCardActions`, `ClusterComponent` of `StatComponent` (`loading` skeleton values) or a danger `AlertComponent` with *Try again*, `CardComponent` "Recent activity" with `FeedComponent` (ready, loading, empty, error with *Try again*) of `FeedItemComponent` (`formatFeedTime` meta, a `LinkComponent` to the item), `EmptyStateComponent` error variant ("We couldn’t load your home page" with *Try again*). The no-role state is a `GridComponent` `auto` of three `CardComponent`s with `ButtonComponent` links (*Edit profile*, *Browse events*, *Meet the team*) above the Recent activity card.
 - Lives in the app as the shell's landing route ([ADR 0016](adr/0016-home-page-lives-in-the-app-shell.md)); services: `EVENTS_SERVICE`, `PARTNERS_SERVICE`, `ACTIVITY_SERVICE`.
 - Local: the `<aside aria-label="Activity">` and the muted lines of text.
+- Organizations states: `single-org`, `switcher-*`, `long-names` and `shelfie` are the shell row above. `all-orgs` drops *New event* and *Add contact*, adds `AlertComponent` `info` “You’re viewing All orgs”, and labels each `EventCardComponent` meta and `FeedItemComponent` with **Add to components** `OrgLabelComponent` (`ft-org-label`); agents in the feed carry `BadgeComponent` `variant="agent"` (**Add to components**). `shelfie` shows only Startup’s features and *New page*.
 
-### Profile — `/people/:id`, `/people/me` (`pages/profile`: default, own, loading, empty, error, not-found)
+### Profile — `/people/:id`, `/people/me` (`pages/profile`: default, own, loading, empty, error, not-found, agent)
 
 - Library: `ProfileHeaderComponent` (featured photo, or initials without one, in an XL `AvatarComponent`, name as the `h1`, `BadgeComponent` roles, home city, bio, photo strip of `PhotoComponent`), `ButtonComponent` (*Edit profile*, *Add photos*, *Try again*, *Go home*), `EmptyStateComponent` (no photos on the own profile; error variant for load failure; not-found).
 - Loading uses `ProfileHeaderComponent [loading]` (skeletons, `aria-busy`).
 - Own state adds *Edit profile* in the header's `[actions]` slot; the admin state (a System Admin on another member, `CanEdit`) adds it too, linking to `/people/{id}/edit`.
 - *Add a role* and *Remove a role* (`ButtonComponent` in the `[actions]` slot) appear when `assignableRoles` from `api` offers an option for the caller (City Lead or System Admin, L2-009); each opens `RoleDialogComponent` through `DialogService` (ADR 0005) and the role badges update from the API's answer.
 - Local: none beyond composition. The `h1` for the error and not-found states is a visually hidden page heading.
+- Organizations state `agent`: `ProfileHeaderComponent` with `BadgeComponent` `variant="agent"`, the role badge and `OrgLabelComponent`, a `CardComponent` with `DescriptionListComponent` (Kind, Created by, Last active) and *Manage tokens* (`ButtonComponent` link, Org Leads and the Portfolio Lead).
 
 ### Edit profile — `/people/me/edit`, `/people/:id/edit` (`pages/edit-profile`: default, admin, loading, error, invalid, busy, success, uploading, too-large, pending, storing, full, forbidden)
 
@@ -62,11 +65,12 @@ Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the 
 - Admin state: the breadcrumb names the member, the header reads "Edit {name}’s profile" with the audit note, and Cancel returns to their profile. Forbidden state: `EmptyStateComponent` "You can only edit your own profile" with *Back to profile* and no form.
 - Local: the `<form>` element and the section headings.
 
-### People and roles — `/people` (`pages/people`: default, admin, read-only, loading, error, no-results, forbidden)
+### People and roles — `/people` (`pages/people`: default, admin, read-only, loading, error, no-results, forbidden, org, agents, all-orgs)
 
-- Library: `PageHeaderComponent` ("People and roles", subtitle by role) with *Invite someone* (`ButtonComponent` `primary` link to `/invites`, City Leads and System Admins), `TextFieldComponent` `type="search"` labelled "Search people", `TableComponent` caption "Members and their roles" (cell templates: `AvatarComponent` `sm` with the featured photo + `LinkComponent` to `/people/:id`; `BadgeComponent` `role` per role or "No role yet"; City; `ButtonComponent` *Add role* and ghost *Remove* with the member's name as `object`, or the caption "Only System Admin can change"), `ListSkeletonComponent` (5 rows), `EmptyStateComponent` (no-results "No one matches “{term}”" with *Invite someone*; error with *Try again*; forbidden "Only City Leads manage roles" with *Back to home*), `ButtonComponent` *Show more people* when more than 25.
+- Library: `PageHeaderComponent` ("People and roles", subtitle by role) with *Invite someone* (`ButtonComponent` `primary` link to `/invites`, City Leads and System Admins), `TextFieldComponent` `type="search"` labelled "Search people", `TableComponent` caption "Members and their roles" (cell templates: `AvatarComponent` `sm` with the featured photo + `LinkComponent` to `/people/:id`; `BadgeComponent` `role` per role or "No role yet"; City; `ButtonComponent` *Add role* and ghost *Remove* with the member's name as `object`, or the caption "Only an Org Lead or above can change"), `ListSkeletonComponent` (5 rows), `EmptyStateComponent` (no-results "No one matches “{term}”" with *Invite someone*; error with *Try again*; forbidden "Only City Leads manage roles" with *Back to home*), `ButtonComponent` *Show more people* when more than 25.
 - Opens `RoleDialogComponent` through `DialogService` (ADR 0005); the row's badges update from the API's answer.
 - Local: the search `<form role="search">`.
+- Organizations states: `org` lists only FaithTech Toronto members (L2-140), with `BadgeComponent` `info` “Org Lead”, `SwitchComponent` *Include agents* in a `FilterBarComponent`, *Add member* (navigates to `/o/{slug}/settings/members` and opens `add-member` there) and *Change roles* (`RoleDialogComponent` `mode="org"`, **Add to components**, see dialogs). `agents` shows agents with `BadgeComponent` `variant="agent"`. `all-orgs` adds an Org column of `OrgLabelComponent` and drops every role action.
 
 ### Admin users — `/admin/users` (`pages/admin-users`: default, loading, error, no-results, forbidden)
 
@@ -75,27 +79,30 @@ Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the 
 - `AlertComponent` `warning` "A workspace needs a new owner" for each live workspace whose owner lost City Lead (from `AGILE_SERVICE.listWorkspaces`), with *Open workspace settings* (`ButtonComponent` link) in `ftAlertActions` (L2-037 AC2).
 - Local: the search `<form role="search">`.
 
-### Audit log — `/admin/audit-log` (`pages/audit-log`: default, loading, empty, error, no-results, exporting, exported, export-failed)
+### Audit log — `/admin/audit-log` (`pages/audit-log`: default, loading, empty, error, no-results, exporting, exported, export-failed, portfolio)
 
 - Library: `PageHeaderComponent` with *Export CSV* (`ButtonComponent` with `loading` while exporting, `IconComponent` `export`; `ToastService` "Audit log exported" or a danger toast with *Try again*), `TabsComponent` + `TabComponent`, `FormFieldComponent` + `SelectComponent` "Action" (all, role changes, suspensions, private contact access, deletions), `TableComponent` (When monospaced, Who, What; `loading` shows skeleton rows under the headers), `EmptyStateComponent` (empty; no-results "No {category} in the last 90 days" with *Show all actions*; error; forbidden as on admin users), `ButtonComponent` *Show older entries* when more than 50.
 - Local: the CSV download glue (object URL and a temporary link).
+- Organizations state `portfolio` (at `/portfolio/audit-log` in the Portfolio tabs): adds an Org column (`OrgLabelComponent`, or “Platform” for System Admin entries) and an Organization `SelectComponent`; agent rows show `BadgeComponent` `variant="agent"` and the token and issuer in the What cell. The Org Lead’s org-only log is `organization/audit-log`.
 
-### Invites — `/invites` (`pages/invites`: default, loading, empty, error, more, more-error)
+### Invites — `/invites` (`pages/invites`: default, loading, empty, error, more, more-error, org)
 
 - Library: `BreadcrumbComponent` + `BreadcrumbItemComponent` (People and roles → Invites), `PageHeaderComponent` with *My QR code* (secondary `ButtonComponent` with the `qr` icon, City Leads and System Admins only, L2-080) and *Invite someone*, `CardComponent` `flush` + `ListComponent` + `ListItemComponent` (email, "{role} · Sent {day} · expires {day}" meta, trailing `BadgeComponent` — Pending `info`, Accepted `success`, Expired `warning`, Withdrawn `neutral` — and a ghost *Resend* on expired invites), `ListSkeletonComponent` (3 rows), `EmptyStateComponent` (empty with *Invite someone*; error with *Try again*), `ToastService` ("Invite sent to {email}", "Invite sent again"). Paging (more, more-error): `ClusterComponent` (the "Showing N of M invites" count and *Show more invites* `ButtonComponent` with `loading`), and `AlertComponent` danger ("We couldn’t load more invites. Try again.").
 - Opens `SendInviteDialog` and `MyQrCodeDialog` through `DialogService`.
 - Local: none beyond composition.
+- Organizations state `org`: the subtitle names the org with `OrgLabelComponent`; roles in the table and in `send-invite` come from the org’s catalogue.
 
 ### Accept invite — `/accept-invite/:token` (`pages/accept-invite`: default, invalid, error, existing, sign-in, wrong-account)
 
 - Library: `AuthLayoutComponent`, `CardComponent`, `StackComponent`, `ClusterComponent` + `AvatarComponent` + `BadgeComponent` `role` (the invitation line), `AlertComponent` (error summary "Fix N things to accept the invite"; unreachable), `FormFieldComponent` + `TextFieldComponent` (Full name; Email read-only with help; Create a password with `reveal`), `FormErrorFocusDirective`, `ButtonComponent` (*Accept and join*, *Accept invite*, *Sign in to accept*, *Create an account*, *Go home*), `EmptyStateComponent` error variant with `headingLevel` 1 (expired, used, withdrawn, unknown link, wrong account), `SkeletonComponent` while the token is checked.
 - Local: the `<form>` element and the `h1` "You’re invited".
 
-### Connect — `/meet/:token` (`pages/connect`: default, loading, invalid, error, busy, email-exists, signed-in, pending, own-code)
+### Connect — `/meet/:token` (`pages/connect`: default, loading, invalid, error, busy, email-exists, signed-in, pending, own-code, org)
 
 - Library: `AuthLayoutComponent`, `CardComponent`, `StackComponent`, `PersonSummaryComponent` (the lead's photo, name and "City Lead · Toronto"), `AlertComponent` (error summary; unreachable; signed-in success "Connected with {lead}"; pending and own-code info; invalid warning "Link not recognised"), `FormFieldComponent` + `TextFieldComponent` (Full name, Email, Password with `reveal`), `FormErrorFocusDirective`, `ButtonComponent` (*Create account and connect* with `loading`, *Create an account*, *Sign in*, *Try again*, *Go to QuinntyneBrown.Community*), `LinkComponent` (*Sign in to connect*), `SkeletonComponent` while the token is checked.
 - `ConnectPage` in `invites`, routed by `CONNECT_ROUTES` (`/meet` because `/connect/*` is the identity server's).
 - Local: the `<form>` element, the `h1`, and the consent caption saying what connecting does.
+- Organizations state `org`: **Add to components** `OrgBandComponent` (`ft-org-band`) above the card; the heading and caption name the org (“Join FaithTech Toronto and connect with Grace”).
 
 ### Team — `/team` (`pages/team`: default, member, loading, empty, no-results, error, more, more-error)
 
@@ -150,11 +157,12 @@ Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the 
 - Library: `BreadcrumbComponent`, `PageHeaderComponent`, `StackComponent` `width="sm"` holding `CardComponent`, `ErrorSummaryComponent`, `FormErrorFocusDirective`, `AlertComponent` (error), `FormFieldComponent` + `TextFieldComponent` (Organisation, Website, What they could offer, Main contact, Email, Phone), `SelectComponent` (Owner: "No owner" and the members with a lead role), `TextareaComponent` (Notes), `FormActionsComponent` + `ButtonComponent` (*Cancel*, then *Save partner*), `SkeletonComponent`, `EmptyStateComponent` (error; read-only for Staff).
 - Local: the `<form>` element.
 
-### Workspaces — `/workspaces` (`pages/workspaces`: default, member, staff, empty, empty-member, loading, error, archived)
+### Workspaces — `/workspaces` (`pages/workspaces`: default, member, staff, empty, empty-member, loading, error, archived, all-orgs)
 
 - Library: `PageHeaderComponent` with *New workspace* (City Lead, System Admin), `AlertComponent` (Read-only for Staff), `CardComponent` `flush` + `ListComponent` + `ListItemComponent` (`IconTileComponent` leading, "Owner: … · Scrum · Sprint 7 active · 5 members" meta, `BadgeComponent` *Owner*), a second card *Archived* with *Restore* (`ButtonComponent`, `IconComponent` `restore`), `ListSkeletonComponent`, `EmptyStateComponent` (empty for leads and for members; error).
 - Opens `CreateWorkspaceDialog`.
 - Local: none beyond composition.
+- Organizations state `all-orgs`: an Org column of `OrgLabelComponent`; *New workspace* opens `choose-org` through `DialogService`.
 
 ### Workspace frame — shared by board, backlog, Planning Poker and settings
 
@@ -173,11 +181,12 @@ Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the 
 - Opens `WorkItemDialog`, `StartSprintDialog`, `CloseSprintDialog`.
 - Local: the four explicit tree levels (content queries cannot see recursive templates).
 
-### Work item — `/workspaces/:id/items/:itemId` (`pages/work-item`: default, member, staff, empty, not-in-sprint, loading, error)
+### Work item — `/workspaces/:id/items/:itemId` (`pages/work-item`: default, member, staff, empty, not-in-sprint, loading, error, agent)
 
 - Library: `BreadcrumbComponent`, `PageHeaderComponent` with *Edit* and, for the owner and System Admin, *Archive*, `SplitComponent`, `CardComponent` (Description, Details), `DescriptionListComponent`, `CheckboxGroupComponent` + `CheckboxComponent` (tasks), `FormFieldComponent` + `TextFieldComponent` / `TextareaComponent` / `SelectComponent` (new task, comment, status), `FeedComponent` + `FeedItemComponent` (comments), `BadgeComponent`, `AlertComponent`, `EmptyStateComponent`, `SkeletonComponent`.
 - Opens `WorkItemDialog` (edit, add task) and `ArchiveWorkItemDialog`.
 - Local: the task and comment `<form>` elements, as the mock shows them inline.
+- Organizations state `agent`: activity `FeedItemComponent`s by an agent show `BadgeComponent` `variant="agent"` after the name.
 
 ### Workspace settings — `/workspaces/:id/settings` (`pages/workspace-settings`: default, invalid, forbidden, loading, error, needs-owner)
 
@@ -220,48 +229,54 @@ Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the 
 - Opens `AddWalkInDialog` through `DialogService`. A walk-in added and checked in shows the success toast "{name} is checked in" ("{time} · {n} of {total} here.", no *Undo*; walk-in-added), or "{name} already RSVP’d and is checked in" when the email matched an RSVP; with *Check them in now* off, "{name} is on the list" (or "{name} already RSVP’d") with "Turn on their switch when they’re here.". *Export CSV* downloads the attendance and toasts "Attendance exported" ("{file} is in your downloads."), or the danger "We couldn’t export the attendance".
 - Local: the search `<form role="search">`, the list caption, the CSV download glue (as on the event page).
 
-### Public event — `/public/events/:id` (`pages/public-event`: default, loading, invalid, error, success, full, cancelled)
+### Public event — `/public/events/:id` (`pages/public-event`: default, loading, invalid, error, success, full, cancelled, org, org-unbranded)
 
 - Inside `PublicShellComponent` (app shell for anonymous pages: `SkipLinkComponent`, `TopBarComponent` `anonymous` with *Sign in* returning to `/events/:id`, `ContainerComponent`).
 - Library: `PageHeaderComponent` with `overline` ("FaithTech {city} · Public event"), title and subtitle ("Fri 6 Nov 2026 · 6:30 – 9:00 pm · {venue}" from `formatTimeRange`, or "Was {day} · {city}" when cancelled), *Add to calendar (.ics)* (`ButtonComponent` link to the public `.ics`; *Update your calendar (.ics)* once cancelled; also *primary* in the success card), `AlertComponent` (danger "This event was cancelled" with who cancelled it, when and why; info "This event is full"; danger refusal, rate limit or save failure), `SplitComponent`, `CardComponent` "About" with `DescriptionListComponent` (Where, Hosted by), `CardComponent` "RSVP" with `ErrorSummaryComponent` ("Fix N things to RSVP"), `FormErrorFocusDirective`, `FormFieldComponent` + `TextFieldComponent` (Your name; Email with help) and `ButtonComponent` `primary` `lg` *I’m going* with `loading`, `CardComponent` `success` "You’re on the list, {first name}" with *Create a FaithTech account*, `SkeletonComponent` cards (loading), `EmptyStateComponent` error `headingLevel` 1.
 - Local: the `<form>` element and the "Already a member? Sign in to RSVP" caption.
+- Organizations states (`/o/{orgSlug}/events/{id}`, L2-149): **Add to components** `OrgBandComponent` under the anonymous `TopBarComponent`, with the org’s display name, logo and accent pair (`org-unbranded` falls back to the default pair); the `PageHeaderComponent` overline and *Hosted by* name the org. The old `/public/events/{id}` route redirects.
 
 ### Guest cancel RSVP — `/public/events/:id/cancel-rsvp?token=` (`pages/guest-cancel-rsvp`: default, busy, success, invalid, error)
 
 - Inside `PublicShellComponent`. Library: `PageHeaderComponent` with `overline` (the event, or "Your RSVP" when it cannot be shown), `StackComponent` `width="sm"`, `CardComponent` "Cancel your RSVP?" with `AlertComponent` (failed "RSVP not cancelled") and `ButtonComponent` (*Cancel my RSVP* `danger` with `loading`, *Keep my RSVP* `ghost` link), `CardComponent` `success` "Your RSVP is cancelled" with *Back to the event*, `EmptyStateComponent` error "This cancel link doesn’t work" with *Go to the event*.
 - Local: none beyond composition.
 
-### Notifications — `/notifications` (`pages/notifications`: default, unread, loading, empty, error)
+### Notifications — `/notifications` (`pages/notifications`: default, unread, loading, empty, error, org-labels)
 
 - Library: `PageHeaderComponent` ("Notifications", subtitle "{n} unread") with ghost *Mark all as read* (while anything is unread) and ghost *Settings* link (`ButtonComponent`, `IconComponent` `done`, `settings`), `ClusterComponent` group "Show notifications" with `ChipComponent` *All* and *Unread* (`pressed`), `CardComponent` `flush` + `NoticeListComponent` (`deferNavigation`: the page marks the notice read, then navigates), `ButtonComponent` *Show older notifications* (50 more, with `loading`), `ListSkeletonComponent` (4 rows), `EmptyStateComponent` ("You’re all caught up"; "Nothing unread" under Unread; error with *Try again*).
 - Local: the notice mapping, as in the shell.
+- Organizations state `org-labels`: `NoticeListComponent` notices end their meta with `OrgLabelComponent` (Portfolio for portfolio-wide announcements); agents carry the Agent badge.
 
-### Announcements — `/announcements` (`pages/announcements`: default, loading, empty, error)
+### Announcements — `/announcements` (`pages/announcements`: default, loading, empty, error, org-labels)
 
 - Library: `PageHeaderComponent` ("Announcements", subtitle "In-app and email. People can opt out of announcement emails.") with primary *New announcement* for Communications Leads and System Admins, `CardComponent` `flush` + `ListComponent` "Announcements" + `ListItemComponent` (subject, meta "To {audience} · Sent {day} by {sender} · {n} recipients", `description` the message, leading `IconTileComponent` `announcements`), `ButtonComponent` *Show older announcements*, `ListSkeletonComponent`, `EmptyStateComponent` ("No announcements yet", with *New announcement* for senders; error with *Try again*).
 - Local: the audience wording ("Product Engineers", "RSVPs: {event}").
+- Organizations state `org-labels`: each `ListItemComponent` meta ends with `OrgLabelComponent` (`portfolio` variant for portfolio-wide).
 
-### New announcement — `/announcements/new` (`pages/compose-announcement`: default, invalid, busy, error, success)
+### New announcement — `/announcements/new` (`pages/compose-announcement`: default, invalid, busy, error, success, portfolio-wide)
 
 - Library: `BreadcrumbComponent`, `PageHeaderComponent`, `StackComponent` `width="md"`, `CardComponent`, `ErrorSummaryComponent` ("Fix N things to send"), `FormErrorFocusDirective`, `AlertComponent` (danger "Your announcement wasn’t sent"), `RadioGroupComponent` "Send to" + `RadioComponent` (*Everyone* with "{n} members", *People with a role*, *An event’s RSVP list*), `CheckboxGroupComponent` "Roles" + `CheckboxComponent` (the nine roles), `FormFieldComponent` + `SelectComponent` (Event: upcoming events as "{title} · {day}"), `FormFieldComponent` + `TextFieldComponent` (Subject) and `TextareaComponent` (Message), `SwitchComponent` (*Also send by email*, on), `FormActionsComponent` with *Cancel* and primary *Send to {n} people* (`loading`, "Sending…"), `CardComponent` `success` ("Sent to {n} people", "{m} will also get it by email — {k} have opted out", *Back to announcements*, *Write another*).
 - Anyone without Communications Lead or System Admin is sent to `/forbidden`.
 - Local: the `<form>` element.
+- Organizations state `portfolio-wide`: the audience `RadioGroupComponent` adds *Everyone in the portfolio* (with the recipient count) for the Portfolio Lead only, and role audiences come from the org’s catalogue (`{ key, name }` from the API).
 
 ### Unsubscribe — `/unsubscribe?token=` (`pages/unsubscribe`: default, success, error)
 
 - Outside the shell, anonymous. Library: `AuthLayoutComponent`, `CardComponent`, `EmptyStateComponent` `headingLevel` 1 (working "Turning off announcement emails…" in a status region; "You’re unsubscribed" with *Open settings*; error "This unsubscribe link doesn’t work" with *Open settings*), `ButtonComponent`.
 - Local: the status region around the working state.
 
-### Search — `/search?q=` (`pages/search`: default, member, loading, empty, invalid, no-results, error)
+### Search — `/search?q=` (`pages/search`: default, member, loading, empty, invalid, no-results, error, all-orgs)
 
 - Library: `PageHeaderComponent` ("Search"), `ClusterComponent`, `FormFieldComponent` (label "Search" with `labelHidden`, the "Type at least 2 characters to search." hint as `help`) + `TextFieldComponent` `type="search"` `size="lg"`, `ButtonComponent` primary `lg` *Search*, `SearchResultsComponent` (groups People, Events, Partners, "Your private contacts", "Work items in your workspaces", "Resources ({n})" with type `IconTileComponent`s, *Shared with you* / *Private* `BadgeComponent`s and *See all in Resources* linking to `/resources?q=` (`pages/search/resources`), with the "{n} results for “{term}”" status, avatars, icons and badges), `ListSkeletonComponent` (in a busy status region), `EmptyStateComponent` ("Search all of FaithTech"; "No results for “{term}”" with *Clear search*; error with *Try again*).
 - Local: the `<form role="search">`, the visually hidden status line that announces the hint, and the result mapping (event day, partner stage label, work item status).
+- Organizations state `all-orgs`: `SearchResultsComponent` groups with an `OrgLabelComponent` in each result’s meta, and `CheckboxComponent` *Include agents* beside the search box (agents hidden by default, L2-152). Inside one org results carry no label.
 
-### Resources — `/resources` (`pages/resources`: default, loading, empty, error, no-results, filtered, member)
+### Resources — `/resources` (`pages/resources`: default, loading, empty, error, no-results, filtered, member, all-orgs)
 
 - Library: `PageHeaderComponent` ("Resources", subtitle "Decks, logos, training and templates · {n} resources" or "· none yet") with ghost *Archived* (`ButtonComponent` `href` `/resources/archived`, `IconComponent` `archive`) and primary *Add resource* (`IconComponent` `add`) for contributors only (`member` hides both), `FormFieldComponent` (`labelHidden` "Search resources") + `TextFieldComponent` `type="search"` (placeholder "Search titles, descriptions, tags and file names"), `FormFieldComponent` (`labelHidden` "Tag") + `SelectComponent` ("Any tag" and the tags in use), `ChipGroupComponent` "Type" of `ChipComponent` toggles (All types, Deck, Logo, Image, Training, Template, Document, Other; one pressed), `CardComponent` `flush` + `ListComponent` "Recently added" + `ListItemComponent` (title linking to `/resources/:id`; meta "Type · EXT · size · owner · day" from `formatDay`, with `IconComponent` `external` before a link's host; leading `IconTileComponent` with the type icon, or `imageSrc` with the thumbnail object URL for an Image; `[meta]` slot `BadgeComponent` *Private* `neutral` with `locked`, *Shared* / *Shared with you* `info` with `people`; trailing ghost icon `ButtonComponent` *Download {title}, {EXT}, {size}* or link *Open {title} on {host} (opens in a new tab)*), `ButtonComponent` *Show more*, `ListSkeletonComponent` "Loading resources", `EmptyStateComponent` (empty "No resources yet" with *Add the first resource* for contributors; no-results "Nothing matches “{term}”" with *Clear search*; error "We couldn’t load resources" with *Try again*), *Clear filters* `ButtonComponent` ghost in the filtered state, `ToastService` (resource toasts).
 - Opens `AddResourceDialog` through `DialogService`. Services: `RESOURCES_SERVICE`.
 - Local: the search `<form role="search">`, the "Recently added" section heading, the filtered heading line ("2 resources tagged “hackathon”") and the download glue (object URL and a temporary `<a download>`).
+- Organizations state `all-orgs`: `TableComponent` with an Org column of `OrgLabelComponent` (`variant="portfolio"` for Portfolio-wide items) and the visibility level; no *Add resource* under All orgs.
 
 ### Resource — `/resources/:id` (`pages/resource`: default, image, link, shared, shared-with-you, private, member, admin, archived, loading, error, missing)
 
@@ -274,7 +289,7 @@ Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the 
 - Library: `BreadcrumbComponent` (Resources › Archived), `PageHeaderComponent` ("Archived resources", "Only you can see these. Each is deleted for good 30 days after you archive it."), `CardComponent` `flush` + `ListComponent` + `ListItemComponent` (type `IconTileComponent`, title, meta "{Type} · {EXT} · {size} · archived {day} · deleted for good {day}", ", in {n} days" in the last week; trailing `ButtonComponent` *Restore* with the title as its visually hidden `object`), `ListSkeletonComponent` "Loading archived resources", `EmptyStateComponent` ("Nothing archived" with *Back to Resources*; error "We couldn’t load your archived resources" with *Try again*), `ToastService` (restored, wasn’t restored).
 - Local: none beyond composition.
 
-### Reports — `/reports` (`pages/reports`: default, filtered, city, unknown-filter, exporting, export-failed, loading, empty, error, forbidden)
+### Reports — `/reports` (`pages/reports`: default, filtered, city, unknown-filter, exporting, export-failed, loading, empty, error, forbidden, org-filter)
 
 - Library: `PageHeaderComponent` ("Reports", subtitle "{city} · {period} · updated today at {time}"), the filter row: `FormFieldComponent` + `SelectComponent` City (All cities and each city in use) and Period (Last 30 days, Last 90 days, This year, All time), *Apply* (`ButtonComponent` submit) and ghost *Export CSV* (`export`, `loading`, "Exporting…") in a `FilterBarComponent` (`ft-filter-bar label="Report filters"`) with Export CSV in its `ftFilterBarEnd` slot (`patterns/lists-and-tables.html`, Report; `components/chip.html`, `.filter-bar__end`).
 - Figures: five `StatComponent` in a stat row (Members, Events held, RSVPs, Partners confirmed, Announcements), each with its `context` line ("+18 in the last 30 days", "0 cancelled", "85% checked in", "of 12 in the pipeline", "sent by leads"; `components/stat.html`, Report row with context lines), in a `ClusterComponent` `gap="8"`, or a `StackComponent` below SM (`BreakpointService`) so the figures are one column on a phone.
@@ -284,11 +299,14 @@ Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the 
 - Unknown-filter: a `?city=` or `?period=` the server does not recognise falls back to All cities and Last 30 days with a title-only `AlertComponent` warning `polite` "We couldn’t use that filter, so this shows all cities for the last 30 days." above the filters.
 - Apply reloads `REPORTS_SERVICE` and writes `?city=&period=` to the URL; *Export CSV* downloads the same filters, `loading` while it runs (exporting); a failure shows the `danger` toast "Couldn’t export the report. Try again." with *Try again* (export-failed).
 - Local: the `<form>` element, the CSV download glue.
-### Notes — `/notes` (`pages/notes`: default, loading, empty, error, no-results, shared-with-me)
+- Organizations state `org-filter`: the `FilterBarComponent`’s first `SelectComponent` is “Organization” (All my orgs and each covered org with Reports on), and the table’s rows are orgs with `OrgLabelComponent`.
+
+### Notes — `/notes` (`pages/notes`: default, loading, empty, error, no-results, shared-with-me, all-orgs)
 
 - Library: `PageHeaderComponent` ("Notes", subtitle "Meeting notes, playbooks and how-tos · {n} pages" or "· none yet") with an `ftPageHeaderActions` `ClusterComponent` of ghost *Archived* (`ButtonComponent` `href` `/notes/archived`, `IconComponent` `archive`) and primary *New page* (`IconComponent` `add`, `loading` while `POST /api/notes` runs); `FormFieldComponent` (`labelHidden` "Search notes") + `TextFieldComponent` `type="search"` (placeholder "Search page titles and text"); `ChipGroupComponent` "Owner" of `ChipComponent` toggles (*All pages*, *Mine*, *Shared with me*; one `pressed`); `CardComponent` `flush` + `ListComponent` "Notes" + `ListItemComponent` (label = title, "Untitled" when empty; `href` `/notes/:id`; `meta` "Edited {ddd d MMM} · {you | owner}[ · in {parent title | Private page}]" from `formatDay`; leading `IconTileComponent` `name="notes"` with `[emoji]` = the page icon; `meta` slot `BadgeComponent` *Private* `neutral`, *Shared* / *Shared with you* `info`, none for Global); `ButtonComponent` *Show more* (25 at a time, `loading`); `ListSkeletonComponent` "Loading notes"; `EmptyStateComponent` (empty `icon="notes"` "No pages yet" with primary *Create your first page*; no-results `icon="search"` "No pages match “{term}”" with *Clear search*; error variant "We couldn’t load notes" with *Try again*); `ToastService` (danger "Page not created", "We couldn’t load more pages").
 - Services: `NOTES_SERVICE`. *New page* creates and navigates to `/notes/:id` with focus in the title.
 - Local: the filter row wrapper (`role="search"`), the "Recently edited" section heading, and the glue that debounces the search and maps a summary to its meta line and badge (`note-format.ts`).
+- Organizations state `all-orgs`: as Resources: Org column of `OrgLabelComponent`, visibility (Private, Shared, Org-wide, Portfolio-wide); no *New page* under All orgs.
 
 ### Note page — `/notes/:id` (`pages/note`: default, new, block-menu, slash-menu, toolbar, page-link, dragging, keyboard-move, saving, save-failed, conflict, read-only, shared-with-you, private, backlinks, nested, admin, archived, forbidden, loading, error, not-found)
 
@@ -303,6 +321,90 @@ Coverage: the profiles screens (`profile`, `edit-profile`, `delete-photo`), the 
 
 - Library: `BreadcrumbComponent` (Notes › Archived), `PageHeaderComponent` ("Archived pages", "Only you can see these. Restore a page to put it back where it was."), `CardComponent` `flush` + `ListComponent` "Archived pages" + `ListItemComponent` (`IconTileComponent` `name="notes"` with `[emoji]`, title linking to the archived page, meta "archived {ddd d MMM}"; trailing `ButtonComponent` *Restore* with `IconComponent` `restore` and the title as its visually hidden `object`), `ListSkeletonComponent` "Loading archived pages", `EmptyStateComponent` ("Nothing archived", "When you archive a page it waits here until you restore it." with *Back to Notes*; error variant "We couldn’t load your archived pages", "Nothing has been deleted. Check your connection and try again." with *Try again*), `ToastService` (success "{title} restored", "It’s back in Notes, with the same visibility as before." with *View*).
 - Opens `RestoreNoteDialog`. Local: none beyond composition.
+
+## Organizations
+
+The organization hierarchy's screens (L1-025, `L2-134` to `L2-157`, ADRs 0033 to 0041) live in the `organizations` feature library, except the shell parts above. Services: `ACCESS_SERVICE` (`GET /api/me/access`: covered orgs, features, permissions, branding) and `ORGANIZATIONS_SERVICE` (orgs, members, Org Types and catalogues, cross-org roles, agents and tokens), both in `api`. Portfolio admin pages share `PageHeaderComponent` "Portfolio" and `TabsComponent` + `TabComponent` in navigation mode (Organizations, Org Types, Cross-org roles, Agents, Audit log); organization settings share `PageHeaderComponent` "Organization settings" with `OrgLabelComponent` in the subtitle and tabs General, Branding, Members, Agents, Audit log. Their forbidden states are `EmptyStateComponent` with a page-level visually hidden `h1`, their errors the error variant with *Try again*, their loading `ListSkeletonComponent` or `SkeletonComponent`.
+
+### Waiting to be added — any app URL for someone who covers no org (`pages/waiting`: default, checked)
+
+- Library: `TopBarComponent` with only the account `MenuComponent` (no nav, switcher or search), `CardComponent` with the hourglass `IconComponent`, `ListComponent` of three `ListItemComponent`s (*Your profile* link, “Have an invite?”, *Sign out* with the email), `ButtonComponent` *Check again* (reloads access; with orgs it routes to the org's home, L2-142 AC4), a polite status line (“Still waiting…”).
+- Local: the `h1` "Waiting to be added" and the copy.
+
+### Organizations — `/portfolio/organizations` (`pages/organizations`: default, created, archived, loading, empty, error, forbidden)
+
+- Library: portfolio header and tabs, *New organization* (`ButtonComponent` `primary` opening `create-org`), `TabsComponent` Active / Archived, `TableComponent` (Organization: **Add to components** `OrgMarkComponent` + `LinkComponent` + the slug in a caption; Type; Members; Org Leads; Status; *Settings* or *Restore* `ButtonComponent` `sm`), `AlertComponent` `info` on the archived view, `EmptyStateComponent` (“Create your first organization”), `ToastService` success “{org} created” with *Open members*.
+- Local: none beyond composition.
+
+### Organization settings — `/o/:orgSlug/settings` (`pages/organization`: default, org-lead, invalid, saved, branding, branding-invalid, branding-saved, members, members-no-results, audit-log, archived, loading, error, forbidden)
+
+- General: `FormFieldComponent` + `TextFieldComponent` Name and Slug (mono; `readonly` for an Org Lead with the caption “Only the Portfolio Lead can change the name, slug and type”), `SelectComponent` Org Type (disabled), `ErrorSummaryComponent` (invalid slug), `FormActionsComponent` *Save changes*, `DangerZoneComponent` *Archive {org}* (Portfolio Lead only), `ToastService` “Slug changed”.
+- Branding: `TextFieldComponent` Display name, logo row (**Add to components** `OrgMarkComponent` `lg`, `ButtonComponent` *Replace logo* opening the file picker as `FileDropzoneComponent` does, ghost *Remove*), **Add to components** `ColourFieldComponent` (`ft-colour-field`: value, ratio, foreground, error; design system `components/colour-field.html`), a preview `CardComponent` with **Add to components** `OrgBandComponent`, `ErrorSummaryComponent` with the API's message “This colour doesn't have enough contrast. Choose a darker or lighter shade.” (branding-invalid), `ToastService` “Branding saved”.
+- Members: *Invite someone* and *Add member* in the header, `FilterBarComponent` with `TextFieldComponent` search and `SwitchComponent` *Include agents*, `TableComponent` (`AvatarComponent` + `LinkComponent`, `BadgeComponent` `variant="agent"` for agents; `BadgeComponent` `info` “Org Lead” + `role` badges; Joined; *Change roles* and ghost *Remove* `ButtonComponent`s), `EmptyStateComponent` (no results with *Clear search* and *Invite someone*), a `CardComponent` “Also covering this org” with `ListComponent` of cross-org holders.
+- Audit log (Org Lead): `AlertComponent` `info` “Entries for {org} only”, `FilterBarComponent` + `SelectComponent` Action, `TableComponent` (When, Who with the Agent badge, What with the token and issuer), *Export CSV*.
+- Archived: `AlertComponent` `warning` with *Restore {org}*; fields read-only.
+- Local: the tab routing and the slug and contrast error mapping from the API's validation problem.
+
+### Org Types — `/portfolio/org-types` (`pages/org-types`: default, loading, empty, error, forbidden)
+
+- Library: portfolio header and tabs, *New Org Type* (opens `create-org-type`), `TableComponent` (Org Type `LinkComponent` with its description, Roles, Features, Organizations), `EmptyStateComponent`.
+- Local: none.
+
+### Org Type catalogue — `/portfolio/org-types/:id` (`pages/org-type`: default, reorder, feature-off, remove-refused, invalid, saved, features, loading, empty, error, forbidden)
+
+- Library: `BreadcrumbComponent`, `PageHeaderComponent`, `TabsComponent` (Roles, Features), `SplitComponent` of two `CardComponent`s:
+  - Roles: **Add to components** `RoleTreeComponent` (`ft-role-tree`: roles, selectedId, memberBundle, announcement, `(select)`, `(move)`; `components/role-tree.html`) with *Add role*; `EmptyStateComponent` when the type has no roles.
+  - Role editor: `TextFieldComponent` Name and Key (mono), Description, `SelectComponent` “Shown under”, **Add to components** `PermissionChecklistComponent` (`ft-permission-checklist`: groups, value, hiddenFeatures, hiddenCount, readonly, error; `components/permission-checklist.html`), `CheckboxGroupComponent` “Can grant” (inline), `FormActionsComponent` *Save role*, ghost *Remove role* (opens `remove-catalogue-role`), `ErrorSummaryComponent` (invalid: blank name, duplicate key).
+  - `AlertComponent` `danger` for the 409 refusal naming the holders (remove-refused); `ToastService` “{role} saved” (saved).
+  - Features: `CardComponent` with `ListComponent` of `SwitchComponent`s with descriptions (Profiles and Docs & notes disabled, “Always on”), *Save features*.
+- Local: building the permission groups from the code list and the type's enabled features (the hidden note's count), and the move announcement text.
+
+### Cross-org roles — `/portfolio/cross-org-roles` (`pages/cross-org-roles`: default, editor, editor-orgs, invalid, saved, assignments, loading, empty, error, forbidden)
+
+- Library: portfolio header and tabs, *New cross-org role* (opens `create-cross-org-role`), `TableComponent` (Role with description, Scope, Permissions, Can join work `BadgeComponent`, Holders, *Edit* and *Assignments*).
+- Editor: `BreadcrumbComponent`, `TextFieldComponent` Name and Description, **Add to components** `ScopePickerComponent` (`ft-scope-picker`: value, orgTypes, orgs, summary, error; `components/scope-picker.html`), `SwitchComponent` *Can join work* with its description, **Add to components** `PermissionChecklistComponent` (every feature of the portfolio), `FormActionsComponent`, `ErrorSummaryComponent` (no org chosen), `ToastService` “{role} saved”.
+- Assignments: `TableComponent` (Person, Covers with `OrgLabelComponent` when narrowed, Since, ghost *Unassign*), *Assign {role}* (opens `assign-cross-org-role`).
+- Local: the coverage summary text (“Covers 2 orgs today… New FaithTech City orgs are covered automatically.”).
+
+### Agents — `/portfolio/agents`, `/o/:orgSlug/settings/agents` (`pages/agents`: default, tokens, revoked, org-lead, loading, empty, error, forbidden)
+
+- Library: portfolio header and tabs, *New agent* (opens `create-agent`), `TableComponent` (Agent with `AvatarComponent` initials and `BadgeComponent` `variant="agent"`, Org and roles with `OrgLabelComponent`, Tokens, Last used, *Tokens*).
+- Tokens: `BreadcrumbComponent`, `PageHeaderComponent` with the Agent badge and *Issue token*, `TableComponent` (Name, prefix in mono, Orgs, Expires with `BadgeComponent` `warning` “Expired …”, Last used, Issued by, ghost *Revoke* or `BadgeComponent` `danger` “Revoked”), `ToastService` “Token revoked”.
+- Org Lead (`org-lead`, in organization settings): `AlertComponent` `info` “You can issue tokens scoped to {org}”, one row per agent in the org with *Issue token*.
+- Local: none beyond composition.
+
+### My work — `/o/all/my-work`, `/o/:orgSlug/my-work` (`pages/my-work`: default, org, loading, empty, error)
+
+- Library: `PageHeaderComponent`, `TableComponent` (Item `LinkComponent`, Workspace, Org `OrgLabelComponent` under All orgs only, Status `BadgeComponent`, Due), `ListSkeletonComponent`, `EmptyStateComponent` with *Open workspaces*.
+- Services: `AGILE_SERVICE` (assigned items across covered orgs).
+- Local: none.
+
+### Organizations dialogs
+
+| Dialog (mock: states) | Surface | Library | Local |
+|---|---|---|---|
+| Add member (`dialogs/add-member`: default, invalid, busy, failed) | `DialogService` | `DialogComponent` (`icon="user-add"`, `busy`), `FormFieldComponent` + `TextFieldComponent` `type="email"` with the API's 404 “No account uses that email. Send an invite instead.”, `ButtonComponent` link *Send an invite instead*, `SelectComponent` Role (No role (Member) and the roles the caller may grant), `AlertComponent` (failed), *Cancel*, *Add member* with `loading` | — |
+| Remove member (`dialogs/remove-member`: default, busy, failed, last-org-lead) | `DialogService` | `DialogComponent` (`tone="danger"`), the consequences as a plain list, `AlertComponent` `danger` for the 409 last Org Lead (with only *Close*), *Remove {name}* `variant="danger"` with `loading` | — |
+| Change org roles (`dialogs/change-org-roles`: default, org-lead, busy, failed) | `DialogService` | **Add to components** `RoleDialogComponent` `mode="org"` (shared with People): `DialogComponent`, `CheckboxGroupComponent` “Built in” with *Org Lead* (Portfolio Lead only) and `CheckboxGroupComponent` “{type} roles” of the roles the caller may grant (`{ key, name }` from the API), `AlertComponent` (403 refusal), *Save roles* | — (opened with a `submit` that calls `ORGANIZATIONS_SERVICE`) |
+| New organization (`dialogs/create-org`: default, invalid, busy, failed) | `DialogService` | `DialogComponent` (`icon="building"`), `TextFieldComponent` Name, Slug (mono, help with the rules), `SelectComponent` Org Type, `ErrorSummaryComponent`, `AlertComponent` (409 slug taken), *Create organization* | — |
+| New Org Type (`dialogs/create-org-type`: default, invalid, busy, failed) | `DialogService` | `DialogComponent` (`icon="layers"`), `TextFieldComponent` Name, Description, `CheckboxGroupComponent` Features (inline; Profiles and Docs & notes disabled), `ErrorSummaryComponent`, *Create and add roles* | — |
+| New cross-org role (`dialogs/create-cross-org-role`: default, invalid, busy, failed) | `DialogService` | `DialogComponent` (`icon="globe"`), `TextFieldComponent` Name and Description, **Add to components** `ScopePickerComponent`, `SwitchComponent` *Can join work*, *Create and choose permissions* | — |
+| Assign cross-org role (`dialogs/assign-cross-org-role`: default, narrowed, invalid, busy, failed) | `DialogService` | `DialogComponent`, `PersonPickerComponent` (single) “Person”, `RadioGroupComponent` “Covers” (every org of the role / only some) revealing `CheckboxGroupComponent` of the role's orgs, `ErrorSummaryComponent`, *Assign {role}* | — |
+| New agent (`dialogs/create-agent`: default, invalid, busy, failed) | `DialogService` | `DialogComponent` (`icon="bot"`), `TextFieldComponent` Name and What it does, `SelectComponent` Member of and Role, *Create agent* | — |
+| Issue token (`dialogs/issue-token`: default, org-lead, invalid, busy, failed, issued) | `DialogService` | `DialogComponent` (`icon="key"`), `TextFieldComponent` Token name, `SelectComponent` Expires after (1, 7, 30 default, 60, 90 days), `CheckboxGroupComponent` Organizations (fixed and disabled for an Org Lead), `ErrorSummaryComponent`; issued: **Add to components** `TokenRevealComponent` (`ft-token-reveal`: token, prefix, label, hint, `(copied)`; `components/token-reveal.html`) and only *I’ve copied it* | — |
+| Revoke token (`dialogs/revoke-token`: default, busy, failed) | `DialogService` | `DialogComponent` (`tone="danger"`), *Revoke token* `variant="danger"` with `loading`, `AlertComponent` (failed) | — |
+| Remove catalogue role (`dialogs/remove-catalogue-role`: default, busy, refused, failed) | `DialogService` | `DialogComponent` (`tone="danger"`), `AlertComponent` `danger` for the 409 naming the holders (only *Close*), *Remove {role}* | — |
+| Choose an organization (`dialogs/choose-org`: default, invalid) | `DialogService` | `DialogComponent` (`icon="building"`), `RadioGroupComponent` “Create it in” of the orgs where the caller may create, `ErrorSummaryComponent` + error “Choose an organization”, *Continue* | — (each feature that creates under All orgs opens it; it returns the slug) |
+| Send invite, org state (`dialogs/send-invite`: org) | `DialogService` | As Send invite; the title names the org and the Role `SelectComponent` lists the org's catalogue roles the inviter may grant | — |
+| My QR code, org state (`dialogs/my-qr-code`: org) | `DialogService` | As My QR code; title, caption and the copy field's label name the org (one link per org) | — |
+| Add workspace members, cross-org state (`dialogs/add-workspace-member`: cross-org) | `DialogService` | As Add members; a covering cross-org holder's `CheckboxComponent` label adds `BadgeComponent` `role` “Cross-org · {role}” and the caption “Not a member of {org}; joins as a workspace Member” | — |
+| Add resource and Share page, visibility states (`dialogs/add-resource`: org-wide, portfolio-wide; `dialogs/share-note`: org-wide, portfolio-wide) | `DialogService` | The visibility `RadioGroupComponent` becomes Private, Shared, “Everyone in {org}” (Org-wide) and, for the Portfolio Lead only, “Everyone in the portfolio” (Portfolio-wide) | — |
+| Reassign owner, Org Lead state (`dialogs/reassign-owner`: org-lead) | `DialogService` | As Reassign owner, opened by the Org Lead from Workspaces; the `RadioGroupComponent` lists the org's `workspaces.create` holders and Org Leads | — |
+
+### Organizations notifications
+
+- `notifications/org-toast` (info, success, warning, danger) on Home: `ToastService` with `ToastComponent` variants — info “Switched to {org}” (“{section} isn’t used in {org}, so you’re on its home page.”), success “{name} added to {org}” with *Undo*, warning “This address moved” (old slug redirected), danger “We couldn’t switch to {org}” with *Try again*.
+- `notifications/bell` `org-labels`: `NotificationPanelComponent`'s `NoticeListComponent` notices end their meta with **Add to components** `OrgLabelComponent`; the panel is otherwise unchanged.
 
 ## Dialogs
 
@@ -394,6 +496,21 @@ Notes (`notifications/note-toast`: archived, restored, danger, shared, moved) us
     - `PageHeaderComponent` `focusTitle()`: the h1 takes `tabindex="-1"` so focus can return to it when an action removes the focused control (`components/layout.html`, Focus). Partner *Not the same*.
     
     Local to the feature libraries, by composition only: `PartnerTimelineComponent` (`ft-partner-timeline`, in `partners`), the merge dialog's intro sentence, the check-in search form and list caption, and the CSV download glue (`download.ts` in `reports`, as on the event page). The possible-duplicate contact alert is plain `AlertComponent` composition.
+
+15. Organizations: add to the library before the screens that need them (design system pages in brackets):
+    - `OrgSwitcherComponent` (`ft-org-switcher`: `orgs`, `active`, `showAllOrgs`, `portfolioName`, `label`, `(orgChange)`; single org renders the static mark and name) (`components/org-switcher.html`). Shell.
+    - `OrgLabelComponent` (`ft-org-label`: `name`, `variant` `'org' | 'portfolio'`, `accent`, `accentForeground`), `OrgMarkComponent` (`ft-org-mark`: `name`, `logoUrl`, `accent`, `accentForeground`, `size` `'sm' | 'md' | 'lg'`, `all`) and `OrgBandComponent` (`ft-org-band`: `name`, `logoUrl`, `accent`, `accentForeground`) (`components/org-label.html`). All orgs lists, search, notifications, audit log, organizations, branding, public event and connect pages.
+    - `OrgAccentDirective` (`[ftOrgAccent]="{ accent, accentForeground }"`): sets `--color-org-accent` and `--color-org-accent-foreground` on its host; null keeps the defaults (`foundations/theming.html#org-accent`). Shell header and strip.
+    - `BadgeComponent` `variant="agent"` (bot icon and “Agent”) (`components/agent-badge.html`). People, feeds, audit log, agents, profile.
+    - `PermissionChecklistComponent` (`ft-permission-checklist`: `groups`, `value`/`(valueChange)`, `hiddenFeatures`, `hiddenCount`, `readonly`, `error`, `label`) (`components/permission-checklist.html`). Org Type catalogue, cross-org roles.
+    - `ScopePickerComponent` (`ft-scope-picker`: `value` `{ kind: 'portfolio' | 'orgType' | 'orgs', orgTypeId?, orgIds? }`, `orgTypes`, `orgs`, `summary`, `portfolioName`, `error`, `(valueChange)`) (`components/scope-picker.html`). Cross-org roles.
+    - `RoleTreeComponent` (`ft-role-tree`: `roles` `{ id, key, name, depth, holders }[]`, `selectedId`, `memberBundle`, `announcement`, `label`, `(select)`, `(move)` `{ id, direction }`) (`components/role-tree.html`). Org Type catalogue.
+    - `ColourFieldComponent` (`ft-colour-field`: `label`, `value`/`(valueChange)`, `minimumRatio` 4.5, `previewText`, `help`, `error`, `optional`; computes the ratio and foreground locally for feedback only) and a `contrastRatio(hex, hex)` helper (`components/colour-field.html`). Organization branding.
+    - `TokenRevealComponent` (`ft-token-reveal`: `token` (null = hidden), `prefix`, `label`, `hint`, `(copied)`) (`components/token-reveal.html`). Issue token.
+    - `RoleDialogComponent` `mode="org"`: checkboxes of the org's grantable catalogue roles plus an optional Org Lead box, labelled by the API's role names; shared by People (profiles) and Organization settings (organizations).
+    - `IconComponent` icons `building`, `layers`, `bot`, `key`, `hourglass`, `user-add`, `user-remove`, `globe` and `list-check`.
+
+    Local to `organizations`, by composition only: the settings and portfolio tab routing, the catalogue editor's glue (permission groups from the code list and enabled features, the move announcement), the coverage summary text and the switch handler in the shell.
 
 ### Settings — `/settings` (`pages/settings`: Appearance and Email me when cards so far)
 

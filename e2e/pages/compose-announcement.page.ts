@@ -34,6 +34,11 @@ export class ComposeAnnouncementPage {
   }
 
   /** "Everyone", "People with a role" or "An event’s RSVP list". */
+  /** The "Send to" option whose name starts with `label`. */
+  audience(label: string): Locator {
+    return this.sendTo.getByRole('radio', { name: new RegExp(`^${label}`) });
+  }
+
   async chooseAudience(label: string): Promise<void> {
     await this.sendTo.getByRole('radio', { name: new RegExp(`^${label}`) }).check();
   }

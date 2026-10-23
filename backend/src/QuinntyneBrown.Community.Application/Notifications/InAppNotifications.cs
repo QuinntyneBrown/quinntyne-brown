@@ -3,9 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Notifications;
 
-/// <summary>A notification as its recipient sees it. The actor is the member whose action raised it, when known.</summary>
+/// <summary>A notification as its recipient sees it. The actor is the member whose action raised it, when known.
+/// <c>Organization</c> names the org the activity happened in; platform notices have none (L2-152 AC1).</summary>
 public record NotificationDto(
-    Guid Id, string Kind, string Title, string LinkPath, DateTimeOffset CreatedAt, DateTimeOffset? ReadAt, Guid? ActorId, string? ActorName);
+    Guid Id, string Kind, string Title, string LinkPath, DateTimeOffset CreatedAt, DateTimeOffset? ReadAt, Guid? ActorId, string? ActorName,
+    Organizations.OrgLabel? Organization = null);
 
 public record NotificationPage(
     IReadOnlyList<NotificationDto> Items, int Page, int PageSize, int TotalCount, int UnreadCount, bool HasMore);
@@ -33,11 +35,16 @@ public class InAppNotificationsHandler(IApplicationDbContext db, ICurrentUser cu
                 select new { n, ActorName = actor == null ? null : actor.Name })
             .ToListAsync(cancellationToken);
 
+        var orgIds = rows.Select(r => r.n.OrganizationId).OfType<Guid>().Distinct().ToList();
+        var orgs = await db.Organizations.AsNoTracking().Where(o => orgIds.Contains(o.Id))
+            .ToDictionaryAsync(o => o.Id, o => new Organizations.OrgLabel(o.Id, o.Slug, o.DisplayName ?? o.Name), cancellationToken);
+
         // The join may lose the order in some providers, so it is applied again in memory.
         var items = rows
             .OrderByDescending(r => r.n.CreatedAt).ThenByDescending(r => r.n.Id)
             .Select(r => new NotificationDto(
-                r.n.Id, r.n.Kind.ToString(), r.n.Title, r.n.LinkPath, r.n.CreatedAt, r.n.ReadAt, r.n.ActorId, r.ActorName))
+                r.n.Id, r.n.Kind.ToString(), r.n.Title, r.n.LinkPath, r.n.CreatedAt, r.n.ReadAt, r.n.ActorId, r.ActorName,
+                r.n.OrganizationId is { } org ? orgs.GetValueOrDefault(org) : null))
             .ToList();
         return new NotificationPage(items, request.Page, request.PageSize, total, unreadCount, request.Skip + items.Count < total);
     }

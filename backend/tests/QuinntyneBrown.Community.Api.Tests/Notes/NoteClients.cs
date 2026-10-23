@@ -30,7 +30,7 @@ public static class NoteClients
 
     public sealed record AudienceMember(Guid Id, string Name, string? City);
 
-    public sealed record AudienceRole(string Role, int Count);
+    public sealed record AudienceRole(string Role, int Count, string? Name = null);
 
     public sealed record Audience(AudienceMember[] Members, AudienceRole[] Roles);
 
@@ -69,16 +69,16 @@ public static class NoteClients
     }
 
     /// <summary>A page shared with the given members and roles, set straight in the database.</summary>
-    public static async Task ShareInDbAsync(this CommunityApiFactory factory, Guid pageId, Guid[] members, Role[] roles) =>
+    public static async Task ShareInDbAsync(this CommunityApiFactory factory, Guid pageId, Guid[] members, SeededRole[] roles) =>
         await factory.WithDbAsync(async db =>
         {
             var stored = await db.NotePages.SingleAsync(p => p.Id == pageId);
-            stored.SetAudience(NoteVisibility.Shared, members, roles);
+            stored.SetAudience(NoteVisibility.Shared, members, [.. roles.Select(r => r.Id())]);
             return await db.SaveChangesAsync();
         });
 
     public static async Task<Detail> AddNoteAsync(
-        this CommunityApiFactory factory, ProfileClients.Member owner, string title, string visibility = "Private", params Role[] roles)
+        this CommunityApiFactory factory, ProfileClients.Member owner, string title, string visibility = "Private", params SeededRole[] roles)
     {
         var client = factory.ClientFor(owner, roles);
         var page = await client.CreateNoteAsync(title);

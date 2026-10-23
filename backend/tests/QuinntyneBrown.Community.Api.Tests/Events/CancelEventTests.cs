@@ -27,10 +27,10 @@ public class CancelEventTests(CommunityApiFactory factory) : IClassFixture<Commu
     // AC1: Given an Event Lead, City Lead or System Admin, when they cancel an event with a required reason after
     // confirming, then the event is marked cancelled and new RSVPs are refused.
     [Theory]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Event_manager_cancels_with_a_reason_and_new_rsvps_are_refused(Role role)
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Event_manager_cancels_with_a_reason_and_new_rsvps_are_refused(SeededRole role)
     {
         var existing = await factory.AddEventAsync("Builders Night", Week);
         var esther = await factory.AddMemberAsync("Esther Nakamura");
@@ -49,9 +49,9 @@ public class CancelEventTests(CommunityApiFactory factory) : IClassFixture<Commu
 
     [Theory]
     [InlineData]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.Volunteer, Role.CreateLead)]
-    public async Task Any_other_role_gets_403_and_nothing_changes(params Role[] roles)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.Volunteer, SeededRole.CreateLead)]
+    public async Task Any_other_role_gets_403_and_nothing_changes(params SeededRole[] roles)
     {
         var existing = await factory.AddEventAsync("Builders Night", Week);
         var member = await factory.AddMemberAsync("Leah Thompson");
@@ -72,7 +72,7 @@ public class CancelEventTests(CommunityApiFactory factory) : IClassFixture<Commu
         var existing = await factory.AddEventAsync("Builders Night", Week);
         var lead = await factory.AddMemberAsync("Esther Nakamura");
 
-        var response = await factory.ClientFor(lead, Role.EventLead).PostAsJsonAsync($"/api/events/{existing.Id}/cancel", new { reason });
+        var response = await factory.ClientFor(lead, SeededRole.EventLead).PostAsJsonAsync($"/api/events/{existing.Id}/cancel", new { reason });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var errors = (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("errors");
@@ -86,7 +86,7 @@ public class CancelEventTests(CommunityApiFactory factory) : IClassFixture<Commu
         var existing = await factory.AddEventAsync("Builders Night", Week);
         var lead = await factory.AddMemberAsync("Esther Nakamura");
 
-        var response = await factory.ClientFor(lead, Role.EventLead).PostAsJsonAsync($"/api/events/{existing.Id}/cancel", new { reason = new string('a', 501) });
+        var response = await factory.ClientFor(lead, SeededRole.EventLead).PostAsJsonAsync($"/api/events/{existing.Id}/cancel", new { reason = new string('a', 501) });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -96,7 +96,7 @@ public class CancelEventTests(CommunityApiFactory factory) : IClassFixture<Commu
     {
         var cancelled = await factory.AddEventAsync("Builders Night", Week, cancelledBecause: "Venue flooded.");
         var lead = await factory.AddMemberAsync("Esther Nakamura");
-        var client = factory.ClientFor(lead, Role.EventLead);
+        var client = factory.ClientFor(lead, SeededRole.EventLead);
 
         var unknown = await client.PostAsJsonAsync($"/api/events/{Guid.NewGuid()}/cancel", new { reason = Reason });
         var again = await client.PostAsJsonAsync($"/api/events/{cancelled.Id}/cancel", new { reason = Reason });
@@ -118,7 +118,7 @@ public class CancelEventTests(CommunityApiFactory factory) : IClassFixture<Commu
             members: [ruth.ProfileId, jonah.ProfileId], guests: [("Abby Brooks", guestEmail)]);
         var lead = await factory.AddMemberAsync("Esther Nakamura");
 
-        var response = await factory.ClientFor(lead, Role.CityLead).PostAsJsonAsync($"/api/events/{existing.Id}/cancel", new { reason = Reason });
+        var response = await factory.ClientFor(lead, SeededRole.CityLead).PostAsJsonAsync($"/api/events/{existing.Id}/cancel", new { reason = Reason });
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         foreach (var address in new[] { await factory.EmailOfAsync(ruth), await factory.EmailOfAsync(jonah), guestEmail })
@@ -148,7 +148,7 @@ public class CancelEventTests(CommunityApiFactory factory) : IClassFixture<Commu
         var existing = await factory.AddEventAsync("Builders Night", Week);
         var admin = await factory.AddMemberAsync("Priya Shah");
 
-        (await factory.ClientFor(admin, Role.SystemAdmin).PostAsJsonAsync($"/api/events/{existing.Id}/cancel", new { reason = Reason }))
+        (await factory.ClientFor(admin, SeededRole.SystemAdmin).PostAsJsonAsync($"/api/events/{existing.Id}/cancel", new { reason = Reason }))
             .EnsureSuccessStatusCode();
 
         var entry = await factory.WithDbAsync(db => db.AuditEntries.AsNoTracking().SingleAsync(e => e.TargetId == existing.Id.ToString()));
@@ -160,7 +160,7 @@ public class CancelEventTests(CommunityApiFactory factory) : IClassFixture<Commu
     {
         var existing = await factory.AddEventAsync("Builders Night", Week);
         var esther = await factory.AddMemberAsync("Esther Nakamura");
-        await factory.ClientFor(esther, Role.CityLead).PostAsJsonAsync($"/api/events/{existing.Id}/cancel", new { reason = Reason });
+        await factory.ClientFor(esther, SeededRole.CityLead).PostAsJsonAsync($"/api/events/{existing.Id}/cancel", new { reason = Reason });
         var leah = await factory.AddMemberAsync("Leah Thompson");
 
         var json = await factory.ClientFor(leah).GetFromJsonAsync<JsonElement>($"/api/events/{existing.Id}");

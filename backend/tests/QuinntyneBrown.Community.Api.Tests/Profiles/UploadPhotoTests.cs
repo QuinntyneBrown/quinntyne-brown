@@ -140,8 +140,8 @@ public class UploadPhotoTests(CommunityApiFactory factory) : IClassFixture<Commu
 
     [Theory]
     [InlineData]
-    [InlineData(Role.Staff)]
-    public async Task Anyone_but_the_owner_or_a_system_admin_gets_403(params Role[] roles)
+    [InlineData(SeededRole.Staff)]
+    public async Task Anyone_but_the_owner_or_a_system_admin_gets_403(params SeededRole[] roles)
     {
         var samuel = await factory.AddMemberAsync("Samuel Mensah");
         var other = await factory.AddMemberAsync("Daniel Reyes");
@@ -158,7 +158,7 @@ public class UploadPhotoTests(CommunityApiFactory factory) : IClassFixture<Commu
         var priya = await factory.AddMemberAsync("Priya Shah");
         var samuel = await factory.AddMemberAsync("Samuel Mensah");
 
-        var response = await Upload(factory.ClientFor(priya, Role.SystemAdmin), samuel, TestImages.Jpeg(), "a.jpg", "Samuel at the hackathon");
+        var response = await Upload(factory.ClientFor(priya, SeededRole.SystemAdmin), samuel, TestImages.Jpeg(), "a.jpg", "Samuel at the hackathon");
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var entry = await factory.WithDbAsync(db => db.AuditEntries.SingleAsync(a => a.TargetId == samuel.ProfileId.ToString()));

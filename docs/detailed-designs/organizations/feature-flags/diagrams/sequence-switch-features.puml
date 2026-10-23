@@ -1,0 +1,44 @@
+@startuml
+title UML sequence behaviour — Switch an Org Type's features
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Portfolio Lead" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "OrgTypePage" as page
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "OrgTypesEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "SetOrgTypeFeaturesHandler" as h
+  participant "IAuditLog" as audit
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Turn Partners off for "Startup"
+page -> ep : PUT /api/org-types/{id}/features { enabled: [...] }
+ep -> h : HandleAsync
+alt caller is not Portfolio Lead or System Admin
+  h --> page : 403 (404 outside the portfolio) (L2-137 #2)
+else profiles or notes missing, or unknown feature
+  h --> page : 400 enabled (L2-147 #4)
+else
+  h -> db : OrgType.EnabledFeatures = enabled (data kept)
+  h -> audit : orgType.featuresChanged (before, after) (L2-137 #1)
+  h --> page : 200 OrgTypeDto; editor hides the feature's codes (L2-137 #4)
+end
+note over db : Every org of the type is affected on its next request (L2-137 #5, L2-147 #5)
+@enduml

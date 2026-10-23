@@ -67,8 +67,15 @@ export class ShareNoteDialog {
     this.save = this.dialog.getByRole('button', { name: 'Save', exact: true });
   }
 
-  visibility(name: 'Private' | 'Shared' | 'Global'): Locator {
-    return this.dialog.getByRole('radio', { name: new RegExp(`^${name}`) });
+  /** Org-wide is "Everyone in {org}", Portfolio-wide "Everyone in the portfolio" (ADR 0039). */
+  visibility(name: 'Private' | 'Shared' | 'OrgWide' | 'PortfolioWide'): Locator {
+    const label = {
+      Private: /^Private/,
+      Shared: /^Shared/,
+      OrgWide: /^Everyone in (?!the portfolio)/,
+      PortfolioWide: /^Everyone in the portfolio/,
+    }[name];
+    return this.dialog.getByRole('radio', { name: label });
   }
 
   role(name: string): Locator {

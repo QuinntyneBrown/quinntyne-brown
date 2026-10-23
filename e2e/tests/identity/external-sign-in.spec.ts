@@ -23,7 +23,7 @@ test.describe('Google and GitHub sign-in on the community app', () => {
 
     await signIn.signInWithGitHub.click();
 
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
     expect(api.accounts.get('leah@example.org')).toMatchObject({ verified: true, roles: [] });
   });
 
@@ -112,7 +112,7 @@ test.describe('Google and GitHub sign-in on the community app', () => {
 
     await signUp.signUpWithGitHub.click();
 
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
     expect(api.accounts.get('leah@example.org')?.name).toBe('leah-builds');
   });
 });

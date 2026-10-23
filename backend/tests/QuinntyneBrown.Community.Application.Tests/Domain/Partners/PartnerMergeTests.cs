@@ -9,7 +9,7 @@ public class PartnerMergeTests
     private static readonly Guid Lead = Guid.NewGuid();
 
     private static Partner NewPartner(string name = "Kestrel Labs") =>
-        new(name, "kestrel.example", "Venue", Lead, "Nadia", null, null, null);
+        new(Guid.NewGuid(), name, "kestrel.example", "Venue", Lead, "Nadia", null, null, null);
 
     [Fact]
     public void Every_edit_move_merge_archive_and_restore_moves_the_version_on()

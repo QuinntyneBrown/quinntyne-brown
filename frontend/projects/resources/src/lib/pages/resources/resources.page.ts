@@ -11,8 +11,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  AUTH_SERVICE,
-  RESOURCE_CONTRIBUTOR_ROLES,
+  ACCESS_SERVICE,
+  ALL_ORGS,
+  Permission,
   RESOURCE_TYPES,
   RESOURCES_SERVICE,
   ResourceDto,
@@ -39,6 +40,7 @@ import {
   SelectOption,
   TextFieldComponent,
   ToastService,
+  OrgLabelComponent,
 } from '@faithtech-community/components';
 import { debounceTime, distinctUntilChanged, firstValueFrom } from 'rxjs';
 
@@ -62,6 +64,7 @@ type State = 'loading' | 'loaded' | 'error';
 @Component({
   selector: 'ft-resources-page',
   imports: [
+    OrgLabelComponent,
     ReactiveFormsModule,
     BadgeComponent,
     ButtonComponent,
@@ -87,7 +90,7 @@ type State = 'loading' | 'loaded' | 'error';
 })
 export class ResourcesPage {
   private readonly resources = inject(RESOURCES_SERVICE);
-  private readonly roles = inject(AUTH_SERVICE).roles;
+  private readonly access = inject(ACCESS_SERVICE);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
@@ -112,8 +115,11 @@ export class ResourcesPage {
   protected readonly page = signal(1);
   protected readonly loadingMore = signal(false);
 
-  protected readonly canAdd = computed(() =>
-    this.roles().some((r) => RESOURCE_CONTRIBUTOR_ROLES.includes(r)),
+  /** Rows are labelled with their org under "All orgs" (L2-145). */
+  protected readonly allOrgs = computed(() => this.access.activeSlug() === ALL_ORGS);
+  /** Nothing is added under "All orgs", which has no org to put it in (L2-145 AC2). */
+  protected readonly canAdd = computed(
+    () => !this.allOrgs() && this.access.can(Permission.ResourcesCreate),
   );
   protected readonly filtered = computed(
     () => !!this.type() || !!this.tagChoice() || !!this.term(),
@@ -286,9 +292,11 @@ function plural(n: number): string {
 }
 
 export function addedText(resource: ResourceDto): string {
-  return resource.visibility === 'Global'
-    ? 'Every signed-in member can find it now.'
-    : resource.visibility === 'Private'
-      ? 'Only you can see it.'
-      : 'Everyone you shared it with can find it now.';
+  return resource.visibility === 'OrgWide'
+    ? 'Everyone in the organization can find it now.'
+    : resource.visibility === 'PortfolioWide'
+      ? 'Everyone in the portfolio can find it now.'
+      : resource.visibility === 'Private'
+        ? 'Only you can see it.'
+        : 'Everyone you shared it with can find it now.';
 }

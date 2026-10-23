@@ -12,8 +12,8 @@ namespace QuinntyneBrown.Community.Application.Admin;
 public class RoleChangeNotifier(IApplicationDbContext db, IEmailQueue emails, IOptions<WebAppOptions> webApp, TimeProvider time)
 {
     /// <summary>Adds the in-app notification to the unit of work.</summary>
-    public void Notify(Guid ownerProfileId, string title) =>
-        db.Notifications.Add(new Notification(ownerProfileId, NotificationKind.RoleChanged, title, "/people/me", time.GetUtcNow()));
+    public void Notify(Guid ownerProfileId, string title, Guid? organizationId = null) =>
+        db.Notifications.Add(new Notification(ownerProfileId, NotificationKind.RoleChanged, title, "/people/me", time.GetUtcNow(), organizationId: organizationId));
 
     /// <summary>Queues the email in the unit of work; the caller saves.</summary>
     public async Task QueueEmailAsync(Guid ownerProfileId, string title, CancellationToken cancellationToken = default)

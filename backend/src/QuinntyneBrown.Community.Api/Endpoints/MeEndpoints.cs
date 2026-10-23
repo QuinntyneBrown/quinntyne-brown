@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using QuinntyneBrown.Community.Application.Common;
 using QuinntyneBrown.Community.Application.Identity;
+using QuinntyneBrown.Community.Application.Organizations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OpenIddict.Abstractions;
@@ -27,9 +28,17 @@ public static class MeEndpoints
                 Name = name,
                 Email = user?.Email ?? principal.FindFirst(OpenIddictConstants.Claims.Email)?.Value,
                 EmailVerified = user?.EmailConfirmed ?? false,
-                Roles = current.Roles.Select(r => r.ToString()),
+                current.Access.IsSystemAdmin,
             });
         });
+
+        // What the web app may show: covered orgs, their features, branding and the caller's permissions (L2-155, ADR 0037).
+        app.MapGet("/api/me/access", async (GetMyAccessHandler handler, CancellationToken cancellationToken) =>
+            Results.Ok(await handler.HandleAsync(cancellationToken)));
+
+        // An old org link follows the org's slug change; orgs outside the caller's coverage are not found (L2-145).
+        app.MapGet("/api/orgs/resolve/{slug}", async (string slug, ResolveOrgSlugHandler handler, CancellationToken cancellationToken) =>
+            await handler.HandleAsync(slug, cancellationToken) is { } resolved ? Results.Ok(resolved) : Results.NotFound());
         return app;
     }
 }

@@ -1,0 +1,114 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Org-owned data and org context
+package "Application/Organizations" {
+  enum ActiveOrgKind {
+    None
+    All
+    Org
+  }
+  class ActiveOrg {
+    +ActiveOrgKind Kind
+    +string? Slug
+    +Guid? OrgId
+    +bool IsUnknown
+  }
+  class OrgScope {
+    +Read(access: CallerAccess, active: ActiveOrg, feature: string): ScopeResult
+    +CreateTarget(access: CallerAccess, active: ActiveOrg, feature: string, code: string): CreateTargetResult
+    +ById(access: CallerAccess, orgId: Guid, feature: string): bool
+  }
+  class ScopeResult {
+    +IReadOnlySet<Guid> OrgIds
+    +bool NotFound
+  }
+  class CreateTargetResult {
+    +Guid? OrgId
+    +ResultStatus Status
+    +string? Message
+  }
+  class ProfileVisibility <<static>> {
+    +WhereVisibleTo(q: IQueryable<Profile>, access: CallerAccess, includeAgents: bool): IQueryable<Profile>
+  }
+  class OrgRefDto {
+    +Guid Id
+    +string Slug
+    +string Name
+  }
+  class AccessDto {
+    +bool IsSystemAdmin
+    +PortfolioAccessDto[] Portfolios
+    +OrgAccessDto[] Orgs
+  }
+  class OrgAccessDto {
+    +Guid Id
+    +string Slug
+    +string Name
+    +string TypeName
+    +bool IsMember
+    +bool IsOrgLead
+    +bool IsPortfolioLead
+    +bool CanJoinWork
+    +string[] Features
+    +string[] Permissions
+    +BrandingDto Branding
+  }
+}
+package "Application/Common" {
+  interface ICurrentUser {
+    +Guid? UserId
+    +Guid? ProfileId
+    +CallerAccess Access
+    +ActiveOrg ActiveOrg
+  }
+}
+package "Domain (org-owned roots)" {
+  interface IOrgOwned {
+    +Guid OrganizationId
+  }
+  class Event
+  class Partner
+  class Contact
+  class Resource
+  class NotePage
+  class Workspace
+  class Announcement
+  class Invite
+  class ConnectLink
+}
+package "api library (frontend)" {
+  interface AccessService {
+    +load(): Promise<void>
+    +refresh(): Promise<void>
+    +active: Signal<OrgAccess | 'all' | null>
+    +can(code: string, org?: string): boolean
+    +feature(name: string, org?: string): boolean
+    +setActive(slug: string): void
+  }
+}
+IOrgOwned <|.. Event
+IOrgOwned <|.. Partner
+IOrgOwned <|.. Contact
+IOrgOwned <|.. Resource
+IOrgOwned <|.. NotePage
+IOrgOwned <|.. Workspace
+IOrgOwned <|.. Announcement
+IOrgOwned <|.. Invite
+IOrgOwned <|.. ConnectLink
+ActiveOrg --> ActiveOrgKind
+OrgScope ..> ActiveOrg : reads
+OrgScope ..> ScopeResult : returns
+OrgScope ..> CreateTargetResult : returns
+ICurrentUser --> ActiveOrg
+AccessDto "1" *-- "many" OrgAccessDto
+AccessService ..> AccessDto : loads
+@enduml

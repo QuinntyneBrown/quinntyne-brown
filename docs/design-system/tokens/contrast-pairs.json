@@ -1,5 +1,5 @@
 {
-  "$comment": "Foreground/background token pairs checked by scripts/check_contrast.py. 4.5:1 is WCAG 2.2 AA for normal text (1.4.3); 3:1 is AA for large text, UI component edges and focus indicators (1.4.11). Inherited from Shelfie: covers, avatars, chapter rows, the streak pill, progress tracks, controls inside dialogs and status icons on the inverse toast surface. FaithTech additions cover date badges, the Kanban column, unread notifications, notes, search highlights, role and danger badges and tabs.",
+  "$comment": "Foreground/background token pairs checked by scripts/check_contrast.py. 4.5:1 is WCAG 2.2 AA for normal text (1.4.3); 3:1 is AA for large text, UI component edges and focus indicators (1.4.11). Inherited from Shelfie: covers, avatars, chapter rows, the streak pill, progress tracks, controls inside dialogs and status icons on the inverse toast surface. FaithTech additions cover date badges, the Kanban column, unread notifications, notes, search highlights, role and danger badges and tabs. Organizations additions: the scoped org accent pair, org labels, the Agent badge and the token reveal panel.",
   "pairs": [
     {
       "fg": "--color-fg-default",
@@ -708,6 +708,30 @@
       "bg": "--color-bg-subtle",
       "min": 3,
       "note": "notes block handle icon on a hovered row"
+    },
+    {
+      "fg": "--color-org-accent-foreground",
+      "bg": "--color-org-accent",
+      "min": 4.5,
+      "note": "org accent pair: switcher mark initials, public event band (default values; an org's own pair is refused below 4.5:1 by the server, L2-149)"
+    },
+    {
+      "fg": "--color-fg-muted",
+      "bg": "--color-bg-subtle",
+      "min": 4.5,
+      "note": "org label text on its pill"
+    },
+    {
+      "fg": "--color-fg-default",
+      "bg": "--color-info-bg",
+      "min": 4.5,
+      "note": "Agent badge text"
+    },
+    {
+      "fg": "--color-fg-default",
+      "bg": "--color-warning-bg",
+      "min": 4.5,
+      "note": "token reveal panel text"
     }
   ]
 }

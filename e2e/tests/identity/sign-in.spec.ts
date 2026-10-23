@@ -30,7 +30,7 @@ test.describe('Sign in', () => {
     await signIn.open();
     await signIn.signIn(account.email, account.password);
 
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page).toHaveURL(/\/o\/faithtech-toronto$/);
   });
 
   test('wrong credentials show a generic error on the form', async ({ page, api, axe }) => {
@@ -95,7 +95,7 @@ test.describe('Sign in', () => {
 
     await signIn.open();
     await signIn.signIn(account.email, account.password);
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page).toHaveURL(/\/o\/faithtech-toronto$/);
     expect(await signIn.storedRefreshToken('sessionStorage')).toBe('refresh-token');
     expect(await signIn.storedRefreshToken('localStorage')).toBeNull();
   });
@@ -108,7 +108,7 @@ test.describe('Sign in', () => {
     await signIn.signIn(account.email, account.password, {
       keepSignedIn: true,
     });
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page).toHaveURL(/\/o\/faithtech-toronto$/);
 
     expect(await signIn.storedRefreshToken('localStorage')).toBe('refresh-token');
   });

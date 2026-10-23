@@ -18,11 +18,11 @@ public class AcceptInviteTests(CommunityApiFactory factory) : IClassFixture<Comm
     public async Task Anyone_with_the_link_sees_who_invited_them_and_with_which_role()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo", p => p.Update("Grace Okonkwo", "Toronto", null));
-        var (_, token) = await factory.AddInviteAsync(grace, "ruth.alvarez@example.org", Role.Volunteer);
+        var (_, token) = await factory.AddInviteAsync(grace, "ruth.alvarez@example.org", SeededRole.Volunteer);
 
         var lookup = await LookUpAsync(factory.CreateClient(), token);
 
-        Assert.Equal(new Lookup("Pending", "ruth.alvarez@example.org", "Grace Okonkwo", "Toronto", "Volunteer", false), lookup);
+        Assert.Equal(new Lookup("Pending", "ruth.alvarez@example.org", "Grace Okonkwo", "Toronto", "volunteer", false), lookup);
         Assert.Equal(HttpStatusCode.NotFound, (await factory.CreateClient().PostAsJsonAsync("/api/invites/lookup", new { token = "nope" })).StatusCode);
     }
 
@@ -53,7 +53,7 @@ public class AcceptInviteTests(CommunityApiFactory factory) : IClassFixture<Comm
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var email = $"{Guid.NewGuid():N}@example.org";
-        var (invite, token) = await factory.AddInviteAsync(grace, email, Role.Volunteer);
+        var (invite, token) = await factory.AddInviteAsync(grace, email, SeededRole.Volunteer);
 
         var response = await factory.CreateClient().PostAsJsonAsync("/api/invites/accept",
             new { Token = token, Name = " Ruth Alvarez ", Password = OidcFlow.Password });
@@ -66,7 +66,7 @@ public class AcceptInviteTests(CommunityApiFactory factory) : IClassFixture<Comm
         });
         Assert.True(user.EmailConfirmed);
         Assert.Equal("Ruth Alvarez", profile.Name);
-        Assert.Equal([Role.Volunteer], profile.Roles.Select(r => r.Role));
+        Assert.Equal([SeededRole.Volunteer], await factory.WithDbAsync(db => SeededRoles.OfAsync(db, profile.Id)));
         var accepted = await factory.LoadInviteAsync(invite.Id);
         Assert.Equal(InviteStatus.Accepted, accepted.Status(factory.Time.GetUtcNow()));
         Assert.Equal(profile.Id, accepted.AcceptedBy);
@@ -88,7 +88,7 @@ public class AcceptInviteTests(CommunityApiFactory factory) : IClassFixture<Comm
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var email = $"{Guid.NewGuid():N}@example.org";
-        var (_, token) = await factory.AddInviteAsync(grace, email, Role.Volunteer);
+        var (_, token) = await factory.AddInviteAsync(grace, email, SeededRole.Volunteer);
 
         await factory.CreateClient().PostAsJsonAsync("/api/invites/accept", new { Token = token, Name = "Ruth Alvarez", Password = OidcFlow.Password });
 
@@ -119,16 +119,16 @@ public class AcceptInviteTests(CommunityApiFactory factory) : IClassFixture<Comm
     public async Task An_existing_account_signed_in_with_the_invited_email_gets_the_role()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var jonah = await factory.AddMemberAsync("Jonah Bell", p => p.AddRole(Role.Attendee, Guid.Empty, DateTime.UtcNow));
+        var jonah = await factory.AddMemberAsync("Jonah Bell", p => p.AddRole(SeededRole.Attendee, Guid.Empty, DateTime.UtcNow));
         var email = await EmailOfAsync(jonah);
-        var (invite, token) = await factory.AddInviteAsync(grace, email.ToUpperInvariant(), Role.Volunteer);
+        var (invite, token) = await factory.AddInviteAsync(grace, email.ToUpperInvariant(), SeededRole.Volunteer);
         Assert.True((await LookUpAsync(factory.CreateClient(), token))!.HasAccount);
 
         var response = await factory.ClientFor(jonah).PostAsJsonAsync("/api/invites/accept", new { Token = token });
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         var profile = await factory.WithDbAsync(db => db.Profiles.AsNoTracking().SingleAsync(p => p.Id == jonah.ProfileId));
-        Assert.Equal([Role.Volunteer, Role.Attendee], profile.Roles.Select(r => r.Role).Order());
+        Assert.Equal([SeededRole.Volunteer, SeededRole.Attendee], await factory.WithDbAsync(db => SeededRoles.OfAsync(db, profile.Id)));
         Assert.Equal(jonah.ProfileId, (await factory.LoadInviteAsync(invite.Id)).AcceptedBy);
         Assert.True(await factory.WithDbAsync(db => db.Notifications.AnyAsync(n => n.RecipientId == grace.ProfileId && n.Kind == NotificationKind.InviteAccepted)));
     }
@@ -138,7 +138,7 @@ public class AcceptInviteTests(CommunityApiFactory factory) : IClassFixture<Comm
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var jonah = await factory.AddMemberAsync("Jonah Bell");
-        var (invite, token) = await factory.AddInviteAsync(grace, "ruth.alvarez@example.org", Role.Volunteer);
+        var (invite, token) = await factory.AddInviteAsync(grace, "ruth.alvarez@example.org", SeededRole.Volunteer);
 
         var response = await factory.ClientFor(jonah).PostAsJsonAsync("/api/invites/accept", new { Token = token });
 

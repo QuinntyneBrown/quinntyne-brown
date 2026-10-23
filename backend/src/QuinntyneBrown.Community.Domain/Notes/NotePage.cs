@@ -15,9 +15,10 @@ public class NotePage
 
     private NotePage() { }
 
-    public NotePage(Guid ownerId, string? title, Guid? parentId, DateTimeOffset now)
+    public NotePage(Guid organizationId, Guid ownerId, string? title, Guid? parentId, DateTimeOffset now)
     {
         Id = Guid.NewGuid();
+        OrganizationId = organizationId;
         OwnerId = ownerId;
         Title = title?.Trim() ?? string.Empty;
         ParentId = parentId;
@@ -29,6 +30,9 @@ public class NotePage
     }
 
     public Guid Id { get; private set; }
+
+    /// <summary>The org that owns this record (ADR 0034).</summary>
+    public Guid OrganizationId { get; private set; }
 
     /// <summary>Empty until the owner names it; shown as "Untitled".</summary>
     public string Title { get; private set; } = string.Empty;
@@ -74,7 +78,7 @@ public class NotePage
     }
 
     /// <summary>Sets the visibility and, for Shared, the named members and roles; any other visibility clears them.</summary>
-    public void SetAudience(NoteVisibility visibility, IReadOnlyCollection<Guid> members, IReadOnlyCollection<Profiles.Role> roles)
+    public void SetAudience(NoteVisibility visibility, IReadOnlyCollection<Guid> members, IReadOnlyCollection<Guid> roles)
     {
         if (visibility == NoteVisibility.Shared && members.Count == 0 && roles.Count == 0)
         {
@@ -85,9 +89,9 @@ public class NotePage
         var keepMembers = visibility == NoteVisibility.Shared ? members : [];
         var keepRoles = visibility == NoteVisibility.Shared ? roles : [];
         _members.RemoveAll(m => !keepMembers.Contains(m.ProfileId));
-        _roles.RemoveAll(r => !keepRoles.Contains(r.Role));
+        _roles.RemoveAll(r => !keepRoles.Contains(r.RoleId));
         _members.AddRange(keepMembers.Where(m => _members.All(x => x.ProfileId != m)).Select(m => new NoteShareMember(Id, m)));
-        _roles.AddRange(keepRoles.Where(r => _roles.All(x => x.Role != r)).Select(r => new NoteShareRole(Id, r)));
+        _roles.AddRange(keepRoles.Where(r => _roles.All(x => x.RoleId != r)).Select(r => new NoteShareRole(Id, r)));
     }
 
     /// <summary>A soft delete: the page leaves every list and read but its owner's and System Admin's (L2-095).</summary>

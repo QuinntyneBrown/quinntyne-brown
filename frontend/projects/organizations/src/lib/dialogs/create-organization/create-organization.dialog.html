@@ -1,0 +1,41 @@
+<ft-dialog
+  heading="New organization"
+  description="Staff covers it automatically if it’s a FaithTech City org. You make someone its Org Lead next."
+  [busy]="busy()"
+  (closed)="ref.close()"
+>
+  <form [formGroup]="form" (submit)="$event.preventDefault(); create()">
+    <ft-stack>
+      @if (failure(); as message) {
+        <ft-alert status="danger" heading="Organization not created">{{ message }}</ft-alert>
+      }
+      <ft-form-field required label="Name" [error]="errors()['name'] ?? ''">
+        <ft-text-field formControlName="name" initialFocus [readonly]="busy()" />
+      </ft-form-field>
+      <ft-form-field
+        required
+        label="Slug"
+        [help]="
+          'Appears in addresses: /o/' +
+          (form.controls.slug.value || 'faithtech-austin') +
+          '. Lower-case letters, numbers and hyphens, 3 to 40 characters; “all” is reserved.'
+        "
+        [error]="errors()['slug'] ?? ''"
+      >
+        <ft-text-field formControlName="slug" [readonly]="busy()" />
+      </ft-form-field>
+      <ft-form-field
+        required
+        label="Org Type"
+        help="Sets its roles and features. It can’t be changed later."
+        [error]="errors()['orgTypeId'] ?? ''"
+      >
+        <ft-select formControlName="orgTypeId" [options]="typeOptions" />
+      </ft-form-field>
+    </ft-stack>
+  </form>
+  <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+  <ft-button ftDialogFooter variant="primary" [loading]="busy()" (click)="create()">
+    Create organization
+  </ft-button>
+</ft-dialog>

@@ -9,9 +9,9 @@ public class ReportAccessTests(CommunityApiFactory factory) : IClassFixture<Comm
 {
     // L2-123 AC1: Given Staff or a System Admin, when they open the report, then it is shown.
     [Theory]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Staff_and_System_Admins_read_the_report(Role role)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Staff_and_System_Admins_read_the_report(SeededRole role)
     {
         var client = factory.ClientFor(await factory.AddMemberAsync("Sam Rivera"), role);
 
@@ -22,7 +22,7 @@ public class ReportAccessTests(CommunityApiFactory factory) : IClassFixture<Comm
     [Fact]
     public async Task A_lead_who_is_also_Staff_reads_the_report()
     {
-        var client = factory.ClientFor(await factory.AddMemberAsync("Sam Rivera"), Role.CityLead, Role.Staff);
+        var client = factory.ClientFor(await factory.AddMemberAsync("Sam Rivera"), SeededRole.CityLead, SeededRole.Staff);
 
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/reports")).StatusCode);
     }
@@ -30,14 +30,14 @@ public class ReportAccessTests(CommunityApiFactory factory) : IClassFixture<Comm
     // L2-123 AC2: Given any other signed-in member, City Leads and the other lead roles included, when they call
     // GET /api/reports, then the server answers 403.
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CreateLead)]
-    [InlineData(Role.CommunicationsLead)]
-    [InlineData(Role.Volunteer)]
-    [InlineData(Role.ProductEngineer)]
-    [InlineData(Role.Attendee)]
-    public async Task Every_other_role_is_refused(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CreateLead)]
+    [InlineData(SeededRole.CommunicationsLead)]
+    [InlineData(SeededRole.Volunteer)]
+    [InlineData(SeededRole.ProductEngineer)]
+    [InlineData(SeededRole.Attendee)]
+    public async Task Every_other_role_is_refused(SeededRole role)
     {
         var client = factory.ClientFor(await factory.AddMemberAsync("Grace Okonkwo"), role);
 

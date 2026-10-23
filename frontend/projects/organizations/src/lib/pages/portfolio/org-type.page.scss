@@ -1,0 +1,15 @@
+ft-tabs {
+  display: block;
+  margin-block-end: var(--space-4);
+}
+.muted {
+  margin: 0;
+  font: var(--text-body-sm);
+  color: var(--color-fg-muted);
+}
+.indented {
+  padding-inline-start: var(--space-6);
+}
+code {
+  font-family: var(--font-family-mono);
+}

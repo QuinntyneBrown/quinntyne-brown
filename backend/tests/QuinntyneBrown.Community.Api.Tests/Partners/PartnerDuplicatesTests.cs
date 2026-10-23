@@ -33,7 +33,7 @@ public class PartnerDuplicatesTests(CommunityApiFactory factory) : IClassFixture
         var kept = await factory.AddPartnerAsync(grace, $"Kestrel {u} Labs", $"https://kestrel-{u}.example");
         var other = await factory.AddPartnerAsync(esther, $"Kestrel {u} Studio", $"www.Kestrel-{u}.example/about");
 
-        var duplicates = await factory.ClientFor(grace, Role.CityLead).DuplicatesAsync(kept.Id);
+        var duplicates = await factory.ClientFor(grace, SeededRole.CityLead).DuplicatesAsync(kept.Id);
 
         var match = Assert.Single(duplicates.Matches);
         Assert.Equal(
@@ -50,7 +50,7 @@ public class PartnerDuplicatesTests(CommunityApiFactory factory) : IClassFixture
         var kept = await factory.AddPartnerAsync(grace, $"Acme {u} Ltd.", $"acme-{u}.example");
         var other = await factory.AddPartnerAsync(grace, $"acme {u}", $"acme-{u}.org");
 
-        var duplicates = await factory.ClientFor(grace, Role.CityLead).DuplicatesAsync(kept.Id);
+        var duplicates = await factory.ClientFor(grace, SeededRole.CityLead).DuplicatesAsync(kept.Id);
 
         var match = Assert.Single(duplicates.Matches);
         Assert.Equal((other.Id, "Name", $"acme {u}"), (match.Id, match.Reason, match.MatchedOn));
@@ -64,7 +64,7 @@ public class PartnerDuplicatesTests(CommunityApiFactory factory) : IClassFixture
         var harbour = await factory.AddPartnerAsync(grace, $"Harbour {u} Coffee", null, $"harbour{u}@gmail.com");
         await factory.AddPartnerAsync(grace, $"Northside {u} Church", null, $"northside{u}@gmail.com");
 
-        var duplicates = await factory.ClientFor(grace, Role.CityLead).DuplicatesAsync(harbour.Id);
+        var duplicates = await factory.ClientFor(grace, SeededRole.CityLead).DuplicatesAsync(harbour.Id);
 
         Assert.Empty(duplicates.Matches);
     }
@@ -78,7 +78,7 @@ public class PartnerDuplicatesTests(CommunityApiFactory factory) : IClassFixture
         var zed = await factory.AddPartnerAsync(grace, $"Zed {u}", $"http://kestrel-{u}.example");
         var bee = await factory.AddPartnerAsync(grace, $"kestrel {u} inc", null);
 
-        var duplicates = await factory.ClientFor(grace, Role.CityLead).DuplicatesAsync(kept.Id);
+        var duplicates = await factory.ClientFor(grace, SeededRole.CityLead).DuplicatesAsync(kept.Id);
 
         Assert.Equal([(bee.Id, "Name"), (zed.Id, "Website")], duplicates.Matches.Select(m => (m.Id, m.Reason)));
     }
@@ -90,8 +90,8 @@ public class PartnerDuplicatesTests(CommunityApiFactory factory) : IClassFixture
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var kept = await factory.AddPartnerAsync(grace, $"Kestrel {u}", $"kestrel-{u}.example");
         await factory.AddPartnerAsync(grace, $"Kestrel {u} Inc.", null);
-        var staff = factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), Role.Staff);
-        var volunteer = factory.ClientFor(await factory.AddMemberAsync("Ruth Alvarez"), Role.Volunteer);
+        var staff = factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), SeededRole.Staff);
+        var volunteer = factory.ClientFor(await factory.AddMemberAsync("Ruth Alvarez"), SeededRole.Volunteer);
 
         Assert.Single((await staff.DuplicatesAsync(kept.Id)).Matches);
         Assert.Equal(HttpStatusCode.Forbidden, (await volunteer.GetAsync($"/api/partners/{kept.Id}/duplicates")).StatusCode);
@@ -107,13 +107,13 @@ public class PartnerDuplicatesTests(CommunityApiFactory factory) : IClassFixture
         var marcus = await factory.AddMemberAsync("Marcus Lee");
         var kept = await factory.AddPartnerAsync(grace, $"Kestrel {u}", $"kestrel-{u}.example");
         var other = await factory.AddPartnerAsync(grace, $"Kestrel {u} Inc.", null);
-        var lead = factory.ClientFor(grace, Role.CityLead);
+        var lead = factory.ClientFor(grace, SeededRole.CityLead);
 
         var first = await lead.DismissDuplicateAsync(other.Id, kept.Id);
         var again = await lead.DismissDuplicateAsync(kept.Id, other.Id);
 
         Assert.Equal((HttpStatusCode.NoContent, HttpStatusCode.NoContent), (first.StatusCode, again.StatusCode));
-        var marcusClient = factory.ClientFor(marcus, Role.EventLead);
+        var marcusClient = factory.ClientFor(marcus, SeededRole.EventLead);
         Assert.Empty((await marcusClient.DuplicatesAsync(kept.Id)).Matches);
         Assert.Empty((await marcusClient.DuplicatesAsync(other.Id)).Matches);
         var (low, high) = kept.Id.CompareTo(other.Id) < 0 ? (kept.Id, other.Id) : (other.Id, kept.Id);
@@ -131,7 +131,7 @@ public class PartnerDuplicatesTests(CommunityApiFactory factory) : IClassFixture
         var kept = await factory.AddPartnerAsync(grace, $"Kestrel {u}", $"kestrel-{u}.example");
         var dismissed = await factory.AddPartnerAsync(grace, $"Kestrel {u} Inc.", null);
         var still = await factory.AddPartnerAsync(grace, $"Kestrel {u} Ltd", null);
-        var lead = factory.ClientFor(grace, Role.CityLead);
+        var lead = factory.ClientFor(grace, SeededRole.CityLead);
 
         await lead.DismissDuplicateAsync(kept.Id, dismissed.Id);
 
@@ -145,8 +145,8 @@ public class PartnerDuplicatesTests(CommunityApiFactory factory) : IClassFixture
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var kept = await factory.AddPartnerAsync(grace, $"Kestrel {u}", $"kestrel-{u}.example");
         var other = await factory.AddPartnerAsync(grace, $"Kestrel {u} Inc.", null);
-        var staff = factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), Role.Staff);
-        var volunteer = factory.ClientFor(await factory.AddMemberAsync("Ruth Alvarez"), Role.Volunteer);
+        var staff = factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), SeededRole.Staff);
+        var volunteer = factory.ClientFor(await factory.AddMemberAsync("Ruth Alvarez"), SeededRole.Volunteer);
 
         var byStaff = await staff.DismissDuplicateAsync(kept.Id, other.Id);
         var byVolunteer = await volunteer.DismissDuplicateAsync(kept.Id, other.Id);
@@ -164,7 +164,7 @@ public class PartnerDuplicatesTests(CommunityApiFactory factory) : IClassFixture
         var u = Unique();
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var kept = await factory.AddPartnerAsync(grace, $"Kestrel {u}", $"kestrel-{u}.example");
-        var lead = factory.ClientFor(grace, Role.CityLead);
+        var lead = factory.ClientFor(grace, SeededRole.CityLead);
 
         Assert.Equal(HttpStatusCode.BadRequest, (await lead.DismissDuplicateAsync(kept.Id, kept.Id)).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await lead.DismissDuplicateAsync(kept.Id, Guid.NewGuid())).StatusCode);
@@ -181,8 +181,8 @@ public class PartnerDuplicatesTests(CommunityApiFactory factory) : IClassFixture
         var loneTwin = await factory.AddPartnerAsync(grace, $"Lone {u} LLC", null);
         var priya = await factory.AddMemberAsync("Priya Shah");
 
-        var response = await factory.ClientFor(priya, Role.SystemAdmin).DismissDuplicateAsync(kept.Id, other.Id);
-        await factory.ClientFor(grace, Role.CityLead).DismissDuplicateAsync(lone.Id, loneTwin.Id);
+        var response = await factory.ClientFor(priya, SeededRole.SystemAdmin).DismissDuplicateAsync(kept.Id, other.Id);
+        await factory.ClientFor(grace, SeededRole.CityLead).DismissDuplicateAsync(lone.Id, loneTwin.Id);
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         var entry = Assert.Single(await factory.WithDbAsync(db => db.AuditEntries

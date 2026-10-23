@@ -13,8 +13,7 @@ import {
   ADMIN_USERS_SERVICE,
   AGILE_SERVICE,
   AdminUserSummary,
-  ROLE_LABELS,
-  Role,
+  RoleRef,
   UserStatus,
   WorkspaceSummaryDto,
 } from '@faithtech-community/api';
@@ -121,8 +120,9 @@ export class AdminUsersPage {
     return user.status === 'Suspended' ? 'plain' : avatarColorFor(user.id);
   }
 
-  protected roleLabel(role: Role): string {
-    return ROLE_LABELS[role];
+  /** "City Lead · FaithTech Toronto" for an org role, the name alone for a platform role. */
+  protected roleLabel(role: RoleRef): string {
+    return role.organizationName ? `${role.name} · ${role.organizationName}` : role.name;
   }
 
   protected badge(status: UserStatus): BadgeVariant {

@@ -16,6 +16,8 @@ export const ICONS: Readonly<Record<string, string>> = {
   team: "<circle cx='9' cy='8' r='4'/><path d='M2 21a7 7 0 0 1 14 0M16 3.5a4 4 0 0 1 0 7.5M22 21a7 7 0 0 0-4-6.3'/>",
   archive: "<path d='M3 4h18v4H3zM5 8v12h14V8M10 12h4'/>",
   done: "<path d='M4 12l6 6L20 6'/>",
+  'chevron-down': "<path d='m6 9 6 6 6-6'/>",
+  layers: "<path d='m12 3 9 5-9 5-9-5zM3 13l9 5 9-5'/>",
   delete: "<path d='M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3'/>",
   link: "<path d='M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1'/>",
   admin: "<path d='M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z'/>",

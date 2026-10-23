@@ -15,10 +15,10 @@ public static partial class InviteClients
 
     /// <summary>Stores an invite with a known token, sent <paramref name="age"/> ago.</summary>
     public static async Task<(Invite Invite, string Token)> AddInviteAsync(
-        this CommunityApiFactory factory, ProfileClients.Member inviter, string email, Role? role = null, TimeSpan age = default)
+        this CommunityApiFactory factory, ProfileClients.Member inviter, string email, SeededRole? role = null, TimeSpan age = default)
     {
         var token = Guid.NewGuid().ToString("N");
-        var invite = new Invite(email, Hash(token), role, inviter.ProfileId, factory.Time.GetUtcNow() - age);
+        var invite = new Invite(Infrastructure.Persistence.HierarchySeed.TorontoId, email, Hash(token), role?.Id(), inviter.ProfileId, factory.Time.GetUtcNow() - age);
         await factory.WithDbAsync(async db =>
         {
             db.Invites.Add(invite);

@@ -24,6 +24,13 @@ Key terms:
 
 The list is not paged in v1. Past events are reachable from this page through the Past chip.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Event` carries a required `OrganizationId`; RSVPs and check-ins belong to it. Events are created in the active org. The `City` field stays a property of the event.
+- "Data is global" no longer holds: the list covers the active org, or every covered org with `events` on under "All orgs", each row with its org label (`L2-139`, `L2-145`).
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

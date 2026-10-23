@@ -19,15 +19,19 @@ public class Resource
 
     private Resource() { }
 
-    private Resource(Guid id, string title, string? description, ResourceType type, Guid ownerId, DateTimeOffset now)
+    private Resource(Guid organizationId, Guid id, string title, string? description, ResourceType type, Guid ownerId, DateTimeOffset now)
     {
         Id = id;
+        OrganizationId = organizationId;
         OwnerId = ownerId;
         AddedAt = now;
         SetDetails(title, description, type);
     }
 
     public Guid Id { get; private set; }
+
+    /// <summary>The org that owns this record (ADR 0034).</summary>
+    public Guid OrganizationId { get; private set; }
 
     public string Title { get; private set; } = string.Empty;
 
@@ -40,7 +44,7 @@ public class Resource
     public Guid OwnerId { get; private set; }
 
     /// <summary>The contributing role the owner held when they became the owner, named if they later lose it (L2-064 AC2).</summary>
-    public Role? OwnerRole { get; private set; }
+    public string? OwnerRoleName { get; private set; }
 
     public DateTimeOffset AddedAt { get; private set; }
 
@@ -74,13 +78,13 @@ public class Resource
     public bool IsLink => LinkUrl is not null;
 
     public static Resource ForFile(
-        Guid id, string title, string? description, ResourceType type, Guid ownerId, ResourceFile file, DateTimeOffset now) =>
-        new(id, title, description, type, ownerId, now) { File = file };
+        Guid organizationId, Guid id, string title, string? description, ResourceType type, Guid ownerId, ResourceFile file, DateTimeOffset now) =>
+        new(organizationId, id, title, description, type, ownerId, now) { File = file };
 
     public static Resource ForLink(
-        string title, string? description, ResourceType type, Guid ownerId, Uri link, DateTimeOffset now, Guid? id = null)
+        Guid organizationId, string title, string? description, ResourceType type, Guid ownerId, Uri link, DateTimeOffset now, Guid? id = null)
     {
-        var resource = new Resource(id ?? Guid.NewGuid(), title, description, type, ownerId, now);
+        var resource = new Resource(organizationId, id ?? Guid.NewGuid(), title, description, type, ownerId, now);
         resource.SetLink(link);
         return resource;
     }
@@ -114,9 +118,9 @@ public class Resource
     {
         Visibility = audience.Visibility;
         _members.RemoveAll(m => !audience.Members.Contains(m.ProfileId));
-        _roles.RemoveAll(r => !audience.Roles.Contains(r.Role));
+        _roles.RemoveAll(r => !audience.Roles.Contains(r.RoleId));
         _members.AddRange(audience.Members.Where(m => _members.All(x => x.ProfileId != m)).Select(m => new ResourceShareMember(Id, m)));
-        _roles.AddRange(audience.Roles.Where(r => _roles.All(x => x.Role != r)).Select(r => new ResourceShareRole(Id, r)));
+        _roles.AddRange(audience.Roles.Where(r => _roles.All(x => x.RoleId != r)).Select(r => new ResourceShareRole(Id, r)));
     }
 
     public void SetLink(Uri link)
@@ -155,9 +159,9 @@ public class Resource
 
     public bool IsPurgeDue(DateTimeOffset now) => ArchivedAt is { } at && now >= at + PurgeAfter;
 
-    public void SetOwner(Guid ownerId, Role? ownerRole)
+    public void SetOwner(Guid ownerId, string? ownerRoleName)
     {
         OwnerId = ownerId;
-        OwnerRole = ownerRole;
+        OwnerRoleName = ownerRoleName;
     }
 }

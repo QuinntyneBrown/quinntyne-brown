@@ -16,7 +16,7 @@ public class EditResourceTests(CommunityApiFactory factory) : IClassFixture<Comm
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck());
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         factory.Time.Advance(TimeSpan.FromHours(2));
 
         var response = await client.PutAsJsonAsync($"/api/resources/{deck.Id}",
@@ -32,10 +32,10 @@ public class EditResourceTests(CommunityApiFactory factory) : IClassFixture<Comm
 
     public static TheoryData<string, object> Invalid() => new()
     {
-        { "Title", new { Title = "   ", Type = "Deck", Visibility = "Global" } },
-        { "Title", new { Title = new string('a', 121), Type = "Deck", Visibility = "Global" } },
-        { "Description", new { Title = "Deck", Description = new string('a', 1001), Type = "Deck", Visibility = "Global" } },
-        { "Type", new { Title = "Deck", Type = "Spreadsheet", Visibility = "Global" } },
+        { "Title", new { Title = "   ", Type = "Deck", Visibility = "OrgWide" } },
+        { "Title", new { Title = new string('a', 121), Type = "Deck", Visibility = "OrgWide" } },
+        { "Description", new { Title = "Deck", Description = new string('a', 1001), Type = "Deck", Visibility = "OrgWide" } },
+        { "Type", new { Title = "Deck", Type = "Spreadsheet", Visibility = "OrgWide" } },
         { "Visibility", new { Title = "Deck", Type = "Deck", Visibility = "City" } },
         { "Visibility", new { Title = "Deck", Type = "Deck", Visibility = "Shared" } },
     };
@@ -47,7 +47,7 @@ public class EditResourceTests(CommunityApiFactory factory) : IClassFixture<Comm
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck());
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PutAsJsonAsync($"/api/resources/{deck.Id}", body);
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PutAsJsonAsync($"/api/resources/{deck.Id}", body);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Contains(field, (await response.Content.ReadFromJsonAsync<ValidationProblemDetails>())!.Errors.Keys);
@@ -59,16 +59,16 @@ public class EditResourceTests(CommunityApiFactory factory) : IClassFixture<Comm
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck());
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PutAsJsonAsync($"/api/resources/{deck.Id}", EditBody(deck, title: " "));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PutAsJsonAsync($"/api/resources/{deck.Id}", EditBody(deck, title: " "));
 
         Assert.Equal("Give it a title so people can find it.", (await response.Content.ReadFromJsonAsync<ValidationProblemDetails>())!.Errors["Title"].Single());
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.Volunteer)]
-    public async Task Anyone_but_the_owner_or_a_system_admin_is_refused(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.Volunteer)]
+    public async Task Anyone_but_the_owner_or_a_system_admin_is_refused(SeededRole role)
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck());
@@ -85,9 +85,9 @@ public class EditResourceTests(CommunityApiFactory factory) : IClassFixture<Comm
     public async Task Staff_edit_their_own_resources()
     {
         var esther = await factory.AddMemberAsync("Esther Nakamura");
-        var deck = await factory.AddFileAsync(esther, Deck(), role: Role.Staff);
+        var deck = await factory.AddFileAsync(esther, Deck(), role: SeededRole.Staff);
 
-        var response = await factory.ClientFor(esther, Role.Staff).PutAsJsonAsync($"/api/resources/{deck.Id}", EditBody(deck, title: "Staff deck"));
+        var response = await factory.ClientFor(esther, SeededRole.Staff).PutAsJsonAsync($"/api/resources/{deck.Id}", EditBody(deck, title: "Staff deck"));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -99,7 +99,7 @@ public class EditResourceTests(CommunityApiFactory factory) : IClassFixture<Comm
         var deck = await factory.AddFileAsync(grace, Deck());
         var priya = await factory.AddMemberAsync("Priya Shah");
 
-        var response = await factory.ClientFor(priya, Role.SystemAdmin).PutAsJsonAsync($"/api/resources/{deck.Id}", EditBody(deck, title: "Launch deck (fixed)"));
+        var response = await factory.ClientFor(priya, SeededRole.SystemAdmin).PutAsJsonAsync($"/api/resources/{deck.Id}", EditBody(deck, title: "Launch deck (fixed)"));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var entry = await factory.WithDbAsync(db => db.AuditEntries.SingleAsync(e => e.ActorId == priya.ProfileId && e.Action == "resource.edited"));
@@ -113,7 +113,7 @@ public class EditResourceTests(CommunityApiFactory factory) : IClassFixture<Comm
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck("launch-v1.pptx"));
         var oldBlobs = factory.Files.Blobs.Keys.Where(k => k.Contains(deck.Id.ToString())).ToList();
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var response = await client.PutAsync($"/api/resources/{deck.Id}/file", Form([new Upload("launch-v2.pdf", Pdf)]));
 
@@ -131,7 +131,7 @@ public class EditResourceTests(CommunityApiFactory factory) : IClassFixture<Comm
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck());
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PutAsync($"/api/resources/{deck.Id}/file", Form([new Upload("virus.exe", [0x4D, 0x5A])]));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PutAsync($"/api/resources/{deck.Id}/file", Form([new Upload("virus.exe", [0x4D, 0x5A])]));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Equal("city-launch-deck.pptx", (await factory.WithDbAsync(db => db.Resources.SingleAsync(r => r.Id == deck.Id))).File!.FileName);
@@ -144,14 +144,13 @@ public class EditResourceTests(CommunityApiFactory factory) : IClassFixture<Comm
         var deck = await factory.AddFileAsync(grace, Deck());
         await factory.WithDbAsync(async db =>
         {
-            var profile = await db.Profiles.SingleAsync(p => p.Id == grace.ProfileId);
-            profile.RemoveRole(Role.CityLead);
-            return await db.SaveChangesAsync();
+            await SeededRoles.RevokeAsync(db, grace.ProfileId, SeededRole.CityLead);
+            return 0;
         });
-        var admin = factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), Role.SystemAdmin);
+        var admin = factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), SeededRole.SystemAdmin);
 
         var page = (await admin.GetFromJsonAsync<Detail>($"/api/resources/{deck.Id}"))!;
 
-        Assert.Equal((grace.ProfileId, "Global", "CityLead"), (page.OwnerId, page.Visibility, page.OwnerLostRole));
+        Assert.Equal((grace.ProfileId, "OrgWide", "City Lead"), (page.OwnerId, page.Visibility, page.OwnerLostRole));
     }
 }

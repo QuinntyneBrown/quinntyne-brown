@@ -1,0 +1,98 @@
+<ng-template #memberCell let-member>
+  <ft-cluster gap="2">
+    <ft-avatar
+      size="sm"
+      [name]="member.name"
+      [src]="member.photoUrl"
+      [color]="avatarColor(member)"
+    />
+    <ft-link [href]="'/people/' + member.profileId">{{ member.name }}</ft-link>
+    @if (member.kind === 'Agent') {
+      <ft-badge variant="info">Agent</ft-badge>
+    }
+  </ft-cluster>
+</ng-template>
+<ng-template #rolesCell let-member>
+  <ft-cluster gap="2">
+    @if (member.isOrgLead) {
+      <ft-badge variant="role">Org Lead</ft-badge>
+    }
+    @for (name of member.roleNames; track name) {
+      <ft-badge variant="role">{{ name }}</ft-badge>
+    } @empty {
+      @if (!member.isOrgLead) {
+        <span class="text-muted">Member, no role</span>
+      }
+    }
+  </ft-cluster>
+</ng-template>
+<ng-template #actionCell let-member>
+  <ft-cluster gap="2">
+    <ft-button size="sm" [href]="'/people/' + member.profileId">
+      Change roles<span class="visually-hidden"> for {{ member.name }}</span>
+    </ft-button>
+    <ft-button
+      size="sm"
+      variant="ghost"
+      [label]="'Remove ' + member.name + ' from ' + (org()?.branding?.displayName ?? '')"
+      (click)="remove(member)"
+    >
+      Remove
+    </ft-button>
+  </ft-cluster>
+</ng-template>
+
+@if (state() === 'forbidden') {
+  <h1 class="visually-hidden">Organization settings</h1>
+  <ft-empty-state
+    heading="Only Org Leads manage members"
+    text="Ask your Org Lead if someone needs to be added or removed."
+  >
+    <ft-button actions variant="primary" href="/">Back to home</ft-button>
+  </ft-empty-state>
+} @else {
+  <ft-page-header title="Organization settings" [subtitle]="subtitle()">
+    <ft-cluster ftPageHeaderActions gap="2">
+      <ft-button [href]="'/o/' + (org()?.slug ?? '') + '/invites'">
+        <ft-icon name="invite" /> Invite someone
+      </ft-button>
+      <ft-button variant="primary" (click)="add()"><ft-icon name="add" /> Add member</ft-button>
+    </ft-cluster>
+  </ft-page-header>
+  <ft-tabs label="Organization settings">
+    <ft-tab label="General" [href]="'/o/' + (org()?.slug ?? '') + '/settings/general'" />
+    <ft-tab
+      label="Members"
+      [href]="'/o/' + (org()?.slug ?? '') + '/settings/members'"
+      [current]="true"
+    />
+    <ft-tab label="Branding" [href]="'/o/' + (org()?.slug ?? '') + '/settings/branding'" />
+  </ft-tabs>
+  <form class="search" role="search" (submit)="$event.preventDefault(); search()">
+    <ft-text-field
+      type="search"
+      label="Search members"
+      placeholder="Search members by name"
+      [formControl]="query"
+    />
+  </form>
+  @switch (state()) {
+    @case ('loading') {
+      <ft-list-skeleton label="Loading members" [rows]="4" />
+    }
+    @case ('error') {
+      <ft-empty-state
+        variant="error"
+        heading="We couldn’t load the members"
+        text="Check your connection and try again."
+      >
+        <ft-button actions variant="primary" (click)="search()">Try again</ft-button>
+      </ft-empty-state>
+    }
+    @default {
+      <div class="table-card">
+        <ft-table [caption]="caption()" [columns]="columns()" [rows]="rows()" />
+      </div>
+    }
+  }
+}

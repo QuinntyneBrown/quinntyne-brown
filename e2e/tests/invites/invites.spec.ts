@@ -19,7 +19,7 @@ test.describe('Send invites', () => {
       {
         email: 'nate.oyelaran@example.org',
         invitedBy: grace.profileId,
-        preassignedRole: 'ProductEngineer',
+        preassignedRole: 'product-engineer',
       },
       1,
     );
@@ -27,13 +27,13 @@ test.describe('Send invites', () => {
       {
         email: 'ruth.alvarez@example.org',
         invitedBy: marcus.profileId,
-        preassignedRole: 'Volunteer',
+        preassignedRole: 'volunteer',
         acceptedAt: '2026-10-18T12:00:00Z',
       },
       3,
     );
     api.addInvite(
-      { email: 'felix.wu@example.org', invitedBy: marcus.profileId, preassignedRole: 'Attendee' },
+      { email: 'felix.wu@example.org', invitedBy: marcus.profileId, preassignedRole: 'attendee' },
       20,
     );
     const invites = new InvitesPage(page);
@@ -106,12 +106,12 @@ test.describe('Send invites', () => {
     await expect(dialog.email).toBeFocused();
     await expect(dialog.role.locator('option')).toHaveText([
       'No role',
-      'Attendee',
-      'Volunteer',
-      'Product Engineer',
       'Event Lead',
       'Create Lead',
       'Communications Lead',
+      'Volunteer',
+      'Product Engineer',
+      'Attendee',
     ]);
     await axe.check();
     await dialog.email.fill('nate@');
@@ -128,7 +128,7 @@ test.describe('Send invites', () => {
     await expect(invites.toast).toContainText('Invite sent to nate.oyelaran@example.org');
     expect(api.callsTo('POST', '/api/invites')[0].body).toEqual({
       email: 'nate.oyelaran@example.org',
-      preassignedRole: 'ProductEngineer',
+      preassignedRole: 'product-engineer',
       note: 'Loved your demo at Builders Night!',
     });
   });

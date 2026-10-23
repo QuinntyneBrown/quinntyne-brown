@@ -14,7 +14,6 @@ import { Router } from '@angular/router';
 import {
   AGILE_SERVICE,
   ArchivedItemDto,
-  ROLE_LABELS,
   WorkspaceDto,
   WorkspaceMemberDto,
   WorkspaceMethod,
@@ -127,7 +126,7 @@ export class WorkspaceSettingsPage {
     return access === 'Owner'
       ? 'Settings · only you, the owner, can change these'
       : access === 'Admin'
-        ? 'Settings · you’re changing these as System Admin, and each change is recorded in the audit log'
+        ? 'Settings · you’re changing these as an Org Lead or administrator, and each change is recorded in the audit log'
         : 'Settings';
   });
   protected readonly summary = computed<FormError[]>(() =>
@@ -145,7 +144,8 @@ export class WorkspaceSettingsPage {
   }
 
   protected roles(member: WorkspaceMemberDto): string {
-    return member.roles.map((r) => ROLE_LABELS[r]).join(', ');
+    // Cross-org people are marked, since they are not members of the org (L2-146 AC2).
+    return [...member.roles, ...(member.isCrossOrg ? ['Cross-org'] : [])].join(', ');
   }
 
   protected retry(): void {

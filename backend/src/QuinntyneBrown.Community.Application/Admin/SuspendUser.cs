@@ -1,7 +1,6 @@
 using QuinntyneBrown.Community.Application.Common;
 using QuinntyneBrown.Community.Application.Identity;
 using QuinntyneBrown.Community.Application.Profiles;
-using QuinntyneBrown.Community.Domain.Profiles;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +31,7 @@ public class SuspensionHandler(
 {
     public async Task<Result> SuspendAsync(Guid profileId, SuspendUserCommand command, CancellationToken cancellationToken = default)
     {
-        if (!current.HasRole(Role.SystemAdmin))
+        if (!current.Access.IsSystemAdmin)
         {
             return Result.Forbidden();
         }
@@ -70,7 +69,7 @@ public class SuspensionHandler(
 
     public async Task<Result> ReinstateAsync(Guid profileId, CancellationToken cancellationToken = default)
     {
-        if (!current.HasRole(Role.SystemAdmin))
+        if (!current.Access.IsSystemAdmin)
         {
             return Result.Forbidden();
         }

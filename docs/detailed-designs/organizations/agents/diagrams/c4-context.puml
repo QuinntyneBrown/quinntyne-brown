@@ -1,0 +1,12 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Agents
+Person(pl, "Portfolio Lead", "Creates agents; issues tokens for any org of the portfolio")
+Person(ol, "Org Lead", "Issues tokens scoped to its own org")
+System(ftc, "QuinntyneBrown.Community", "Home base for the people Quinntyne Brown builds with: orgs, profiles, events, resources, notes and Agile workspaces")
+System_Ext(agent, "AI agent", "Calls the API with Bearer ftca_...")
+Rel(pl, ftc, "Creates agents, issues and revokes tokens in")
+Rel(ol, ftc, "Issues and revokes its org tokens in")
+Rel(agent, ftc, "Reads and writes within its roles and token orgs via", "HTTPS")
+@enduml

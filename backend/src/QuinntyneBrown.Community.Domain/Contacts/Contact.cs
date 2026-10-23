@@ -11,15 +11,19 @@ public class Contact
 
     private Contact() { }
 
-    public Contact(Guid ownerId, string name, string? email, string? phone, string? organization, string? city, DateTime createdAtUtc)
+    public Contact(Guid organizationId, Guid ownerId, string name, string? email, string? phone, string? organization, string? city, DateTime createdAtUtc)
     {
         Id = Guid.NewGuid();
+        OrganizationId = organizationId;
         OwnerId = ownerId;
         CreatedAtUtc = createdAtUtc;
         Update(name, email, phone, organization, city);
     }
 
     public Guid Id { get; private set; }
+
+    /// <summary>The org that owns this record (ADR 0034).</summary>
+    public Guid OrganizationId { get; private set; }
 
     public Guid OwnerId { get; private set; }
 

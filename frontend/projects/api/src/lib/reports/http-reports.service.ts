@@ -31,6 +31,7 @@ export class HttpReportsService implements ReportsService {
   }
 
   private params(filters: ReportFilters): HttpParams {
-    return new HttpParams().set('city', filters.city ?? '').set('period', filters.period);
+    const params = new HttpParams().set('city', filters.city ?? '').set('period', filters.period);
+    return filters.organization ? params.set('organization', filters.organization) : params;
   }
 }

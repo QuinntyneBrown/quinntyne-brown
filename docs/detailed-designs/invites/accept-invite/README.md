@@ -24,6 +24,14 @@ Because the invite reached the invited address, signing up with that address cou
 - **Email mismatch** — a signed-in account whose email differs from the invited email cannot accept (`409` "This invite is for another email.", mock state `wrong-account`; ADR 0006).
 - **Role grant audit** — a role granted through an invite is recorded through `IAuditLog` as `role.granted` with the inviter as actor (ADR 0006). A role the account already holds is not granted again.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- Accepting makes the person a member of the invite's org through `OrgJoiner` (`JoinedVia = Invite`) and grants the pre-assigned catalogue role. An existing account that accepts an invite to another org joins that org too (`L2-141` AC3).
+- After accepting, the app opens `/o/{orgSlug}`.
+- Details are in [membership and joining](../../organizations/membership-and-joining/README.md) and [ADR 0041](../../../adr/0041-org-bound-invites-and-connect-links.md).
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

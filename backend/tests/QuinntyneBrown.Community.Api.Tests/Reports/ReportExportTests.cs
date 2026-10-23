@@ -20,9 +20,9 @@ public class ReportExportTests : IAsyncLifetime
     // tables, one section after another, for the same filters. L2-128 AC3: every value is quoted per RFC 4180 and a
     // value starting like a formula is guarded; the members context is written without a leading "+".
     [Theory]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Staff_and_System_Admins_export_every_section_for_the_filters(Role role)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Staff_and_System_Admins_export_every_section_for_the_filters(SeededRole role)
     {
         var client = factory.ClientFor(await factory.AddMemberAsync("Sam Staff"), role);
         var grace = await factory.AddCityMemberAsync("Grace Okonkwo", "Toronto", joinedAt: Now.AddDays(-2));
@@ -93,12 +93,12 @@ public class ReportExportTests : IAsyncLifetime
     // L2-128 AC2: Given any other caller, when they request the export, then the response is 403, or 401 when
     // anonymous; an unknown filter is 400 as for the report.
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CreateLead)]
-    [InlineData(Role.CommunicationsLead)]
-    [InlineData(Role.Volunteer)]
-    public async Task Every_other_role_is_refused(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CreateLead)]
+    [InlineData(SeededRole.CommunicationsLead)]
+    [InlineData(SeededRole.Volunteer)]
+    public async Task Every_other_role_is_refused(SeededRole role)
     {
         var client = factory.ClientFor(await factory.AddMemberAsync("Grace Okonkwo"), role);
 

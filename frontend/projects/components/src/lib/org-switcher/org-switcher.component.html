@@ -1,0 +1,87 @@
+<ng-template #mark let-org>
+  @if (org === null) {
+    <span class="org-mark org-mark--all" aria-hidden="true"
+      ><ft-icon name="layers" size="sm"
+    /></span>
+  } @else if (org.logoUrl) {
+    <span class="org-mark" aria-hidden="true"><img [src]="org.logoUrl" alt="" /></span>
+  } @else {
+    <!-- The initials are drawn by CSS, so the button's visible text is the org's name alone (WCAG 2.5.3). -->
+    <span
+      class="org-mark"
+      aria-hidden="true"
+      [attr.data-initials]="initials(org.name)"
+      [style]="accentStyle(org)"
+    ></span>
+  }
+</ng-template>
+
+@if (single()) {
+  <span class="org-switcher__current" [attr.title]="currentName()">
+    <ng-container *ngTemplateOutlet="mark; context: { $implicit: current() }" />
+    <span class="org-switcher__current-name">{{ currentName() }}</span>
+  </span>
+} @else if (orgs().length > 1) {
+  <button
+    class="org-switcher__button"
+    type="button"
+    [attr.aria-label]="currentName() + ', ' + label()"
+    [attr.title]="currentName()"
+    [cdkMenuTriggerFor]="panel"
+    [cdkMenuPosition]="positions"
+  >
+    <ng-container
+      *ngTemplateOutlet="mark; context: { $implicit: active() === allOrgs ? null : current() }"
+    />
+    <span class="org-switcher__name">{{ currentName() }}</span>
+    <ft-icon class="org-switcher__chevron" name="chevron-down" size="sm" />
+  </button>
+}
+
+<ng-template #panel>
+  <ul class="org-switcher__menu" cdkMenu role="menu" [attr.aria-label]="label()">
+    <li role="none" class="org-switcher__header">
+      <div class="org-switcher__title">{{ portfolioName() }}</div>
+      <div class="org-switcher__caption">{{ caption() }}</div>
+    </li>
+    @for (org of orgs(); track org.slug) {
+      <li role="none">
+        <button
+          class="org-switcher__option"
+          type="button"
+          cdkMenuItemRadio
+          [cdkMenuItemChecked]="org.slug === active()"
+          (cdkMenuItemTriggered)="choose(org.slug)"
+        >
+          <ng-container *ngTemplateOutlet="mark; context: { $implicit: org }" />
+          <span class="org-switcher__option-text">
+            <span class="org-switcher__option-name">{{ org.name }}</span>
+            <span class="org-switcher__option-type">{{ org.typeName }}</span>
+          </span>
+          <ft-icon class="org-switcher__check" name="done" size="sm" />
+        </button>
+      </li>
+    }
+    @if (showAllOrgs()) {
+      <li role="none" class="org-switcher__divider" aria-hidden="true"></li>
+      <li role="none">
+        <button
+          class="org-switcher__option"
+          type="button"
+          cdkMenuItemRadio
+          [cdkMenuItemChecked]="active() === allOrgs"
+          (cdkMenuItemTriggered)="choose(allOrgs)"
+        >
+          <ng-container *ngTemplateOutlet="mark; context: { $implicit: null }" />
+          <span class="org-switcher__option-text">
+            <span class="org-switcher__option-name">All orgs</span>
+            <span class="org-switcher__option-type"
+              >Read and assigned work across {{ orgs().length }} orgs</span
+            >
+          </span>
+          <ft-icon class="org-switcher__check" name="done" size="sm" />
+        </button>
+      </li>
+    }
+  </ul>
+</ng-template>

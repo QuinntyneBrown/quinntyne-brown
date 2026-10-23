@@ -34,6 +34,17 @@ Visibility enforcement for Shared resources (`ResourceAccess.Visible`) is descri
 - **Re-share refused** — a recipient is not the owner, so `ResourceAccess.CanEdit` is false and `PUT /api/resources/{id}` answers `403` (`L2-061` AC4). A System Admin changing someone else's audience is audited as `resource.shared` with the before and after audience.
 - **Live roles** — no snapshot of role holders is stored. `ResourceAccess.Visible` joins `ResourceShareRoles` against the caller's roles from `ICurrentUser`, so a member who gains a role sees the resource on their next request without a notification, and one who loses it does not (`L2-061` AC3, `L2-060` AC8).
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Resource` carries a required `OrganizationId`; files and tags belong to it. Lists and search are scoped to the active org, or to every covered org with `resources` on under "All orgs", with org labels.
+- Adding requires `resources.create` in the target org (the four FaithTech leads, the Staff cross-org role, the Startup Engineer and Advisor), or a tier.
+- Visibility levels are Private, Shared, **Org-wide** (was Global) and **Portfolio-wide** ([ADR 0039](../../../adr/0039-org-wide-and-portfolio-wide-visibility.md), `L2-148`). The stored value `Global` is renamed `OrgWide`; the default stays Org-wide. Only the Portfolio Lead or a System Admin may choose Portfolio-wide (`403` otherwise).
+- Shared audiences store a `RoleDefinitionId` (a catalogue role in the item's org) or a `CrossOrgRoleId` instead of a `Role`; named people shall cover the item's org.
+- Private resources stay visible only to their owner and to System Admin, audited; the Portfolio Lead, Org Lead and cross-org roles never see them, by id, list or search (`L2-148` AC6).
+- Only the owner edits, shares, archives, restores or transfers. A transfer target shall cover the item's org. The 30-day purge is unchanged.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

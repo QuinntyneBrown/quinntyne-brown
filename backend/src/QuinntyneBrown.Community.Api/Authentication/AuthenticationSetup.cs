@@ -9,6 +9,8 @@ namespace QuinntyneBrown.Community.Api.Authentication;
 
 public static class AuthenticationSetup
 {
+    public const string DefaultScheme = "Bearer or agent token";
+
     public static IServiceCollection AddCommunityAuthentication(
         this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
     {
@@ -54,7 +56,14 @@ public static class AuthenticationSetup
                 options.UseAspNetCore();
             });
 
-        services.AddAuthentication(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)
+        // Agent tokens go to their own handler; every other request to OpenIddict validation (ADR 0036).
+        services.AddAuthentication(DefaultScheme)
+            .AddPolicyScheme(DefaultScheme, DefaultScheme, options => options.ForwardDefaultSelector = context =>
+                AgentTokenAuthenticationHandler.Carries(context.Request)
+                    ? AgentTokenAuthenticationHandler.SchemeName
+                    : OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)
+            .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, AgentTokenAuthenticationHandler>(
+                AgentTokenAuthenticationHandler.SchemeName, null)
             .AddCookie(IdentityConstants.ApplicationScheme, options =>
             {
                 // Short-lived: it only carries a signed-in browser from the sign-in page to /connect/authorize.

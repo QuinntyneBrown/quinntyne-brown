@@ -1,8 +1,9 @@
 using QuinntyneBrown.Community.Application.Admin;
 using QuinntyneBrown.Community.Application.Common;
+using QuinntyneBrown.Community.Application.Organizations;
 using QuinntyneBrown.Community.Application.Profiles;
 using QuinntyneBrown.Community.Domain.Agile;
-using QuinntyneBrown.Community.Domain.Profiles;
+using QuinntyneBrown.Community.Domain.Organizations;
 using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Agile;
@@ -11,8 +12,12 @@ namespace QuinntyneBrown.Community.Application.Agile;
 public enum WorkspaceAccess
 {
     Outsider,
+    /// <summary>A holder of <c>workspaces.readAll</c> in the workspace's org (Staff): read-only.</summary>
     Staff,
-    /// <summary>A System Admin who does not own the workspace, member or not: every write is an audited override.</summary>
+    /// <summary>
+    /// The org's Org Lead, the Portfolio Lead or a System Admin who does not own the workspace, member or not: every
+    /// write is an audited override (D12).
+    /// </summary>
     Admin,
     Member,
     Owner,
@@ -43,28 +48,37 @@ public record WorkspaceCaller(Guid ProfileId, WorkspaceAccess Access)
 /// </summary>
 public class WorkspaceAccessPolicy(IApplicationDbContext db, ICurrentUser current, ProfileAccess profiles, IAuditLog audit)
 {
-    public bool ReadsEverything => current.HasRole(Role.Staff) || current.HasRole(Role.SystemAdmin);
+    private CallerAccess Access => current.Access;
 
-    public bool IsSystemAdmin => current.HasRole(Role.SystemAdmin);
+    public bool IsSystemAdmin => Access.IsSystemAdmin;
+
+    /// <summary>Whether the caller is "Admin" for workspaces of the org: its Org Lead, the Portfolio Lead or a System Admin (D12).</summary>
+    public bool AdministersOrg(Guid orgId) => Access.LeadsOrg(orgId) && Access.Covers(orgId, Features.Agile);
 
     public Task<Guid?> CallerProfileIdAsync(CancellationToken cancellationToken = default) => profiles.CallerProfileIdAsync(cancellationToken);
 
     /// <summary>
-    /// Owner first; then System Admin, even when they also belong to the workspace, so every action a System Admin
-    /// takes outside their own workspace succeeds and is audited (L2-031 AC7); then member, Staff and outsider.
+    /// Owner first; then the org's administrators, even when they also belong to the workspace, so every action they
+    /// take outside their own workspace succeeds and is audited (L2-031 AC7); then member, read-all and outsider. A
+    /// workspace of an org the caller does not cover, or with agile switched off, is always outsider (404).
     /// </summary>
     public WorkspaceAccess Classify(Workspace workspace, Guid? caller) =>
-        caller is { } me && workspace.OwnerId == me ? WorkspaceAccess.Owner
-            : current.HasRole(Role.SystemAdmin) ? WorkspaceAccess.Admin
+        !Access.Covers(workspace.OrganizationId, Features.Agile) ? WorkspaceAccess.Outsider
+            : caller is { } me && workspace.OwnerId == me ? WorkspaceAccess.Owner
+            : AdministersOrg(workspace.OrganizationId) ? WorkspaceAccess.Admin
             : caller is { } m && workspace.Members.Any(x => x.ProfileId == m) ? WorkspaceAccess.Member
-            : current.HasRole(Role.Staff) ? WorkspaceAccess.Staff
+            : Access.Has(workspace.OrganizationId, Permissions.WorkspacesReadAll) ? WorkspaceAccess.Staff
             : WorkspaceAccess.Outsider;
 
-    /// <summary>The workspaces the caller may read.</summary>
-    public IQueryable<Workspace> Visible(IQueryable<Workspace> workspaces, Guid? caller) =>
-        ReadsEverything ? workspaces
-            : caller is { } me ? workspaces.Where(w => w.OwnerId == me || w.Members.Any(m => m.ProfileId == me))
-            : workspaces.Where(_ => false);
+    /// <summary>The workspaces the caller may read, in the request's scope (ADR 0034).</summary>
+    public IQueryable<Workspace> Visible(IQueryable<Workspace> workspaces, Guid? caller)
+    {
+        var scope = Access.ReadScope(Features.Agile);
+        var readAll = scope.Where(org => AdministersOrg(org) || Access.Has(org, Permissions.WorkspacesReadAll)).ToList();
+        var me = caller ?? Guid.Empty;
+        return workspaces.Where(w => scope.Contains(w.OrganizationId)
+            && (readAll.Contains(w.OrganizationId) || w.OwnerId == me || w.Members.Any(m => m.ProfileId == me)));
+    }
 
     /// <summary>
     /// Loads a workspace (tracked) with the caller's access. The workspace is null when it does not exist or, unless
@@ -92,16 +106,16 @@ public class WorkspaceAccessPolicy(IApplicationDbContext db, ICurrentUser curren
         return workspace is null ? (null!, caller, Result.NotFound()) : (workspace, caller, caller.Refuse(manage));
     }
 
-    /// <summary>Records an action only a System Admin may take, such as reassigning the owner.</summary>
-    public void Audit(WorkspaceCaller caller, string action, string targetType, Guid targetId, object? before, object? after) =>
-        audit.Record(caller.ProfileId, action, targetType, targetId.ToString(), before, after);
+    /// <summary>Records an action only an administrator may take, such as reassigning the owner.</summary>
+    public void Audit(WorkspaceCaller caller, string action, string targetType, Guid targetId, object? before, object? after, Guid? organizationId = null) =>
+        audit.Record(caller.ProfileId, action, targetType, targetId.ToString(), before, after, organizationId);
 
-    /// <summary>Records a System Admin override (ADR 0011); writes by the owner or a member are not audited.</summary>
-    public void AuditOverride(WorkspaceCaller caller, string action, string targetType, Guid targetId, object? before, object? after)
+    /// <summary>Records an administrator's override (ADR 0011); writes by the owner or a member are not audited.</summary>
+    public void AuditOverride(WorkspaceCaller caller, string action, string targetType, Guid targetId, object? before, object? after, Guid? organizationId = null)
     {
         if (caller.IsOverride)
         {
-            audit.Record(caller.ProfileId, action, targetType, targetId.ToString(), before, after);
+            audit.Record(caller.ProfileId, action, targetType, targetId.ToString(), before, after, organizationId);
         }
     }
 }

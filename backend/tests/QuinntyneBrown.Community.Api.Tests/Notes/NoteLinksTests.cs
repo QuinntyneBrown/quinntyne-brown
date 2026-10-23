@@ -33,9 +33,9 @@ public class NoteLinksTests(CommunityApiFactory factory) : IClassFixture<Communi
         var hannah = await factory.AddMemberAsync("Hannah Kim");
         var retro = await factory.AddNoteAsync(hannah, "Austin launch retro notes");
         await factory.ShareInDbAsync(retro.Id, [grace.ProfileId], []);
-        var playbook = await factory.AddNoteAsync(grace, "Playbook", "Global");
+        var playbook = await factory.AddNoteAsync(grace, "Playbook", "OrgWide");
         (await factory.ClientFor(grace).SaveNoteAsync(playbook, [Block("paragraph", [new { Text = "Read " }, PageLink(retro.Id)])])).EnsureSuccessStatusCode();
-        var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), Role.CityLead);
+        var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead);
 
         var json = await marcus.GetStringAsync($"/api/notes/{playbook.Id}");
         var read = (await marcus.GetFromJsonAsync<Detail>($"/api/notes/{playbook.Id}"))!;
@@ -69,8 +69,8 @@ public class NoteLinksTests(CommunityApiFactory factory) : IClassFixture<Communi
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var hannah = await factory.AddMemberAsync("Hannah Kim");
-        var checklist = await factory.AddNoteAsync(grace, "Volunteer onboarding checklist", "Global");
-        var open = await factory.AddNoteAsync(grace, "Toronto playbook", "Global");
+        var checklist = await factory.AddNoteAsync(grace, "Volunteer onboarding checklist", "OrgWide");
+        var open = await factory.AddNoteAsync(grace, "Toronto playbook", "OrgWide");
         var hidden = await factory.AddNoteAsync(hannah, "Hannah’s private plan");
         (await factory.ClientFor(grace).SaveNoteAsync(open, [Block("paragraph", [PageLink(checklist.Id)])])).EnsureSuccessStatusCode();
         (await factory.ClientFor(hannah).SaveNoteAsync(hidden, [Block("paragraph", [PageLink(checklist.Id)])])).EnsureSuccessStatusCode();
@@ -93,7 +93,7 @@ public class NoteLinksTests(CommunityApiFactory factory) : IClassFixture<Communi
         var current = await client.CreateNoteAsync("Builders Night run sheet");
         await client.CreateNoteAsync("Builders Night budget");
         await factory.AddNoteAsync(hannah, "Builders Night private notes");
-        await factory.AddNoteAsync(hannah, "Builders Night shared plan", "Global");
+        await factory.AddNoteAsync(hannah, "Builders Night shared plan", "OrgWide");
 
         var found = (await client.GetFromJsonAsync<PageRef[]>($"/api/notes/links?q=builders&exclude={current.Id}"))!;
 

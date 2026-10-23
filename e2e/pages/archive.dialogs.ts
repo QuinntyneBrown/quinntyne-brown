@@ -33,7 +33,7 @@ export class ReassignOwnerDialog {
 
   constructor(page: Page, workspace: string) {
     this.dialog = page.getByRole('dialog', { name: `Choose a new owner for ${workspace}` });
-    this.owner = this.dialog.getByRole('combobox', { name: 'New owner (City Leads only)' });
+    this.owner = this.dialog.getByRole('combobox', { name: 'New owner' });
     this.confirm = this.dialog.getByRole('button', { name: 'Reassign owner' });
     this.ownerError = this.dialog.getByText('Choose who will own this workspace.').last();
   }

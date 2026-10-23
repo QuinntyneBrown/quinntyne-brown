@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { NOTIFICATIONS_SERVICE, NotificationDto } from '@faithtech-community/api';
+import { ACCESS_SERVICE, NOTIFICATIONS_SERVICE, NotificationDto } from '@faithtech-community/api';
 import {
   ButtonComponent,
   CardComponent,
@@ -53,7 +53,11 @@ export class NotificationsPage {
   private page = 1;
   private request = 0;
 
-  protected readonly notices = computed<Notice[]>(() => this.items().map(toNotice));
+  private readonly access = inject(ACCESS_SERVICE);
+  protected readonly notices = computed<Notice[]>(() => {
+    const labelled = this.access.orgs().length > 1;
+    return this.items().map((n) => toNotice(n, labelled));
+  });
   protected readonly subtitle = computed(() =>
     this.unread() > 0 ? `${this.unread()} unread` : null,
   );
@@ -126,7 +130,8 @@ export class NotificationsPage {
   }
 }
 
-function toNotice(n: NotificationDto): Notice {
+/** The notice for a notification; `labelled` names its org, for people who cover several. */
+function toNotice(n: NotificationDto, labelled: boolean): Notice {
   return {
     id: n.id,
     name: n.actorName ?? 'Quinntyne Brown',
@@ -136,5 +141,6 @@ function toNotice(n: NotificationDto): Notice {
     href: n.linkPath,
     meta: formatFeedTime(n.createdAt),
     unread: !n.readAt,
+    org: labelled ? n.organization?.name : undefined,
   };
 }

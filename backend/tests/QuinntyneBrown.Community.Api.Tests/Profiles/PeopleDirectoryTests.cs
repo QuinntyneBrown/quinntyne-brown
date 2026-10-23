@@ -23,9 +23,9 @@ public class PeopleDirectoryTests(CommunityApiFactory factory) : IClassFixture<C
     // AC3, AC6: any other signed-in caller gets 403 and no member data.
     [Theory]
     [InlineData]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.Volunteer, Role.ProductEngineer)]
-    public async Task Anyone_but_a_city_lead_staff_or_system_admin_gets_403(params Role[] roles)
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.Volunteer, SeededRole.ProductEngineer)]
+    public async Task Anyone_but_a_city_lead_staff_or_system_admin_gets_403(params SeededRole[] roles)
     {
         var member = await factory.AddMemberAsync("Leah Thompson");
 
@@ -37,17 +37,17 @@ public class PeopleDirectoryTests(CommunityApiFactory factory) : IClassFixture<C
 
     // AC1, AC5: City Lead, Staff and System Admin see members by name with photo, roles and home city, never email.
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Permitted_callers_see_members_by_name_with_photo_roles_and_city(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Permitted_callers_see_members_by_name_with_photo_roles_and_city(SeededRole role)
     {
         var tag = Guid.NewGuid().ToString("N")[..8];
         var samuel = await factory.AddMemberAsync($"Samuel {tag}", p =>
         {
             p.Update(p.Name, "Toronto", null);
-            p.AddRole(Role.ProductEngineer, Guid.Empty, DateTime.UtcNow);
-            p.AddRole(Role.CreateLead, Guid.Empty, DateTime.UtcNow);
+            p.AddRole(SeededRole.ProductEngineer, Guid.Empty, DateTime.UtcNow);
+            p.AddRole(SeededRole.CreateLead, Guid.Empty, DateTime.UtcNow);
             p.AddPhoto(new ProfilePhoto($"profiles/{p.Id}/featured.jpg", "Samuel at Builders Night", Earlier));
         });
         await factory.AddMemberAsync($"Leah {tag}");
@@ -65,7 +65,7 @@ public class PeopleDirectoryTests(CommunityApiFactory factory) : IClassFixture<C
         var row = page.Items[1];
         Assert.Equal(samuel.ProfileId, row.Id);
         Assert.Equal("Toronto", row.HomeCity);
-        Assert.Equal(["CreateLead", "ProductEngineer"], row.Roles);
+        Assert.Equal(["create-lead", "product-engineer"], row.Roles.Select(r => r.Key));
         Assert.Equal($"{FakePhotoStorage.BaseUrl}profiles/{samuel.ProfileId}/featured.jpg", row.PhotoUrl);
         Assert.DoesNotContain("@example.org", await response.Content.ReadAsStringAsync());
     }
@@ -78,7 +78,7 @@ public class PeopleDirectoryTests(CommunityApiFactory factory) : IClassFixture<C
         var email = await factory.WithDbAsync(db => db.Users.Where(u => u.Id == ruth.UserId).Select(u => u.Email!).SingleAsync());
         var viewer = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var page = await factory.ClientFor(viewer, Role.CityLead).GetFromJsonAsync<PeoplePage>($"/api/people?q={email[..12].ToUpperInvariant()}");
+        var page = await factory.ClientFor(viewer, SeededRole.CityLead).GetFromJsonAsync<PeoplePage>($"/api/people?q={email[..12].ToUpperInvariant()}");
 
         Assert.Equal([ruth.ProfileId], page!.Items.Select(p => p.Id));
     }
@@ -89,7 +89,7 @@ public class PeopleDirectoryTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var viewer = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var page = await factory.ClientFor(viewer, Role.CityLead).GetFromJsonAsync<PeoplePage>("/api/people?q=xavier-nobody");
+        var page = await factory.ClientFor(viewer, SeededRole.CityLead).GetFromJsonAsync<PeoplePage>("/api/people?q=xavier-nobody");
 
         Assert.Equal(0, page!.TotalCount);
         Assert.Empty(page.Items);
@@ -106,7 +106,7 @@ public class PeopleDirectoryTests(CommunityApiFactory factory) : IClassFixture<C
         }
 
         var viewer = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(viewer, Role.Staff);
+        var client = factory.ClientFor(viewer, SeededRole.Staff);
         var first = await client.GetFromJsonAsync<PeoplePage>($"/api/people?q={tag}");
         var second = await client.GetFromJsonAsync<PeoplePage>($"/api/people?q={tag}&page=2");
 
@@ -115,7 +115,7 @@ public class PeopleDirectoryTests(CommunityApiFactory factory) : IClassFixture<C
         Assert.Equal([$"Member {tag} 25"], second!.Items.Select(p => p.Name));
     }
 
-    private sealed record Person(Guid Id, string Name, string? HomeCity, string? PhotoUrl, string[] Roles);
+    private sealed record Person(Guid Id, string Name, string? HomeCity, string? PhotoUrl, RoleRef[] Roles);
 
     private sealed record PeoplePage(List<Person> Items, int Page, int PageSize, int TotalCount);
 }

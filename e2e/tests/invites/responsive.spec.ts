@@ -16,7 +16,7 @@ for (const name of Object.keys(BREAKPOINTS) as BreakpointName[]) {
     api.addInvite({
       email: 'nate.oyelaran@example.org',
       invitedBy: grace.profileId,
-      preassignedRole: 'ProductEngineer',
+      preassignedRole: 'product-engineer',
     });
     const expired = api.addInvite(
       { email: 'felix.wu@example.org', invitedBy: grace.profileId },
@@ -25,7 +25,7 @@ for (const name of Object.keys(BREAKPOINTS) as BreakpointName[]) {
     const pending = api.addInvite({
       email: 'ruth.alvarez@example.org',
       invitedBy: grace.profileId,
-      preassignedRole: 'Volunteer',
+      preassignedRole: 'volunteer',
     });
 
     const accept = new AcceptInvitePage(page);

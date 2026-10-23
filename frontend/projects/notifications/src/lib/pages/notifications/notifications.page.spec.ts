@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import {
   NOTIFICATIONS_SERVICE,
+  provideStaticAccess,
   NotificationDto,
   NotificationPage,
   NotificationQuery,
@@ -45,7 +46,7 @@ async function setup(list: (query: NotificationQuery) => Observable<Notification
     markAllRead: vi.fn(() => of(undefined)),
   };
   TestBed.configureTestingModule({
-    providers: [{ provide: NOTIFICATIONS_SERVICE, useValue: service }],
+    providers: [{ provide: NOTIFICATIONS_SERVICE, useValue: service }, provideStaticAccess()],
   });
   const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
   const fixture = TestBed.createComponent(NotificationsPage);

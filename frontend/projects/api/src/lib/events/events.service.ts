@@ -1,8 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Role } from '../shared/role';
-
 // "Hackathon" is only an event type in v1; teams, projects and judging are v2.
 export type EventType = 'Gathering' | 'BuildersNight' | 'Hackathon' | 'PrayerAndPlanning' | 'Panel';
 export type EventFormat = 'InPerson' | 'Online';
@@ -106,6 +104,18 @@ export interface PublicEventDto {
   isFull: boolean;
   isCancelled: boolean;
   cancellationReason: string | null;
+  organization: PublicOrgDto;
+}
+
+/** The org a public event belongs to and its branding (PublicOrgDto, L2-149). */
+export interface PublicOrgDto {
+  slug: string;
+  /** Old slugs, which redirect to `slug`. */
+  aliases: string[];
+  displayName: string;
+  logoUrl: string | null;
+  accent: string | null;
+  accentForeground: string | null;
 }
 
 export interface GuestRsvpRequest {
@@ -158,12 +168,5 @@ export const EVENT_TYPE_LABELS: Record<EventType, string> = {
   PrayerAndPlanning: 'Prayer & planning',
   Panel: 'Panel',
 };
-
-const EVENT_MANAGERS: readonly Role[] = ['EventLead', 'CityLead', 'SystemAdmin'];
-
-/** Event Leads, City Leads and System Admins create, edit and cancel events (L2-020, L2-025). */
-export function canManageEvents(callerRoles: readonly Role[]): boolean {
-  return callerRoles.some((r) => EVENT_MANAGERS.includes(r));
-}
 
 export const EVENTS_SERVICE = new InjectionToken<EventsService>('EVENTS_SERVICE');

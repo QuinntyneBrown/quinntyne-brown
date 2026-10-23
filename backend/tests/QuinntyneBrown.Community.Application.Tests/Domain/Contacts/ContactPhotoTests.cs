@@ -7,7 +7,7 @@ public class ContactPhotoTests
 {
     private static readonly DateTimeOffset Start = new(2026, 10, 22, 12, 0, 0, TimeSpan.Zero);
 
-    private static Contact NewContact() => new(Guid.NewGuid(), "Tomás Ortega", null, null, null, null, Start.UtcDateTime);
+    private static Contact NewContact() => new(Guid.NewGuid(), Guid.NewGuid(), "Tomás Ortega", null, null, null, null, Start.UtcDateTime);
 
     private static ContactPhoto Photo(int minutes) => new($"contacts/c/photo-{minutes}.jpg", $"Photo {minutes}", Start.AddMinutes(minutes));
 

@@ -38,7 +38,7 @@ test.describe('Public events and guest RSVP', () => {
     await expect(page.getByText('No account needed. 34 people are going.')).toBeVisible();
     await expect(publicPage.signIn).toHaveAttribute(
       'href',
-      `/sign-in?returnUrl=%2Fevents%2F${event.id}`,
+      `/sign-in?returnUrl=%2Fo%2Ffaithtech-toronto%2Fevents%2F${event.id}`,
     );
     await axe.check();
     await page.emulateMedia({ colorScheme: 'dark' });

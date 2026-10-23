@@ -19,10 +19,16 @@ public class ExportCheckInsHandler(IApplicationDbContext db, EventPermissions pe
             return (Result.Forbidden(), null);
         }
 
-        var e = await db.Events.AsNoTracking().Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var e = await permissions.Covered(db.Events.AsNoTracking()).Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (e is null)
         {
             return (Result.NotFound(), null);
+        }
+
+        permissions.Focus(e.OrganizationId);
+        if (!permissions.CanCheckIn)
+        {
+            return (Result.Forbidden(), null);
         }
 
         var memberIds = e.Rsvps.Select(r => r.ProfileId).OfType<Guid>().ToList();

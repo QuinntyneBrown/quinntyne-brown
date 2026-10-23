@@ -14,6 +14,8 @@ import { MockSearch } from './mock-search';
 import { MockWall } from './mock-wall';
 import { MockResources } from './mock-resources';
 import { MockNotes } from './mock-notes';
+import { MockOrganizations, MockRoleRef, OrgMember } from './mock-organizations';
+import { MockPortfolio } from './mock-portfolio';
 
 export interface MockAccount {
   name: string;
@@ -21,8 +23,21 @@ export interface MockAccount {
   password: string;
   verified: boolean;
   suspended: boolean;
+  /**
+   * Old role names: catalogue roles in the account's first org (`City Lead` there), `Staff` as the
+   * Staff cross-org role and `SystemAdmin` as the System Admin tier (mock-organizations.ts).
+   */
   roles: string[];
   profileId: string;
+  /** The slugs of the orgs the person belongs to; FaithTech Toronto when absent. */
+  orgs?: string[];
+  /** Catalogue role keys in other orgs, by slug: `{ shelfie: ['engineer'] }`. */
+  orgRoles?: Record<string, string[]>;
+  /** The orgs (slugs) where the person is Org Lead. */
+  orgLead?: string[];
+  portfolioLead?: boolean;
+  /** Cross-org role keys: `portfolio`, `staff`. */
+  crossOrg?: string[];
 }
 
 export interface MockPhoto {
@@ -87,18 +102,38 @@ export interface MockAuditEntry {
   ipAddress: string;
 }
 
-const CITY_LEAD_ROLES = [
-  'EventLead',
-  'CreateLead',
-  'CommunicationsLead',
-  'Volunteer',
-  'ProductEngineer',
-  'Attendee',
-];
+/** Role keys as the API takes them, and the old role names the fake keeps on profiles. */
+const LEGACY_ROLE: Record<string, string> = {
+  'city-lead': 'CityLead',
+  'event-lead': 'EventLead',
+  'create-lead': 'CreateLead',
+  'communications-lead': 'CommunicationsLead',
+  volunteer: 'Volunteer',
+  'product-engineer': 'ProductEngineer',
+  attendee: 'Attendee',
+  staff: 'Staff',
+  'system-admin': 'SystemAdmin',
+};
 const LEAD_ROLES = ['CityLead', 'EventLead', 'CreateLead', 'CommunicationsLead', 'SystemAdmin'];
 const TEAM_LEAD_ROLES = ['CityLead', 'EventLead', 'CreateLead', 'CommunicationsLead'];
 const TEAM_ROLES = [...TEAM_LEAD_ROLES, 'Volunteer'];
 const DAY = 24 * 60 * 60 * 1000;
+/** The app sections that live under /o/{slug} (ADR 0037); the rest are personal or platform pages. */
+const ORG_SECTIONS = [
+  '',
+  'people',
+  'contacts',
+  'partners',
+  'workspaces',
+  'team',
+  'events',
+  'search',
+  'announcements',
+  'resources',
+  'reports',
+  'notes',
+  'invites',
+];
 /** The API's CORS origins (WebApp:Origin and Marketing:Origin), with credentials allowed. */
 const ALLOWED_ORIGINS = ['http://localhost:4200', 'http://localhost:4300'];
 
@@ -143,6 +178,7 @@ export class MockApi {
       const account = this.accounts.get(email.toLowerCase());
       return account?.verified ? account.profileId : undefined;
     },
+    (slug) => this.organizations.publicOrg(slug),
   );
   /** In-app notifications (L2-027) for the bell, the notifications page and home's Recent activity. */
   readonly notifications = new MockNotifications(() => this.now);
@@ -156,7 +192,13 @@ export class MockApi {
   /** Requests the fake does not implement. The fixture fails the test if any arrive (AGENTS.md). */
   readonly unrecognised: string[] = [];
   /** The Agile workspaces API: add workspaces, items and sprints through it. */
-  readonly agile = new MockAgile(this.profiles, this.unrecognised, () => this.signedIn);
+  readonly agile = new MockAgile(
+    this.profiles,
+    this.unrecognised,
+    () => this.signedIn,
+    () => this.organizations,
+    () => [...this.accounts.values()],
+  );
   private readonly overrides = new Map<string, Handler>();
   private session: MockAccount | null = null;
   private signedIn: MockAccount | null = null;
@@ -186,6 +228,14 @@ export class MockApi {
   readonly google = new MockGoogle(this, (account) => (this.session = account));
   /** GitHub sign-in: GitHub itself and the API's GitHub endpoints (L2-130). */
   readonly github = new MockGitHub(this, (account) => (this.session = account));
+  /** Orgs, their types, features and catalogues, and what each caller covers (ADR 0033 to 0038). */
+  readonly organizations = new MockOrganizations();
+  /** Portfolio administration: Org Types, catalogues, orgs, cross-org roles and agents. */
+  readonly portfolio = new MockPortfolio(
+    () => this.organizations,
+    () => [...this.accounts.values()],
+    () => this.now,
+  );
   /** The private-preview wall on both hosts (ADR 0026); open unless a test calls wall.lock(). */
   readonly wall: MockWall;
 
@@ -301,7 +351,36 @@ export class MockApi {
     await this.page.getByLabel('Email').fill(account.email);
     await this.page.getByLabel('Password', { exact: true }).fill(account.password);
     await this.page.getByRole('button', { name: 'Sign in', exact: true }).click();
-    await this.page.waitForURL((url) => url.pathname === path);
+    const landing = this.landingFor(account, path);
+    await this.page.waitForURL((url) => url.pathname === landing);
+  }
+
+  /**
+   * Where the app lands for `path`: an address from before orgs (`/partners`) moves under the
+   * person's first org (`/o/faithtech-toronto/partners`), as the app's redirect does (ADR 0037).
+   */
+  landingFor(account: MockAccount, path: string): string {
+    const section = path.split('/')[1] ?? '';
+    if (path.startsWith('/o/') || !ORG_SECTIONS.includes(section)) return path;
+    const org = this.organizations.covered(account)[0]?.org.slug;
+    // Someone who covers no org waits to be added (L2-142).
+    if (!org) return '/waiting';
+    return `/o/${org}${path === '/' ? '' : path}`;
+  }
+
+  /** The person behind a profile, for the role and org rules. */
+  memberFor(profile: MockProfile): OrgMember {
+    return (
+      [...this.accounts.values()].find((a) => a.profileId === profile.id) ?? {
+        profileId: profile.id,
+        roles: profile.roles,
+      }
+    );
+  }
+
+  /** A profile's roles as the API lists them (RoleDto). */
+  roleRefs(profile: MockProfile): MockRoleRef[] {
+    return this.organizations.roleRefs({ ...this.memberFor(profile), roles: profile.roles });
   }
 
   callsTo(method: string, path: string) {
@@ -341,6 +420,19 @@ export class MockApi {
     if (override) return override(route, body);
 
     const authorization = request.headers()['authorization'];
+    const gated = this.organizations.gate(
+      route,
+      url.pathname,
+      request.headers()['x-org'],
+      this.caller(authorization),
+    );
+    if (gated) return gated;
+    const resolve = /^\/api\/orgs\/resolve\/([^/]+)$/.exec(url.pathname);
+    if (method === 'GET' && resolve) {
+      if (!this.caller(authorization)) return route.fulfill({ status: 401 });
+      const slug = this.organizations.resolve(decodeURIComponent(resolve[1]));
+      return slug ? route.fulfill({ status: 200, json: { slug } }) : route.fulfill({ status: 404 });
+    }
     const connect = this.connect.handle(route, method, url, body, this.caller(authorization));
     if (connect) return connect;
     const contacts = this.contacts.handle(route, method, url, body, this.caller(authorization));
@@ -394,6 +486,22 @@ export class MockApi {
       return this.roles(route, method, roleRoute[1], roleRoute[2], body, authorization);
     const suspension = /^\/api\/admin\/users\/([^/]+)\/suspension$/.exec(url.pathname);
     if (suspension) return this.suspension(route, method, suspension[1], body, authorization);
+    const portfolio = this.portfolio.handle(
+      route,
+      method,
+      url.pathname,
+      url,
+      body,
+      this.caller(authorization),
+    );
+    if (portfolio) return portfolio;
+    const members = /^\/api\/organizations\/([^/]+)\/members(?:\/([^/]+))?(\/org-lead)?$/.exec(
+      url.pathname,
+    );
+    if (members) return this.members(route, method, url, members, body, authorization);
+    const branding = /^\/api\/organizations\/([^/]+)\/branding(\/logo)?$/.exec(url.pathname);
+    if (branding)
+      return this.branding(route, method, branding[1], !!branding[2], body, authorization);
     const inviteAction = /^\/api\/invites\/([^/]+)\/(resend|revoke)$/.exec(url.pathname);
     if (method === 'POST' && inviteAction) {
       return this.inviteAction(route, inviteAction[1], inviteAction[2], authorization);
@@ -436,6 +544,11 @@ export class MockApi {
         return this.token(route, body);
       case 'GET /api/me':
         return this.me(route, request.headers()['authorization']);
+      case 'GET /api/me/access': {
+        const caller = this.caller(authorization);
+        if (!caller) return route.fulfill({ status: 401 });
+        return route.fulfill({ status: 200, json: this.organizations.access(caller) });
+      }
       case 'POST /api/account/sign-out':
         this.signedIn = null;
         return route.fulfill({ status: 204 });
@@ -532,7 +645,7 @@ export class MockApi {
         name: account.name,
         email: account.email,
         emailVerified: account.verified,
-        roles: account.roles,
+        isSystemAdmin: account.roles.includes('SystemAdmin'),
       },
     });
   }
@@ -704,38 +817,191 @@ export class MockApi {
     return route.abort('failed');
   }
 
-  /** RolesEndpoints: the L2-009 limits and the last System Admin guard. */
+  /**
+   * RolesEndpoints with ChangeRolesHandler's rules: catalogue roles by key in one org (the
+   * caller's grantable roles there), System Admin and Portfolio Lead for System Admins, and the
+   * last System Admin guard. Answers the person's roles (RoleDto) in that org.
+   */
   private roles(
     route: Route,
     method: string,
     profileId: string,
-    roleName: string | undefined,
+    roleKey: string | undefined,
     body: Record<string, unknown>,
     authorization: string | undefined,
   ) {
     const caller = this.caller(authorization);
     if (!caller) return route.fulfill({ status: 401 });
-    const role =
-      method === 'POST' ? String(body['role'] ?? '') : decodeURIComponent(roleName ?? '');
+    const key = method === 'POST' ? String(body['role'] ?? '') : decodeURIComponent(roleKey ?? '');
     const admin = caller.roles.includes('SystemAdmin');
-    if (!admin && !(caller.roles.includes('CityLead') && CITY_LEAD_ROLES.includes(role))) {
-      return route.fulfill({ status: 403 });
-    }
     const profile = this.profiles.get(profileId);
-    if (!profile) return route.fulfill({ status: 404 });
+    if (!profile) return route.fulfill({ status: admin ? 404 : 403 });
     const adding = method === 'POST';
-    if (profile.roles.includes(role) === adding)
-      return conflict(route, 'They already hold that role.');
-    if (!adding && role === 'SystemAdmin') {
+    const legacy = LEGACY_ROLE[key];
+    if (key === 'system-admin' || key === 'portfolio-lead') {
+      if (!admin) return route.fulfill({ status: 403 });
+    } else {
+      const orgId =
+        (method === 'POST'
+          ? body['organizationId']
+          : new URL(route.request().url()).searchParams.get('organizationId')) ?? null;
+      const covered =
+        this.organizations
+          .covered(caller)
+          .find((c) =>
+            orgId ? c.org.id === orgId : c.org.slug === route.request().headers()['x-org'],
+          ) ?? this.organizations.covered(caller)[0];
+      if (!covered) return route.fulfill({ status: 404 });
+      if (!this.organizations.grantable(caller, covered).some((r) => r.key === key)) {
+        return route.fulfill({ status: 403 });
+      }
+    }
+    if (!legacy) return route.fulfill({ status: 403 });
+    if (profile.roles.includes(legacy) === adding)
+      return conflict(
+        route,
+        adding ? 'They already hold that role.' : 'They don’t hold that role.',
+      );
+    if (!adding && legacy === 'SystemAdmin') {
       const admins = [...this.profiles.values()].filter((p) => p.roles.includes('SystemAdmin'));
       if (admins.length <= 1)
         return conflict(route, 'There must always be at least one System Admin.');
     }
-    profile.roles = adding ? [...profile.roles, role] : profile.roles.filter((r) => r !== role);
+    profile.roles = adding ? [...profile.roles, legacy] : profile.roles.filter((r) => r !== legacy);
     for (const account of this.accounts.values()) {
       if (account.profileId === profile.id) account.roles = profile.roles;
     }
-    return route.fulfill({ status: 200, json: profile.roles });
+    return route.fulfill({ status: 200, json: this.roleRefs(profile) });
+  }
+
+  /**
+   * MembersHandler: an org's Org Lead, its Portfolio Lead or a System Admin lists, adds and
+   * removes members (L2-143); anyone else 403, an uncovered org 404.
+   */
+  /** PUT /api/organizations/{id}/branding and PUT or DELETE …/branding/logo (L2-149 AC4, AC5). */
+  private branding(
+    route: Route,
+    method: string,
+    orgId: string,
+    logo: boolean,
+    body: Record<string, unknown>,
+    authorization: string | undefined,
+  ) {
+    const caller = this.caller(authorization);
+    if (!caller) return route.fulfill({ status: 401 });
+    const covered = this.organizations.covered(caller).find((c) => c.org.id === orgId);
+    if (!covered) return route.fulfill({ status: 404 });
+    const lead =
+      caller.roles.includes('SystemAdmin') || covered.isPortfolioLead || covered.isOrgLead;
+    if (!lead) return route.fulfill({ status: 403 });
+    const org = covered.org;
+    if (logo && method === 'DELETE') {
+      org.logoUrl = null;
+      return route.fulfill({ status: 204 });
+    }
+    if (logo) {
+      org.logoUrl = `https://blobs.example/organizations/${org.id}/logo.png`;
+      return route.fulfill({ status: 200, json: this.organizations.brandingOf(org) });
+    }
+    const result = this.organizations.saveBranding(
+      org,
+      String(body['displayName'] ?? ''),
+      (body['accent'] as string | null) ?? null,
+    );
+    return route.fulfill(result);
+  }
+
+  private members(
+    route: Route,
+    method: string,
+    url: URL,
+    [, orgId, profileId, orgLead]: RegExpExecArray,
+    body: Record<string, unknown>,
+    authorization: string | undefined,
+  ) {
+    const caller = this.caller(authorization);
+    if (!caller) return route.fulfill({ status: 401 });
+    const covered = this.organizations.covered(caller).find((c) => c.org.id === orgId);
+    if (!covered) return route.fulfill({ status: 404 });
+    const org = covered.org;
+    const admin = caller.roles.includes('SystemAdmin');
+    const tier = admin || covered.isPortfolioLead;
+    if (!tier && !covered.isOrgLead) return route.fulfill({ status: 403 });
+    const memberOf = (a: MockAccount) => this.organizations.memberships(a).includes(org.slug);
+    const leads = () =>
+      [...this.accounts.values()].filter(
+        (a) => memberOf(a) && (a.orgLead ?? []).includes(org.slug),
+      );
+    const dto = (a: MockAccount) => ({
+      profileId: a.profileId,
+      name: this.profiles.get(a.profileId)?.name ?? a.name,
+      photoUrl: null,
+      kind: 'Person',
+      isOrgLead: (a.orgLead ?? []).includes(org.slug),
+      roles: this.organizations
+        .roleRefs(a)
+        .filter((r) => r.kind !== 'crossOrg' && r.organizationId === org.id),
+      joinedAt: this.now.toISOString(),
+      joinedVia: 'Invite',
+    });
+    if (orgLead) {
+      if (!tier) return route.fulfill({ status: 403 });
+      const account = [...this.accounts.values()].find((a) => a.profileId === profileId);
+      if (!account || !memberOf(account)) return route.fulfill({ status: 404 });
+      account.orgLead =
+        method === 'PUT'
+          ? [...new Set([...(account.orgLead ?? []), org.slug])]
+          : (account.orgLead ?? []).filter((s) => s !== org.slug);
+      return route.fulfill({ status: 204 });
+    }
+    if (method === 'GET' && !profileId) {
+      const q = (url.searchParams.get('q') ?? '').trim().toLowerCase();
+      const list = [...this.accounts.values()]
+        .filter((a) => memberOf(a) && (!q || a.name.toLowerCase().includes(q)))
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(dto);
+      return route.fulfill({ status: 200, json: list });
+    }
+    if (method === 'POST' && !profileId) {
+      const email = String(body['email'] ?? '')
+        .trim()
+        .toLowerCase();
+      const account = this.accounts.get(email);
+      if (!account || !account.verified) {
+        return problemDetail(route, 404, 'No account uses that email. Send an invite instead.');
+      }
+      if (memberOf(account))
+        return conflict(route, 'They’re already a member of this organization.');
+      account.orgs = [...this.organizations.memberships(account), org.slug];
+      this.addNotification({
+        recipientId: account.profileId,
+        kind: 'AddedToOrg',
+        title: `${caller.name} added you to ${org.name}`,
+        linkPath: `/o/${org.slug}`,
+      });
+      return route.fulfill({ status: 201, json: dto(account) });
+    }
+    if (method === 'DELETE' && profileId) {
+      const account = [...this.accounts.values()].find((a) => a.profileId === profileId);
+      if (!account || !memberOf(account)) return route.fulfill({ status: 404 });
+      const isLead = (account.orgLead ?? []).includes(org.slug);
+      if (isLead && leads().length <= 1 && !tier) {
+        return conflict(route, 'Every organization needs an Org Lead.');
+      }
+      const first = this.organizations.memberships(account)[0] === org.slug;
+      account.orgs = this.organizations.memberships(account).filter((s) => s !== org.slug);
+      account.orgLead = (account.orgLead ?? []).filter((s) => s !== org.slug);
+      if (account.orgRoles) delete account.orgRoles[org.slug];
+      // Old role names are the roles held in the first org; they go with it.
+      if (first) {
+        account.roles = account.roles.filter((r) => r === 'SystemAdmin' || r === 'Staff');
+        const profile = this.profiles.get(account.profileId);
+        if (profile) profile.roles = account.roles;
+      }
+      return route.fulfill({ status: 204 });
+    }
+    this.unrecognised.push(`${method} ${url.pathname}`);
+    return route.abort('failed');
   }
 
   /** AdminUsersEndpoints: GET /api/admin/users, System Admin only, 25 per page by name. */
@@ -750,7 +1016,7 @@ export class MockApi {
         id: a.profileId,
         name: this.profiles.get(a.profileId)?.name ?? a.name,
         email: a.email,
-        roles: this.profiles.get(a.profileId)?.roles ?? a.roles,
+        roles: this.organizations.roleRefs(a),
         status: a.suspended ? 'Suspended' : a.verified ? 'Active' : 'Unverified',
       }))
       .filter((u) => !term || u.name.toLowerCase().includes(term) || u.email.includes(term))
@@ -766,7 +1032,8 @@ export class MockApi {
   private listPeople(route: Route, url: URL, authorization: string | undefined) {
     const caller = this.caller(authorization);
     if (!caller) return route.fulfill({ status: 401 });
-    if (!caller.roles.some((r) => ['CityLead', 'Staff', 'SystemAdmin'].includes(r))) {
+    // people.view in some org: City Leads, Staff, the Portfolio Lead and System Admins (L2-136).
+    if (!this.organizations.covered(caller).some((c) => c.permissions.has('people.view'))) {
       return route.fulfill({ status: 403 });
     }
     const term = (url.searchParams.get('q') ?? '').trim().toLowerCase();
@@ -785,7 +1052,7 @@ export class MockApi {
         name: profile.name,
         homeCity: profile.homeCity,
         photoUrl: profile.photos.find((photo) => photo.isFeatured)?.url ?? null,
-        roles: profile.roles,
+        roles: this.roleRefs(profile),
       }));
     const items = all.slice((page - 1) * 25, page * 25);
     return route.fulfill({
@@ -882,6 +1149,8 @@ export class MockApi {
     const { token: _token, note: _note, invitedBy, ...rest } = invite;
     return {
       ...rest,
+      preassignedRoleName: roleName(invite.preassignedRole),
+      organization: { id: 'org-toronto', slug: 'faithtech-toronto', name: 'FaithTech Toronto' },
       status: this.inviteStatus(invite),
       invitedByName: this.profiles.get(invitedBy)?.name ?? 'A former member',
     };
@@ -918,7 +1187,9 @@ export class MockApi {
       name: p.name,
       homeCity: p.homeCity,
       photoUrl: p.photos.find((photo) => photo.isFeatured)?.url ?? null,
-      roles: p.roles,
+      roles: this.roleRefs(p)
+        .filter((r) => r.kind === 'catalogue')
+        .map((r) => r.name),
     }));
     const cities = [
       ...new Set(team.map((p) => p.homeCity?.trim()).filter((c): c is string => !!c)),
@@ -979,7 +1250,10 @@ export class MockApi {
       return problemDetail(route, 403, 'Verify your email before sending invites.');
     }
     const admin = caller.roles.includes('SystemAdmin');
-    if (role && !admin && !(caller.roles.includes('CityLead') && CITY_LEAD_ROLES.includes(role))) {
+    const grantable = this.organizations
+      .covered(caller)
+      .flatMap((c) => this.organizations.grantable(caller, c).map((r) => r.key));
+    if (role && !admin && !grantable.includes(role)) {
       return problemDetail(route, 403, 'You can’t give that role.');
     }
     const since = new Date(this.now.getTime() - DAY).toISOString();
@@ -1043,6 +1317,8 @@ export class MockApi {
         inviterName: inviter?.name ?? 'A FaithTech lead',
         inviterCity: inviter?.homeCity ?? null,
         preassignedRole: invite.preassignedRole,
+        preassignedRoleName: roleName(invite.preassignedRole),
+        organizationName: 'FaithTech Toronto',
         hasAccount: this.accounts.has(invite.email.toLowerCase()),
       },
     });
@@ -1097,8 +1373,9 @@ export class MockApi {
       account = caller;
     }
     const profile = this.profiles.get(account.profileId)!;
-    if (invite.preassignedRole && !profile.roles.includes(invite.preassignedRole)) {
-      profile.roles = [...profile.roles, invite.preassignedRole];
+    const granted = invite.preassignedRole ? LEGACY_ROLE[invite.preassignedRole] : undefined;
+    if (granted && !profile.roles.includes(granted)) {
+      profile.roles = [...profile.roles, granted];
       account.roles = profile.roles;
     }
     invite.acceptedAt = this.now.toISOString();
@@ -1111,12 +1388,22 @@ export class MockApi {
       .map((p) => ({ ...p, isStored: p.isStored ?? true }));
     return {
       ...profile,
+      roles: this.roleRefs(profile),
       photos,
       featuredPhoto: photos.find((p) => p.isFeatured) ?? null,
       isOwn: profile.id === caller.profileId,
       canEdit: profile.id === caller.profileId || caller.roles.includes('SystemAdmin'),
     };
   }
+}
+
+/** A role key's name as the API returns it beside the key. */
+function roleName(key: string | null): string | null {
+  if (!key) return null;
+  return key
+    .split('-')
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join(' ');
 }
 
 /** The name rule shared by sign-up, invite sign-up and the profile editor. */

@@ -1,7 +1,8 @@
 using QuinntyneBrown.Community.Application.Admin;
 using QuinntyneBrown.Community.Application.Common;
+using QuinntyneBrown.Community.Application.Organizations;
 using QuinntyneBrown.Community.Domain.Contacts;
-using QuinntyneBrown.Community.Domain.Profiles;
+using QuinntyneBrown.Community.Domain.Organizations;
 using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Contacts;
@@ -15,11 +16,21 @@ public enum ContactAccessKind
     NotFound,
 }
 
-/// <summary>Private contact visibility (L2-012, ADR 0014): the owning lead and System Admin, nobody else.</summary>
+/// <summary>
+/// Private contact visibility (L2-012, ADR 0014, ADR 0039): the owner and System Admin, nobody else. The Portfolio Lead,
+/// Org Leads and cross-org roles never see another person's contacts, whatever their permissions.
+/// </summary>
 public class ContactAccess(IApplicationDbContext db, ICurrentUser current, IAuditLog audit)
 {
-    /// <summary>Lead roles and System Admin keep contacts; everyone else gets 403 for the list and create.</summary>
-    public bool CanKeepContacts => current.HoldsLeadRole() || current.HasRole(Role.SystemAdmin);
+    /// <summary>The orgs in the request's scope where the caller keeps contacts (<c>contacts.private</c>).</summary>
+    public IReadOnlyList<Guid> KeepingScope =>
+        [.. current.Access.ReadScope(Features.Contacts).Where(org => current.Access.Has(org, Permissions.ContactsPrivate))];
+
+    /// <summary>Holders of <c>contacts.private</c> keep contacts; everyone else gets 403 for the list and create.</summary>
+    public bool CanKeepContacts => KeepingScope.Count > 0;
+
+    /// <summary>The org a new contact is kept in (ADR 0034).</summary>
+    public CreateTarget CreateTarget() => current.Access.TargetFor(Permissions.ContactsPrivate);
 
     public async Task<Guid?> CallerProfileIdAsync(CancellationToken cancellationToken = default) =>
         current.UserId is { } userId
@@ -33,13 +44,13 @@ public class ContactAccess(IApplicationDbContext db, ICurrentUser current, IAudi
         var caller = await CallerProfileIdAsync(cancellationToken);
         IQueryable<Contact> contacts = withNotes ? db.Contacts.Include(c => c.Notes) : db.Contacts;
         var contact = caller is null ? null : await contacts.SingleOrDefaultAsync(c => c.Id == contactId, cancellationToken);
-        if (contact is null || caller is not { } actor)
+        if (contact is null || caller is not { } actor || !current.Access.Covers(contact.OrganizationId, Features.Contacts))
         {
             return (ContactAccessKind.NotFound, null, Guid.Empty);
         }
 
         var access = contact.OwnerId == actor ? ContactAccessKind.Owner
-            : current.HasRole(Role.SystemAdmin) ? ContactAccessKind.AdminOverride
+            : current.Access.IsSystemAdmin ? ContactAccessKind.AdminOverride
             : ContactAccessKind.NotFound;
         return access == ContactAccessKind.NotFound ? (access, null, Guid.Empty) : (access, contact, actor);
     }
@@ -49,7 +60,7 @@ public class ContactAccess(IApplicationDbContext db, ICurrentUser current, IAudi
     {
         if (access == ContactAccessKind.AdminOverride)
         {
-            audit.Record(actor, action, "Contact", contact.Id.ToString(), before, after ?? new { contact.Name });
+            audit.Record(actor, action, "Contact", contact.Id.ToString(), before, after ?? new { contact.Name }, contact.OrganizationId);
         }
     }
 }

@@ -1,11 +1,9 @@
-using QuinntyneBrown.Community.Domain.Profiles;
-
 namespace QuinntyneBrown.Community.Domain.Resources;
 
 /// <summary>A visibility with, for Shared, the named members and roles (at least one of either).</summary>
 public record ResourceAudience
 {
-    private ResourceAudience(ResourceVisibility visibility, IReadOnlySet<Guid> members, IReadOnlySet<Role> roles)
+    private ResourceAudience(ResourceVisibility visibility, IReadOnlySet<Guid> members, IReadOnlySet<Guid> roles)
     {
         Visibility = visibility;
         Members = members;
@@ -16,13 +14,15 @@ public record ResourceAudience
 
     public IReadOnlySet<Guid> Members { get; }
 
-    public IReadOnlySet<Role> Roles { get; }
+    public IReadOnlySet<Guid> Roles { get; }
 
-    public static ResourceAudience Private() => new(ResourceVisibility.Private, new HashSet<Guid>(), new HashSet<Role>());
+    public static ResourceAudience Private() => new(ResourceVisibility.Private, new HashSet<Guid>(), new HashSet<Guid>());
 
-    public static ResourceAudience Global() => new(ResourceVisibility.Global, new HashSet<Guid>(), new HashSet<Role>());
+    public static ResourceAudience OrgWide() => new(ResourceVisibility.OrgWide, new HashSet<Guid>(), new HashSet<Guid>());
 
-    public static ResourceAudience Shared(IEnumerable<Guid> members, IEnumerable<Role> roles)
+    public static ResourceAudience PortfolioWide() => new(ResourceVisibility.PortfolioWide, new HashSet<Guid>(), new HashSet<Guid>());
+
+    public static ResourceAudience Shared(IEnumerable<Guid> members, IEnumerable<Guid> roles)
     {
         var memberSet = members.ToHashSet();
         var roleSet = roles.ToHashSet();

@@ -62,7 +62,7 @@ app.UseStatusCodePages();
 app.UseStaticSites(app.Configuration);
 app.UseCors(WebProtectionSetup.WebAppCorsPolicy);
 app.UseAuthentication();
-app.UseMiddleware<CurrentRolesMiddleware>();
+app.UseMiddleware<CurrentAccessMiddleware>();
 app.UseRateLimiter();
 app.UseAuthorization();
 
@@ -75,6 +75,7 @@ app.MapMeEndpoints();
 app.MapProfilesEndpoints();
 app.MapAuditLogEndpoints();
 app.MapRolesEndpoints();
+app.MapOrganizationsEndpoints();
 app.MapAdminUsersEndpoints();
 app.MapInvitesEndpoints();
 app.MapConnectEndpoints();

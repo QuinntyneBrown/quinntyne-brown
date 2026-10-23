@@ -57,12 +57,7 @@ public class TeamPagingTests(CommunityApiFactory factory) : IClassFixture<Commun
         var client = await ViewerAsync();
         await factory.WithDbAsync(async db =>
         {
-            var profile = await db.Profiles.SingleAsync(p => p.Id == added[0].ProfileId);
-            foreach (var role in profile.Roles.Select(r => r.Role).ToList())
-            {
-                profile.RemoveRole(role);
-            }
-
+            db.OrgRoleAssignments.RemoveRange(db.OrgRoleAssignments.Where(a => a.ProfileId == added[0].ProfileId));
             return await db.SaveChangesAsync();
         });
 
@@ -96,7 +91,7 @@ public class TeamPagingTests(CommunityApiFactory factory) : IClassFixture<Commun
             var member = await factory.AddMemberAsync(name, p =>
             {
                 p.Update(name, home, null);
-                p.AddRole(volunteer ? Role.Volunteer : Role.EventLead, Guid.Empty, DateTime.UtcNow);
+                p.AddRole(volunteer ? SeededRole.Volunteer : SeededRole.EventLead, Guid.Empty, DateTime.UtcNow);
             });
             added.Add(new Added(member.ProfileId, home, volunteer));
         }

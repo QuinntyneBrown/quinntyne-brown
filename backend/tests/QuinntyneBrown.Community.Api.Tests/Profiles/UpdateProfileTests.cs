@@ -71,9 +71,9 @@ public class UpdateProfileTests(CommunityApiFactory factory) : IClassFixture<Com
 
     [Theory]
     [InlineData]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.CityLead)]
-    public async Task Anyone_but_the_owner_or_a_system_admin_gets_403(params Role[] roles)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.CityLead)]
+    public async Task Anyone_but_the_owner_or_a_system_admin_gets_403(params SeededRole[] roles)
     {
         var samuel = await factory.AddMemberAsync("Samuel Mensah");
         var other = await factory.AddMemberAsync("Daniel Reyes");
@@ -91,7 +91,7 @@ public class UpdateProfileTests(CommunityApiFactory factory) : IClassFixture<Com
         var priya = await factory.AddMemberAsync("Priya Shah");
         var samuel = await factory.AddMemberAsync("Samuel Mensah", p => p.Update("Samuel Mensah", "Toronto", null));
 
-        var response = await factory.ClientFor(priya, Role.SystemAdmin).PutAsJsonAsync(
+        var response = await factory.ClientFor(priya, SeededRole.SystemAdmin).PutAsJsonAsync(
             $"/api/profiles/{samuel.ProfileId}", new { Name = "Samuel K. Mensah", HomeCity = "Toronto" });
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -112,7 +112,7 @@ public class UpdateProfileTests(CommunityApiFactory factory) : IClassFixture<Com
     {
         var priya = await factory.AddMemberAsync("Priya Shah");
 
-        await factory.ClientFor(priya, Role.SystemAdmin).PutAsJsonAsync($"/api/profiles/{priya.ProfileId}", new { Name = "Priya S." });
+        await factory.ClientFor(priya, SeededRole.SystemAdmin).PutAsJsonAsync($"/api/profiles/{priya.ProfileId}", new { Name = "Priya S." });
 
         Assert.False(await factory.WithDbAsync(db => db.AuditEntries.AnyAsync(a => a.TargetId == priya.ProfileId.ToString())));
     }
@@ -124,7 +124,7 @@ public class UpdateProfileTests(CommunityApiFactory factory) : IClassFixture<Com
         var unknown = $"/api/profiles/{Guid.NewGuid()}";
 
         var asMember = await factory.ClientFor(member).PutAsJsonAsync(unknown, new { Name = "X" });
-        var asAdmin = await factory.ClientFor(member, Role.SystemAdmin).PutAsJsonAsync(unknown, new { Name = "X" });
+        var asAdmin = await factory.ClientFor(member, SeededRole.SystemAdmin).PutAsJsonAsync(unknown, new { Name = "X" });
 
         Assert.Equal(HttpStatusCode.Forbidden, asMember.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, asAdmin.StatusCode);

@@ -75,13 +75,13 @@ test.describe('Notes: share pages', () => {
     await axe.check();
   });
 
-  test('a Global page tells readers who can change it', async ({ page, api }) => {
+  test('an Org-wide page tells readers who can change it', async ({ page, api }) => {
     const grace = api.addAccount({ email: 'grace@example.org', name: 'Grace Okonkwo' });
     const marcus = api.addAccount({ email: 'marcus@example.org', name: 'Marcus Lee' });
     const playbook = api.notes.add({
       title: 'Playbook',
       ownerId: grace.profileId,
-      visibility: 'Global',
+      visibility: 'OrgWide',
     });
     await api.signInAs(marcus, `/notes/${playbook.id}`);
 

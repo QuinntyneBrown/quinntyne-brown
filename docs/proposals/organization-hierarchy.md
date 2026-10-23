@@ -2,9 +2,9 @@
 
 A data-driven hierarchy for QuinntyneBrown.Community: Portfolio, Organizations of configurable types, and role catalogues defined as data rather than code. FaithTech becomes one type of organization among several, and Quinntyne's start-ups (Sweet Hand, Shelfie and others) can run beside it with a much simpler structure.
 
-- Status: signed off 2026-10-23; repository layout and `AGENTS.md` domain rules updated; requirements not yet written
+- Status: signed off 2026-10-23; ADRs 0033 to 0041, L1-025 and L2-134 to L2-157, mocks, design system and detailed designs written; implemented in all four phases (slices 1 to 14). What remains is listed in `docs/estimates/organizations.md`.
 - Date: 2026-10-23
-- Next step: run `docs/prompts/organization-hierarchy-prompt.md`, which carries these decisions through ADRs, requirements, mocks, design system, detailed design, estimate and incremental implementation of all four phases.
+- Next step: the remaining items in `docs/estimates/organizations.md`, and re-recording the journey videos.
 
 ## Problem
 

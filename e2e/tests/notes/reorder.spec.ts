@@ -102,7 +102,7 @@ test.describe('Notes: reorder blocks by drag and by keyboard', () => {
     const playbook = api.notes.add({
       title: 'Playbook',
       ownerId: grace.profileId,
-      visibility: 'Global',
+      visibility: 'OrgWide',
       blocks,
     });
     await api.signInAs(marcus, `/notes/${playbook.id}`);

@@ -5,7 +5,6 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
   AGILE_SERVICE,
   MemberCandidateDto,
-  ROLE_LABELS,
   WorkspaceDto,
   problemDetails,
 } from '@faithtech-community/api';
@@ -51,7 +50,8 @@ export class AddWorkspaceMembersDialog {
   }
 
   protected roles(candidate: MemberCandidateDto): string {
-    return candidate.roles.map((r) => ROLE_LABELS[r]).join(', ');
+    // Cross-org people are marked, since they are not members of the org (L2-146 AC2).
+    return [...candidate.roles, ...(candidate.isCrossOrg ? ['Cross-org'] : [])].join(', ');
   }
 
   protected async add(): Promise<void> {

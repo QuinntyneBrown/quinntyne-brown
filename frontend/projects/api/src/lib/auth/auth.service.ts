@@ -11,8 +11,6 @@
 import { InjectionToken, Signal } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Role } from '../shared';
-
 export interface CurrentUser {
   id: string;
   /** The caller's profile id; their avatar colour is derived from it (ADR 0008). */
@@ -20,7 +18,8 @@ export interface CurrentUser {
   name: string | null;
   email: string | null;
   emailVerified: boolean;
-  roles: Role[];
+  /** The platform tier; what else the member may do comes from ACCESS_SERVICE (ADR 0037). */
+  isSystemAdmin: boolean;
 }
 
 export type SignInError = 'invalid_credentials' | 'locked_out' | 'suspended';
@@ -40,7 +39,6 @@ export type ExternalSignInFrom = 'marketing' | 'app';
 
 export interface AuthService {
   readonly isAuthenticated: Signal<boolean>;
-  readonly roles: Signal<Role[]>;
   /** The signed-in member, loaded from /api/me; null until loaded or when signed out. */
   readonly currentUser: Signal<CurrentUser | null>;
 

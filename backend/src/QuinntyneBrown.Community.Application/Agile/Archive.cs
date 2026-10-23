@@ -1,7 +1,8 @@
 using QuinntyneBrown.Community.Application.Common;
+using QuinntyneBrown.Community.Application.Organizations;
 using QuinntyneBrown.Community.Domain.Agile;
 using QuinntyneBrown.Community.Domain.Notifications;
-using QuinntyneBrown.Community.Domain.Profiles;
+using QuinntyneBrown.Community.Domain.Organizations;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,9 +25,9 @@ public class ReassignOwnerValidator : AbstractValidator<ReassignOwnerCommand>
 /// Archives and restores workspaces and work items, and reassigns ownership (L2-037). Archive is an owner action;
 /// System Admin may do it too and is audited (ADR 0011). An archived workspace stays hidden from everyone else.
 /// </summary>
-public class ArchiveHandler(IApplicationDbContext db, WorkspaceAccessPolicy policy, TimeProvider time)
+public class ArchiveHandler(IApplicationDbContext db, WorkspaceAccessPolicy policy, WorkEligibility eligibility, ProfileRoles profileRoles, TimeProvider time)
 {
-    public const string NotCityLeadMessage = "Choose a City Lead.";
+    public const string NotCityLeadMessage = "Choose someone who can create workspaces in this organization.";
 
     public Task<Result> ArchiveWorkspaceAsync(Guid workspaceId, CancellationToken cancellationToken = default) =>
         SetWorkspaceArchivedAsync(workspaceId, archive: true, cancellationToken);
@@ -67,7 +68,7 @@ public class ArchiveHandler(IApplicationDbContext db, WorkspaceAccessPolicy poli
                 i.ArchivedById is { } by ? names.GetValueOrDefault(by) ?? "A former member" : "A former member"))]);
     }
 
-    /// <summary>City Leads who could take the workspace over, for System Admin only.</summary>
+    /// <summary>People who could take the workspace over (<c>workspaces.create</c> holders and Org Leads), for its administrators.</summary>
     public async Task<(Result Result, IReadOnlyList<MemberCandidateDto>? Candidates)> OwnerCandidatesAsync(Guid workspaceId, CancellationToken cancellationToken = default)
     {
         var (workspace, _, refusal) = await AuthorizeAdminAsync(workspaceId, cancellationToken);
@@ -76,14 +77,16 @@ public class ArchiveHandler(IApplicationDbContext db, WorkspaceAccessPolicy poli
             return (refusal, null);
         }
 
+        var ids = await eligibility.OwnerCandidatesAsync(workspace.OrganizationId, cancellationToken);
         var leads = await db.Profiles.AsNoTracking()
-            .Where(p => !p.IsSuspended && p.Id != workspace.OwnerId && p.Roles.Any(r => r.Role == Role.CityLead))
+            .Where(p => !p.IsSuspended && p.Id != workspace.OwnerId && ids.Contains(p.Id))
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken);
-        return (Result.Ok(), [.. leads.Select(p => new MemberCandidateDto(p.Id, p.Name, [.. p.Roles.Select(r => r.Role).Order().Select(r => r.ToString())]))]);
+        var roles = await profileRoles.ForAsync([.. leads.Select(p => p.Id)], [workspace.OrganizationId], cancellationToken);
+        return (Result.Ok(), [.. leads.Select(p => new MemberCandidateDto(p.Id, p.Name, [.. roles[p.Id].Select(r => r.Name)]))]);
     }
 
-    /// <summary>System Admin gives the workspace to another City Lead; always audited (L2-037 AC2, L2-041).</summary>
+    /// <summary>The org's Org Lead, the Portfolio Lead or a System Admin gives the workspace to another eligible owner; always audited (L2-146 AC4).</summary>
     public async Task<Result> ReassignOwnerAsync(Guid workspaceId, ReassignOwnerCommand command, CancellationToken cancellationToken = default)
     {
         var (workspace, caller, refusal) = await AuthorizeAdminAsync(workspaceId, cancellationToken);
@@ -93,14 +96,14 @@ public class ArchiveHandler(IApplicationDbContext db, WorkspaceAccessPolicy poli
         }
 
         var owner = await db.Profiles.SingleOrDefaultAsync(p => p.Id == command.OwnerId, cancellationToken);
-        if (owner is null || owner.IsSuspended || !owner.HasRole(Role.CityLead))
+        if (owner is null || owner.IsSuspended || !await eligibility.CanOwnAsync(owner.Id, workspace.OrganizationId, cancellationToken))
         {
             return Result.Invalid("OwnerId", NotCityLeadMessage);
         }
 
         var before = workspace.OwnerId;
-        workspace.ReassignOwner(owner, time.GetUtcNow());
-        policy.Audit(caller, "workspace.owner.reassigned", "Workspace", workspace.Id, new { OwnerId = before }, new { workspace.OwnerId });
+        workspace.ReassignOwner(owner, canOwn: true, time.GetUtcNow());
+        policy.Audit(caller, "workspace.owner.reassigned", "Workspace", workspace.Id, new { OwnerId = before }, new { workspace.OwnerId }, workspace.OrganizationId);
         await db.SaveChangesAsync(cancellationToken);
         return Result.Ok();
     }
@@ -109,7 +112,7 @@ public class ArchiveHandler(IApplicationDbContext db, WorkspaceAccessPolicy poli
     {
         var (workspace, caller) = await policy.LoadAsync(workspaceId, cancellationToken);
         return workspace is null || !caller.CanRead ? (null!, caller, Result.NotFound())
-            : !policy.IsSystemAdmin ? (null!, caller, Result.Forbidden())
+            : !policy.AdministersOrg(workspace.OrganizationId) ? (null!, caller, Result.Forbidden())
             : (workspace, caller, null);
     }
 
@@ -181,34 +184,39 @@ public class ArchiveHandler(IApplicationDbContext db, WorkspaceAccessPolicy poli
 /// When an owner loses the City Lead role, tells every System Admin which of their workspaces needs a new owner
 /// (L2-037 AC2). The actor is a System Admin too and is told as well: they are the one who can reassign it.
 /// </summary>
-public class CityLeadRoleRemovedHandler(IApplicationDbContext db, AgileNotifier notifier)
+/// <summary>
+/// When someone loses <c>workspaces.create</c> in an org (D12), tells the org's Org Leads and the Portfolio Lead that
+/// each workspace they own there needs a new owner.
+/// </summary>
+public class WorkspaceCreatorPermissionLostHandler(IApplicationDbContext db, PermissionHolders holders, AgileNotifier notifier)
 {
-    public async Task HandleAsync(CityLeadRoleRemoved removed, CancellationToken cancellationToken = default)
+    public async Task HandleAsync(WorkspaceCreatorPermissionLost lost, CancellationToken cancellationToken = default)
     {
-        var workspaces = await db.Workspaces.AsNoTracking().Where(w => w.OwnerId == removed.ProfileId).ToListAsync(cancellationToken);
+        var workspaces = await db.Workspaces.AsNoTracking()
+            .Where(w => w.OwnerId == lost.ProfileId && w.OrganizationId == lost.OrganizationId).ToListAsync(cancellationToken);
         if (workspaces.Count == 0)
         {
             return;
         }
 
-        var name = await db.Profiles.Where(p => p.Id == removed.ProfileId).Select(p => p.Name).SingleAsync(cancellationToken);
-        var admins = await db.Profiles.AsNoTracking()
-            .Where(p => !p.IsSuspended && p.Roles.Any(r => r.Role == Role.SystemAdmin))
-            .Select(p => p.Id)
-            .ToListAsync(cancellationToken);
+        var name = await db.Profiles.Where(p => p.Id == lost.ProfileId).Select(p => p.Name).SingleAsync(cancellationToken);
+        var leaders = await holders.LeadersOfAsync(lost.OrganizationId, cancellationToken);
+        var active = await db.Profiles.AsNoTracking().Where(p => leaders.Contains(p.Id) && !p.IsSuspended && p.Id != lost.ProfileId)
+            .Select(p => p.Id).ToListAsync(cancellationToken);
         foreach (var workspace in workspaces)
         {
-            var title = $"{name} no longer holds the City Lead role but owns {workspace.Name}";
-            foreach (var admin in admins)
+            var title = $"{name} can no longer own workspaces but owns {workspace.Name}";
+            foreach (var leader in active)
             {
                 notifier.Notify(
                     Guid.Empty,
-                    admin,
+                    leader,
                     NotificationKind.WorkspaceOwnerLostCityLead,
                     title,
                     $"/workspaces/{workspace.Id}/settings",
                     $"{workspace.Name} needs a new owner",
-                    $"{title}. A workspace owner must be a City Lead, so choose a new owner.\n\nOpen the workspace settings:");
+                    $"{title}. A workspace owner must be able to create workspaces in its organization, so choose a new owner.\n\nOpen the workspace settings:",
+                    lost.OrganizationId);
             }
         }
     }

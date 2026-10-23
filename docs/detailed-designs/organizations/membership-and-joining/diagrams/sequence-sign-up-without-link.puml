@@ -1,0 +1,42 @@
+@startuml
+title UML sequence behaviour — Sign up without a link
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Newcomer" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "Shell" as shell
+  participant "AccessService" as acc
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "MeEndpoints" as me
+  participant "<Feature>Endpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "AccessResolver" as res
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> shell : Sign in after verifying (no invite or link)
+shell -> acc : load()
+acc -> me : GET /api/me/access
+me -> res : ResolveAsync
+res -> db : No membership, tier or cross-org row
+me --> acc : 200 { orgs: [] } (L2-142 #1)
+acc --> shell : No covered org
+shell --> actor : "Waiting to be added": name, own profile link, sign out (L2-142 #2)
+actor -> ep : GET /api/events (any org-scoped list)
+ep --> actor : 200 empty; by id 404 (L2-142 #3)
+@enduml

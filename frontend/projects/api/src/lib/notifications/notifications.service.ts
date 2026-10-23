@@ -1,6 +1,8 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { OrgLabel } from '../shared';
+
 export type NotificationKind =
   | 'ContactSignedUp'
   | 'EventCancelled'
@@ -28,6 +30,8 @@ export interface NotificationDto {
   /** The member whose action raised it, when there is one (ADR 0016). */
   actorId: string | null;
   actorName: string | null;
+  /** The org the activity happened in; null for platform notices (L2-152 AC1). */
+  organization?: OrgLabel | null;
 }
 
 /** The caller's notifications, newest first, 50 to a page (L2-027). */

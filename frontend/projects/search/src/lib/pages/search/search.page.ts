@@ -10,6 +10,8 @@ import {
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
+  ACCESS_SERVICE,
+  ALL_ORGS,
   MIN_SEARCH_LENGTH,
   SEARCH_SERVICE,
   SearchResultGroup,
@@ -85,6 +87,7 @@ const STATUSES: Record<string, string> = { ToDo: 'To do', InProgress: 'In progre
 })
 export class SearchPage {
   private readonly service = inject(SEARCH_SERVICE);
+  private readonly access = inject(ACCESS_SERVICE);
   private readonly router = inject(Router);
 
   /** The `q` query parameter. */
@@ -131,7 +134,8 @@ export class SearchPage {
     try {
       const results = await firstValueFrom(this.service.search(term));
       if (request !== this.request) return;
-      this.groups.set(results.groups.map((g) => toGroup(g, term)));
+      const allOrgs = this.access.activeSlug() === ALL_ORGS;
+      this.groups.set(results.groups.map((g) => toGroup(g, term, allOrgs)));
       this.state.set('loaded');
     } catch {
       if (request === this.request) this.state.set('error');
@@ -139,11 +143,11 @@ export class SearchPage {
   }
 }
 
-function toGroup(group: SearchResultGroup, term: string): SearchGroup {
+function toGroup(group: SearchResultGroup, term: string, allOrgs: boolean): SearchGroup {
   return {
     id: group.kind,
     title: TITLES[group.kind],
-    items: group.items.map((i) => toView(group.kind, i)),
+    items: group.items.map((i) => withOrg(toView(group.kind, i), i, allOrgs)),
     // The Resources page searches the same fields, with filters and paging (L2-065 AC1).
     more:
       group.kind === 'Resource'
@@ -152,6 +156,12 @@ function toGroup(group: SearchResultGroup, term: string): SearchGroup {
           ? { label: 'See all in Notes', href: `/notes?q=${encodeURIComponent(term)}` }
           : undefined,
   };
+}
+
+/** Under "All orgs" each result names its org after its details (L2-152 AC2). */
+function withOrg(view: ResultView, item: SearchResultItem, allOrgs: boolean): ResultView {
+  if (!allOrgs || !item.organization) return view;
+  return { ...view, meta: [view.meta, item.organization].filter(Boolean).join(' · ') };
 }
 
 function toView(kind: SearchResultKind, item: SearchResultItem): ResultView {

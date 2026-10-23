@@ -19,11 +19,11 @@ public class AddResourcesTests(CommunityApiFactory factory) : IClassFixture<Comm
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).UploadAsync(Deck("city-launch-deck.pptx"), tags: [" Launch", "launch ", "Brand", ""]);
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).UploadAsync(Deck("city-launch-deck.pptx"), tags: [" Launch", "launch ", "Brand", ""]);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var added = Assert.Single((await response.Content.ReadFromJsonAsync<Detail[]>())!);
-        Assert.Equal(("city-launch-deck", "Deck", "Global", grace.ProfileId), (added.Title, added.Type, added.Visibility, added.OwnerId));
+        Assert.Equal(("city-launch-deck", "Deck", "OrgWide", grace.ProfileId), (added.Title, added.Type, added.Visibility, added.OwnerId));
         Assert.Equal(("city-launch-deck.pptx", "pptx", (long)Zip.Length), (added.FileName, added.Extension, added.Size));
         Assert.Equal(["launch", "brand"], added.Tags);
         Assert.Equal(factory.Time.GetUtcNow(), added.AddedAt);
@@ -69,7 +69,7 @@ public class AddResourcesTests(CommunityApiFactory factory) : IClassFixture<Comm
             new Dictionary<string, string> { ["visibility"] = "Private" },
             ["launch"]);
 
-        var response = await factory.ClientFor(grace, Role.EventLead).PostAsync("/api/resources", form);
+        var response = await factory.ClientFor(grace, SeededRole.EventLead).PostAsync("/api/resources", form);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var added = (await response.Content.ReadFromJsonAsync<Detail[]>())!;
@@ -83,7 +83,7 @@ public class AddResourcesTests(CommunityApiFactory factory) : IClassFixture<Comm
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var files = Enumerable.Range(1, 21).Select(i => new Upload($"file-{i}.pdf", Pdf));
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsync("/api/resources", Form(files));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsync("/api/resources", Form(files));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Equal(0, await factory.WithDbAsync(db => db.Resources.CountAsync(r => r.OwnerId == grace.ProfileId)));
@@ -103,7 +103,7 @@ public class AddResourcesTests(CommunityApiFactory factory) : IClassFixture<Comm
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).UploadAsync(new Upload(fileName, content));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).UploadAsync(new Upload(fileName, content));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = (await response.Content.ReadFromJsonAsync<ValidationProblemDetails>())!;
@@ -117,7 +117,7 @@ public class AddResourcesTests(CommunityApiFactory factory) : IClassFixture<Comm
         var big = new byte[100 * 1024 * 1024 + 1];
         Pdf.CopyTo(big, 0);
 
-        var response = await factory.ClientFor(grace, Role.CityLead).UploadAsync(new Upload("huge.pdf", big));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).UploadAsync(new Upload("huge.pdf", big));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Equal(0, await factory.WithDbAsync(db => db.Resources.CountAsync(r => r.OwnerId == grace.ProfileId)));
@@ -128,7 +128,7 @@ public class AddResourcesTests(CommunityApiFactory factory) : IClassFixture<Comm
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsync("/api/resources", Form([]));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsync("/api/resources", Form([]));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -138,20 +138,20 @@ public class AddResourcesTests(CommunityApiFactory factory) : IClassFixture<Comm
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead)
+        var response = await factory.ClientFor(grace, SeededRole.CityLead)
             .UploadAsync(Deck(), new Dictionary<string, string> { ["url"] = "https://canva.com/design/1" });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CreateLead)]
-    [InlineData(Role.CommunicationsLead)]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Leads_staff_and_system_admins_may_add(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CreateLead)]
+    [InlineData(SeededRole.CommunicationsLead)]
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Leads_staff_and_system_admins_may_add(SeededRole role)
     {
         var member = await factory.AddMemberAsync("Hannah Kim");
 
@@ -161,10 +161,10 @@ public class AddResourcesTests(CommunityApiFactory factory) : IClassFixture<Comm
     }
 
     [Theory]
-    [InlineData(Role.Volunteer)]
-    [InlineData(Role.ProductEngineer)]
-    [InlineData(Role.Attendee)]
-    public async Task Everyone_else_is_refused(Role role)
+    [InlineData(SeededRole.Volunteer)]
+    [InlineData(SeededRole.ProductEngineer)]
+    [InlineData(SeededRole.Attendee)]
+    public async Task Everyone_else_is_refused(SeededRole role)
     {
         var member = await factory.AddMemberAsync("Samuel Mensah");
 
@@ -192,7 +192,7 @@ public class AddResourcesTests(CommunityApiFactory factory) : IClassFixture<Comm
             return await db.SaveChangesAsync();
         });
 
-        var response = await factory.ClientFor(grace, Role.CityLead).UploadAsync(Deck());
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).UploadAsync(Deck());
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal("Verify your email before adding resources.", (await response.Content.ReadFromJsonAsync<ProblemDetails>())!.Detail);
@@ -233,7 +233,7 @@ public class AddResourcesTests(CommunityApiFactory factory) : IClassFixture<Comm
     public async Task While_storage_is_down_the_resource_is_saved_and_its_file_is_stored_once_storage_recovers()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         factory.Files.Down = true;
         Detail added;
         try

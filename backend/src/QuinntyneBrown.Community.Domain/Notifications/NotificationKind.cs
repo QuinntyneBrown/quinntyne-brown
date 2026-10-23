@@ -17,4 +17,5 @@ public enum NotificationKind
     ResourceShared,
     ResourceOwnershipTransferred,
     NotePageShared,
+    AddedToOrg,
 }

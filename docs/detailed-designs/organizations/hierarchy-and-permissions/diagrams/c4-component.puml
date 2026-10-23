@@ -1,0 +1,31 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Hierarchy and permissions
+Container_Boundary(api, "Community API") {
+  Component(authn, "Authentication", "OpenIddict validation / AgentToken", "Identity only; tokens carry no roles")
+  Component(mw, "CurrentAccessMiddleware", "ASP.NET Core middleware", "Builds CallerAccess once per request into HttpContext.Items")
+  Component(cu, "ICurrentUser / HttpCurrentUser", "Application abstraction", "UserId, ProfileId, Access")
+  Component(res, "AccessResolver", "Application/Organizations", "Combines tiers, memberships, catalogue and cross-org roles, minus disabled features")
+  Component(ca, "CallerAccess", "Application/Organizations", "Covers, Has, HasByRole, IsOrgLead, IsPortfolioLead, OrgsWith, ReadScope")
+  Component(perm, "Permissions and Feature", "Domain/Organizations", "Closed list of permission codes, each tied to a feature")
+  Component(acc, "Feature *Access classes", "Application/<Feature>", "Ask CallerAccess for codes, never role names")
+  Component(rgp, "RoleGrantPolicy", "Application/Organizations", "May this caller grant role R to P in org X")
+  Component(roles, "OrgRolesEndpoints / ChangeOrgRolesHandler", "Api + Application", "Grant and remove catalogue roles and tiers")
+  Component(meep, "MeEndpoints GET /api/me/access", "Api", "Projects CallerAccess for the web app")
+  Component(audit, "IAuditLog / RoleChangeNotifier", "Application", "Audits Portfolio Lead and System Admin grants; notifies the person")
+  ComponentDb(db, "CommunityDbContext", "EF Core", "Portfolios, OrgTypes, RoleDefinitions, Organizations, memberships, assignments")
+}
+Rel(authn, mw, "Authenticated principal")
+Rel(mw, res, "ResolveAsync(userId, credential)")
+Rel(res, db, "Reads hierarchy rows", "indexed queries")
+Rel(res, perm, "Filters codes by enabled feature")
+Rel(res, ca, "Builds")
+Rel(mw, cu, "Stores CallerAccess for")
+Rel(acc, cu, "Reads Access")
+Rel(roles, rgp, "Checks grant")
+Rel(rgp, cu, "Reads Access")
+Rel(roles, audit, "Records / notifies")
+Rel(roles, db, "Writes OrgRoleAssignment rows")
+Rel(meep, cu, "Reads Access")
+@enduml

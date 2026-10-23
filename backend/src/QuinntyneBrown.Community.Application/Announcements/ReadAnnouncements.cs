@@ -1,4 +1,7 @@
 using QuinntyneBrown.Community.Application.Common;
+using QuinntyneBrown.Community.Application.Organizations;
+using QuinntyneBrown.Community.Domain.Announcements;
+using QuinntyneBrown.Community.Domain.Organizations;
 using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Announcements;
@@ -13,7 +16,8 @@ public record AnnouncementListItem(
     string AudienceKind,
     IReadOnlyList<string> Roles,
     string? EventTitle,
-    int RecipientCount);
+    int RecipientCount,
+    OrgLabel? Organization = null);
 
 public record AnnouncementEmailOptOut(bool OptedOut);
 
@@ -28,8 +32,10 @@ public class ListMyAnnouncementsHandler(IApplicationDbContext db, ICurrentUser c
     {
         var request = new PageRequest(page, PageSize);
         var me = await CallerProfileIdAsync(db, current, cancellationToken);
+        var scope = current.Access.ReadScope(Features.Announcements);
         var mine = db.Announcements.AsNoTracking()
-            .Where(a => a.SenderId == me || a.Recipients.Any(r => r.ProfileId == me));
+            .Where(a => a.SenderId == me || a.Recipients.Any(r => r.ProfileId == me))
+            .Where(a => scope.Contains(a.OrganizationId) || a.Audience.Kind == AudienceKind.Portfolio);
         var total = await mine.CountAsync(cancellationToken);
         var rows = await mine
             .OrderByDescending(a => a.SentAt).ThenByDescending(a => a.Id)
@@ -44,8 +50,11 @@ public class ListMyAnnouncementsHandler(IApplicationDbContext db, ICurrentUser c
                 a.Audience,
                 EventTitle = db.Events.Where(e => e.Id == a.Audience.EventId).Select(e => e.Title).FirstOrDefault(),
                 RecipientCount = a.Recipients.Count,
+                a.OrganizationId,
             })
             .ToListAsync(cancellationToken);
+        var roleIds = rows.SelectMany(r => r.Audience.Roles).Distinct().ToList();
+        var roleNames = await db.RoleDefinitions.AsNoTracking().Where(r => roleIds.Contains(r.Id)).ToDictionaryAsync(r => r.Id, r => r.Key, cancellationToken);
 
         var items = rows
             .OrderByDescending(r => r.SentAt).ThenByDescending(r => r.Id)
@@ -56,9 +65,10 @@ public class ListMyAnnouncementsHandler(IApplicationDbContext db, ICurrentUser c
                 r.SentAt,
                 r.SenderName ?? string.Empty,
                 r.Audience.Kind.ToString(),
-                [.. r.Audience.Roles.Select(role => role.ToString()).Order()],
+                [.. r.Audience.Roles.Select(role => roleNames.GetValueOrDefault(role) ?? role.ToString()).Order()],
                 r.EventTitle,
-                r.RecipientCount))
+                r.RecipientCount,
+                OrgLabel.Of(current.Access.Orgs, r.OrganizationId)))
             .ToList();
         return new PagedResult<AnnouncementListItem>(items, request.Page, request.PageSize, total);
     }

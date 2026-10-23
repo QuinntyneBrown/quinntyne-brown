@@ -1,0 +1,16 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Branding and public pages
+Person(caller, "Lead or anonymous visitor", "")
+System_Boundary(ftc, "QuinntyneBrown.Community") {
+  Container(web, "Web app", "Angular", "Shell, organizations and feature libraries, api and components libraries")
+  Container(api, "Community API", "ASP.NET Core", "QuinntyneBrown.Community.Api with Application, Domain and Infrastructure")
+  ContainerDb(db, "Community database", "PostgreSQL", "Hierarchy, memberships, catalogues and org-owned records")
+}
+System_Ext(blob, "Azure Blob storage", "Org logos")
+Rel(caller, web, "Uses", "HTTPS")
+Rel(web, api, "Branding endpoints; GET /api/public/events/{id}", "JSON/HTTPS")
+Rel(api, db, "Organization branding columns, OrgSlugAliases", "EF Core")
+Rel(api, blob, "Logo blobs", "HTTPS")
+@enduml

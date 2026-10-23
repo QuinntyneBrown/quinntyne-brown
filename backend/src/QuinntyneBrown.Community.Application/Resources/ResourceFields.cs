@@ -1,5 +1,5 @@
 using QuinntyneBrown.Community.Application.Common;
-using QuinntyneBrown.Community.Domain.Profiles;
+using QuinntyneBrown.Community.Application.Organizations;
 using QuinntyneBrown.Community.Domain.Resources;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,14 +19,19 @@ public record ResourceFieldsInput(
 public record ResourceFields(string? Title, string? Description, ResourceType? Type, IReadOnlyList<string> Tags, ResourceAudience Audience);
 
 /// <summary>The field rules shared by the add and edit dialogs and the API (L2-059).</summary>
-public class ResourceFieldRules(IApplicationDbContext db)
+public class ResourceFieldRules(IApplicationDbContext db, ShareRoles shareRoles, ICurrentUser current)
 {
     public const string TitleMessage = "Give it a title so people can find it.";
     public const string AudienceMessage = "Choose at least one person or role, or pick another visibility.";
 
+    /// <summary>Portfolio-wide is the Portfolio Lead's and System Admin's to set (L2-148 AC4): anyone else is refused.</summary>
+    public bool RefusesVisibility(Guid orgId, ResourceFieldsInput input) =>
+        input.Visibility == nameof(ResourceVisibility.PortfolioWide) && !PortfolioWide.MayPublish(current.Access, orgId);
+
     /// <param name="titleRequired">False for uploads, where a missing title comes from the file name.</param>
+    /// <param name="orgId">The resource's org: shared roles are its catalogue roles and covering cross-org roles.</param>
     public async Task<(ResourceFields? Fields, Dictionary<string, string[]> Errors)> CheckAsync(
-        ResourceFieldsInput input, bool titleRequired, CancellationToken cancellationToken = default)
+        Guid orgId, ResourceFieldsInput input, bool titleRequired, CancellationToken cancellationToken = default)
     {
         var errors = new Dictionary<string, string[]>();
         var title = input.Title?.Trim();
@@ -69,13 +74,13 @@ public class ResourceFieldRules(IApplicationDbContext db)
             errors["Tags"] = [$"Keep each tag to {Resource.MaxTag} characters or fewer."];
         }
 
-        var audience = await AudienceAsync(input, errors, cancellationToken);
+        var audience = await AudienceAsync(orgId, input, errors, cancellationToken);
         return errors.Count > 0 ? (null, errors) : (new ResourceFields(title, description, type, tags, audience!), errors);
     }
 
-    private async Task<ResourceAudience?> AudienceAsync(ResourceFieldsInput input, Dictionary<string, string[]> errors, CancellationToken cancellationToken)
+    private async Task<ResourceAudience?> AudienceAsync(Guid orgId, ResourceFieldsInput input, Dictionary<string, string[]> errors, CancellationToken cancellationToken)
     {
-        var visibility = string.IsNullOrWhiteSpace(input.Visibility) ? nameof(ResourceVisibility.Global) : input.Visibility;
+        var visibility = string.IsNullOrWhiteSpace(input.Visibility) ? nameof(ResourceVisibility.OrgWide) : input.Visibility;
         if (!IsName<ResourceVisibility>(visibility, out var parsed))
         {
             errors["Visibility"] = ["Choose who can see it."];
@@ -84,19 +89,18 @@ public class ResourceFieldRules(IApplicationDbContext db)
 
         if (parsed != ResourceVisibility.Shared)
         {
-            return parsed == ResourceVisibility.Private ? ResourceAudience.Private() : ResourceAudience.Global();
+            return parsed switch
+            {
+                ResourceVisibility.Private => ResourceAudience.Private(),
+                ResourceVisibility.PortfolioWide => ResourceAudience.PortfolioWide(),
+                _ => ResourceAudience.OrgWide(),
+            };
         }
 
-        var roles = new List<Role>();
-        foreach (var value in input.Roles ?? [])
+        if (await shareRoles.ResolveAsync(orgId, input.Roles ?? [], cancellationToken) is not { } roles)
         {
-            if (!IsName<Role>(value, out var role) || !ResourceAccess.ShareableRoles.Contains(role))
-            {
-                errors["Roles"] = ["Choose roles from the list."];
-                return null;
-            }
-
-            roles.Add(role);
+            errors["Roles"] = ["Choose roles from the list."];
+            return null;
         }
 
         var members = (input.MemberIds ?? []).Distinct().ToList();

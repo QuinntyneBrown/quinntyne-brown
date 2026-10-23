@@ -1,5 +1,4 @@
 using QuinntyneBrown.Community.Application.Common;
-using QuinntyneBrown.Community.Domain.Profiles;
 using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Profiles;
@@ -21,14 +20,14 @@ public class ProfileAccess(IApplicationDbContext db, ICurrentUser current)
             : null;
 
     public bool CanEdit(Guid profileId, Guid? callerProfileId) =>
-        profileId == callerProfileId || current.HasRole(Role.SystemAdmin);
+        profileId == callerProfileId || current.Access.IsSystemAdmin;
 
     /// <summary>Decides how the caller may change the profile, and returns the caller's profile id as the actor.</summary>
     public async Task<(EditAccess Access, Guid Actor)> AuthorizeEditAsync(Guid profileId, CancellationToken cancellationToken = default)
     {
         var caller = await CallerProfileIdAsync(cancellationToken);
         var access = profileId == caller ? EditAccess.Owner
-            : current.HasRole(Role.SystemAdmin) ? EditAccess.AdminOverride
+            : current.Access.IsSystemAdmin ? EditAccess.AdminOverride
             : EditAccess.Forbidden;
         return (access, caller ?? Guid.Empty);
     }

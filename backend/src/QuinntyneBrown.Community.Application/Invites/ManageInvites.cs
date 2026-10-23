@@ -1,11 +1,12 @@
 using QuinntyneBrown.Community.Application.Common;
+using QuinntyneBrown.Community.Application.Organizations;
 using QuinntyneBrown.Community.Domain.Invites;
 using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Invites;
 
 /// <summary>Lists, resends and revokes invites for leads and System Admins (L2-010 AC4, AC5).</summary>
-public class ManageInvitesHandler(IApplicationDbContext db, InviteSender sender, TimeProvider time)
+public class ManageInvitesHandler(IApplicationDbContext db, ICurrentUser current, InviteSender sender, TimeProvider time)
 {
     public const int DefaultPageSize = 50;
 
@@ -30,8 +31,9 @@ public class ManageInvitesHandler(IApplicationDbContext db, InviteSender sender,
         }
 
         var size = Math.Clamp(pageSize ?? DefaultPageSize, 1, PageRequest.MaxPageSize);
-        var total = await db.Invites.CountAsync(cancellationToken);
-        var invites = db.Invites.AsNoTracking();
+        var scope = sender.Scope;
+        var total = await db.Invites.CountAsync(i => scope.Contains(i.OrganizationId), cancellationToken);
+        var invites = db.Invites.AsNoTracking().Where(i => scope.Contains(i.OrganizationId));
         if (cursor is { } c)
         {
             invites = invites.Where(i => i.CreatedAt < c.CreatedAt || (i.CreatedAt == c.CreatedAt && i.Id.CompareTo(c.Id) < 0));
@@ -49,7 +51,12 @@ public class ManageInvitesHandler(IApplicationDbContext db, InviteSender sender,
         rows = [.. rows.OrderByDescending(r => r.Invite.CreatedAt).ThenByDescending(r => r.Invite.Id)];
         var page = rows.Take(size).ToList();
         var next = rows.Count > size ? new InviteCursor(page[^1].Invite.CreatedAt, page[^1].Invite.Id).ToString() : null;
-        return (Result.Ok(), new InvitePageDto([.. page.Select(r => InviteDto.From(r.Invite, r.Name ?? "A former member", now))], next, total));
+        var roleIds = page.Select(r => r.Invite.PreassignedRoleId).OfType<Guid>().Distinct().ToList();
+        var roles = await db.RoleDefinitions.AsNoTracking().Where(r => roleIds.Contains(r.Id)).ToDictionaryAsync(r => r.Id, cancellationToken);
+        return (Result.Ok(), new InvitePageDto([.. page.Select(r => InviteDto.From(
+            r.Invite, r.Name ?? "A former member", now,
+            r.Invite.PreassignedRoleId is { } role ? roles.GetValueOrDefault(role) : null,
+            OrgLabel.Of(current.Access.Orgs, r.Invite.OrganizationId)))], next, total));
     }
 
     public async Task<(Result Result, InviteDto? Invite)> ResendAsync(Guid id, CancellationToken cancellationToken = default)
@@ -59,7 +66,8 @@ public class ManageInvitesHandler(IApplicationDbContext db, InviteSender sender,
             return (Result.Forbidden(), null);
         }
 
-        var invite = await db.Invites.AsNoTracking().SingleOrDefaultAsync(i => i.Id == id, cancellationToken);
+        var scope = sender.Scope;
+        var invite = await db.Invites.AsNoTracking().SingleOrDefaultAsync(i => i.Id == id && scope.Contains(i.OrganizationId), cancellationToken);
         if (invite is null)
         {
             return (Result.NotFound(), null);
@@ -70,7 +78,8 @@ public class ManageInvitesHandler(IApplicationDbContext db, InviteSender sender,
             return (Result.Conflict("Only an expired invite can be resent."), null);
         }
 
-        return await sender.CreateAsync(invite.Email, invite.PreassignedRole, invite.Note, cancellationToken);
+        var role = invite.PreassignedRoleId is { } roleId ? await db.RoleDefinitions.AsNoTracking().SingleOrDefaultAsync(r => r.Id == roleId, cancellationToken) : null;
+        return await sender.CreateAsync(invite.OrganizationId, invite.Email, role, invite.Note, cancellationToken);
     }
 
     public async Task<Result> RevokeAsync(Guid id, CancellationToken cancellationToken = default)
@@ -80,7 +89,8 @@ public class ManageInvitesHandler(IApplicationDbContext db, InviteSender sender,
             return Result.Forbidden();
         }
 
-        var invite = await db.Invites.SingleOrDefaultAsync(i => i.Id == id, cancellationToken);
+        var scope = sender.Scope;
+        var invite = await db.Invites.SingleOrDefaultAsync(i => i.Id == id && scope.Contains(i.OrganizationId), cancellationToken);
         if (invite is null)
         {
             return Result.NotFound();

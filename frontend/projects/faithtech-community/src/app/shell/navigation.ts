@@ -1,106 +1,167 @@
-import { Role, isLead } from '@faithtech-community/api';
+import { ALL_ORGS, AccessService, Feature, Permission } from '@faithtech-community/api';
 
 export interface Section {
   label: string;
-  href: string;
+  /** The section's path under the org (`events`), or an absolute path for personal and platform pages. */
+  path: string;
   icon: string;
   /** Hidden from the top bar between 768px and 1023px (design system, top bar). */
   secondary?: boolean;
-  /** Whether a member holding these roles may open the section; the API refuses the rest. */
-  opens: (roles: readonly Role[]) => boolean;
+  /** Personal and platform pages live outside /o/{slug} (ADR 0037). */
+  orgless?: boolean;
+  /** Shown under "All orgs", which combines People, Workspaces, My work, Resources and Notes (L2-145). */
+  allOrgs?: boolean;
+  /**
+   * Whether the caller may open the section in `org` (a slug or `all`); it only hides links, and
+   * the API refuses the rest (ADR 0037).
+   */
+  opens: (access: AccessService, org: string) => boolean;
 }
 
 const anyone = () => true;
-const has =
-  (...allowed: Role[]) =>
-  (roles: readonly Role[]) =>
-    roles.some((r) => allowed.includes(r));
+const feature = (name: Feature) => (access: AccessService, org: string) =>
+  access.feature(name, org);
+const can =
+  (...permissions: Permission[]) =>
+  (access: AccessService, org: string) =>
+    permissions.some((p) => access.can(p, org));
 
 /**
- * Every section in the order the top bar, the tab bar and the menu show them
- * (docs/adr/0009-shell-navigation-by-role.md).
+ * Every section in the order the top bar, the tab bar and the menu show them, opened by the
+ * caller's permissions and the org's features (ADR 0037, refining ADR 0009).
  */
 export const SECTIONS: readonly Section[] = [
-  { label: 'Home', href: '/', icon: 'home', opens: anyone },
-  { label: 'Events', href: '/events', icon: 'events', opens: anyone },
-  // Private contacts belong to the lead who created them; System Admin may see all (L2-012).
-  { label: 'Contacts', href: '/contacts', icon: 'contacts', opens: isLead },
-  // One shared pipeline for leads, read-only for Staff (L2-017).
+  { label: 'Home', path: '', icon: 'home', allOrgs: true, opens: anyone },
+  { label: 'Events', path: 'events', icon: 'events', opens: feature('events') },
+  // Private contacts belong to the person who created them (L2-012).
   {
-    label: 'Partners',
-    href: '/partners',
-    icon: 'partners',
-    opens: (roles) => isLead(roles) || roles.includes('Staff'),
+    label: 'Contacts',
+    path: 'contacts',
+    icon: 'contacts',
+    opens: can(Permission.ContactsPrivate),
   },
-  // Workspaces are for leads and volunteers; Staff and System Admin see all of them (L2-050).
+  { label: 'Partners', path: 'partners', icon: 'partners', opens: can(Permission.PartnersRead) },
   {
     label: 'Workspaces',
-    href: '/workspaces',
+    path: 'workspaces',
     icon: 'workspaces',
     secondary: true,
-    opens: (roles) => isLead(roles) || has('Volunteer', 'Staff', 'SystemAdmin')(roles),
+    allOrgs: true,
+    // Any workspace permission, or a cross-org role that may join work there (L2-155 AC3).
+    opens: (access, org) =>
+      can(
+        Permission.WorkspacesJoin,
+        Permission.WorkspacesCreate,
+        Permission.WorkspacesReadAll,
+      )(access, org) ||
+      access.orgs().some((o) => (org === ALL_ORGS || o.slug === org) && o.canJoinWork),
   },
-  { label: 'Team', href: '/team', icon: 'team', secondary: true, opens: anyone },
+  // The work assigned to someone who works in several orgs, in one list (L2-145 AC3).
+  {
+    label: 'My work',
+    path: 'my-work',
+    icon: 'workspaces',
+    secondary: true,
+    allOrgs: true,
+    opens: (access, org) => access.orgs().length > 1 && access.feature('agile', org),
+  },
+  { label: 'Team', path: 'team', icon: 'team', secondary: true, opens: feature('team') },
   {
     label: 'Announcements',
-    href: '/announcements',
+    path: 'announcements',
     icon: 'announcements',
     secondary: true,
-    opens: anyone,
+    opens: feature('announcements'),
   },
-  // Decks, logos, training and templates, for every signed-in member (L2-055).
   {
     label: 'Resources',
-    href: '/resources',
+    path: 'resources',
     icon: 'resources',
     secondary: true,
-    opens: anyone,
+    allOrgs: true,
+    opens: feature('resources'),
   },
-  // Docs & notes: block-based pages, for every signed-in member (L2-085).
-  {
-    label: 'Notes',
-    href: '/notes',
-    icon: 'notes',
-    secondary: true,
-    opens: anyone,
-  },
-  // The people directory (L2-053).
+  // Docs & notes are on in every org (ADR 0038).
+  { label: 'Notes', path: 'notes', icon: 'notes', secondary: true, allOrgs: true, opens: anyone },
   {
     label: 'People',
-    href: '/people',
+    path: 'people',
     icon: 'team',
     secondary: true,
-    opens: has('CityLead', 'Staff', 'SystemAdmin'),
+    allOrgs: true,
+    opens: can(Permission.PeopleView),
   },
-  // City-level numbers for Staff and System Admin only (L2-123, ADR 0031).
   {
     label: 'Reports',
-    href: '/reports',
+    path: 'reports',
     icon: 'reports',
     secondary: true,
-    opens: has('Staff', 'SystemAdmin'),
+    opens: can(Permission.ReportsView),
+  },
+  // The org's settings for its Org Lead, the Portfolio Lead and System Admins (L2-155 AC3).
+  {
+    label: 'Organization',
+    path: 'settings',
+    icon: 'settings',
+    secondary: true,
+    opens: (access, org) =>
+      access.isSystemAdmin() ||
+      access.orgs().some((o) => o.slug === org && (o.isOrgLead || o.isPortfolioLead)),
+  },
+  // Org Types, orgs, cross-org roles and agents for the Portfolio Lead and System Admins (L2-156).
+  {
+    label: 'Portfolio',
+    path: 'portfolio',
+    icon: 'layers',
+    secondary: true,
+    opens: (access) =>
+      access.isSystemAdmin() || !!access.access()?.portfolios.some((p) => p.isLead),
   },
   // Only System Admins see the admin area (L2-040).
-  { label: 'Admin', href: '/admin', icon: 'admin', secondary: true, opens: has('SystemAdmin') },
+  {
+    label: 'Admin',
+    path: '/admin',
+    icon: 'admin',
+    secondary: true,
+    orgless: true,
+    opens: (access) => access.isSystemAdmin(),
+  },
 ];
 
 export const SEARCH_SECTION: Section = {
   label: 'Search',
-  href: '/search',
+  path: 'search',
   icon: 'search',
   opens: anyone,
 };
 
-/** The sections a member holding `roles` may open, in order. */
-export function sectionsFor(roles: readonly Role[]): Section[] {
-  return SECTIONS.filter((s) => s.opens(roles));
+/** The section's address in `org`. */
+export function hrefFor(section: Section, org: string | null): string {
+  if (section.orgless || !org) return section.path || '/';
+  return section.path ? `/o/${org}/${section.path}` : `/o/${org}`;
+}
+
+/** The sections the caller may open in `org` (a slug or `all`), in order. */
+export function sectionsFor(access: AccessService, org: string | null): Section[] {
+  const scope = org ?? ALL_ORGS;
+  return SECTIONS.filter(
+    (s) => (scope !== ALL_ORGS || s.allOrgs || s.orgless) && s.opens(access, scope),
+  );
 }
 
 /**
  * The phone tab bar's links: Home, Events, Search and the member's next section. A More tab
  * follows them and opens the menu of every section.
  */
-export function tabsFor(roles: readonly Role[]): Section[] {
-  const [home, events, ...rest] = sectionsFor(roles);
-  return [home, events, SEARCH_SECTION, ...rest.slice(0, 1)];
+export function tabsFor(access: AccessService, org: string | null): Section[] {
+  const [home, ...rest] = sectionsFor(access, org);
+  const events = rest.find((s) => s.path === 'events');
+  const others = rest.filter((s) => s !== events);
+  return [home, ...(events ? [events] : []), SEARCH_SECTION, ...others.slice(0, events ? 1 : 2)];
+}
+
+/** The section a path is in: `events` for /o/toronto/events/123. */
+export function sectionOf(path: string): string {
+  const match = /^\/o\/[^/]+\/?([^/?#]*)/.exec(path);
+  return match ? match[1] : '';
 }

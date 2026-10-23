@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Role } from '../shared';
+import { RoleRef } from '../shared';
 
 /**
  * Contract for role assignment (L2-009). Pages depend on ROLES_SERVICE, never on HttpRolesService.
@@ -9,8 +9,16 @@ import { Role } from '../shared';
  * change and 409 for a role already held, one not held, or the last System Admin.
  */
 export interface RolesService {
-  addRole(profileId: string, role: Role): Observable<Role[]>;
-  removeRole(profileId: string, role: Role): Observable<Role[]>;
+  /**
+   * Grants a role by key: a catalogue role or Org Lead in `organizationId` (the active org when
+   * null), or System Admin and Portfolio Lead on the platform. Answers the person's roles there.
+   */
+  addRole(profileId: string, role: string, organizationId?: string | null): Observable<RoleRef[]>;
+  removeRole(
+    profileId: string,
+    role: string,
+    organizationId?: string | null,
+  ): Observable<RoleRef[]>;
 }
 
 export const ROLES_SERVICE = new InjectionToken<RolesService>('ROLES_SERVICE');

@@ -37,6 +37,18 @@ export interface MockEvent {
   sequence: number;
   createdById: string;
   rsvps: MockRsvp[];
+  /** The org's slug; FaithTech Toronto unless set (ADR 0034). */
+  orgSlug?: string;
+}
+
+/** The org a public event belongs to and its branding, as PublicOrgDto carries it (L2-149). */
+export interface PublicEventOrg {
+  slug: string;
+  aliases: string[];
+  displayName: string;
+  logoUrl: string | null;
+  accent: string | null;
+  accentForeground: string | null;
 }
 
 /** The signed-in caller as the events fake needs it. */
@@ -196,6 +208,8 @@ export class MockEvents {
     private readonly profile: (id: string) => EventsProfile | undefined = () => undefined,
     /** The profile of the verified account with this email, as AddWalkInHandler looks it up. */
     private readonly verifiedMember: (email: string) => string | undefined = () => undefined,
+    /** The event's org when it shows public events: not archived, with events on (L2-149 AC7). */
+    private readonly publicOrg: (slug: string) => PublicEventOrg | undefined = () => undefined,
   ) {}
 
   /** An event as a lead would create it; give `startsInDays` relative to the fake's "now". */
@@ -599,7 +613,8 @@ export class MockEvents {
   guestRequests = 0;
 
   private publicEvent(id: string): MockEvent | undefined {
-    return this.events.find((e) => e.id === id && e.visibility === 'Public');
+    const event = this.events.find((e) => e.id === id && e.visibility === 'Public');
+    return event && this.publicOrg(event.orgSlug ?? 'faithtech-toronto') ? event : undefined;
   }
 
   /** GET /api/public/events/{id} (L2-023 AC1, AC3): anonymous; members-only and unknown are 404. */
@@ -622,6 +637,7 @@ export class MockEvents {
         isFull: event.capacity !== null && rsvped(event).length >= event.capacity,
         isCancelled: event.isCancelled,
         cancellationReason: event.cancellationReason,
+        organization: this.publicOrg(event.orgSlug ?? 'faithtech-toronto'),
       },
     });
   }

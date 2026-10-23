@@ -15,7 +15,7 @@ public class ConnectLinkTests(CommunityApiFactory factory) : IClassFixture<Commu
     public async Task A_City_Lead_gets_one_reusable_link_whose_token_is_never_stored_in_plain_text()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var first = await client.GetFromJsonAsync<LinkBody>("/api/connect/link");
         var again = await client.GetFromJsonAsync<LinkBody>("/api/connect/link");
@@ -34,17 +34,17 @@ public class ConnectLinkTests(CommunityApiFactory factory) : IClassFixture<Commu
     {
         var priya = await factory.AddMemberAsync("Priya Shah");
 
-        var response = await factory.ClientFor(priya, Role.SystemAdmin).GetAsync("/api/connect/link");
+        var response = await factory.ClientFor(priya, SeededRole.SystemAdmin).GetAsync("/api/connect/link");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Theory]
     [InlineData(null)]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.Volunteer)]
-    public async Task Everyone_else_is_refused(Role? role)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.Volunteer)]
+    public async Task Everyone_else_is_refused(SeededRole? role)
     {
         var member = await factory.AddMemberAsync("Daniel Reyes");
         var client = role is { } r ? factory.ClientFor(member, r) : factory.ClientFor(member);
@@ -77,7 +77,7 @@ public class ConnectLinkTests(CommunityApiFactory factory) : IClassFixture<Commu
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var old = await factory.ConnectTokenOfAsync(grace);
 
-        var replaced = await factory.ClientFor(grace, Role.CityLead).PostAsync("/api/connect/link", null);
+        var replaced = await factory.ClientFor(grace, SeededRole.CityLead).PostAsync("/api/connect/link", null);
 
         Assert.Equal(HttpStatusCode.OK, replaced.StatusCode);
         var fresh = TokenFrom((await replaced.Content.ReadFromJsonAsync<LinkBody>())!.Url);
@@ -98,7 +98,7 @@ public class ConnectLinkTests(CommunityApiFactory factory) : IClassFixture<Commu
         await factory.WithDbAsync(async db =>
         {
             (await db.Profiles.SingleAsync(p => p.Id == grace.ProfileId)).Suspend("Spam", DateTime.UtcNow);
-            (await db.Profiles.SingleAsync(p => p.Id == esther.ProfileId)).RemoveRole(Role.CityLead);
+            await SeededRoles.RevokeAsync(db, esther.ProfileId, SeededRole.CityLead);
             return await db.SaveChangesAsync();
         });
         var anonymous = factory.CreateClient();

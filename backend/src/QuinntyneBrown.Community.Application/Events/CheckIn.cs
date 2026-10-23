@@ -64,7 +64,7 @@ public class CheckInHandler(IApplicationDbContext db, EventPermissions permissio
     {
         if (permissions.IsCheckInOverride)
         {
-            audit.Record(actor, action, "Event", e.Id.ToString(), null, new { RsvpId = rsvp.Id, Name = name });
+            audit.Record(actor, action, "Event", e.Id.ToString(), null, new { RsvpId = rsvp.Id, Name = name }, e.OrganizationId);
         }
     }
 
@@ -75,10 +75,16 @@ public class CheckInHandler(IApplicationDbContext db, EventPermissions permissio
             return (Result.Forbidden(), null);
         }
 
-        var e = await db.Events.AsNoTracking().Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var e = await permissions.Covered(db.Events.AsNoTracking()).Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (e is null)
         {
             return (Result.NotFound(), null);
+        }
+
+        permissions.Focus(e.OrganizationId);
+        if (!permissions.CanViewCheckIn)
+        {
+            return (Result.Forbidden(), null);
         }
 
         var names = await NamesAsync(e.Rsvps, cancellationToken);
@@ -102,10 +108,16 @@ public class CheckInHandler(IApplicationDbContext db, EventPermissions permissio
             return (Result.Forbidden(), null);
         }
 
-        var e = await db.Events.Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var e = await permissions.Covered(db.Events).Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (e is null || e.Rsvps.All(r => r.Id != rsvpId))
         {
             return (Result.NotFound(), null);
+        }
+
+        permissions.Focus(e.OrganizationId);
+        if (!permissions.CanCheckIn)
+        {
+            return (Result.Forbidden(), null);
         }
 
         if (Refusal(e, time.GetUtcNow()) is { } refusal)
@@ -132,10 +144,16 @@ public class CheckInHandler(IApplicationDbContext db, EventPermissions permissio
             return Result.Forbidden();
         }
 
-        var e = await db.Events.Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var e = await permissions.Covered(db.Events).Include(x => x.Rsvps).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (e is null || e.Rsvps.All(r => r.Id != rsvpId))
         {
             return Result.NotFound();
+        }
+
+        permissions.Focus(e.OrganizationId);
+        if (!permissions.CanCheckIn)
+        {
+            return Result.Forbidden();
         }
 
         if (Refusal(e, time.GetUtcNow()) is { } refusal)

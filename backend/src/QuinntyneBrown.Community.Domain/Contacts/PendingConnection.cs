@@ -8,15 +8,19 @@ public class PendingConnection
 {
     private PendingConnection() { }
 
-    public PendingConnection(Guid profileId, Guid leadId, DateTimeOffset createdAt)
+    public PendingConnection(Guid organizationId, Guid profileId, Guid leadId, DateTimeOffset createdAt)
     {
         Id = Guid.NewGuid();
+        OrganizationId = organizationId;
         ProfileId = profileId;
         LeadId = leadId;
         CreatedAt = createdAt;
     }
 
     public Guid Id { get; private set; }
+
+    /// <summary>The org that owns this record (ADR 0034).</summary>
+    public Guid OrganizationId { get; private set; }
 
     public Guid ProfileId { get; private set; }
 

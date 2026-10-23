@@ -49,6 +49,14 @@ The slice runs from the contacts pages and the shared components to the `Contact
 - **`api`** — `ContactsService` (token `CONTACTS_SERVICE`) gains `uploadPhoto(contactId, file, altText)`, `describePhoto`, `setFeaturedPhoto`, `deletePhoto` and `photoImage(url): Observable<string>`. `photoImage` returns a storage URL as it is; for a contacts API path it GETs the image as a blob with the bearer token and returns an object URL, cached per URL for the session. The DTOs gain `ContactPhoto`, `photos`, and the summary's photo, note count and created date.
 - **`contacts`** — `ContactsPage` renders the grid, with each card's colour from `avatarColorFor(contact.id)` (ADR 0008) and its photo through `photoImage`; the × opens `ArchiveContactDialog`, and on confirmation the card leaves the grid with a toast. `ContactFormPage` adds the picker on create, creates the contact, uploads the chosen photos featured first, and opens the contact page (with the failed descriptions in navigation state when an upload failed). `ContactPage` adds the Photos card (`ft-photo-gallery`, "{n} of 10", *Add photos* disabled at 10 with the reason; featuring is immediate, a delete reloads the contact so the server's new featured photo shows), loads its header photo through `photoImage`, and opens the new dialogs in `src/lib/dialogs/`: `AddContactPhotoDialog`, `EditPhotoDescriptionDialog` and `DeleteContactPhotoDialog` (confirmation).
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Contact` and `PendingConnection` carry a required `OrganizationId`; notes and photos belong to the contact. Contacts are created in the active org and require `contacts.private` there (the four FaithTech leads, or a tier).
+- Private contacts and their notes stay visible only to their owner and to System Admin, audited. The Portfolio Lead, Org Lead and cross-org roles never see them, by id, list or search (`L2-148` AC6). This check is explicit in `ContactAccess` and does not go through `CallerAccess.Has`.
+- Lists are scoped to the owner's contacts in the active org, or in every covered org under "All orgs", with org labels; the `contacts` feature switched off answers `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
 ## Requirements
 
 | L2 ID | Refines (L1) | Requirement |

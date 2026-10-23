@@ -27,8 +27,9 @@ public class SeedLoadUsersCommandTests
         Assert.All(users, u => Assert.True(u.EmailConfirmed));
         var hasher = new PasswordHasher<CommunityUser>();
         Assert.All(users, u => Assert.NotEqual(PasswordVerificationResult.Failed, hasher.VerifyHashedPassword(u, u.PasswordHash!, Password)));
-        // Plain members: no role, so the run exercises the member permissions and changes nothing else.
-        Assert.All(await db.Profiles.ToListAsync(), p => Assert.Empty(p.Roles));
+        // Plain members of FaithTech Toronto: no role, so the run exercises the member permissions and changes nothing else.
+        Assert.Empty(await db.OrgRoleAssignments.ToListAsync());
+        Assert.Equal(3, await db.OrgMemberships.CountAsync(m => m.OrganizationId == HierarchySeed.TorontoId));
         Assert.Equal(3, await db.Profiles.CountAsync());
     }
 

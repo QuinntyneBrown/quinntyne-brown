@@ -7,6 +7,10 @@ public static class WorkItemsEndpoints
 {
     public static IEndpointRouteBuilder MapWorkItemsEndpoints(this IEndpointRouteBuilder app)
     {
+        // My work: what is assigned to the caller, in the active org or across "All orgs" (L2-145 AC3).
+        app.MapGet("/api/work/mine", async (MyWorkHandler handler, CancellationToken cancellationToken) =>
+            Results.Ok(await handler.ListAsync(cancellationToken)));
+
         app.MapPost("/api/workspaces/{id:guid}/items", async (
                 Guid id, CreateWorkItemCommand command, WorkItemsHandler handler, CancellationToken cancellationToken) =>
             {

@@ -1,6 +1,6 @@
 import { Locator, Page } from '@playwright/test';
 
-/** A public event's share page at /public/events/:id (docs/mocks/pages/public-event). */
+/** A public event's share page at /o/:orgSlug/events/:id (docs/mocks/pages/public-event). */
 export class PublicEventPage {
   readonly heading: Locator;
   readonly overline: Locator;
@@ -17,6 +17,8 @@ export class PublicEventPage {
   readonly addToCalendar: Locator;
   readonly loadError: Locator;
   readonly tryAgain: Locator;
+  /** The org band: the org's display name and logo on its accent (L2-149). */
+  readonly orgBand: Locator;
 
   constructor(private readonly page: Page) {
     this.heading = page.getByRole('heading', { level: 1 });
@@ -34,9 +36,15 @@ export class PublicEventPage {
     this.addToCalendar = page.getByRole('link', { name: 'Add to calendar (.ics)' }).first();
     this.loadError = page.getByRole('heading', { name: 'We couldn’t load this event' });
     this.tryAgain = page.getByRole('button', { name: 'Try again' });
+    this.orgBand = page.locator('ft-org-band');
   }
 
-  async open(id: string): Promise<void> {
+  /** Opens the org-addressed page (L2-149 AC1). */
+  async open(id: string, org = 'faithtech-toronto'): Promise<void> {
+    await this.page.goto(`/o/${org}/events/${id}`);
+  }
+
+  async openLegacy(id: string): Promise<void> {
     await this.page.goto(`/public/events/${id}`);
   }
 

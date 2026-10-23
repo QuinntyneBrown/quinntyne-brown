@@ -23,7 +23,7 @@ const deck: ResourceSummary = {
   ownerId: 'p1',
   ownerName: 'Grace Okonkwo',
   isOwn: true,
-  visibility: 'Global',
+  visibility: 'OrgWide',
   sharedWithYou: false,
   hasThumbnail: false,
   isStored: true,
@@ -53,7 +53,7 @@ describe('resource formatting', () => {
     expect(downloadLabel(deck)).toBe('Download City launch deck, PPTX, 24.6 MB');
   });
 
-  it('badges visibility from the viewer’s side, and nothing for Global', () => {
+  it('badges visibility from the viewer’s side, and nothing for Org-wide', () => {
     expect(badgeOf(deck)).toBeNull();
     expect(badgeOf({ visibility: 'Private', sharedWithYou: false })!.text).toBe('Private');
     expect(badgeOf({ visibility: 'Shared', sharedWithYou: false })!.text).toBe('Shared');

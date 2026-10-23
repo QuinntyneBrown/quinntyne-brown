@@ -22,6 +22,9 @@ public record Result(
 
     public static Result NotFound() => new(ResultStatus.NotFound);
 
+    /// <summary>A not-found that tells the person what to do instead, such as sending an invite.</summary>
+    public static Result NotFound(string detail) => new(ResultStatus.NotFound, Detail: detail);
+
     public static Result Forbidden(string? detail = null) => new(ResultStatus.Forbidden, Detail: detail);
 
     public static Result Conflict(string detail, IReadOnlyDictionary<string, object?>? extensions = null) =>

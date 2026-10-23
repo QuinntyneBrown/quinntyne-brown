@@ -33,6 +33,15 @@
         <ft-form-field label="Period">
           <ft-select [options]="periods" [formControl]="periodControl" />
         </ft-form-field>
+        @if (orgOptions().length > 1) {
+          <ft-form-field label="Organization">
+            <ft-select
+              placeholder="All organizations"
+              [options]="orgOptions()"
+              [formControl]="orgControl"
+            />
+          </ft-form-field>
+        }
         <ft-button type="submit">Apply</ft-button>
         <ft-button
           ftFilterBarEnd

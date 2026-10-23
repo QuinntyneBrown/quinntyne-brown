@@ -1,10 +1,4 @@
-import {
-  ResourceSummary,
-  ResourceType,
-  ResourceVisibility,
-  ROLE_LABELS,
-  Role,
-} from '@faithtech-community/api';
+import { ResourceSummary, ResourceType, ResourceVisibility } from '@faithtech-community/api';
 import { BadgeVariant, formatDay, formatFileSize } from '@faithtech-community/components';
 
 /** The upload rules shown in the add dialog and checked again by the server (L2-057 AC1, AC7). */
@@ -96,13 +90,14 @@ export function metaLine(resource: ResourceSummary): string {
   ].join(' · ');
 }
 
-/** The visibility badge from the viewer's side (L2-055 AC3); none for Global. */
+/** The visibility badge from the viewer's side (L2-055 AC3); none for Org-wide. */
 export function badgeOf(
   resource: Pick<ResourceSummary, 'visibility' | 'sharedWithYou'>,
 ): { text: string; variant: BadgeVariant } | null {
   if (resource.visibility === 'Private') return { text: 'Private', variant: 'neutral' };
   if (resource.visibility === 'Shared')
     return { text: resource.sharedWithYou ? 'Shared with you' : 'Shared', variant: 'info' };
+  if (resource.visibility === 'PortfolioWide') return { text: 'Portfolio', variant: 'info' };
   return null;
 }
 
@@ -116,14 +111,11 @@ export function openLabel(resource: Pick<ResourceSummary, 'title' | 'linkHost'>)
 
 export function visibilityLine(visibility: ResourceVisibility): string {
   return {
-    Global: 'Global — every signed-in member',
+    OrgWide: 'Org-wide — everyone in the organization',
+    PortfolioWide: 'Portfolio-wide — everyone in the portfolio',
     Private: 'Private — only you',
     Shared: 'Shared — the people and roles below',
   }[visibility];
-}
-
-export function roleLabel(role: Role | string): string {
-  return ROLE_LABELS[role as Role] ?? role;
 }
 
 /** Hands the browser a fetched file under its own name. */

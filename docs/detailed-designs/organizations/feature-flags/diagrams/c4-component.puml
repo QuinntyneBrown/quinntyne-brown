@@ -1,0 +1,24 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Feature flags per Org Type
+Container_Boundary(web, "Web app") {
+  Component(nav, "Shell navigation", "faithtech-community", "Section shown when feature(name) and can(code)")
+  Component(ed, "OrgTypePage features panel", "organizations library", "ft-switch per switchable feature")
+}
+Container_Boundary(api, "Community API") {
+  Component(ep, "OrgTypesEndpoints", "Api", "PUT /api/org-types/{id}/features")
+  Component(h, "SetOrgTypeFeaturesHandler", "Application/Organizations", "Validates, audits before and after")
+  Component(feat, "Feature", "Domain/Organizations", "Always-on and switchable features")
+  Component(res, "AccessResolver", "Application/Organizations", "Drops codes of disabled features; Covers(org, feature) false")
+  Component(fh, "Feature handlers", "Application/<Feature>", "Ask OrgScope with their feature; 404 when off")
+  ComponentDb(db, "CommunityDbContext", "EF Core", "")
+}
+Rel(ed, ep, "Calls", "JSON/HTTPS")
+Rel(ep, h, "Dispatches")
+Rel(h, feat, "Validates against")
+Rel(h, db, "Writes EnabledFeatures")
+Rel(res, db, "Reads OrgType features")
+Rel(fh, res, "Reads CallerAccess")
+Rel(nav, ep, "Reads features via /api/me/access", "JSON/HTTPS")
+@enduml

@@ -1,11 +1,18 @@
+import { MockOrganizations, legacyRoleOf, roleKeyOf, roleNameOf } from './mock-organizations';
 import { Route } from '@playwright/test';
 
 import type { MockAccount, MockProfile } from './mock-api';
 import type { MockNotifications } from './mock-notifications';
 
 export type MockResourceType =
-  'Deck' | 'Logo' | 'Image' | 'Training' | 'Template' | 'Document' | 'Other';
-export type MockVisibility = 'Private' | 'Shared' | 'Global';
+  | 'Deck'
+  | 'Logo'
+  | 'Image'
+  | 'Training'
+  | 'Template'
+  | 'Document'
+  | 'Other';
+export type MockVisibility = 'Private' | 'Shared' | 'OrgWide' | 'PortfolioWide';
 
 /** A resource as the Resources table holds it, with its file bytes when it is an upload. */
 export interface MockResource {
@@ -36,6 +43,8 @@ export interface ResourcesContext {
   readonly profiles: Map<string, MockProfile>;
   readonly notifications: MockNotifications;
   readonly now: Date;
+  /** Who may publish Portfolio-wide (ADR 0039). */
+  readonly organizations: MockOrganizations;
 }
 
 const CONTRIBUTORS = [
@@ -153,7 +162,7 @@ function parseForm(data: Buffer | null, contentType: string): Form {
 /**
  * ResourcesEndpoints in the browser (backend/src/QuinntyneBrown.Community.Api/Endpoints/ResourcesEndpoints.cs,
  * ADR 0017): visibility in every read (Private to the owner and System Admin, Shared to its members and the
- * current holders of its roles, Global to every member), owner-only writes, contributors only for adds.
+ * current holders of its roles, Org-wide and Portfolio-wide to every member), owner-only writes, contributors only for adds.
  */
 export class MockResources {
   readonly resources: MockResource[] = [];
@@ -176,7 +185,7 @@ export class MockResources {
       description: null,
       type: 'Document',
       tags: [],
-      visibility: 'Global',
+      visibility: 'OrgWide',
       memberIds: [],
       roles: [],
       addedAt: new Date(this.context.now.getTime() - daysAgo * DAY).toISOString(),
@@ -317,7 +326,8 @@ export class MockResources {
 
   private mayOpen(r: MockResource, caller: MockAccount): boolean {
     return (
-      r.visibility === 'Global' ||
+      r.visibility === 'OrgWide' ||
+      r.visibility === 'PortfolioWide' ||
       r.ownerId === caller.profileId ||
       caller.roles.includes('SystemAdmin') ||
       (r.visibility === 'Shared' &&
@@ -396,7 +406,7 @@ export class MockResources {
         id: a.profileId,
         name: a.name,
         city: this.context.profiles.get(a.profileId)?.homeCity ?? null,
-        roles: [...a.roles].sort(),
+        roles: a.roles.map(roleNameOf).sort(),
       }));
     return this.json(route, 200, people);
   }
@@ -430,7 +440,7 @@ export class MockResources {
         type: one('type'),
         visibility: one('visibility'),
         memberIds: form.fields['memberIds'] ?? [],
-        roles: form.fields['roles'] ?? [],
+        roles: (form.fields['roles'] ?? []).map(legacyRoleOf),
       },
       false,
     );
@@ -452,7 +462,7 @@ export class MockResources {
           ...this.audience(
             one('visibility'),
             form.fields['memberIds'] ?? [],
-            form.fields['roles'] ?? [],
+            (form.fields['roles'] ?? []).map(legacyRoleOf),
           ),
         }),
       );
@@ -472,6 +482,8 @@ export class MockResources {
     body: Record<string, unknown>,
   ) {
     if (!contributes) return route.fulfill({ status: 403 });
+    if (this.refusesVisibility(String(body['visibility'] ?? ''), caller))
+      return route.fulfill({ status: 403 });
     const errors = this.check(this.input(body), true) ?? {};
     const url = String(body['url'] ?? '').trim();
     if (!/^https:\/\/[^\s/]+\.[^\s]+/i.test(url)) errors['Url'] = [LINK_MESSAGE];
@@ -499,6 +511,8 @@ export class MockResources {
     if (resource.archivedAt)
       return this.json(route, 409, { status: 409, detail: 'Restore it before you edit it.' });
     const input = this.input(body);
+    if (this.refusesVisibility(input.visibility ?? '', caller))
+      return route.fulfill({ status: 403 });
     const errors = this.check(input, true) ?? {};
     const url = String(body['url'] ?? '').trim();
     if (resource.linkUrl && !/^https:\/\/[^\s/]+\.[^\s]+/i.test(url))
@@ -567,6 +581,13 @@ export class MockResources {
     return this.json(route, 200, this.dto(resource, caller));
   }
 
+  /** Only the Portfolio Lead or a System Admin publishes Portfolio-wide (L2-148 AC4). */
+  private refusesVisibility(visibility: string, caller: MockAccount): boolean {
+    return (
+      visibility === 'PortfolioWide' && !this.context.organizations.mayPublishPortfolioWide(caller)
+    );
+  }
+
   private input(body: Record<string, unknown>) {
     return {
       title: (body['title'] as string | null) ?? null,
@@ -574,7 +595,7 @@ export class MockResources {
       type: (body['type'] as string | null) ?? null,
       visibility: (body['visibility'] as string | null) ?? null,
       memberIds: (body['memberIds'] as string[] | undefined) ?? [],
-      roles: (body['roles'] as string[] | undefined) ?? [],
+      roles: ((body['roles'] as string[] | undefined) ?? []).map(legacyRoleOf),
     };
   }
 
@@ -598,8 +619,8 @@ export class MockResources {
       errors['Description'] = ['Use 1,000 characters or fewer for the description.'];
     if ((titleRequired || input.type) && !TYPES.includes(input.type as MockResourceType))
       errors['Type'] = ['Choose a type.'];
-    const visibility = input.visibility || 'Global';
-    if (!['Private', 'Shared', 'Global'].includes(visibility))
+    const visibility = input.visibility || 'OrgWide';
+    if (!['Private', 'Shared', 'OrgWide', 'PortfolioWide'].includes(visibility))
       errors['Visibility'] = ['Choose who can see it.'];
     if (visibility === 'Shared') {
       if (input.roles.some((r) => !SHAREABLE.includes(r)))
@@ -611,7 +632,7 @@ export class MockResources {
   }
 
   private audience(visibility: string | null, memberIds: string[], roles: string[]) {
-    const v = (visibility || 'Global') as MockVisibility;
+    const v = (visibility || 'OrgWide') as MockVisibility;
     return v === 'Shared'
       ? { visibility: v, memberIds: [...new Set(memberIds)], roles: [...new Set(roles)] }
       : { visibility: v, memberIds: [], roles: [] };
@@ -657,6 +678,7 @@ export class MockResources {
   private summary(r: MockResource, caller: MockAccount) {
     const isOwn = r.ownerId === caller.profileId;
     return {
+      organization: { id: 'org-toronto', slug: 'faithtech-toronto', name: 'FaithTech Toronto' },
       id: r.id,
       title: r.title,
       type: r.type,
@@ -687,7 +709,7 @@ export class MockResources {
     const sharedVia = summary.sharedWithYou
       ? r.memberIds.includes(caller.profileId)
         ? 'you'
-        : r.roles.find((role) => caller.roles.includes(role))!
+        : roleKeyOf(r.roles.find((role) => caller.roles.includes(role))!)
       : null;
     return {
       ...summary,
@@ -701,7 +723,8 @@ export class MockResources {
           city: this.context.profiles.get(id)?.homeCity ?? null,
         })),
         roles: r.roles.map((role) => ({
-          role,
+          role: roleKeyOf(role),
+          name: roleNameOf(role),
           count: [...this.context.accounts.values()].filter(
             (a) => !a.suspended && a.roles.includes(role),
           ).length,
@@ -719,7 +742,7 @@ export class MockResources {
       canTransfer: admin,
       ownerLostRole:
         ownerAccount && !ownerAccount.roles.some((role) => CONTRIBUTORS.includes(role))
-          ? 'CityLead'
+          ? 'City Lead'
           : null,
     };
   }

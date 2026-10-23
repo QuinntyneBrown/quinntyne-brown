@@ -17,12 +17,20 @@ const invite: InviteLookupDto = {
   email: 'ruth.alvarez@example.org',
   inviterName: 'Grace Okonkwo',
   inviterCity: 'Toronto',
-  preassignedRole: 'Volunteer',
+  preassignedRole: 'volunteer',
+  preassignedRoleName: 'Volunteer',
   hasAccount: false,
 };
 
 function user(email: string): CurrentUser {
-  return { id: 'u1', profileId: 'p1', name: 'Jonah Bell', email, emailVerified: true, roles: [] };
+  return {
+    id: 'u1',
+    profileId: 'p1',
+    name: 'Jonah Bell',
+    email,
+    emailVerified: true,
+    isSystemAdmin: false,
+  };
 }
 
 async function setup(

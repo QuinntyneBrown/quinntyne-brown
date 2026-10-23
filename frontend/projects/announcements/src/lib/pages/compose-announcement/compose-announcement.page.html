@@ -37,6 +37,13 @@
               >People with a role</ft-radio
             >
             <ft-radio value="EventRsvps">An event’s RSVP list</ft-radio>
+            @if (mayReachPortfolio) {
+              <ft-radio
+                value="Portfolio"
+                description="Every member of every org in the portfolio, once each"
+                >Everyone in the portfolio</ft-radio
+              >
+            }
           </ft-radio-group>
           @if (kind() === 'Roles') {
             <ft-checkbox-group legend="Roles" formControlName="roles" [error]="error('roles')">

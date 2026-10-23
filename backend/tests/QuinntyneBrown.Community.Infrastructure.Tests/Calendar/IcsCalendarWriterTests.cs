@@ -11,7 +11,7 @@ public class IcsCalendarWriterTests
     private readonly IcsCalendarWriter _writer = new(new FakeTimeProvider(new DateTimeOffset(2026, 10, 21, 12, 0, 0, TimeSpan.Zero)));
 
     private static Event InPerson(string title = "Toronto Builders Night") =>
-        new(title, "Demos, then open tables.", EventType.BuildersNight, Start, Start.AddHours(2.5), "Toronto",
+        new(Guid.NewGuid(), title, "Demos, then open tables.", EventType.BuildersNight, Start, Start.AddHours(2.5), "Toronto",
             EventFormat.InPerson, "Kestrel Labs, 220 King St W", null, null, EventVisibility.Public, Guid.NewGuid());
 
     private static string[] Lines(string ics) => ics.Split("\r\n");
@@ -45,7 +45,7 @@ public class IcsCalendarWriterTests
     [Fact]
     public void An_online_event_carries_its_link_as_the_url_and_no_location()
     {
-        var e = new Event("Prayer & Planning", "", EventType.PrayerAndPlanning, Start, Start.AddHours(1), "Toronto",
+        var e = new Event(Guid.NewGuid(), "Prayer & Planning", "", EventType.PrayerAndPlanning, Start, Start.AddHours(1), "Toronto",
             EventFormat.Online, null, "https://meet.example.org/ft", null, EventVisibility.MembersOnly, Guid.NewGuid());
 
         var lines = Lines(_writer.Write(e));
@@ -57,7 +57,7 @@ public class IcsCalendarWriterTests
     [Fact]
     public void The_public_copy_links_the_public_page_instead_of_the_joining_link()
     {
-        var e = new Event("Prayer & Planning", "", EventType.PrayerAndPlanning, Start, Start.AddHours(1), "Toronto",
+        var e = new Event(Guid.NewGuid(), "Prayer & Planning", "", EventType.PrayerAndPlanning, Start, Start.AddHours(1), "Toronto",
             EventFormat.Online, null, "https://meet.example.org/ft", null, EventVisibility.Public, Guid.NewGuid());
 
         var lines = Lines(_writer.Write(e, "https://app.example/public/events/1"));

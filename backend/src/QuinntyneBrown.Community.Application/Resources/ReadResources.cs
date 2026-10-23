@@ -68,7 +68,7 @@ public class ResourceTagsHandler(IApplicationDbContext db, ResourceAccess access
     }
 }
 
-/// <summary>The resource page (L2-056). A System Admin opening a resource that is not theirs and not Global is audited (L2-060 AC5).</summary>
+/// <summary>The resource page (L2-056). A System Admin opening a resource that is not theirs and not Org-wide or Portfolio-wide is audited (L2-060 AC5).</summary>
 public class GetResourceHandler(IApplicationDbContext db, ResourceAccess access, ResourceViews views, IAuditLog audit)
 {
     public async Task<ResourceDto?> HandleAsync(Guid id, CancellationToken cancellationToken = default)
@@ -139,7 +139,7 @@ internal static class ResourceAudit
 {
     /// <summary>A System Admin reaching a resource only their role lets them see.</summary>
     public static bool IsPrivileged(ResourceAccess access, Resource resource, Guid caller) =>
-        access.IsOverride(resource, caller) && (resource.Visibility != ResourceVisibility.Global || resource.IsArchived);
+        access.IsOverride(resource, caller) && (resource.Visibility is not (ResourceVisibility.OrgWide or ResourceVisibility.PortfolioWide) || resource.IsArchived);
 
     public static object Snapshot(Resource r) => new
     {
@@ -149,7 +149,7 @@ internal static class ResourceAudit
         Tags = r.Tags.Select(t => t.Tag).ToList(),
         Visibility = r.Visibility.ToString(),
         Members = r.SharedMembers.Select(m => m.ProfileId).ToList(),
-        Roles = r.SharedRoles.Select(x => x.Role.ToString()).ToList(),
+        Roles = r.SharedRoles.Select(x => x.RoleId).ToList(),
         r.File?.FileName,
         r.LinkUrl,
         r.OwnerId,

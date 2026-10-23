@@ -1,0 +1,56 @@
+<ft-dialog
+  [heading]="'Issue a token to ' + data.agent.name"
+  description="Tokens expire, can be revoked at any time and record when they were last used."
+  [busy]="busy()"
+  (closed)="ref.close(issued() ?? undefined)"
+>
+  @if (issued(); as token) {
+    <ft-token-reveal [token]="token.token" />
+  } @else {
+    <form [formGroup]="form" (submit)="$event.preventDefault(); issue()">
+      <ft-stack>
+        @if (failure(); as message) {
+          <ft-alert status="danger" heading="Token not issued">{{ message }}</ft-alert>
+        }
+        <ft-form-field
+          required
+          label="Token name"
+          help="So you can tell tokens apart later."
+          [error]="errors()['name'] ?? ''"
+        >
+          <ft-text-field formControlName="name" initialFocus [readonly]="busy()" />
+        </ft-form-field>
+        <ft-form-field
+          label="Expires after"
+          help="1 to 90 days."
+          [error]="errors()['expiresInDays'] ?? ''"
+        >
+          <ft-select formControlName="expiresInDays" [options]="expiries" />
+        </ft-form-field>
+        <ft-checkbox-group
+          legend="Organizations"
+          hint="The token can reach only these orgs, and only where the agent has roles."
+          formControlName="orgIds"
+          [error]="errors()['orgIds'] ?? ''"
+        >
+          @for (org of data.orgs; track org.id) {
+            <ft-checkbox [value]="org.id" [description]="org.typeName">
+              {{ org.branding.displayName }}
+            </ft-checkbox>
+          }
+        </ft-checkbox-group>
+      </ft-stack>
+    </form>
+  }
+  @if (issued(); as token) {
+    <ft-button ftDialogFooter variant="primary" (click)="ref.close(token)">Done</ft-button>
+  }
+  @if (!issued()) {
+    <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+  }
+  @if (!issued()) {
+    <ft-button ftDialogFooter variant="primary" [loading]="busy()" (click)="issue()">
+      Issue token
+    </ft-button>
+  }
+</ft-dialog>

@@ -98,9 +98,11 @@ test.describe('Share resources', () => {
     await resource.changeWhoCanSee.click();
     const dialog = new EditResourceDialog(page);
     await expect(dialog.visibility('Shared')).toBeFocused();
-    await dialog.visibility('Global').check();
+    await dialog.visibility('OrgWide').check();
     await dialog.save.click();
-    await expect(resource.detail('Visibility')).toContainText('Global — every signed-in member');
+    await expect(resource.detail('Visibility')).toContainText(
+      'Org-wide — everyone in the organization',
+    );
     await expect(resource.audience).toHaveCount(0);
   });
 });

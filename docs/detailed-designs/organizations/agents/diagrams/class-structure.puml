@@ -1,0 +1,71 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Agents
+enum ProfileKind {
+  Person
+  Agent
+}
+class Profile {
+  +Guid Id
+  +string Name
+  +ProfileKind Kind
+  +bool IsSuspended
+}
+class AgentCredential {
+  +Guid Id
+  +Guid AgentProfileId
+  +string Name
+  +string TokenHash
+  +string Prefix
+  +Guid IssuedById
+  +IReadOnlySet<Guid> OrgIds
+  +DateTime CreatedAt
+  +DateTime ExpiresAt
+  +DateTime? RevokedAt
+  +DateTime? LastUsedAt
+  +IsUsable(now: DateTime): bool
+  +Revoke(now: DateTime): void
+  +Touch(now: DateTime): bool
+}
+interface IAgentTokenFactory {
+  +Create(): (string Token, string Hash, string Prefix)
+  +Hash(token: string): string
+}
+class AgentTokenAuthenticationHandler {
+  #HandleAuthenticateAsync(): Task<AuthenticateResult>
+}
+class AgentHandlers {
+  +CreateAgentAsync(portfolioId: Guid, name: string): Task<Result<AgentDto>>
+  +IssueTokenAsync(agentId: Guid, req: IssueTokenRequest): Task<Result<IssuedTokenDto>>
+  +ListTokensAsync(agentId: Guid): Task<Result<AgentTokenDto[]>>
+  +RevokeAsync(agentId: Guid, tokenId: Guid): Task<Result>
+}
+class IssueTokenRequest {
+  +string Name
+  +int ExpiresInDays
+  +Guid[] OrgIds
+}
+class IssuedTokenDto {
+  +Guid Id
+  +string Token
+  +string Prefix
+  +DateTime ExpiresAt
+}
+Profile --> ProfileKind
+AgentCredential --> Profile : agent
+AgentHandlers ..> IAgentTokenFactory
+AgentHandlers ..> AgentCredential : creates / revokes
+AgentHandlers ..> IssueTokenRequest
+AgentHandlers ..> IssuedTokenDto
+AgentTokenAuthenticationHandler ..> IAgentTokenFactory : hashes with
+AgentTokenAuthenticationHandler ..> AgentCredential : validates
+@enduml

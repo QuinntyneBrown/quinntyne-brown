@@ -1,0 +1,56 @@
+@if (!leads()) {
+  <h1 class="visually-hidden">Organization settings</h1>
+  <ft-empty-state
+    heading="Only Org Leads open the organization’s settings"
+    text="Ask your Org Lead if something about the organization needs to change."
+  >
+    <ft-button actions variant="primary" href="/">Back to home</ft-button>
+  </ft-empty-state>
+} @else {
+  <ft-page-header
+    title="Organization settings"
+    [subtitle]="active()?.branding?.displayName ?? ''"
+  />
+  <ft-tabs label="Organization settings">
+    <ft-tab label="General" [href]="base() + '/general'" [current]="true" />
+    <ft-tab label="Branding" [href]="base() + '/branding'" />
+    <ft-tab label="Members" [href]="base() + '/members'" />
+  </ft-tabs>
+  @switch (state()) {
+    @case ('loading') {
+      <ft-list-skeleton label="Loading the organization" />
+    }
+    @case ('error') {
+      <ft-empty-state
+        variant="error"
+        heading="We couldn’t load the organization"
+        text="Check your connection and try again."
+      >
+        <ft-button actions variant="primary" (click)="load()">Try again</ft-button>
+      </ft-empty-state>
+    }
+    @default {
+      @if (org(); as o) {
+        <ft-card heading="General">
+          <ft-description-list>
+            <ft-description-list-item label="Name">{{ o.name }}</ft-description-list-item>
+            <ft-description-list-item label="Address">/o/{{ o.slug }}</ft-description-list-item>
+            @if (o.aliases.length) {
+              <ft-description-list-item label="Old addresses">
+                {{ o.aliases.join(', ') }}
+              </ft-description-list-item>
+            }
+            <ft-description-list-item label="Org Type">{{
+              o.orgType.name
+            }}</ft-description-list-item>
+          </ft-description-list>
+          @if (edits()) {
+            <ft-button (click)="edit(o)">Edit name and address</ft-button>
+          } @else {
+            <p>Only the Portfolio Lead changes the name, address or type.</p>
+          }
+        </ft-card>
+      }
+    }
+  }
+}

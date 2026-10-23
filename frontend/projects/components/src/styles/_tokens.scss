@@ -199,6 +199,9 @@
   --color-accent-subtle: var(--palette-violet-50); /* selected row, accent chip background */
   --color-accent-subtle-hover: var(--palette-violet-100);
   --color-fg-on-accent: var(--palette-white);
+  /* The active org's accent, set per org by OrgAccentDirective (ADR 0037). */
+  --color-org-accent: var(--color-accent);
+  --color-org-accent-foreground: var(--color-fg-on-accent);
   --color-fg-accent: var(--palette-violet-700); /* accent-coloured text on surfaces */
 
   --color-focus-ring: var(--palette-violet-600);

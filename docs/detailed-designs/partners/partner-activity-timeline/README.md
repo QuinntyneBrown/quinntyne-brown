@@ -153,6 +153,15 @@ E2E specs in `e2e/tests/partners/partner-activity.spec.ts` with page objects `e2
 
 `e2e/tests/partners/partner-board.spec.ts` changes its two Stage history assertions to read the timeline's Stage moved entry.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Partner` carries a required `OrganizationId`; activities, stage changes and duplicate dismissals belong to it. Partners are created in the active org.
+- Reading requires `partners.read` in the partner's org (the four FaithTech leads, the Staff and Portfolio cross-org roles, and the tiers); changing requires `partners.write` (the four leads and the tiers). `LeadRoles` is deleted.
+- An *override* is now an action allowed by a tier (Org Lead, Portfolio Lead, System Admin) but not by any role: `CallerAccess.Has(org, code)` without `HasByRole(org, code)`. Overrides on other people's items are audited, replacing "a System Admin without a lead role". This replaces "a System Admin acting without a lead role".
+- Lists and the board cover the active org, or every covered org under "All orgs" with org labels.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

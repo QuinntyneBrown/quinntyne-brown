@@ -118,7 +118,7 @@ test.describe('Notes: write a page with autosave', () => {
     const playbook = api.notes.add({
       title: 'Toronto city team playbook',
       ownerId: grace.profileId,
-      visibility: 'Global',
+      visibility: 'OrgWide',
       blocks: [{ id: 'b1', type: 'paragraph', text: [{ text: 'How we run FaithTech Toronto.' }] }],
     });
     await api.signInAs(marcus, `/notes/${playbook.id}`);

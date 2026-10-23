@@ -18,7 +18,15 @@ const grace: AdminUserSummary = {
   id: 'p1',
   name: 'Grace Okonkwo',
   email: 'grace@example.org',
-  roles: ['CityLead'],
+  roles: [
+    {
+      key: 'city-lead',
+      name: 'City Lead',
+      kind: 'catalogue',
+      organizationId: 'org-toronto',
+      organizationName: 'FaithTech Toronto',
+    },
+  ],
   status: 'Active',
 };
 const victor: AdminUserSummary = {
@@ -192,7 +200,7 @@ describe('AdminUsersPage', () => {
     expect(alerts.length).toBe(1);
     expect(alerts[0].textContent).toContain('A workspace needs a new owner');
     expect(alerts[0].textContent).toContain(
-      'Grace Okonkwo no longer holds the City Lead role but owns Toronto team.',
+      'Grace Okonkwo can no longer own workspaces but owns Toronto team.',
     );
     expect(alerts[0].querySelector('a')?.getAttribute('href')).toBe('/workspaces/w1/settings');
   });
@@ -205,7 +213,11 @@ describe('AdminUsersPage', () => {
       c.textContent!.trim(),
     );
     expect(cells[0]).toContain('Grace Okonkwo');
-    expect(cells.slice(1, 4)).toEqual(['grace@example.org', 'City Lead', 'Active']);
+    expect(cells.slice(1, 4)).toEqual([
+      'grace@example.org',
+      'City Lead · FaithTech Toronto',
+      'Active',
+    ]);
     expect(row('Grace Okonkwo').querySelector('a')!.getAttribute('href')).toBe('/people/p1');
     expect(row('Victor Kane').textContent).toContain('No role');
     expect(row('Victor Kane').textContent).toContain('Suspended');

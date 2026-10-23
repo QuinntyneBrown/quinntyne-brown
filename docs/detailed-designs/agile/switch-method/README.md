@@ -20,6 +20,14 @@ The workspace owner chooses the method when creating the workspace (see `agile/w
 - **`WorkspaceAccessPolicy`** — Application service shared by every agile handler. It resolves the caller from `ICurrentUser` and classifies the caller as owner, member, Staff, System Admin or outsider for a workspace. Outsiders receive 404, Staff and non-owner members receive 403 on writes they lack, and System Admin actions pass and are written to the audit log (`L2-031`, `L2-042`).
 - **`WorkspaceMethod`** — enumeration `Scrum`, `Kanban`.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Workspace` carries a required `OrganizationId`; work items, sprints, comments, poker sessions and members belong to the workspace's org. A workspace outside the caller's coverage, or in an org with `agile` off, answers `404`.
+- `WorkspaceAccessPolicy` classifies with `CallerAccess` for the workspace's org: **Admin** is the org's Org Lead, the Portfolio Lead or a System Admin; the read-only level (formerly **Staff**) is any holder of `workspaces.readAll` there, such as the Staff and Portfolio cross-org roles; Owner, Member and Outsider are unchanged (`L2-146` AC5). The "Read-only for Staff" alert reads "Read-only".
+- Actions by an Admin who is not the owner are overrides and stay audited.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

@@ -7,6 +7,7 @@ public class Partner
     private Partner() { }
 
     public Partner(
+        Guid organizationId,
         string name,
         string? website,
         string? offering,
@@ -18,11 +19,15 @@ public class Partner
         PartnerStage stage = PartnerStage.Lead)
     {
         Id = Guid.NewGuid();
+        OrganizationId = organizationId;
         Stage = stage;
         Update(name, website, offering, ownerId, contactName, email, phone, notes);
     }
 
     public Guid Id { get; private set; }
+
+    /// <summary>The org that owns this record (ADR 0034).</summary>
+    public Guid OrganizationId { get; private set; }
 
     public string Name { get; private set; } = string.Empty;
 

@@ -7,6 +7,7 @@ using QuinntyneBrown.Community.Domain.Contacts;
 using QuinntyneBrown.Community.Domain.Events;
 using QuinntyneBrown.Community.Domain.Invites;
 using QuinntyneBrown.Community.Domain.Notifications;
+using QuinntyneBrown.Community.Domain.Organizations;
 using QuinntyneBrown.Community.Domain.Partners;
 using QuinntyneBrown.Community.Domain.Profiles;
 using QuinntyneBrown.Community.Domain.Notes;
@@ -77,6 +78,28 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
 
     public DbSet<NoteImage> NoteImages => Set<NoteImage>();
 
+    public DbSet<Portfolio> Portfolios => Set<Portfolio>();
+
+    public DbSet<PortfolioLead> PortfolioLeads => Set<PortfolioLead>();
+
+    public DbSet<OrgType> OrgTypes => Set<OrgType>();
+
+    public DbSet<RoleDefinition> RoleDefinitions => Set<RoleDefinition>();
+
+    public DbSet<Organization> Organizations => Set<Organization>();
+
+    public DbSet<OrgSlugAlias> OrgSlugAliases => Set<OrgSlugAlias>();
+
+    public DbSet<OrgMembership> OrgMemberships => Set<OrgMembership>();
+
+    public DbSet<OrgRoleAssignment> OrgRoleAssignments => Set<OrgRoleAssignment>();
+
+    public DbSet<CrossOrgRole> CrossOrgRoles => Set<CrossOrgRole>();
+
+    public DbSet<CrossOrgAssignment> CrossOrgAssignments => Set<CrossOrgAssignment>();
+
+    public DbSet<AgentCredential> AgentCredentials => Set<AgentCredential>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -91,13 +114,7 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
             profile.Property(p => p.Bio).HasMaxLength(400);
             profile.Property(p => p.SuspendedReason).HasMaxLength(500);
             profile.Ignore(p => p.DomainEvents);
-            profile.OwnsMany(p => p.Roles, role =>
-            {
-                role.ToTable("ProfileRoles");
-                role.WithOwner().HasForeignKey(r => r.ProfileId);
-                role.HasKey(r => new { r.ProfileId, r.Role });
-                role.Property(r => r.Role).HasConversion<string>().HasMaxLength(32);
-            });
+            profile.Property(p => p.Kind).HasConversion<string>().HasMaxLength(16);
             profile.OwnsMany(p => p.Photos, photo =>
             {
                 photo.ToTable("ProfilePhotos");
@@ -115,6 +132,8 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
             });
             profile.Navigation(p => p.PhotoLease).IsRequired();
         });
+
+        ConfigureOrganizations(builder);
 
         builder.Entity<PhotoBlobTask>(task =>
         {
@@ -152,7 +171,10 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
             entry.Property(e => e.TargetType).HasMaxLength(100);
             entry.Property(e => e.TargetId).HasMaxLength(100);
             entry.Property(e => e.IpAddress).HasMaxLength(45);
+            entry.Property(e => e.Detail).HasMaxLength(500);
             entry.HasIndex(e => e.OccurredAtUtc);
+            entry.HasIndex(e => new { e.OrganizationId, e.OccurredAtUtc });
+            entry.HasIndex(e => new { e.PortfolioId, e.OccurredAtUtc });
         });
 
         builder.Entity<Notification>(notification =>
@@ -168,13 +190,14 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
         builder.Entity<PendingConnection>(pending =>
         {
             pending.Property(p => p.Id).ValueGeneratedNever();
-            pending.HasIndex(p => new { p.ProfileId, p.LeadId }).IsUnique();
+            pending.HasIndex(p => new { p.ProfileId, p.LeadId, p.OrganizationId }).IsUnique();
         });
 
         builder.Entity<ConnectLink>(link =>
         {
             link.Property(l => l.Id).ValueGeneratedNever();
-            link.HasIndex(l => l.OwnerId).IsUnique();
+            // One link per owner per org (ADR 0041).
+            link.HasIndex(l => new { l.OwnerId, l.OrganizationId }).IsUnique();
             link.Property(l => l.TokenHash).HasMaxLength(64);
             link.HasIndex(l => l.TokenHash).IsUnique();
             link.Property(l => l.ProtectedToken).HasMaxLength(1024);
@@ -186,7 +209,7 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
             invite.Property(i => i.Email).HasMaxLength(256);
             invite.Property(i => i.TokenHash).HasMaxLength(64);
             invite.HasIndex(i => i.TokenHash).IsUnique();
-            invite.Property(i => i.PreassignedRole).HasConversion<string>().HasMaxLength(32);
+            invite.HasIndex(i => new { i.OrganizationId, i.CreatedAt });
             invite.Property(i => i.Note).HasMaxLength(500);
             invite.HasIndex(i => new { i.InvitedBy, i.CreatedAt });
         });
@@ -353,7 +376,7 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
             resource.Property(r => r.Description).HasMaxLength(Resource.MaxDescription);
             resource.Property(r => r.Type).HasConversion<string>().HasMaxLength(16);
             resource.Property(r => r.Visibility).HasConversion<string>().HasMaxLength(16);
-            resource.Property(r => r.OwnerRole).HasConversion<string>().HasMaxLength(32);
+            resource.Property(r => r.OwnerRoleName).HasMaxLength(100);
             resource.Property(r => r.LinkUrl).HasMaxLength(2000);
             resource.Property(r => r.LinkHost).HasMaxLength(255);
             resource.Property(r => r.TagText).HasMaxLength(2000);
@@ -391,8 +414,7 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
             {
                 role.ToTable("ResourceShareRoles");
                 role.WithOwner().HasForeignKey(x => x.ResourceId);
-                role.HasKey(x => new { x.ResourceId, x.Role });
-                role.Property(x => x.Role).HasConversion<string>().HasMaxLength(32);
+                role.HasKey(x => new { x.ResourceId, x.RoleId });
             });
             resource.Navigation(r => r.SharedRoles).HasField("_roles").UsePropertyAccessMode(PropertyAccessMode.Field);
         });
@@ -437,8 +459,7 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
                 role.WithOwner().HasForeignKey(x => x.PageId);
                 role.Property<int>("Id").ValueGeneratedOnAdd();
                 role.HasKey("Id");
-                role.Property(x => x.Role).HasConversion<string>().HasMaxLength(32);
-                role.HasIndex(x => new { x.PageId, x.Role }).IsUnique();
+                role.HasIndex(x => new { x.PageId, x.RoleId }).IsUnique();
             });
             page.Navigation(p => p.SharedRoles).HasField("_roles").UsePropertyAccessMode(PropertyAccessMode.Field);
         });
@@ -471,12 +492,12 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
             {
                 audience.Property(x => x.Kind).HasColumnName("AudienceKind").HasConversion<string>().HasMaxLength(16);
                 audience.Property(x => x.EventId).HasColumnName("AudienceEventId");
-                // The chosen roles, stored as "Volunteer,ProductEngineer".
-                audience.Property(x => x.Roles).HasColumnName("AudienceRoles").HasMaxLength(300)
+                // The chosen catalogue role ids, comma-separated.
+                audience.Property(x => x.Roles).HasColumnName("AudienceRoles").HasMaxLength(1000)
                     .HasConversion(
                         roles => string.Join(',', roles.Select(r => r.ToString()).Order()),
-                        value => value.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(Enum.Parse<Role>).ToHashSet(),
-                        new ValueComparer<IReadOnlySet<Role>>(
+                        value => value.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(Guid.Parse).ToHashSet(),
+                        new ValueComparer<IReadOnlySet<Guid>>(
                             (a, b) => a!.SetEquals(b!),
                             roles => roles.Aggregate(0, (hash, role) => hash ^ role.GetHashCode()),
                             roles => roles.ToHashSet()));
@@ -566,5 +587,113 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
                 vote.Property(v => v.Value).HasConversion<string>().HasMaxLength(16);
             });
         });
+    }
+
+    /// <summary>The hierarchy (ADR 0033 to ADR 0036) and the org index on every org-owned root (ADR 0034).</summary>
+    private static void ConfigureOrganizations(ModelBuilder builder)
+    {
+        builder.Entity<Portfolio>(portfolio =>
+        {
+            portfolio.Property(p => p.Id).ValueGeneratedNever();
+            portfolio.Property(p => p.Name).HasMaxLength(200);
+            portfolio.Property(p => p.Slug).HasMaxLength(40);
+            portfolio.HasIndex(p => p.Slug).IsUnique();
+        });
+
+        builder.Entity<PortfolioLead>(lead =>
+        {
+            lead.HasKey(l => new { l.PortfolioId, l.ProfileId });
+            lead.HasIndex(l => l.ProfileId);
+        });
+
+        builder.Entity<OrgType>(type =>
+        {
+            type.Property(t => t.Id).ValueGeneratedNever();
+            type.Property(t => t.Key).HasMaxLength(60);
+            type.Property(t => t.Name).HasMaxLength(100);
+            type.HasIndex(t => new { t.PortfolioId, t.Key }).IsUnique();
+        });
+
+        builder.Entity<RoleDefinition>(role =>
+        {
+            role.Property(r => r.Id).ValueGeneratedNever();
+            role.Property(r => r.Key).HasMaxLength(60);
+            role.Property(r => r.Name).HasMaxLength(100);
+            role.Property(r => r.Description).HasMaxLength(300);
+            role.HasIndex(r => new { r.OrgTypeId, r.Key }).IsUnique();
+        });
+
+        builder.Entity<Organization>(org =>
+        {
+            org.Property(o => o.Id).ValueGeneratedNever();
+            org.Property(o => o.Name).HasMaxLength(200);
+            org.Property(o => o.Slug).HasMaxLength(40);
+            org.HasIndex(o => o.Slug).IsUnique();
+            org.Property(o => o.DisplayName).HasMaxLength(200);
+            org.Property(o => o.LogoBlobName).HasMaxLength(200);
+            org.Property(o => o.AccentColour).HasMaxLength(7);
+            org.HasIndex(o => o.PortfolioId);
+            org.HasIndex(o => o.OrgTypeId);
+            org.Ignore(o => o.ShownName);
+        });
+
+        builder.Entity<OrgSlugAlias>(alias =>
+        {
+            alias.HasKey(a => a.Slug);
+            alias.Property(a => a.Slug).HasMaxLength(40);
+            alias.HasIndex(a => a.OrganizationId);
+        });
+
+        builder.Entity<OrgMembership>(membership =>
+        {
+            membership.HasKey(m => new { m.OrganizationId, m.ProfileId });
+            membership.Property(m => m.JoinedVia).HasConversion<string>().HasMaxLength(16);
+            membership.HasIndex(m => m.ProfileId);
+        });
+
+        builder.Entity<OrgRoleAssignment>(assignment =>
+        {
+            assignment.HasKey(a => new { a.OrganizationId, a.ProfileId, a.RoleDefinitionId });
+            assignment.HasIndex(a => a.ProfileId);
+            assignment.HasIndex(a => a.RoleDefinitionId);
+        });
+
+        builder.Entity<CrossOrgRole>(role =>
+        {
+            role.Property(r => r.Id).ValueGeneratedNever();
+            role.Property(r => r.Key).HasMaxLength(60);
+            role.Property(r => r.Name).HasMaxLength(100);
+            role.Property(r => r.Description).HasMaxLength(300);
+            role.Property(r => r.ScopeKind).HasConversion<string>().HasMaxLength(16);
+            role.HasIndex(r => new { r.PortfolioId, r.Key }).IsUnique();
+        });
+
+        builder.Entity<CrossOrgAssignment>(assignment =>
+        {
+            assignment.Property(a => a.Id).ValueGeneratedNever();
+            assignment.HasIndex(a => new { a.CrossOrgRoleId, a.ProfileId }).IsUnique();
+            assignment.HasIndex(a => a.ProfileId);
+        });
+
+        builder.Entity<AgentCredential>(credential =>
+        {
+            credential.Property(c => c.Id).ValueGeneratedNever();
+            credential.Property(c => c.Name).HasMaxLength(100);
+            credential.Property(c => c.TokenHash).HasMaxLength(64);
+            credential.HasIndex(c => c.TokenHash).IsUnique();
+            credential.Property(c => c.Prefix).HasMaxLength(16);
+            credential.HasIndex(c => c.AgentProfileId);
+        });
+
+        builder.Entity<Event>().HasIndex(e => e.OrganizationId);
+        builder.Entity<Partner>().HasIndex(p => p.OrganizationId);
+        builder.Entity<Contact>().HasIndex(c => new { c.OrganizationId, c.OwnerId });
+        builder.Entity<PendingConnection>().HasIndex(p => p.OrganizationId);
+        builder.Entity<Resource>().HasIndex(r => r.OrganizationId);
+        builder.Entity<NotePage>().HasIndex(p => p.OrganizationId);
+        builder.Entity<Workspace>().HasIndex(w => w.OrganizationId);
+        builder.Entity<Announcement>().HasIndex(a => a.OrganizationId);
+        builder.Entity<ConnectLink>().HasIndex(l => l.OrganizationId);
+        builder.Entity<Notification>().HasIndex(n => n.OrganizationId);
     }
 }

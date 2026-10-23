@@ -65,6 +65,7 @@ export class AuditLogPage {
     { key: 'when', header: 'When', mono: true },
     { key: 'who', header: 'Who' },
     { key: 'what', header: 'What' },
+    { key: 'org', header: 'Org' },
   ];
 
   protected readonly state = signal<State>('loading');
@@ -84,7 +85,8 @@ export class AuditLogPage {
     this.entries().map((e) => ({
       when: formatTimestamp(e.occurredAtUtc),
       who: e.actorName,
-      what: e.summary,
+      what: e.detail ? `${e.summary} (${e.detail})` : e.summary,
+      org: e.organization?.name ?? 'Platform',
     })),
   );
   protected readonly hasMore = computed(() => this.entries().length < this.total());

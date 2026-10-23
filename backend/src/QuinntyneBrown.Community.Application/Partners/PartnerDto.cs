@@ -27,7 +27,8 @@ public record PartnerDto(
     bool CanLogActivity,
     int Version,
     PartnerArchivedDto? Archived,
-    bool CanRestore);
+    bool CanRestore,
+    Organizations.OrgLabel? Organization = null);
 
 /// <summary>Who merged an archived partner, when and into which partner (L2-114 AC7); MergedIntoVersion feeds a restore.</summary>
 public record PartnerArchivedDto(
@@ -47,7 +48,7 @@ public record PartnerBoardDto(IReadOnlyList<PartnerColumnDto> Columns, bool CanE
 
 public record PartnerOwnerDto(Guid ProfileId, string Name);
 
-public class PartnerViews(IApplicationDbContext db, PartnerAccess access)
+public class PartnerViews(IApplicationDbContext db, PartnerAccess access, ICurrentUser current)
 {
     public async Task<PartnerDto> ToDtoAsync(Partner partner, CancellationToken cancellationToken = default)
     {
@@ -70,7 +71,7 @@ public class PartnerViews(IApplicationDbContext db, PartnerAccess access)
                 by ?? "A former member", partner.MergedAtUtc ?? partner.ArchivedAtUtc!.Value);
         }
 
-        var canWrite = access.CanWrite && !partner.IsArchived;
+        var canWrite = access.CanWriteIn(partner.OrganizationId) && !partner.IsArchived;
         return new PartnerDto(
             partner.Id,
             partner.Name,
@@ -90,6 +91,7 @@ public class PartnerViews(IApplicationDbContext db, PartnerAccess access)
             canWrite,
             partner.Version,
             archived,
-            access.CanRestore && partner.IsArchived);
+            access.CanRestore && partner.IsArchived,
+            Organizations.OrgLabel.Of(current.Access.Orgs, partner.OrganizationId));
     }
 }

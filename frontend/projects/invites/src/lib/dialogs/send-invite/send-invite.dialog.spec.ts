@@ -1,13 +1,13 @@
 import { DialogRef } from '@angular/cdk/dialog';
 import { HttpErrorResponse } from '@angular/common/http';
-import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import {
-  AUTH_SERVICE,
   INVITES_SERVICE,
   InviteDto,
-  Role,
+  RoleOption,
   SendInviteRequest,
+  StaticOrg,
+  provideStaticAccess,
 } from '@faithtech-community/api';
 import { Observable, Subject, of, throwError } from 'rxjs';
 
@@ -16,7 +16,8 @@ import { SendInviteDialog } from './send-invite.dialog';
 const sent: InviteDto = {
   id: 'i1',
   email: 'nate.oyelaran@example.org',
-  preassignedRole: 'ProductEngineer',
+  preassignedRole: 'product-engineer',
+  preassignedRoleName: 'Product Engineer',
   status: 'Pending',
   invitedByName: 'Grace Okonkwo',
   createdAt: '2026-10-21T10:00:00Z',
@@ -25,9 +26,28 @@ const sent: InviteDto = {
   revokedAt: null,
 };
 
+const option = (key: string, name: string): RoleOption => ({
+  key,
+  name,
+  description: null,
+  isCrossOrg: false,
+});
+/** A City Lead's grantable roles in the org, in catalogue order, from /api/me/access. */
+const CITY_LEAD: StaticOrg = {
+  permissions: ['invites.send', 'roles.grant'],
+  grantableRoles: [
+    option('event-lead', 'Event Lead'),
+    option('create-lead', 'Create Lead'),
+    option('communications-lead', 'Communications Lead'),
+    option('volunteer', 'Volunteer'),
+    option('product-engineer', 'Product Engineer'),
+    option('attendee', 'Attendee'),
+  ],
+};
+
 function setup(
   sendInvite: (r: SendInviteRequest) => Observable<InviteDto>,
-  roles: Role[] = ['CityLead'],
+  caller: StaticOrg = CITY_LEAD,
 ) {
   const ref = { close: vi.fn(), disableClose: false };
   const service = { sendInvite: vi.fn(sendInvite) };
@@ -35,7 +55,7 @@ function setup(
     providers: [
       { provide: DialogRef, useValue: ref },
       { provide: INVITES_SERVICE, useValue: service },
-      { provide: AUTH_SERVICE, useValue: { roles: signal(roles) } },
+      provideStaticAccess(caller),
     ],
   });
   const fixture = TestBed.createComponent(SendInviteDialog);
@@ -81,25 +101,25 @@ describe('SendInviteDialog', () => {
     expect(host.querySelector('select')!.disabled).toBe(false);
   });
 
-  it('offers only the roles a City Lead may grant', () => {
+  it('offers only the roles the sender may grant in the org', () => {
     const { host } = setup(() => of(sent));
     const options = Array.from(host.querySelectorAll('select option')).map((o) =>
       o.textContent!.trim(),
     );
     expect(options).toEqual([
       'No role',
-      'Attendee',
-      'Volunteer',
-      'Product Engineer',
       'Event Lead',
       'Create Lead',
       'Communications Lead',
+      'Volunteer',
+      'Product Engineer',
+      'Attendee',
     ]);
     expect(host.textContent).toContain('The invite link lasts 14 days.');
   });
 
   it('has no role choice for a lead who may not grant roles', () => {
-    const { host } = setup(() => of(sent), ['EventLead']);
+    const { host } = setup(() => of(sent), { permissions: ['invites.send'] });
     expect(host.querySelector('select')).toBeNull();
   });
 
@@ -114,12 +134,12 @@ describe('SendInviteDialog', () => {
   it('sends the email, role and note and closes with the invite', async () => {
     const { ref, service, set, send } = setup(() => of(sent));
     set('input[type="email"]', ' nate.oyelaran@example.org ');
-    set('select', 'ProductEngineer', 'change');
+    set('select', 'product-engineer', 'change');
     set('textarea', 'Loved your demo at Builders Night!');
     await send();
     expect(service.sendInvite).toHaveBeenCalledWith({
       email: 'nate.oyelaran@example.org',
-      preassignedRole: 'ProductEngineer',
+      preassignedRole: 'product-engineer',
       note: 'Loved your demo at Builders Night!',
     });
     expect(ref.close).toHaveBeenCalledWith(sent);

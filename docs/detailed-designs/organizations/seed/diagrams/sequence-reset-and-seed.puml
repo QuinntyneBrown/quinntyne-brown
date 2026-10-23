@@ -1,0 +1,40 @@
+@startuml
+title UML sequence behaviour — Reset and seed
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Operator" as op
+box "Backend — QuinntyneBrown.Community.Cli" #D1FADF
+  participant "ResetCommand / SeedCommand" as cli
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  participant "CommunitySeeder" as seeder
+  participant "OrganizationSeed" as os
+  database "Community database" as db
+end box
+op -> cli : reset
+cli -> db : Drop database; apply squashed initial migration
+op -> cli : seed
+cli -> seeder : SeedAsync
+seeder -> os : EnsureAsync
+os -> db : Portfolio "Quinntyne Brown" (fixed id) if missing
+os -> db : Org Types FaithTech City, Startup; features; Member bundle notes.create
+os -> db : Catalogue roles with bundles and CanGrant (by key, fixed ids)
+os -> db : Orgs FaithTech Toronto, Shelfie
+os -> db : Cross-org roles Portfolio, Staff
+seeder -> db : OpenIddict web client, SystemAdminRoster, starter resources (Org-wide, FaithTech Toronto)
+seeder -> db : SaveChanges
+note over os, db : Every insert checks the fixed id first;\na second run adds nothing (L2-157 #2)
+cli --> op : Done (L2-157 #1)
+@enduml

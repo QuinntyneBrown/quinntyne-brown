@@ -26,7 +26,7 @@ public class FindDuplicateContactTests(CommunityApiFactory factory) : IClassFixt
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var nadia = await factory.CreateContactAsync(grace, "Nadia Petrov", "nadia@kestrel.example", notes: "Studio director.", organization: "Kestrel Labs");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).GetAsync(Url("  NADIA@Kestrel.Example "));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).GetAsync(Url("  NADIA@Kestrel.Example "));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var match = (await response.Content.ReadFromJsonAsync<DuplicateContact>())!;
@@ -40,7 +40,7 @@ public class FindDuplicateContactTests(CommunityApiFactory factory) : IClassFixt
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var ben = await factory.CreateContactAsync(grace, "Ben Carter", "ben@archived.example");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         await client.PostAsync($"/api/contacts/{ben.Id}/archive", null);
 
         var match = await client.GetFromJsonAsync<DuplicateContact>(Url("ben@archived.example"));
@@ -54,7 +54,7 @@ public class FindDuplicateContactTests(CommunityApiFactory factory) : IClassFixt
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         await factory.CreateContactAsync(grace, "Ben Carter", "ben@elsewhere.example");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).GetAsync(Url("nobody@nowhere.example"));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).GetAsync(Url("nobody@nowhere.example"));
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
@@ -64,7 +64,7 @@ public class FindDuplicateContactTests(CommunityApiFactory factory) : IClassFixt
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).GetAsync(Url("   "));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).GetAsync(Url("   "));
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
@@ -74,7 +74,7 @@ public class FindDuplicateContactTests(CommunityApiFactory factory) : IClassFixt
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var tomas = await factory.CreateContactAsync(grace, "Tomás Ruiz", "tomas@edit.example");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var self = await client.GetAsync(Url("tomas@edit.example", tomas.Id));
         var second = await factory.CreateContactAsync(grace, "Tomás R.", "tomas@edit.example");
@@ -92,7 +92,7 @@ public class FindDuplicateContactTests(CommunityApiFactory factory) : IClassFixt
         factory.Time.Advance(TimeSpan.FromDays(1));
         await factory.CreateContactAsync(grace, "Abby B.", "abby@several.example");
 
-        var match = await factory.ClientFor(grace, Role.CityLead).GetFromJsonAsync<DuplicateContact>(Url("abby@several.example"));
+        var match = await factory.ClientFor(grace, SeededRole.CityLead).GetFromJsonAsync<DuplicateContact>(Url("abby@several.example"));
 
         Assert.Equal(first.Id, match!.Id);
     }
@@ -104,7 +104,7 @@ public class FindDuplicateContactTests(CommunityApiFactory factory) : IClassFixt
         await factory.CreateContactAsync(marcus, "Kwame Asante", "kwame@private.example");
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).GetAsync(Url("kwame@private.example"));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).GetAsync(Url("kwame@private.example"));
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.Empty(await response.Content.ReadAsByteArrayAsync());
@@ -116,7 +116,7 @@ public class FindDuplicateContactTests(CommunityApiFactory factory) : IClassFixt
         var marcus = await factory.AddMemberAsync("Marcus Lee");
         await factory.CreateContactAsync(marcus, "Kwame Asante", "kwame@admin-check.example");
         var priya = await factory.AddMemberAsync("Priya Shah");
-        var admin = factory.ClientFor(priya, Role.SystemAdmin);
+        var admin = factory.ClientFor(priya, SeededRole.SystemAdmin);
 
         var another = await admin.GetAsync(Url("kwame@admin-check.example"));
         var created = await admin.PostAsJsonAsync("/api/contacts", NewContact("Lena Fischer", "lena@admin-check.example"));
@@ -137,11 +137,11 @@ public class FindDuplicateContactTests(CommunityApiFactory factory) : IClassFixt
 
     [Theory]
     [InlineData]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.Volunteer)]
-    [InlineData(Role.ProductEngineer)]
-    [InlineData(Role.Attendee)]
-    public async Task Given_a_member_who_cannot_hold_contacts_when_they_check_then_the_answer_is_403(params Role[] roles)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.Volunteer)]
+    [InlineData(SeededRole.ProductEngineer)]
+    [InlineData(SeededRole.Attendee)]
+    public async Task Given_a_member_who_cannot_hold_contacts_when_they_check_then_the_answer_is_403(params SeededRole[] roles)
     {
         var member = await factory.AddMemberAsync("Daniel Reyes");
 

@@ -26,6 +26,14 @@ Other features create notifications through one Application service, so every so
 
 Server push for the unread count is deferred (ADR 0016).
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Notification` gains a nullable `OrganizationId`, set when org activity raises it; `NotificationDto` gains `organization: { id, slug, name } | null`, shown as a label in the bell and on the notifications page (`L2-152` AC1). Preferences stay per person.
+- `WorkspaceOwnerLostCityLead` is replaced by `WorkspaceNeedsNewOwner`, sent to the org's Org Leads and the Portfolio Lead instead of every System Admin (`L2-146` AC4). New kinds: `AddedToOrg` (`L2-143` AC1) and role changes carry the org.
+- Opening a notification navigates to `/o/{orgSlug}/…` of its org.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

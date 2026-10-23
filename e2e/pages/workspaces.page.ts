@@ -35,9 +35,14 @@ export class WorkspacesPage {
     return this.items.filter({ has: this.page.getByRole('link', { name, exact: true }) });
   }
 
+  /** The org a workspace belongs to, shown under "All orgs" (ft-org-label). */
+  orgLabel(name: string): Locator {
+    return this.item(name).locator('ft-org-label');
+  }
+
   /** The "Owner" badge on a workspace the caller owns. */
   ownerBadge(name: string): Locator {
-    return this.item(name).locator('ft-badge');
+    return this.item(name).locator('ft-badge', { hasText: 'Owner' });
   }
 
   restore(name: string): Locator {

@@ -1,0 +1,46 @@
+@startuml
+title UML sequence behaviour — Add a cross-org holder to a workspace
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Workspace owner" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "Add workspace member dialog" as dlg
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "WorkspacesEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "WorkspaceMembersHandler" as h
+  participant "AccessResolver" as res
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> dlg : Search people
+dlg -> ep : GET /api/workspaces/{id}/eligible-members?q=
+ep -> h : Eligible people in workspace's org
+h -> db : Members with workspaces.join ∪ covering CanJoinWork holders\n(ProfileVisibility applied)
+h --> dlg : 200 people, cross-org ones marked (L2-146 #2)
+actor -> dlg : Add holder
+dlg -> ep : POST /api/workspaces/{id}/members { profileId }
+ep -> h : AddMember
+h -> res : Target's access in workspace org
+alt member with workspaces.join, or covering role with CanJoinWork
+  h -> db : INSERT WorkspaceMember (Member level)
+  h --> dlg : 201 (L2-138 #5)
+else not eligible
+  h --> dlg : 400 (L2-138 #5, L2-146 #2)
+end
+@enduml

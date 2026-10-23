@@ -1,0 +1,62 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Branding and public pages
+class Organization {
+  +string DisplayName
+  +string? LogoBlobName
+  +string? AccentColour
+  +SetBranding(displayName: string, accent: string?): void
+  +SetLogo(blobName: string?): void
+}
+class AccentContrast <<static>> {
+  +{static} Ratio(a: string, b: string): double
+  +{static} Foreground(accent: string): string
+  +{static} MinimumRatio: double = 4.5
+}
+class SaveBrandingHandler {
+  +HandleAsync(orgId: Guid, req: BrandingRequest): Task<Result<BrandingDto>>
+}
+class OrgLogoHandler {
+  +UploadAsync(orgId: Guid, file: Stream, contentType: string): Task<Result<BrandingDto>>
+  +RemoveAsync(orgId: Guid): Task<Result>
+}
+class BrandingRequest {
+  +string DisplayName
+  +string? Accent
+}
+class BrandingDto {
+  +string DisplayName
+  +string? LogoUrl
+  +string? Accent
+  +string? AccentForeground
+  +double? ContrastRatio
+}
+class PublicEventDto {
+  +Guid Id
+  +string Title
+  +PublicOrgDto Organization
+}
+class PublicOrgDto {
+  +string Slug
+  +string[] Aliases
+  +string DisplayName
+  +string? LogoUrl
+  +string? Accent
+  +string? AccentForeground
+}
+SaveBrandingHandler ..> AccentContrast
+SaveBrandingHandler --> Organization
+OrgLogoHandler --> Organization
+SaveBrandingHandler ..> BrandingRequest
+SaveBrandingHandler ..> BrandingDto
+PublicEventDto --> PublicOrgDto
+@enduml

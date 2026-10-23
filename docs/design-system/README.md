@@ -31,11 +31,15 @@ The mocks were styled with the Shelfie design system unchanged plus FaithTech ad
 | [Form field](components/form-field.html) | Label, help, error wrapper. |
 | [Text field](components/text-field.html) | Text, email, password, search, input group. |
 | [Copy field](components/copy-field.html) | Read-only value with a Copy button and a Copied state. |
+| [Token reveal](components/token-reveal.html) | A new agent token, shown once, with copy. |
 | [Textarea](components/textarea.html) | Bios, notes, announcement body. |
 | [Select](components/select.html) | Native select for roles, cities, event types. |
 | [Radio group](components/radio-group.html) | Choice rows with descriptions. |
 | [Checkbox group](components/checkbox-group.html) | Several choices: member and story pickers. |
 | [Switch](components/switch.html) | Notification and email preferences. |
+| [Colour field](components/colour-field.html) | Org accent with a live contrast check; invalid below 4.5:1. |
+| [Permission checklist](components/permission-checklist.html) | Permission codes grouped by feature; hidden features noted. |
+| [Scope picker](components/scope-picker.html) | Cross-org role scope: portfolio, an Org Type or chosen orgs. |
 | [Form layout](components/form-layout.html) | Actions bar, error summary, danger zone. |
 | [Picture list](components/picture-list.html) | Profile and contact photos: up to 10, one featured, alt text. |
 | [Photo gallery](components/photo-gallery.html) | Saved photos with descriptions; Feature, Edit description and Delete open dialogs. |
@@ -47,6 +51,7 @@ The mocks were styled with the Shelfie design system unchanged plus FaithTech ad
 | [Estimate card picker](components/sticker-picker.html) | Planning poker vote cards. |
 | [Emoji picker](components/emoji-picker.html) | Page and callout icon (`ft-emoji-picker`): a radio group of 16 named emoji, with an optional "No icon". |
 | [Top bar](components/top-bar.html) | App header with nav, search, bell and avatar. |
+| [Org switcher](components/org-switcher.html) | Active org in the top bar; covered orgs and All orgs. |
 | [Tab bar](components/tab-bar.html) | Phone navigation. |
 | [Tabs](components/tabs.html) | Section tabs and in-page tab panels. |
 | [Breadcrumb](components/breadcrumb.html) | Two and three levels. |
@@ -60,6 +65,7 @@ The mocks were styled with the Shelfie design system unchanged plus FaithTech ad
 | [Description list](components/description-list.html) | Profile and contact facts. |
 | [Activity feed](components/feed.html) | Activity on contacts, and typed partner activity. |
 | [Backlog tree](components/tree.html) | Initiatives, epics, stories, tasks. |
+| [Role tree](components/role-tree.html) | Catalogue roles in order, display-only nesting, keyboard reorder. |
 | [Kanban board](components/kanban.html) | Partner pipeline and team board. |
 | [Event card](components/event-card.html) | Date badge, title, meta, cancelled. |
 | [Person card](components/person-card.html) | Cover band, round photo or initials, name and status, View profile link, dismiss; 1/2/4-column person grid. |
@@ -76,6 +82,8 @@ The mocks were styled with the Shelfie design system unchanged plus FaithTech ad
 | [QR code](components/qr-code.html) | Dark modules on a light plate in both themes, quiet zone, alt text required. |
 | [Logo mark](components/logo-mark.html) | FaithTech mark on auth screens. |
 | [Badge](components/badge.html) | Roles, status, counts. |
+| [Agent badge](components/agent-badge.html) | The Agent variant of Badge. |
+| [Org label and mark](components/org-label.html) | Which org a row belongs to; the org’s logo or initials. |
 | [Chip](components/chip.html) | Filter toggles. |
 | [Stat](components/stat.html) | Label, value and context line. |
 | [Estimate card](components/sticker.html) | Revealed planning poker votes. |
@@ -110,13 +118,14 @@ Each component page documents variants, sizes and the full state matrix in both 
 ## Tokens
 
 - `tokens/tokens.css` — source of truth: primitives, semantic tokens, light and dark themes.
-- `tokens/tokens.json` — DTCG export generated from `tokens.css` (330 tokens).
+- `tokens/tokens.json` — DTCG export generated from `tokens.css` (361 tokens, including the scoped org accent pair).
 - `tokens/neutral-accent.css` — the neutral accent scope (`data-accent="neutral"`): accent, link and focus roles become greys for pages that must not carry the brand. Loaded after `tokens.css`; not part of `tokens.json`, which exports themes, not scopes.
 - `tokens/contrast-pairs.json` — every fg/bg pair the components rely on, checked in both themes.
 - `assets/components.css` — the component stylesheet, token-driven, with `data-state` hooks for documentation.
 
 ## Changelog
 
+- 2026-10-23 — Organization hierarchy (L1-025, `L2-134` to `L2-157`, ADRs 0033 to 0041). New tokens `--color-org-accent` and `--color-org-accent-foreground`: a scoped pair that defaults to the brand accent (`--color-accent` with `--color-fg-on-accent`) and is overridden only on the element an org's branding scopes (the shell header and strip, the switcher's marks, org labels, the public event band), never on `:root`. **AA rule:** the server picks the foreground (white or `#111111`, whichever contrasts more) and refuses to save an accent below 4.5:1, so every pair the tokens can hold passes WCAG 2.2 AA 1.4.3; the accent is only ever a fill behind its foreground ([Theming](foundations/theming.html#org-accent), [Color](foundations/color.html)). The pair is re-declared in each theme block so nested `[data-theme]` scopes recompute it. New components: [Org switcher](components/org-switcher.html) (`ft-org-switcher`), [Org label and mark](components/org-label.html) (`ft-org-label`, `ft-org-mark`), [Agent badge](components/agent-badge.html) (`ft-badge variant="agent"`), [Permission checklist](components/permission-checklist.html) (`ft-permission-checklist`), [Scope picker](components/scope-picker.html) (`ft-scope-picker`), [Role tree](components/role-tree.html) (`ft-role-tree`), [Colour field](components/colour-field.html) (`ft-colour-field`) and [Token reveal](components/token-reveal.html) (`ft-token-reveal`), with their rules in the "Organizations" section of `components.css` (plus `.org-strip`, `.org-band` and the top bar's scrolling nav when a switcher is present). Four contrast pairs added (org accent pair, org label, Agent badge, token reveal), all passing. `tokens.json` regenerated (it also picks up the GitHub button tokens it had been missing).
 - 2026-10-22 — Built Dynamics components documented: [Switch](components/switch.html) gains a description caption joined with `aria-describedby` (`.switch__description`; `ft-switch` `description`, used for "Check them in now"); [Radio group](components/radio-group.html) inline rows use the new `.choice-row` (`--space-4` between choices, `--space-2` between wrapped lines; `ft-radio-group orientation="inline"`), replacing `.cluster--tight`; [Text field](components/text-field.html) documents the `maxlength` counter ("176 characters left"); [Alert](components/alert.html) documents `polite` (a danger record-state alert as `role="status"`) and the merge failure "Partners not merged" with the server's reason; [Layout](components/layout.html) the page header's focusable title (`tabindex="-1"`, `focusTitle()`); [Chip](components/chip.html) and the Report pattern the filter bar's end slot (`.filter-bar__end`, `ftFilterBarEnd`). Copy aligned with the built screens on [Toast](components/toast.html) (walk-in, Not the same, merged and restored toasts), [Activity feed](components/feed.html) and [Dialog](components/dialog.html) (merge intro, counters, walk-in description). Two new CSS rules (`.choice-row`, `.filter-bar__end`) and one modifier (`.switch__description`); no new tokens, contrast unchanged at 210 pairs.
 - 2026-10-22 — Restore, not-open and export states (mocks commit b1039f84): the check-in switch is named as an action, "Check in {name}" ([Switch](components/switch.html), [List](components/list.html)); [Button](components/button.html) documents a busy page action (Export CSV while exporting) and a disabled action whose reason an alert gives (Add walk-in before check-in opens); [Alert](components/alert.html) adds title-only record-state alerts (check-in not open, unknown Reports filter); [Dialog](components/dialog.html) adds the restore-partner confirm; [Activity feed](components/feed.html) the Restored entry; [Toast](components/toast.html) the restored and export-failed toasts. No new tokens or CSS.
 - 2026-10-22 — Dynamics drift resolved: the Phase 1 mocks fixed every row logged for the Dynamics screens, so they leave the drift table. Reports use `.progress-chart` with `aria-hidden` tracks (no inline `min-width`, no full bar announced as "186 of 412"), card titles no longer repeat `.card--flush` padding, `manifest.json` carries L2-123 to L2-129, and five context-line stats per row stay the rule; `event-check-in/done` takes `.progress--complete`; the possible-duplicate alerts on `partner/duplicate` and `contact-form/possible-duplicate` carry their icon and `role="status"`; `dialogs/merge-partners` stacks each field's `.choice` radios. Documented the new states: [Progress](components/progress.html) complete attendance meter and the one-city chart (`reports/city`); [Alert](components/alert.html) record-state alerts (archived partner, Staff read-only check-in, cancelled event, danger with `role="status"` at load) and the merge conflict; [Radio group](components/radio-group.html) value-per-field and inline short-choice rows; [List](components/list.html) walk-in, disabled and save-failed check-in rows plus the event attendance list; [Switch](components/switch.html) disabled for Staff and cancelled events, revert on a failed save; [Toast](components/toast.html) Undo, the danger Try again and "Not the same"; [Kanban board](components/kanban.html) the "Next: …" line; [Activity feed](components/feed.html) Merged entries, "· from {other}" markers, the filtered caption and the archived record; [Stat](components/stat.html) context-line formulas; the log-activity counters, date and next-step due date and the merge conflict on [Dialog](components/dialog.html); the event-check-in forbidden and cancelled states (empty and error states pattern); and five icons on [Iconography](foundations/iconography.html) (Reports, Check-in, Add walk-in, Merge, Call). No new tokens, no component CSS changes; the contrast check is unchanged at 210 pairs. Five small new drifts are logged below.
@@ -220,6 +229,16 @@ The marketing page mocks (`docs/mocks/pages/marketing`) added the [landing hero]
 
 
 ## Verification
+
+Run on 2026-10-23 after the organization hierarchy mocks and components:
+
+```sh
+python .claude/skills/writing-html-mocks/scripts/check_mocks.py docs/mocks            # 129 screens, 752 mocks; the only errors are the 19 pre-existing broken résumé links on pages/marketing
+python .claude/skills/extracting-design-systems/scripts/check_contrast.py docs/design-system/tokens/tokens.css   # 232 passed, 0 failed, 0 unresolved
+python .claude/skills/extracting-design-systems/scripts/check_design_system.py docs/design-system                 # 95 pages (73 components, 9 patterns), 0 errors, 0 warnings
+```
+
+No browser was available in this environment for screenshots; run `python .claude/skills/writing-html-mocks/scripts/screenshot_mocks.py docs/mocks --filter organization` (and `--filter org-`, `home/`, `agents`, `waiting`) and the design-system pages to review the new screens at 360, 768 and 1280 px in both themes.
 
 Run on 2026-10-22 after merging main (Docs & notes and the private-preview wall) into the Dynamics branch:
 

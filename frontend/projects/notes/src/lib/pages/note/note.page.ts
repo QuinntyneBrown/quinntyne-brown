@@ -12,13 +12,12 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  ACCESS_SERVICE,
   NOTES_SERVICE,
   NoteBlock,
   NoteConflict,
   NotePageDto,
   NotePageRef,
-  ROLE_LABELS,
-  Role,
 } from '@faithtech-community/api';
 import {
   BannerComponent,
@@ -94,6 +93,7 @@ type State = 'loading' | 'loaded' | 'missing' | 'error';
 })
 export class NotePage {
   private readonly notes = inject(NOTES_SERVICE);
+  private readonly access = inject(ACCESS_SERVICE);
   private readonly toasts = inject(ToastService);
   private readonly dialogs = inject(DialogService);
   private readonly router = inject(Router);
@@ -140,7 +140,7 @@ export class NotePage {
     const via =
       p.sharedVia === 'you'
         ? 'you'
-        : `everyone who has the ${ROLE_LABELS[p.sharedVia as Role] ?? p.sharedVia} role`;
+        : `everyone who has the ${this.access.roleName(p.sharedVia, p.organization?.slug)} role`;
     return `${p.ownerName} shared this with ${via}. You can read it, but only ${p.ownerName} can change it.`;
   });
   /** Pages the viewer may open by id: the API's link targets plus every "[[" suggestion seen since. */
@@ -250,9 +250,11 @@ export class NotePage {
           text:
             shared.visibility === 'Private'
               ? 'Only you can see it now.'
-              : shared.visibility === 'Global'
-                ? 'Every signed-in member can find it now.'
-                : 'The people you chose can read it now.',
+              : shared.visibility === 'OrgWide'
+                ? 'Everyone in the organization can find it now.'
+                : shared.visibility === 'PortfolioWide'
+                  ? 'Everyone in the portfolio can find it now.'
+                  : 'The people you chose can read it now.',
         });
       });
   }

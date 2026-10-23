@@ -1,14 +1,14 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Role } from '../shared';
-
 export type InviteStatus = 'Pending' | 'Accepted' | 'Expired' | 'Revoked';
 
 export interface InviteDto {
   id: string;
   email: string;
-  preassignedRole: Role | null;
+  /** The catalogue role's key, and its name to show. */
+  preassignedRole: string | null;
+  preassignedRoleName?: string | null;
   status: InviteStatus;
   invitedByName: string;
   createdAt: string;
@@ -27,7 +27,8 @@ export interface InvitePage {
 
 export interface SendInviteRequest {
   email: string;
-  preassignedRole?: Role | null;
+  /** A catalogue role key the caller may grant in the org. */
+  preassignedRole?: string | null;
   /** Optional personal note, up to 500 characters. */
   note?: string | null;
 }
@@ -38,7 +39,10 @@ export interface InviteLookupDto {
   email: string;
   inviterName: string;
   inviterCity: string | null;
-  preassignedRole: Role | null;
+  preassignedRole: string | null;
+  preassignedRoleName?: string | null;
+  /** The org the invite joins. */
+  organizationName?: string | null;
   /** An account already uses the invited email, so the invitee signs in to accept. */
   hasAccount: boolean;
 }

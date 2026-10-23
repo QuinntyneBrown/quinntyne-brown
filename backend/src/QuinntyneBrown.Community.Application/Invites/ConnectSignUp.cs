@@ -25,7 +25,7 @@ public class ConnectSignUpValidator : AbstractValidator<ConnectSignUpCommand>
 public record ConnectRequest(string? Token);
 
 /// <summary>What the signed-in member's connect page shows (L2-082 AC4, AC5; L2-084 AC6).</summary>
-public record ConnectResultDto(string Outcome, string LeadName);
+public record ConnectResultDto(string Outcome, string LeadName, string? OrganizationName = null);
 
 /// <summary>Signs up through a connect link, or connects a signed-in member (L2-082, L2-083).</summary>
 public class ConnectHandler(
@@ -45,16 +45,18 @@ public class ConnectHandler(
         }
 
         var profileId = await db.Users.Where(u => u.Id == current.UserId).Select(u => u.ProfileId).SingleAsync(cancellationToken);
-        var outcome = await connector.RequestAsync(lead.LeadProfileId, profileId, cancellationToken);
-        return (Result.Ok(), new ConnectResultDto(outcome.ToString(), lead.LeadName));
+        var outcome = await connector.RequestAsync(lead.OrganizationId, lead.LeadProfileId, profileId, cancellationToken);
+        return (Result.Ok(), new ConnectResultDto(outcome.ToString(), lead.LeadName, lead.OrganizationName));
     }
 
     public async Task<Result> SignUpAsync(ConnectSignUpCommand command, CancellationToken cancellationToken = default)
     {
-        if (await links.FindOwnerAsync(command.Token!, cancellationToken) is not { } leadId)
+        if (await links.FindOwnerAsync(command.Token!, cancellationToken) is not { } found)
         {
             return Result.NotFound();
         }
+
+        var (leadId, orgId) = found;
 
         var user = await signUp.CreateAsync(new SignUpCommand(command.Name, command.Email, command.Password), cancellationToken);
 
@@ -62,7 +64,7 @@ public class ConnectHandler(
         // A new account waits for its email to be verified before the lead's contact is made (AC3, AC4).
         if (user is not null)
         {
-            db.PendingConnections.Add(new Domain.Contacts.PendingConnection(user.ProfileId, leadId, time.GetUtcNow()));
+            db.PendingConnections.Add(new Domain.Contacts.PendingConnection(orgId, user.ProfileId, leadId, time.GetUtcNow()));
             await db.SaveChangesAsync(cancellationToken);
         }
 

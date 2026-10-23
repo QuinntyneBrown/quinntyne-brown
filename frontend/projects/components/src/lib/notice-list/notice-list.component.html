@@ -9,7 +9,12 @@
             notice.linkText
           }}</ft-link>
         }
-        <div class="ft-notice__meta">{{ notice.meta }}{{ notice.unread ? ' · Unread' : '' }}</div>
+        <div class="ft-notice__meta">
+          {{ notice.meta }}{{ notice.unread ? ' · Unread' : '' }}
+          @if (notice.org) {
+            <ft-org-label [name]="notice.org" />
+          }
+        </div>
       </div>
     </li>
   }

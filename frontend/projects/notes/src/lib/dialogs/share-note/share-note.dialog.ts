@@ -2,12 +2,10 @@ import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import {
-  NOTE_SHAREABLE_ROLES,
+  ACCESS_SERVICE,
   NOTES_SERVICE,
   NotePageDto,
   NoteVisibility,
-  ROLE_LABELS,
-  Role,
 } from '@faithtech-community/api';
 import {
   AlertComponent,
@@ -51,16 +49,28 @@ export class ShareNoteDialog {
   protected readonly ref = inject<DialogRef<NotePageDto>>(DialogRef);
   protected readonly page = inject<NotePageDto>(DIALOG_DATA);
   private readonly notes = inject(NOTES_SERVICE);
+  private readonly access = inject(ACCESS_SERVICE);
 
   protected readonly title = titleOf(this.page);
-  protected readonly roles = NOTE_SHAREABLE_ROLES.map((r) => ({ value: r, label: ROLE_LABELS[r] }));
+  private readonly org =
+    this.access.orgs().find((o) => o.slug === this.page.organization?.slug) ??
+    this.access.homeOrg();
+  /** "Everyone in FaithTech Toronto", the Org-wide choice (ADR 0039). */
+  protected readonly orgName = this.org?.branding.displayName ?? 'this organization';
+  /** Only the Portfolio Lead, or a System Admin, publishes to the whole portfolio (L2-148 AC4). */
+  protected readonly mayPublishPortfolioWide =
+    this.access.isSystemAdmin() || !!this.org?.isPortfolioLead;
+  /** The page's org's roles and the cross-org roles covering it (ADR 0039). */
+  protected readonly roles = this.access
+    .shareRoles(this.page.organization?.slug)
+    .map((r) => ({ value: r.key, label: r.name }));
   protected readonly form = new FormGroup({
     visibility: new FormControl<NoteVisibility>(this.page.visibility, { nonNullable: true }),
     members: new FormControl<PersonOption[]>(
       this.page.audience.members.map((m) => ({ id: m.id, name: m.name, detail: m.city ?? '' })),
       { nonNullable: true },
     ),
-    roles: new FormControl<Role[]>(
+    roles: new FormControl<string[]>(
       this.page.audience.roles.map((r) => r.role),
       { nonNullable: true },
     ),
@@ -86,9 +96,7 @@ export class ShareNoteDialog {
         members.map((m) => ({
           id: m.id,
           name: m.name,
-          detail: [m.roles.map((r) => ROLE_LABELS[r]).join(', '), m.city]
-            .filter(Boolean)
-            .join(' · '),
+          detail: [m.roles.join(', '), m.city].filter(Boolean).join(' · '),
         })),
       );
     } catch {

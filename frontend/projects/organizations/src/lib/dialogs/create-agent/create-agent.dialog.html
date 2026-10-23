@@ -1,0 +1,32 @@
+<ft-dialog
+  heading="New agent"
+  description="An AI helper with its own profile that acts as a member."
+  [busy]="busy()"
+  (closed)="ref.close()"
+>
+  <form (submit)="$event.preventDefault(); create()">
+    <ft-stack>
+      @if (failed()) {
+        <ft-alert status="danger" heading="Agent not created">
+          We couldn’t reach Quinntyne Brown. Nothing was changed — try again.
+        </ft-alert>
+      }
+      <ft-form-field
+        required
+        label="Name"
+        help="Shown wherever it acts, with an Agent badge."
+        [error]="error()"
+      >
+        <ft-text-field [formControl]="name" initialFocus [readonly]="busy()" />
+      </ft-form-field>
+      <p>
+        Agents have no password or email and can’t sign in with Google or GitHub. You give it roles
+        through an org’s members or a cross-org role, then issue it tokens.
+      </p>
+    </ft-stack>
+  </form>
+  <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+  <ft-button ftDialogFooter variant="primary" [loading]="busy()" (click)="create()">
+    Create agent
+  </ft-button>
+</ft-dialog>

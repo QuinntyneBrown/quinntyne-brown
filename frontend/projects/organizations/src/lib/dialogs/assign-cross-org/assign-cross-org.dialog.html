@@ -1,0 +1,26 @@
+<ft-dialog
+  [heading]="'Assign ' + data.role.name"
+  [description]="data.scope + '. Recorded in the audit log.'"
+  [busy]="busy()"
+  (closed)="ref.close()"
+>
+  <ft-stack>
+    @if (refusal(); as message) {
+      <ft-alert status="danger" [heading]="data.role.name + ' not assigned'">{{
+        message
+      }}</ft-alert>
+    }
+    <ft-form-field
+      required
+      label="Person"
+      help="Anyone in the portfolio. They don’t need to be a member of the orgs."
+      [error]="error()"
+    >
+      <ft-select [formControl]="person" [options]="people()" placeholder="Choose a person" />
+    </ft-form-field>
+  </ft-stack>
+  <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+  <ft-button ftDialogFooter variant="primary" [loading]="busy()" (click)="assign()">
+    Assign {{ data.role.name }}
+  </ft-button>
+</ft-dialog>

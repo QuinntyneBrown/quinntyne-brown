@@ -15,7 +15,6 @@ public class NotesSearchSource(IApplicationDbContext db, IFullTextSearch text, N
 
     public async Task<IReadOnlyList<SearchResultItem>> SearchAsync(string term, Guid caller, int limit, CancellationToken cancellationToken = default)
     {
-        var roles = access.Roles;
         var rows = await text
             .Match(access.Visible(db.NotePages.AsNoTracking(), caller), term, ListNotesHandler.Document)
             .Take(limit)
@@ -29,7 +28,9 @@ public class NotesSearchSource(IApplicationDbContext db, IFullTextSearch text, N
                 p.OwnerId,
                 p.UpdatedAt,
                 Owner = db.Profiles.Where(x => x.Id == p.OwnerId).Select(x => x.Name).FirstOrDefault(),
-                SharedWithCaller = p.SharedMembers.Any(m => m.ProfileId == caller) || p.SharedRoles.Any(x => roles.Contains(x.Role)),
+                SharedWithCaller = p.SharedMembers.Any(m => m.ProfileId == caller),
+                SharedRoleIds = p.SharedRoles.Select(x => x.RoleId).ToList(),
+                p.OrganizationId,
             })
             .ToListAsync(cancellationToken);
         return [.. rows.Select(r => new SearchResultItem(
@@ -40,7 +41,7 @@ public class NotesSearchSource(IApplicationDbContext db, IFullTextSearch text, N
             Badge: r.Visibility switch
             {
                 NoteVisibility.Private => "Private",
-                NoteVisibility.Shared when r.OwnerId != caller && r.SharedWithCaller => "Shared with you",
+                NoteVisibility.Shared when r.OwnerId != caller && (r.SharedWithCaller || access.HoldsAny(r.OrganizationId, r.SharedRoleIds)) => "Shared with you",
                 NoteVisibility.Shared => "Shared",
                 _ => null,
             }))];

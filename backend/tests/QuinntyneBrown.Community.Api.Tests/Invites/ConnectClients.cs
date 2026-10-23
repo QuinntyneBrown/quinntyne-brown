@@ -14,7 +14,7 @@ public static partial class ConnectClients
     public record LookupBody(Guid LeadProfileId, string LeadName, string? LeadPhotoUrl, string? LeadCity, string LeadRole);
 
     /// <summary>A City Lead's link as "My QR code" shows it; issues one on first use.</summary>
-    public static async Task<string> ConnectTokenOfAsync(this CommunityApiFactory factory, ProfileClients.Member lead, Role role = Role.CityLead)
+    public static async Task<string> ConnectTokenOfAsync(this CommunityApiFactory factory, ProfileClients.Member lead, SeededRole role = SeededRole.CityLead)
     {
         var link = await factory.ClientFor(lead, role).GetFromJsonAsync<LinkBody>("/api/connect/link");
         return TokenFrom(link!.Url);

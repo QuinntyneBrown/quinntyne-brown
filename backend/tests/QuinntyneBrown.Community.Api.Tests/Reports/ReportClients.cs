@@ -40,12 +40,15 @@ public static class ReportClients
     public sealed record EventRow(
         Guid Id, string Title, DateTimeOffset StartsAt, string City, string Status, int? Going, int? CheckedIn, int? CheckedInPercent);
 
+    public sealed record ReportOrg(Guid Id, string Slug, string Name);
+
     public sealed record Report(
         string? City,
         string Period,
         DateTimeOffset? From,
         DateTimeOffset To,
         string[] Cities,
+        ReportOrg[] Organizations,
         bool IsEmpty,
         Figures Figures,
         ChartRow[] MembersByCity,
@@ -63,7 +66,7 @@ public static class ReportClients
     }
 
     /// <summary>A Staff member to read the report as: a verified member with no home city, so counted under "Other".</summary>
-    public static async Task<HttpClient> StaffAsync(this CommunityApiFactory factory, Role role = Role.Staff) =>
+    public static async Task<HttpClient> StaffAsync(this CommunityApiFactory factory, SeededRole role = SeededRole.Staff) =>
         factory.ClientFor(await factory.AddMemberAsync("Sam Staff"), role);
 
     public static async Task<Report> ReportAsync(this HttpClient client, string query = "")
@@ -103,6 +106,8 @@ public static class ReportClients
             };
             db.Profiles.Add(profile);
             db.Users.Add(user);
+            db.OrgMemberships.Add(new Domain.Organizations.OrgMembership(
+                Infrastructure.Persistence.HierarchySeed.TorontoId, profile.Id, Domain.Organizations.JoinedVia.Seed, DateTime.UtcNow));
             await db.SaveChangesAsync();
             return new ProfileClients.Member(user.Id, profile.Id);
         });
@@ -119,11 +124,12 @@ public static class ReportClients
         int rsvps = 0,
         int checkedIn = 0,
         int walkIns = 0,
-        bool cancelled = false) =>
+        bool cancelled = false,
+        Guid? organizationId = null) =>
         factory.WithDbAsync(async db =>
         {
             var e = new Event(
-                title, $"About {title}.", EventType.Gathering, startsAt, startsAt.AddHours(2), city, EventFormat.InPerson,
+                organizationId ?? Infrastructure.Persistence.HierarchySeed.TorontoId, title, $"About {title}.", EventType.Gathering, startsAt, startsAt.AddHours(2), city, EventFormat.InPerson,
                 "Kestrel Labs", null, null, EventVisibility.MembersOnly, Guid.NewGuid());
             var taken = new List<Rsvp>();
             for (var i = 0; i < rsvps; i++)
@@ -155,7 +161,7 @@ public static class ReportClients
         this CommunityApiFactory factory, string name, Guid? ownerId, PartnerStage stage = PartnerStage.Lead, Guid? mergedInto = null) =>
         factory.WithDbAsync(async db =>
         {
-            var partner = new Partner(name, null, null, ownerId, null, null, null, null, stage);
+            var partner = new Partner(Infrastructure.Persistence.HierarchySeed.TorontoId, name, null, null, ownerId, null, null, null, null, stage);
             if (mergedInto is { } kept)
             {
                 partner.ArchiveAsMergedInto(kept, Guid.NewGuid(), Now.UtcDateTime);
@@ -169,7 +175,7 @@ public static class ReportClients
     public static Task AddAnnouncementAsync(this CommunityApiFactory factory, Guid senderId, DateTimeOffset sentAt) =>
         factory.WithDbAsync(async db =>
         {
-            db.Announcements.Add(new Announcement("Builders Night", "See you there.", AnnouncementAudience.Everyone(), senderId, sentAt, false));
+            db.Announcements.Add(new Announcement(Infrastructure.Persistence.HierarchySeed.TorontoId, "Builders Night", "See you there.", AnnouncementAudience.Everyone(), senderId, sentAt, false));
             return await db.SaveChangesAsync();
         });
 
@@ -177,7 +183,7 @@ public static class ReportClients
     public static Task AddPrivateContactAsync(this CommunityApiFactory factory, Guid ownerId, string name, string email, string city) =>
         factory.WithDbAsync(async db =>
         {
-            var contact = new Contact(ownerId, name, email, "416-555-0100", "Kestrel Labs", city, Now.UtcDateTime);
+            var contact = new Contact(Infrastructure.Persistence.HierarchySeed.TorontoId, ownerId, name, email, "416-555-0100", "Kestrel Labs", city, Now.UtcDateTime);
             contact.AddNote("Met at Builders Night; wants to host.", Now.UtcDateTime);
             db.Contacts.Add(contact);
             return await db.SaveChangesAsync();

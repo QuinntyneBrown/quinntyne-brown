@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Role } from '../shared';
+import { OrgLabel } from '../shared';
 
 export type WorkspaceMethod = 'Scrum' | 'Kanban';
 
@@ -21,20 +21,36 @@ export interface WorkspaceSummaryDto {
   memberCount: number;
   /** Listed only to the owner and System Admin, so they can restore it. */
   isArchived: boolean;
-  /** The owner no longer holds City Lead; System Admin reassigns it (L2-037 AC2). */
+  /** The owner can no longer create workspaces in its org; an Org Lead reassigns it (L2-146 AC4). */
   needsNewOwner: boolean;
+  /** The org the workspace belongs to (L2-146). */
+  organization?: OrgLabel | null;
+}
+
+/** A work item assigned to the caller, for My work (L2-145 AC3). */
+export interface MyWorkItemDto {
+  id: string;
+  title: string;
+  kind: WorkItemKind;
+  status: WorkItemStatus;
+  workspaceId: string;
+  workspaceName: string;
+  organization: OrgLabel | null;
 }
 
 export interface WorkspaceMemberDto {
   profileId: string;
   name: string;
-  roles: Role[];
+  /** Role names, for display. */
+  roles: string[];
   isOwner: boolean;
   /** Stories and tasks assigned to them, which removing them unassigns (L2-031 AC8). */
   assignedStories: number;
   assignedTasks: number;
   /** The caller, as "(you)" in lists and left out of Planning Poker invites. */
   isYou: boolean;
+  /** Not a member of the workspace's org: here through a cross-org role (L2-146 AC2). */
+  isCrossOrg?: boolean;
 }
 
 export interface WorkspaceDto {
@@ -58,7 +74,10 @@ export interface WorkspaceDto {
 export interface MemberCandidateDto {
   profileId: string;
   name: string;
-  roles: Role[];
+  /** Role names, for display. */
+  roles: string[];
+  /** Eligible through a cross-org role that may join work, not as a member (L2-146 AC2). */
+  isCrossOrg?: boolean;
 }
 
 export type WorkItemKind = 'Initiative' | 'Epic' | 'Story' | 'Task';
@@ -299,6 +318,8 @@ export interface CreateWorkspaceRequest {
  */
 export interface AgileService {
   listWorkspaces(): Observable<WorkspaceSummaryDto[]>;
+  /** GET /api/work/mine: the caller's open work in the active org, or across "All orgs". */
+  myWork(): Observable<MyWorkItemDto[]>;
   /** City Lead or System Admin. 400 per field. */
   createWorkspace(request: CreateWorkspaceRequest): Observable<WorkspaceDto>;
   getWorkspace(id: string): Observable<WorkspaceDto>;

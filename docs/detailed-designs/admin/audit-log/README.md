@@ -18,6 +18,17 @@ This feature covers both writing entries, which other features trigger through `
 - **`ICurrentUser`** — supplies the caller's user id and roles; handlers resolve the actor's profile id from it.
 - **`CommunitySeeder.GrantSystemAdminAsync`** — writes the one entry made outside a request: the Cli `grant-admin` command's `role.granted`, with an empty actor id (shown as "System") and IP address `cli`.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `AuditEntry` gains nullable `OrganizationId` and `PortfolioId`. Platform actions such as suspending an account have neither.
+- `GET /api/audit-log` reads by coverage (`L2-153`): a System Admin reads everything, including entries with no org; the Portfolio Lead reads entries of its portfolios' orgs and portfolio-level entries; an Org Lead reads entries of the orgs they lead; anyone else answers `403`. An optional `org` query parameter (a slug) narrows the list; a slug outside the caller's scope answers `404`.
+- `AuditEntryDto` gains `organization: { id, slug, name } | null`, and for writes made with an agent token `credential: { id, name, issuedBy }` (`L2-154` AC5, [agents](../../organizations/agents/README.md)).
+- An *override* is now an action allowed by a tier (Org Lead, Portfolio Lead, System Admin) but not by any role: `CallerAccess.Has(org, code)` without `HasByRole(org, code)`. Overrides on other people's items are audited, replacing "a System Admin without a lead role".
+- New actions: `organization.*`, `orgType.*`, `catalogue.*`, `crossOrgRole.*`, `membership.*`, `agent.tokenIssued` and `agent.tokenRevoked`, each with before and after values where the requirement asks for them (`L2-137` AC1, `L2-138` AC7, `L2-154` AC7).
+- The Org Lead's audit log page lives in the `organizations` library under the org's settings; the System Admin page stays in `admin`.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

@@ -1,0 +1,52 @@
+@startuml
+title UML sequence behaviour — Agent calls the API
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+participant "AI agent" as agent
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "Bearer policy scheme" as ps
+  participant "AgentTokenAuthenticationHandler" as ath
+  participant "CurrentAccessMiddleware" as mw
+  participant "WorkItemsEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "AccessResolver" as res
+  participant "Work item handler" as h
+  participant "IAuditLog" as audit
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+agent -> ps : PATCH /api/work-items/{id}\nAuthorization: Bearer ftca_...
+ps -> ath : Prefix ftca_ -> AgentToken scheme
+ath -> db : AgentCredential by SHA-256(token), agent profile
+alt unknown, revoked, expired, or agent suspended
+  ath --> agent : 401 (L2-154 #4)
+else usable
+  ath -> db : LastUsedAt = now (at most once a minute)
+  ath -> mw : Principal { sub = agent user id, credential_id }
+  mw -> res : ResolveAsync(userId, credentialId)
+  res -> res : Agent's coverage ∩ credential.OrgIds (L2-154 #3)
+  mw -> ep : Continue
+  ep -> h : Update work item
+  alt work item's org outside the intersection
+    h --> agent : 404 (L2-154 #3)
+  else allowed by the agent's roles
+    h -> db : Save (actor = agent profile)
+    h -> audit : Detail { credentialId, issuerId } (L2-154 #5)
+    h --> agent : 200
+  end
+end
+@enduml

@@ -1,5 +1,4 @@
 using QuinntyneBrown.Community.Domain.Profiles;
-using QuinntyneBrown.Community.Domain.Team;
 
 namespace QuinntyneBrown.Community.Domain.Agile;
 
@@ -9,15 +8,19 @@ public class Workspace
 
     private Workspace() { }
 
-    public Workspace(string name, WorkspaceMethod method, Guid ownerId)
+    public Workspace(Guid organizationId, string name, WorkspaceMethod method, Guid ownerId)
     {
         Id = Guid.NewGuid();
+        OrganizationId = organizationId;
         Rename(name);
         Method = method;
         OwnerId = ownerId;
     }
 
     public Guid Id { get; private set; }
+
+    /// <summary>The org that owns this record (ADR 0034).</summary>
+    public Guid OrganizationId { get; private set; }
 
     public string Name { get; private set; } = string.Empty;
 
@@ -37,11 +40,12 @@ public class Workspace
 
     public bool IsMember(Guid profileId) => profileId == OwnerId || _members.Any(m => m.ProfileId == profileId);
 
-    public void AddMember(Profile profile, DateTimeOffset now)
+    /// <param name="eligible">Whether the profile may join the workspace's org's work (D12), decided by the caller.</param>
+    public void AddMember(Profile profile, bool eligible, DateTimeOffset now)
     {
-        if (!TeamRoles.IsTeamMember(profile))
+        if (!eligible)
         {
-            throw new InvalidOperationException("Only a profile holding a lead or volunteer role can join a workspace.");
+            throw new InvalidOperationException("Only a profile who may join the org's workspaces can be added.");
         }
 
         if (IsMember(profile.Id))
@@ -132,14 +136,15 @@ public class Workspace
     }
 
     /// <summary>
-    /// Gives the workspace to another City Lead (L2-037 AC2). The former owner stays on as a member, even without a
-    /// team role, so they keep their work; the new owner is no longer listed as a member.
+    /// Gives the workspace to someone who may own one in its org (L2-037 AC2, L2-146 AC4). The former owner stays on
+    /// as a member, even if no longer eligible, so they keep their work; the new owner is no longer listed as a member.
     /// </summary>
-    public void ReassignOwner(Profile newOwner, DateTimeOffset now)
+    /// <param name="canOwn">Whether the new owner holds <c>workspaces.create</c> or leads the org, decided by the caller.</param>
+    public void ReassignOwner(Profile newOwner, bool canOwn, DateTimeOffset now)
     {
-        if (!newOwner.HasRole(Role.CityLead))
+        if (!canOwn)
         {
-            throw new InvalidOperationException("A workspace owner must hold the City Lead role.");
+            throw new InvalidOperationException("A workspace owner must be able to create workspaces in its org.");
         }
 
         if (newOwner.Id == OwnerId)

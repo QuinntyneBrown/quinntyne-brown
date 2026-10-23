@@ -1,162 +1,206 @@
-ROLES, WORKSPACES AND PERMISSIONS
-=================================
+ROLES, ORGANIZATIONS AND PERMISSIONS
+====================================
 A plain-language guide to who can see and do what.
-Source of truth: the server (Application/*Access.cs and docs/adr/). The app only
-hides buttons; the API refuses anything a role may not do.
+Source of truth: the server (Application/Organizations/AccessResolver.cs,
+Application/*Access.cs and docs/adr/, especially ADRs 0033 to 0041). The
+app only hides buttons; the API refuses anything you may not do.
 
 
 1. THE BASICS
 -------------
-- Everyone signs in with one profile.
-- A new member starts with NO role.
-- A profile can hold SEVERAL roles at once (e.g. City Lead + Event Lead).
-- Data is global. There is no "my city only" boundary.
-  Exception: private contacts belong only to the lead who made them.
+- Everyone signs in with ONE profile. Profiles are global: one per person.
+- A person belongs to zero, one or several ORGANIZATIONS ("orgs").
+- Every record (event, partner, contact, resource, note page, workspace,
+  announcement, invite, connect link) belongs to exactly ONE org.
+- You see the data of the orgs you COVER: the orgs you are a member of,
+  plus any orgs a cross-org role or the Portfolio Lead tier gives you.
+- Roles are held PER ORG. Several roles = the union of their powers.
+- If something is outside your coverage, the server says "not found" (404).
+- Exception that never bends: PRIVATE items (private contacts and their
+  notes, private resources, private note pages) are seen only by their
+  owner and System Admin (audited).
 
 
-2. THE ROLES (HIERARCHY)
-------------------------
+2. THE HIERARCHY
+----------------
 
-                       +------------------+
-                       |   SYSTEM ADMIN   |   can do anything, anywhere
-                       +------------------+   (every override is audit-logged) - Me 
-                                |
-                       +------------------+
-                       |    PORTFOLIO LEAD |  (Me) can do anything in portfolio, grants roles, own's worspaces, connect link
-                       +------------------+   
-                                |
-                       +------------------+
-                       |    PORTFOLIO     |  Portfolio Level Visibility. A person that can look at boards, resources and data across one or more organizations by configuration. My Wife might be configured to see all data be assigned work spanning orgs. Agents as well.
-                       +------------------+   
-                                
-                                |
-                       +------------------+
-                       |    Organization LEAD     |   One or more Orgs under Portfolio. Data Driven Org Type. Org structure is by configuration
-                       +------------------+   	      One type of Org is FaithTech. It's database entry. The whole City Lead, everything is configuration driven
-						      Another Org might one of my start ups (Sweet Hand, Shelfie, etc...) They might not have the elaborate hierchy like FaitTech Org
+  SYSTEM ADMIN (platform)          anything, anywhere; opening someone's
+     |                             private item or overriding is audited
+     |
+  PORTFOLIO  "Quinntyne Brown"     data; more portfolios are possible
+     |-- PORTFOLIO LEAD            built in: anything in every org of the
+     |                             portfolio except other people's private
+     |                             items; edits Org Types, catalogues,
+     |                             feature flags and cross-org roles
+     |-- CROSS-ORG ROLES           data: a permission bundle over a set of
+     |     "Portfolio"             orgs, every org of a type, or the whole
+     |     "Staff"                 portfolio
+     |
+     |-- ORG TYPE (data)           a role catalogue + enabled features
+     |     "FaithTech City"        every feature
+     |     "Startup"               profiles, invites, notes, resources, agile
+     |
+     |-- ORGANIZATION (data)       "FaithTech Toronto" (FaithTech City)
+           |                       "Shelfie" (Startup)
+           |-- ORG LEAD            built in, every org: anything in the org
+           |                       except other people's private items
+           |-- catalogue roles     from the org's type (below)
+           |-- MEMBER              built in: in the org, no role
 
-
-
-                                |
-                       +------------------+
-                       |    CITY LEAD     |   runs the city: grants roles,
-                       +------------------+   owns workspaces, connect link
-                                |
-         +----------------------+----------------------+
-         |                      |                      |
-  +-------------+      +---------------+     +---------------------+
-  | EVENT LEAD  |      |  CREATE LEAD  |     | COMMUNICATIONS LEAD |
-  +-------------+      +---------------+     +---------------------+
-   runs events          (lead powers)         sends announcements
-         |                      |                      |
-         +----------------------+----------------------+
-                                |
-                 +--------------+--------------+
-                 |                             |
-          +-------------+              +------------------+
-          |  VOLUNTEER  |              | PRODUCT ENGINEER |
-          +-------------+              +------------------+
-                 |                             |
-                 +--------------+--------------+
-                                |
-                         +-------------+
-                         |  ATTENDEE   |
-                         +-------------+
-                                |
-                         +-------------+
-                         |   NO ROLE   |   any signed-in member
-                         +-------------+
-
-  Off to the side:
-
-         +-------------+
-         |    STAFF    |   FaithTech staff. Sees almost everything,
-         +-------------+   changes almost nothing (read-only).
-
-  "Leads" (the 4 lead roles) = City Lead, Event Lead, Create Lead,
-  Communications Lead. Many rules say "any lead" and mean these four.
-
-  The "team" = the 4 lead roles + Volunteer. Only team members can be
-  added to a workspace.
+  The tree inside a catalogue is only display order. Power comes ONLY from
+  each role's permission list and its "can grant" list. Nothing is inherited
+  from a parent role.
 
 
-3. WHO GIVES OUT ROLES
+3. THE CATALOGUES
+-----------------
+
+  FaithTech City                         Startup
+  --------------                         -------
+  ORG LEAD (built in)                    ORG LEAD (built in)
+    CITY LEAD                              ENGINEER
+      EVENT LEAD                           ADVISOR
+      CREATE LEAD                        MEMBER (built in)
+      COMMUNICATIONS LEAD
+        VOLUNTEER
+        PRODUCT ENGINEER
+          ATTENDEE
+  MEMBER (built in)
+
+  "Leads" in FaithTech City = City, Event, Create and Communications Lead.
+  The "team" = the leads + Volunteer (they hold team.member and
+  workspaces.join).
+
+
+4. PERMISSION CODES (fixed in code)
+-----------------------------------
+  people.view            the People page with roles
+  roles.grant            change roles (only those in the role's CanGrant)
+  invites.send           invite people into the org
+  connectLink.own        a reusable QR code for the org
+  contacts.private       keep your own private contacts in the org
+  partners.read/.write   read / change the partner pipeline
+  events.manage          create, edit, cancel events
+  events.rsvpList        see who RSVP'd and the check-in page
+  events.rsvpListEmails  guest emails and the RSVP export
+  events.checkIn         check people in, walk-ins, attendance export
+  announcements.send     send announcements to the org
+  resources.create       add resources
+  notes.create           create note pages
+  workspaces.create      create and own workspaces
+  workspaces.join        can be added to the org's workspaces
+  workspaces.readAll     read every workspace of the org
+  reports.view           the Reports page for the org
+  team.member/team.lead  listed on the Team page / matches its Leads filter
+
+  Each code belongs to a feature. If the org's type switches a feature off,
+  its codes grant nothing there and its pages and endpoints are "not found".
+
+
+5. FAITHTECH CITY: WHO HOLDS WHAT (seeded; same as before the hierarchy)
+-----------------------------------------------------------------------
+  Key:  RW = read & change   R = read only   own = only their own
+        -  = no access
+
+  Area                City   Other   Volun-  Prod.  Attendee/  Staff*  Org Lead /
+                      Lead   Leads   teer    Eng.   Member             Portfolio
+                                                                       Lead
+  ------------------  -----  ------  ------  -----  ---------  ------  ----------
+  Profiles (view)     R      R       R       R      R          R       R
+  Own profile         RW     RW      RW      RW     RW         RW      RW
+  People page         R      -       -       -      -          R       R
+  Private contacts    own    own     -       -      -          -       own
+  Partners            RW     RW      -       -      -          R       RW
+  Events (view/RSVP)  R      R       R       R      R          R       R
+  Events (manage)     RW     Event   -       -      -          -       RW
+                             Lead
+  RSVP list           R      R       count   count  count      R (no   R
+                                                               emails)
+  Check-in            RW     RW      -       -      -          R       RW
+  Invites (send)      yes    yes     -       -      -          -       yes
+  Connect link (QR)   yes    -       -       -      -          -       yes
+  Announcements send  -      Comms   -       -      -          -       yes
+                             Lead
+  Resources (add)     yes    yes     -       -      -          yes     yes
+  Notes pages (add)   yes    yes     yes     yes    yes        yes     yes
+  Workspaces          own/   member  member  -      -          R all   RW all
+                      member
+  Create workspace    yes    -       -       -      -          -       yes
+  Reports             -      -       -       -      -          R       R
+  Org audit log       -      -       -       -      -          -       R
+  Change roles        6 non- -       -       -      -          -       any
+                      lead                                             catalogue
+                                                                       role
+
+  * Staff is a cross-org role, not a catalogue role (section 7).
+  System Admin can do everything, everywhere, and is the only one who can
+  open someone else's private items (audited).
+
+
+6. WHO GIVES OUT ROLES
 ----------------------
+  SYSTEM ADMIN    --> System Admin, Portfolio Lead (and anything below)
+  PORTFOLIO LEAD  --> Org Lead, cross-org roles, any catalogue role in its
+                      orgs
+  ORG LEAD        --> any catalogue role in its org
+  CATALOGUE ROLE  --> only the roles in its "can grant" list, only in its
+                      own org (FaithTech City: City Lead grants the other six)
+  Everyone else   --> cannot change roles
 
-  SYSTEM ADMIN  --> can grant/remove ANY role
-                    (incl. City Lead, Staff, System Admin)
-
-  CITY LEAD     --> can grant/remove only:
-                    Event Lead, Create Lead, Communications Lead,
-                    Volunteer, Product Engineer, Attendee
-
-  Everyone else --> cannot change roles
-
-  - Only System Admin makes someone a City Lead, Staff or System Admin.
-  - When a City Lead changes your roles, you are notified.
-  - When a System Admin does it, it goes in the audit log.
+  - When an Org Lead or a catalogue role changes your roles, you are
+    notified. Portfolio Lead and System Admin changes go in the audit log.
   - An invite can come with a role pre-assigned (same limits apply).
+  - Only the Portfolio Lead (or System Admin) edits Org Types, catalogues,
+    feature flags and cross-org roles. Every edit is audited, before and
+    after. A role somebody holds cannot be removed from a catalogue.
+  - Changes take effect on your next request.
 
 
-4. WHAT LEADS HAVE ACCESS TO
----------------------------
+7. CROSS-ORG ROLES
+------------------
+  A cross-org role applies a permission list across:
+    - a list of orgs, or
+    - every org of a type (new orgs of that type are covered at once), or
+    - the whole portfolio.
+  An assignment can narrow it to fewer orgs.
 
-  ALL LEADS (City, Event, Create, Communications) can:
-  - Send invites (expire after 14 days; max 50 per day)
-  - Keep PRIVATE CONTACTS: list, add, add notes, archive, restore, link
-    -> only they (and System Admin) can ever see their own contacts
-  - Read AND change the PARTNER pipeline (Lead -> In Funnel -> Confirmed)
-  - See who RSVP'd to events, incl. guest emails; export RSVPs as CSV
-  - Check attendees in at events, add walk-ins
-  - Add RESOURCES (files and links) and own/share/archive them
-  - Open WORKSPACES they own or were added to
-
-  CITY LEAD also can:
-  - Grant/remove the 6 non-admin roles (see section 3)
-  - See the People page (everyone's profile and roles)
-  - CREATE WORKSPACES and own them (can own several)
-  - Have a CONNECT LINK: a reusable QR code that never expires
-  - Create, edit and cancel events
-
-  EVENT LEAD also can:
-  - Create, edit and cancel events
-
-  COMMUNICATIONS LEAD also can:
-  - Send announcements (members can opt out of the email)
-
-  CREATE LEAD:
-  - Everything in "all leads"; no extra special powers today
-
-  What leads CANNOT do:
-  - See another lead's private contacts
-  - Edit someone else's profile, resource or note page
-  - Open a workspace they are not a member of
-  - Grant City Lead, Staff or System Admin (City Lead included)
-  - See Reports or the Admin area / audit log
+  PORTFOLIO   whole portfolio. Reads everything in covered orgs (profiles,
+              partners, events and RSVP lists, workspaces, org-wide and
+              shared items, reports) except private items. Can be added to
+              workspaces and assigned work (CanJoinWork). Manages nothing.
+  STAFF       every FaithTech City org. Reads nearly everything (partners,
+              people, events, every workspace, reports); changes only their
+              own resources and note pages. Never sees private contacts.
 
 
-5. WORKSPACES (AGILE)
+8. JOINING AN ORG
+-----------------
+  - Through that org's INVITE (expires after 14 days) or CONNECT LINK
+    (a QR code that never expires and can be replaced; one per person per
+    org), or by being ADDED by the Org Lead or the Portfolio Lead.
+  - Signing up with no link: you belong to no org and see "Waiting to be
+    added" until someone adds you.
+  - Leaving or being removed: your roles in that org go; things you own
+    stay in the org. Workspaces you owned get a new owner.
+
+
+9. WORKSPACES (AGILE)
 ---------------------
-  A workspace is a project space with a backlog, board, sprints,
-  work items and Planning Poker. Kanban or Scrum.
+  A workspace belongs to one org.
 
-  Who creates one?     City Lead or System Admin. The creator is OWNER.
-  Who can be added?    Team members only (any lead or Volunteer),
-                       not suspended. Added by the owner.
+  Who creates one?   workspaces.create holders (City Lead in FaithTech),
+                     the Org Lead or the Portfolio Lead. The creator is OWNER.
+  Who can be added?  org members with workspaces.join, plus cross-org role
+                     holders with CanJoinWork. Not suspended.
 
-  Your level inside one workspace:
-
-     OWNER  ......... the City Lead who created it (or was given it)
-       |
-     ADMIN  ......... any System Admin (not the owner)
-       |
+     OWNER  ......... the creator (or whoever it was given to)
+     ADMIN  ......... the org's Org Lead, the Portfolio Lead, System Admin
      MEMBER ......... someone the owner added
-       |
-     STAFF  ......... any Staff, read-only
-       |
-     OUTSIDER ....... everyone else: cannot even see it exists (404)
+     READ-ONLY ...... workspaces.readAll holders (e.g. Staff)
+     OUTSIDER ....... everyone else: cannot see it exists (404)
 
-                             Owner  Admin  Member  Staff  Outsider
+                             Owner  Admin  Member  Read-  Outsider
+                                                   only
   See the workspace           yes    yes    yes     yes     no
   Stories, tasks, comments,   yes    yes    yes     no      no
    move cards, sprint
@@ -167,92 +211,57 @@ hides buttons; the API refuses anything a role may not do.
    archive & restore
   Reassign the owner          no     yes    no      no      no
 
-  Notes:
-  - Leads and Volunteers see ONLY the workspaces they own or belong to.
-    Being a lead does not open other people's workspaces.
-  - Staff and System Admin can see every workspace.
-  - Archived workspaces vanish for members and Staff; owner and
-    System Admin still see them and can restore them.
-  - If an owner loses City Lead, System Admins are told the workspace
-    "needs a new owner", and a System Admin reassigns it to another
-    City Lead. The old owner stays on as a member.
-  - Every System Admin change in someone else's workspace is audited.
+  - If an owner loses workspaces.create in the org (or leaves it), the Org
+    Lead and Portfolio Lead are told it "needs a new owner"; either can
+    reassign it. The old owner stays as a member if still eligible.
 
 
-6. QUICK MATRIX: WHO SEES WHAT
-------------------------------
-  Key:  RW = read & change   R = read only   own = only their own
-        -  = no access
+10. RESOURCES AND NOTE PAGES (VISIBILITY)
+-----------------------------------------
+    PRIVATE         -> only the owner (and System Admin, audited)
+    SHARED          -> owner + named people + holders of a named role in the
+                       item's org (or a named cross-org role covering it)
+    ORG-WIDE        -> everyone who covers the item's org (was "Global")
+    PORTFOLIO-WIDE  -> everyone in any org of the portfolio; only the
+                       Portfolio Lead can choose it
 
-  Area                City   Other   Volun-  Prod.  Attendee/  Staff   System
-                      Lead   Leads   teer    Eng.   No role            Admin
-  ------------------  -----  ------  ------  -----  ---------  ------  ------
-  Profiles (view)     R      R       R       R      R          R       RW
-  Own profile         RW     RW      RW      RW     RW         RW      RW
-  People page         R      -       -       -      -          R       R
-  Private contacts    own    own     -       -      -          -       RW*
-  Partners            RW     RW      -       -      -          R       RW
-  Events (view/RSVP)  R      R       R       R      R          R       RW
-  Events (manage)     RW     Event   -       -      -          -       RW
-                             Lead
-  RSVP list           R      R       count   count  count      R (no   R
-                                                               emails)
-  Check-in            RW     RW      -       -      -          R       RW
-  Invites (send)      yes    yes     -       -      -          -       yes
-  Connect link (QR)   yes    -       -       -      -          -       yes
-  Announcements read  R      R       R       R      R          R       R
-  Announcements send  -      Comms   -       -      -          -       yes
-                             Lead
-  Resources (add)     yes    yes     -       -      -          yes     yes
-  Notes pages (add)   yes    yes     yes     yes    yes        yes     yes
-  Workspaces          own/   member  member  -      -          R all   RW all
-                      member
-  Create workspace    yes    -       -       -      -          -       yes
-  Reports             -      -       -       -      -          R       R
-  Admin + audit log   -      -       -       -      -          -       RW
-  Change roles        6 non- -       -       -      -          -       all
-                      admin
-
-  * System Admin opening someone else's contact is audit-logged.
-  Notes pages: any member with a verified email can create them.
-
-
-7. RESOURCES AND NOTE PAGES (VISIBILITY)
-----------------------------------------
-  Each resource or note page has one of three settings:
-
-    PRIVATE  -> only the owner
-    SHARED   -> owner + named people and/or everyone holding a named role
-    GLOBAL   -> every signed-in member
-
-  - New resources default to GLOBAL. New note pages default to PRIVATE.
-  - Only the OWNER edits, shares, archives or restores. No exceptions
-    for City Leads or other leads.
-  - System Admin can do anything (audited).
-  - Shared-by-role is live: gain the role, you see it; lose it, you don't.
+  - New resources default to ORG-WIDE. New note pages default to PRIVATE.
+  - Only the OWNER edits, shares, archives or restores. System Admin can
+    override (audited).
   - Archived resources are purged after 30 days. Archived note pages stay.
 
 
-8. STAFF IN ONE SENTENCE
-------------------------
-  Staff can READ nearly everything (partners, people, events, every
-  workspace, reports) but can only CHANGE their own resources and note
-  pages. They never see private contacts.
+11. FEATURES PER ORG TYPE
+-------------------------
+  profiles and notes are always on. contacts, partners, team, events,
+  announcements, invites, resources, agile and reports can be switched off
+  per Org Type. Switched off = gone from the menu and "not found" on the
+  server, for everyone in those orgs.
 
 
-9. ANONYMOUS VISITORS (NOT SIGNED IN)
--------------------------------------
-  - Can see PUBLIC event pages only
+12. AGENTS
+----------
+  An agent is a profile marked "Agent": no password, no email sign-in.
+  It calls the API with a token the Portfolio Lead (or an Org Lead, for
+  their own org) issues: named, limited to chosen orgs, expiring in 1 to 90
+  days, revocable at any time, with its last use shown. It holds roles like
+  a person. Everything it writes is logged as the agent, with who issued the
+  token. Agents are hidden from People unless you ask, and carry a badge.
+
+
+13. ANONYMOUS VISITORS (NOT SIGNED IN)
+--------------------------------------
+  - Can see PUBLIC event pages only, at /o/{org}/events/{id}, with the
+    org's name, logo and colour
   - Can RSVP as a guest and download the calendar (.ics) file
   - Cannot see any profile or anything else
 
 
-10. GOLDEN RULES
+14. GOLDEN RULES
 ----------------
-  - More roles = the union of their powers.
+  - More roles = the union of their powers. No inheritance.
+  - The server checks permission codes, never role names.
+  - Outside your coverage = "not found" (404). Covered but not allowed =
+    "forbidden" (403).
+  - Private stays private: only the owner and System Admin, ever.
   - System Admin can override anything; it is always audit-logged.
-  - Being a lead gives power over city data (contacts, partners, events,
-    invites), NOT over other people's personal work (their profile,
-    pages, resources, or workspaces they don't belong to).
-  - If you can't see something, the server says "not found" (404),
-    so nobody learns it exists.

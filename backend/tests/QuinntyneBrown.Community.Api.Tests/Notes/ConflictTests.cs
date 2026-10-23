@@ -35,7 +35,7 @@ public class ConflictTests(CommunityApiFactory factory) : IClassFixture<Communit
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var page = await factory.ClientFor(grace).CreateNoteAsync("Run sheet");
-        var admin = factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), Role.SystemAdmin);
+        var admin = factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), SeededRole.SystemAdmin);
         (await admin.SaveNoteAsync(page, [Paragraph("Fixed a typo")])).EnsureSuccessStatusCode();
 
         var stale = await factory.ClientFor(grace).SaveNoteAsync(page, [Paragraph("Mine")]);

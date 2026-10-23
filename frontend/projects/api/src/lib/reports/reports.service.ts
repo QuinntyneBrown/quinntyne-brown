@@ -1,6 +1,8 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { OrgLabel } from '../shared';
+
 /** The four periods and their URL keys (L2-124 AC3). */
 export type ReportPeriod = 'last-30-days' | 'last-90-days' | 'this-year' | 'all-time';
 
@@ -8,6 +10,8 @@ export type ReportPeriod = 'last-30-days' | 'last-90-days' | 'this-year' | 'all-
 export interface ReportFilters {
   city: string | null;
   period: ReportPeriod;
+  /** One org's id, or every org the caller reports on when absent (L2-150). */
+  organization?: string | null;
 }
 
 /** A chart bar. */
@@ -53,6 +57,8 @@ export interface ReportDto {
   from: string | null;
   to: string;
   cities: string[];
+  /** The orgs the caller reports on, for the org filter (L2-150 AC1). */
+  organizations: OrgLabel[];
   isEmpty: boolean;
   figures: {
     /** `newInPeriod` is null for All time. */

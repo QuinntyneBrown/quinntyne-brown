@@ -14,7 +14,8 @@ public class GrantAdminCommandTests
     private readonly string _name = Guid.NewGuid().ToString();
 
     [Fact]
-    public async Task Grants_system_admin_to_an_existing_account_once_and_audits_it()
+    // Traces to: L2-009, L2-157
+    public async Task Grants_system_admin_portfolio_lead_and_toronto_org_lead_once_and_audits_it()
     {
         var profileId = await AddAccountAsync("priya@example.org");
 
@@ -23,9 +24,12 @@ public class GrantAdminCommandTests
 
         await using var db = Db();
         var profile = await db.Profiles.SingleAsync(p => p.Id == profileId);
-        Assert.Equal([Role.SystemAdmin], profile.Roles.Select(r => r.Role));
+        Assert.True(profile.IsSystemAdmin);
+        Assert.True(await db.PortfolioLeads.AnyAsync(l => l.ProfileId == profileId && l.PortfolioId == HierarchySeed.PortfolioId));
+        Assert.True(await db.OrgMemberships.AnyAsync(m => m.ProfileId == profileId && m.OrganizationId == HierarchySeed.TorontoId && m.IsOrgLead));
         var entry = await db.AuditEntries.SingleAsync();
         Assert.Equal(("role.granted", profileId.ToString(), "cli"), (entry.Action, entry.TargetId, entry.IpAddress));
+        Assert.Equal("{\"Roles\":[\"org-lead\",\"portfolio-lead\",\"system-admin\"]}", entry.AfterJson);
     }
 
     [Fact]

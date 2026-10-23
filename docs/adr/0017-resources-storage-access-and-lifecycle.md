@@ -1,6 +1,6 @@
 # 0017. Resources: storage, access and lifecycle
 
-- Status: Accepted
+- Status: Accepted; superseded in part by ADR 0039 (Global becomes Org-wide; Portfolio-wide)
 - Date: 2026-10-22
 - Requirements: L1-020, L2-055 to L2-066
 - Designs: `docs/detailed-designs/resources/list-and-find`, `docs/detailed-designs/resources/add-and-edit`, `docs/detailed-designs/resources/share`, `docs/detailed-designs/resources/archive-and-transfer`

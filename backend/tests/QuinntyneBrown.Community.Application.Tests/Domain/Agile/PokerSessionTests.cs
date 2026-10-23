@@ -15,10 +15,10 @@ public class PokerSessionTests
 
     public PokerSessionTests()
     {
-        var facilitator = ProfileWith(Role.Volunteer);
-        var voter = ProfileWith(Role.Volunteer);
-        _workspace.AddMember(facilitator, Now);
-        _workspace.AddMember(voter, Now);
+        var facilitator = ProfileWith();
+        var voter = ProfileWith();
+        _workspace.AddMember(facilitator, eligible: true, Now);
+        _workspace.AddMember(voter, eligible: true, Now);
         _facilitator = facilitator.Id;
         _voter = voter.Id;
         _first = new WorkItem(_workspace.Id, WorkItemKind.Story, "Sign-up", "", null);

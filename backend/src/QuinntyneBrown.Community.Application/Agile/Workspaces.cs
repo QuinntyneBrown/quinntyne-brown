@@ -1,8 +1,8 @@
 using QuinntyneBrown.Community.Application.Common;
+using QuinntyneBrown.Community.Application.Organizations;
 using QuinntyneBrown.Community.Domain.Agile;
 using QuinntyneBrown.Community.Domain.Notifications;
-using QuinntyneBrown.Community.Domain.Profiles;
-using QuinntyneBrown.Community.Domain.Team;
+using QuinntyneBrown.Community.Domain.Organizations;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,16 +31,22 @@ public class WorkspacesHandler(
     ICurrentUser current,
     WorkspaceAccessPolicy policy,
     WorkspaceMembership membership,
+    ProfileRoles profileRoles,
+    WorkEligibility eligibility,
     AgileNotifier notifier)
 {
-    public const string NotOnTeamMessage = "Only people with a lead or volunteer role can be added.";
+    public const string NotOnTeamMessage = "Only people who can join this organization’s workspaces can be added.";
 
-    /// <summary>A City Lead (or System Admin) creates a workspace and owns it; a City Lead may own several.</summary>
+    /// <summary>
+    /// A holder of <c>workspaces.create</c>, the Org Lead or the Portfolio Lead creates a workspace in one org and owns
+    /// it; they may own several (L2-146 AC1).
+    /// </summary>
     public async Task<(Result Result, WorkspaceDto? Workspace)> CreateAsync(CreateWorkspaceCommand command, CancellationToken cancellationToken = default)
     {
-        if (!current.HasRole(Role.CityLead) && !current.HasRole(Role.SystemAdmin))
+        var target = current.Access.TargetFor(Permissions.WorkspacesCreate);
+        if (!target.Allowed)
         {
-            return (Result.Forbidden(), null);
+            return (target.Refusal!, null);
         }
 
         var caller = await policy.CallerProfileIdAsync(cancellationToken);
@@ -49,7 +55,7 @@ public class WorkspacesHandler(
             return (Result.Forbidden(), null);
         }
 
-        var workspace = new Workspace(command.Name!.Trim(), Enum.Parse<WorkspaceMethod>(command.Method!), owner);
+        var workspace = new Workspace(target.OrgId, command.Name!.Trim(), Enum.Parse<WorkspaceMethod>(command.Method!), owner);
         var added = await membership.AddMembersAsync(workspace, owner, command.MemberIds ?? [], cancellationToken);
         if (added is null)
         {
@@ -69,16 +75,27 @@ public class WorkspacesHandler(
     public async Task<IReadOnlyList<WorkspaceSummaryDto>> ListAsync(CancellationToken cancellationToken = default)
     {
         var caller = await policy.CallerProfileIdAsync(cancellationToken);
-        var admin = policy.IsSystemAdmin;
+        var scope = current.Access.ReadScope(Features.Agile);
+        var administered = scope.Where(policy.AdministersOrg).ToList();
         var live = await policy.Visible(db.Workspaces.AsNoTracking(), caller).ToListAsync(cancellationToken);
         var archived = await db.Workspaces.IgnoreQueryFilters().AsNoTracking()
-            .Where(w => w.IsArchived && (admin || w.OwnerId == caller))
+            .Where(w => w.IsArchived && scope.Contains(w.OrganizationId) && (administered.Contains(w.OrganizationId) || w.OwnerId == caller))
             .ToListAsync(cancellationToken);
         var workspaces = live.Concat(archived).OrderBy(w => w.Name).ToList();
 
         var ids = workspaces.Select(w => w.Id).ToList();
         var ownerIds = workspaces.Select(w => w.OwnerId).Distinct().ToList();
         var owners = await db.Profiles.AsNoTracking().Where(p => ownerIds.Contains(p.Id)).ToDictionaryAsync(p => p.Id, cancellationToken);
+        var needsOwner = new HashSet<Guid>();
+        foreach (var w in workspaces.Where(w => !w.IsArchived))
+        {
+            if (await NeedsNewOwnerAsync(w, cancellationToken))
+            {
+                needsOwner.Add(w.Id);
+            }
+        }
+
+        var orgs = current.Access.Orgs;
         var sprints = await db.Sprints.AsNoTracking()
             .Where(s => ids.Contains(s.WorkspaceId) && s.State == SprintState.Active)
             .ToDictionaryAsync(s => s.WorkspaceId, s => s.Name, cancellationToken);
@@ -93,7 +110,8 @@ public class WorkspacesHandler(
             sprints.GetValueOrDefault(w.Id),
             w.Members.Select(m => m.ProfileId).Append(w.OwnerId).Distinct().Count(),
             w.IsArchived,
-            !w.IsArchived && NeedsNewOwner(owners.GetValueOrDefault(w.OwnerId))))];
+            needsOwner.Contains(w.Id),
+            OrgLabel.Of(orgs, w.OrganizationId)))];
     }
 
     /// <summary>The workspace with its members, or null when the caller may not see it (404, L2-042 AC2).</summary>
@@ -107,6 +125,9 @@ public class WorkspacesHandler(
 
         var memberIds = workspace.Members.Select(m => m.ProfileId).Append(workspace.OwnerId).Distinct().ToList();
         var profiles = await db.Profiles.AsNoTracking().Where(p => memberIds.Contains(p.Id)).ToDictionaryAsync(p => p.Id, cancellationToken);
+        var roles = await profileRoles.ForAsync(memberIds, [workspace.OrganizationId], cancellationToken);
+        var orgMembers = await db.OrgMemberships.AsNoTracking()
+            .Where(m => m.OrganizationId == workspace.OrganizationId && memberIds.Contains(m.ProfileId)).Select(m => m.ProfileId).ToListAsync(cancellationToken);
         var assigned = await db.WorkItems.AsNoTracking()
             .Where(i => i.WorkspaceId == id && i.AssigneeId != null)
             .GroupBy(i => new { i.AssigneeId, IsTask = i.Kind == WorkItemKind.Task })
@@ -118,11 +139,12 @@ public class WorkspacesHandler(
             .Select(pid => new WorkspaceMemberDto(
                 pid,
                 profiles.GetValueOrDefault(pid)?.Name ?? "A former member",
-                profiles.GetValueOrDefault(pid) is { } p ? [.. p.Roles.Select(r => r.Role).Order().Select(r => r.ToString())] : [],
+                [.. roles[pid].Select(r => r.Name)],
                 pid == workspace.OwnerId,
                 Count(pid, tasks: false),
                 Count(pid, tasks: true),
-                pid == caller.ProfileId))
+                pid == caller.ProfileId,
+                !orgMembers.Contains(pid)))
             .OrderByDescending(m => m.IsOwner)
             .ThenBy(m => m.Name)
             .ToList();
@@ -138,35 +160,44 @@ public class WorkspacesHandler(
             caller.Access.ToString(),
             caller.CanEdit,
             caller.CanManage,
-            NeedsNewOwner(owner));
+            !workspace.IsArchived && await NeedsNewOwnerAsync(workspace, cancellationToken),
+            OrgLabel.Of(current.Access.Orgs, workspace.OrganizationId));
     }
 
     /// <summary>
-    /// An owner must hold City Lead (or be a System Admin); otherwise System Admin reassigns it (L2-037 AC2). An archived
-    /// workspace is not flagged: nobody can act on it until it is restored, and then it is (ADR 0011).
+    /// An owner must be able to create workspaces in the org (or lead it); otherwise the Org Lead or Portfolio Lead
+    /// reassigns it (L2-146 AC4). An archived workspace is not flagged: nobody can act on it until it is restored (ADR 0011).
     /// </summary>
-    private static bool NeedsNewOwner(Profile? owner) =>
-        owner is null || (!owner.HasRole(Role.CityLead) && !owner.HasRole(Role.SystemAdmin));
+    private async Task<bool> NeedsNewOwnerAsync(Workspace workspace, CancellationToken cancellationToken) =>
+        !await eligibility.CanOwnAsync(workspace.OwnerId, workspace.OrganizationId, cancellationToken);
 }
 
 /// <summary>Adds members to a workspace and notifies each of them (L2-031 AC2).</summary>
-public class WorkspaceMembership(IApplicationDbContext db, AgileNotifier notifier, TimeProvider time)
+public class WorkspaceMembership(IApplicationDbContext db, WorkEligibility eligibility, AgileNotifier notifier, TimeProvider time)
 {
     /// <summary>Adds the profiles and queues their notifications; null (nothing added) when one is not on the team or is suspended.</summary>
     public async Task<IReadOnlyList<Guid>?> AddMembersAsync(Workspace workspace, Guid actor, IReadOnlyList<Guid> profileIds, CancellationToken cancellationToken)
     {
         var ids = profileIds.Distinct().Where(id => !workspace.IsMember(id)).ToList();
         var profiles = await db.Profiles.Where(p => ids.Contains(p.Id)).ToListAsync(cancellationToken);
-        if (profiles.Count != ids.Count || !profiles.All(p => TeamRoles.IsTeamMember(p) && !p.IsSuspended))
+        if (profiles.Count != ids.Count || profiles.Any(p => p.IsSuspended))
         {
             return null;
         }
 
-        var actorName = await db.Profiles.Where(p => p.Id == actor).Select(p => p.Name).SingleOrDefaultAsync(cancellationToken) ?? "A City Lead";
+        foreach (var profile in profiles)
+        {
+            if (!await eligibility.CanJoinAsync(profile.Id, workspace.OrganizationId, cancellationToken))
+            {
+                return null;
+            }
+        }
+
+        var actorName = await db.Profiles.Where(p => p.Id == actor).Select(p => p.Name).SingleOrDefaultAsync(cancellationToken) ?? "A workspace owner";
         var now = time.GetUtcNow();
         foreach (var profile in profiles)
         {
-            workspace.AddMember(profile, now);
+            workspace.AddMember(profile, eligible: true, now);
             notifier.Notify(
                 actor,
                 profile.Id,
@@ -174,7 +205,8 @@ public class WorkspaceMembership(IApplicationDbContext db, AgileNotifier notifie
                 $"{actorName} added you to the workspace {workspace.Name}",
                 $"/workspaces/{workspace.Id}",
                 $"You’ve been added to {workspace.Name}",
-                $"{actorName} added you to the {workspace.Name} workspace. You can add stories and tasks, move cards, comment and vote in Planning Poker.\n\nOpen the workspace:");
+                $"{actorName} added you to the {workspace.Name} workspace. You can add stories and tasks, move cards, comment and vote in Planning Poker.\n\nOpen the workspace:",
+                workspace.OrganizationId);
         }
 
         return [.. profiles.Select(p => p.Id)];

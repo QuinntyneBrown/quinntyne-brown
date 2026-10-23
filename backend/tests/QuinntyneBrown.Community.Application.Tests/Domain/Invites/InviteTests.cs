@@ -9,22 +9,25 @@ public class InviteTests
     private static readonly DateTimeOffset Sent = new(2026, 10, 1, 9, 0, 0, TimeSpan.Zero);
     private static readonly Guid Inviter = Guid.NewGuid();
 
-    private static Invite NewInvite(Role? role = null) => new("grace@example.org", "hash", role, Inviter, Sent);
+    private static readonly Guid Org = Guid.NewGuid();
+    private static readonly Guid Volunteer = Guid.NewGuid();
+
+    private static Invite NewInvite(Guid? role = null) => new(Org, "grace@example.org", "hash", role, Inviter, Sent);
 
     [Fact]
     public void A_new_invite_records_who_sent_it_and_expires_after_14_days()
     {
-        var invite = NewInvite(Role.Volunteer);
+        var invite = NewInvite(Volunteer);
 
         Assert.Equal(
-            ("grace@example.org", "hash", (Role?)Role.Volunteer, Inviter, Sent, Sent.AddDays(14)),
-            (invite.Email, invite.TokenHash, invite.PreassignedRole, invite.InvitedBy, invite.CreatedAt, invite.ExpiresAt));
+            (Org, "grace@example.org", "hash", (Guid?)Volunteer, Inviter, Sent, Sent.AddDays(14)),
+            (invite.OrganizationId, invite.Email, invite.TokenHash, invite.PreassignedRoleId, invite.InvitedBy, invite.CreatedAt, invite.ExpiresAt));
     }
 
     [Fact]
     public void An_invite_keeps_an_optional_personal_note()
     {
-        var invite = new Invite("grace@example.org", "hash", null, Inviter, Sent, "Come build with us!");
+        var invite = new Invite(Org, "grace@example.org", "hash", null, Inviter, Sent, "Come build with us!");
 
         Assert.Equal("Come build with us!", invite.Note);
         Assert.Null(NewInvite().Note);
@@ -35,7 +38,7 @@ public class InviteTests
     [InlineData("grace@example.org", " ")]
     public void An_invite_needs_an_email_and_a_token_hash(string email, string tokenHash)
     {
-        Assert.Throws<ArgumentException>(() => new Invite(email, tokenHash, null, Inviter, Sent));
+        Assert.Throws<ArgumentException>(() => new Invite(Org, email, tokenHash, null, Inviter, Sent));
     }
 
     [Fact]

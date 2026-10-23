@@ -49,10 +49,15 @@ public class LogPartnerActivityHandler(IApplicationDbContext db, PartnerAccess a
             return (Result.Forbidden(), null);
         }
 
-        var partner = await db.Partners.SingleOrDefaultAsync(p => p.Id == partnerId, cancellationToken);
+        var partner = await access.Readable(db.Partners).SingleOrDefaultAsync(p => p.Id == partnerId, cancellationToken);
         if (partner is null)
         {
             return (Result.NotFound(), null);
+        }
+
+        if (!access.CanWriteIn(partner.OrganizationId))
+        {
+            return (Result.Forbidden(), null);
         }
 
         if (partner.IsArchived)

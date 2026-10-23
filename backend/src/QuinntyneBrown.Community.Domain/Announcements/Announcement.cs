@@ -6,11 +6,12 @@ public class Announcement
 
     private Announcement() { }
 
-    public Announcement(string subject, string body, AnnouncementAudience audience, Guid senderId, DateTimeOffset sentAt, bool alsoEmail)
+    public Announcement(Guid organizationId, string subject, string body, AnnouncementAudience audience, Guid senderId, DateTimeOffset sentAt, bool alsoEmail)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(subject);
         ArgumentException.ThrowIfNullOrWhiteSpace(body);
         Id = Guid.NewGuid();
+        OrganizationId = organizationId;
         Subject = subject;
         Body = body;
         Audience = audience;
@@ -20,6 +21,9 @@ public class Announcement
     }
 
     public Guid Id { get; private set; }
+
+    /// <summary>The org that owns this record (ADR 0034).</summary>
+    public Guid OrganizationId { get; private set; }
 
     public string Subject { get; private set; } = string.Empty;
 

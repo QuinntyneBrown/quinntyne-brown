@@ -20,11 +20,11 @@ public class RoleFreshnessTests(CommunityApiFactory factory) : IClassFixture<Com
     [Fact]
     public async Task A_removed_City_Lead_role_stops_working_on_the_token_issued_before_the_removal()
     {
-        var (email, profileId) = await AccountWithRolesAsync(Role.CityLead);
+        var (email, profileId) = await AccountWithRolesAsync(SeededRole.CityLead);
         var api = _flow.Api((await _flow.SignInAndGetTokensAsync(email)).AccessToken);
         Assert.Equal(HttpStatusCode.OK, (await api.GetAsync("/api/invites")).StatusCode);
 
-        var removed = await (await AdminClientAsync()).DeleteAsync($"/api/profiles/{profileId}/roles/CityLead");
+        var removed = await (await AdminClientAsync()).DeleteAsync($"/api/profiles/{profileId}/roles/city-lead?organizationId={Infrastructure.Persistence.HierarchySeed.TorontoId}");
         Assert.Equal(HttpStatusCode.OK, removed.StatusCode);
 
         Assert.Equal(HttpStatusCode.Forbidden, (await api.GetAsync("/api/invites")).StatusCode);
@@ -35,12 +35,12 @@ public class RoleFreshnessTests(CommunityApiFactory factory) : IClassFixture<Com
     [Fact]
     public async Task A_removed_System_Admin_is_refused_with_the_old_token_and_after_refreshing_it()
     {
-        var (email, profileId) = await AccountWithRolesAsync(Role.SystemAdmin);
+        var (email, profileId) = await AccountWithRolesAsync(SeededRole.SystemAdmin);
         var tokens = await _flow.SignInAndGetTokensAsync(email);
         var api = _flow.Api(tokens.AccessToken);
         Assert.Equal(HttpStatusCode.OK, (await api.GetAsync("/api/admin/users")).StatusCode);
 
-        var removed = await (await AdminClientAsync()).DeleteAsync($"/api/profiles/{profileId}/roles/SystemAdmin");
+        var removed = await (await AdminClientAsync()).DeleteAsync($"/api/profiles/{profileId}/roles/system-admin");
         Assert.Equal(HttpStatusCode.OK, removed.StatusCode);
 
         Assert.Equal(HttpStatusCode.Forbidden, (await api.GetAsync("/api/admin/users")).StatusCode);
@@ -48,7 +48,7 @@ public class RoleFreshnessTests(CommunityApiFactory factory) : IClassFixture<Com
         refreshed.EnsureSuccessStatusCode();
         var renewed = _flow.Api((await refreshed.Content.ReadFromJsonAsync<TokenResponse>())!.AccessToken);
         Assert.Equal(HttpStatusCode.Forbidden, (await renewed.GetAsync("/api/admin/users")).StatusCode);
-        Assert.Empty((await renewed.GetFromJsonAsync<JsonElement>("/api/me")).GetProperty("roles").EnumerateArray());
+        Assert.False((await renewed.GetFromJsonAsync<JsonElement>("/api/me")).GetProperty("isSystemAdmin").GetBoolean());
     }
 
     [Fact]
@@ -57,30 +57,30 @@ public class RoleFreshnessTests(CommunityApiFactory factory) : IClassFixture<Com
         var (email, profileId) = await AccountWithRolesAsync();
         var tokens = await _flow.SignInAndGetTokensAsync(email);
 
-        var added = await (await AdminClientAsync()).PostAsJsonAsync($"/api/profiles/{profileId}/roles", new { Role = "CityLead" });
+        var added = await (await AdminClientAsync()).PostAsJsonAsync(
+            $"/api/profiles/{profileId}/roles", new { Role = "city-lead", OrganizationId = Infrastructure.Persistence.HierarchySeed.TorontoId });
         Assert.Equal(HttpStatusCode.OK, added.StatusCode);
 
         var refreshed = await _flow.RefreshAsync(tokens.RefreshToken);
         refreshed.EnsureSuccessStatusCode();
         var api = _flow.Api((await refreshed.Content.ReadFromJsonAsync<TokenResponse>())!.AccessToken);
-        var roles = (await api.GetFromJsonAsync<JsonElement>("/api/me")).GetProperty("roles").EnumerateArray().Select(r => r.GetString());
-        Assert.Equal(["CityLead"], roles);
+        var org = (await api.GetFromJsonAsync<JsonElement>("/api/me/access")).GetProperty("orgs").EnumerateArray().Single();
+        Assert.Contains("invites.send", org.GetProperty("permissions").EnumerateArray().Select(p => p.GetString()));
         Assert.Equal(HttpStatusCode.OK, (await api.GetAsync("/api/invites")).StatusCode);
     }
 
-    private async Task<(string Email, Guid ProfileId)> AccountWithRolesAsync(params Role[] roles)
+    private async Task<(string Email, Guid ProfileId)> AccountWithRolesAsync(params SeededRole[] roles)
     {
         var email = await _flow.CreateAccountAsync();
         var profileId = await factory.WithDbAsync(async db =>
         {
             var id = await db.Users.Where(u => u.Email == email).Select(u => u.ProfileId).SingleAsync();
-            var profile = await db.Profiles.SingleAsync(p => p.Id == id);
+            await SeededRoles.JoinAsync(db, id);
             foreach (var role in roles)
             {
-                profile.AddRole(role, Guid.Empty, DateTime.UtcNow);
+                await SeededRoles.GrantAsync(db, id, role);
             }
 
-            await db.SaveChangesAsync();
             return id;
         });
         return (email, profileId);
@@ -88,7 +88,7 @@ public class RoleFreshnessTests(CommunityApiFactory factory) : IClassFixture<Com
 
     private async Task<HttpClient> AdminClientAsync()
     {
-        var admin = await factory.AddMemberAsync("Priya Raman", p => p.AddRole(Role.SystemAdmin, Guid.Empty, DateTime.UtcNow));
-        return factory.ClientFor(admin, Role.SystemAdmin);
+        var admin = await factory.AddMemberAsync("Priya Raman", p => p.AddRole(SeededRole.SystemAdmin, Guid.Empty, DateTime.UtcNow));
+        return factory.ClientFor(admin, SeededRole.SystemAdmin);
     }
 }

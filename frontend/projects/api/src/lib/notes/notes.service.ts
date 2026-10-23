@@ -1,9 +1,10 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { PagedResult, Role } from '../shared';
+import { OrgLabel, PagedResult } from '../shared';
 
-export type NoteVisibility = 'Private' | 'Shared' | 'Global';
+/** Who can see a page (ADR 0039): Portfolio-wide is the Portfolio Lead's to set. */
+export type NoteVisibility = 'Private' | 'Shared' | 'OrgWide' | 'PortfolioWide';
 
 /** The block types and their wire names (L2-087). */
 export const NOTE_BLOCK_TYPES = [
@@ -22,17 +23,6 @@ export const NOTE_BLOCK_TYPES = [
   'link',
 ] as const;
 export type NoteBlockType = (typeof NOTE_BLOCK_TYPES)[number];
-
-/** The roles a page can be shared with (L2-093 AC2). */
-export const NOTE_SHAREABLE_ROLES: Role[] = [
-  'CityLead',
-  'EventLead',
-  'CreateLead',
-  'CommunicationsLead',
-  'Volunteer',
-  'ProductEngineer',
-  'Staff',
-];
 
 /** A run of text with its marks; `pageId` makes it a page link whose text the server fills (L2-090). */
 export interface NoteSpan {
@@ -72,6 +62,8 @@ export interface NotePageSummary {
   updatedByName: string;
   /** The parent's title, "Private page" when the viewer cannot open it, or null at the top level. */
   parentTitle: string | null;
+  /** The org the page belongs to (ADR 0034). */
+  organization?: OrgLabel | null;
 }
 
 /** A page in a breadcrumb, a child list or backlinks; `id` is null for "Private page". */
@@ -88,7 +80,9 @@ export interface NoteAudienceMember {
 }
 
 export interface NoteAudienceRole {
-  role: Role;
+  /** The role's key, and its name to show. */
+  role: string;
+  name?: string | null;
   count: number;
 }
 
@@ -140,7 +134,8 @@ export interface NoteConflict {
 export interface NoteVisibilityChange {
   visibility: NoteVisibility;
   memberIds: string[];
-  roles: Role[];
+  /** Role keys from the org's share roles (ACCESS_SERVICE). */
+  roles: string[];
 }
 
 export interface ArchivedNote {
@@ -154,7 +149,8 @@ export interface NoteMember {
   id: string;
   name: string;
   city: string | null;
-  roles: Role[];
+  /** Role names, for display. */
+  roles: string[];
 }
 
 export interface NoteImageUploaded {

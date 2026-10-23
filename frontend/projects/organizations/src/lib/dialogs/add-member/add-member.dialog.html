@@ -1,0 +1,50 @@
+<ft-dialog
+  [heading]="'Add a member to ' + org.branding.displayName"
+  [description]="
+    'They’re told by email and in the app, and ' +
+    org.branding.displayName +
+    ' appears in their switcher.'
+  "
+  icon="invite"
+  [busy]="busy()"
+  (closed)="ref.close()"
+>
+  <form [formGroup]="form" (submit)="$event.preventDefault(); add()">
+    <ft-stack>
+      @if (failed()) {
+        <ft-alert status="danger" heading="Member not added">
+          We couldn’t reach Quinntyne Brown. Nothing was changed — try again.
+        </ft-alert>
+      }
+      <ft-form-field
+        required
+        label="Email"
+        help="They need an account already. You can find people by the email they signed up with."
+        [error]="emailError()"
+      >
+        <ft-text-field
+          type="email"
+          formControlName="email"
+          autocomplete="off"
+          initialFocus
+          [readonly]="busy()"
+        />
+      </ft-form-field>
+      @if (needsInvite()) {
+        <p><ft-link [href]="'/o/' + org.slug + '/invites'">Send an invite</ft-link></p>
+      }
+      @if (roleOptions.length > 1) {
+        <ft-form-field
+          label="Role"
+          [help]="'Roles from ' + org.branding.displayName + '’s catalogue that you may grant.'"
+        >
+          <ft-select formControlName="role" [options]="roleOptions" />
+        </ft-form-field>
+      }
+    </ft-stack>
+  </form>
+  <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+  <ft-button ftDialogFooter variant="primary" [loading]="busy()" (click)="add()">
+    {{ busy() ? 'Adding…' : 'Add member' }}
+  </ft-button>
+</ft-dialog>

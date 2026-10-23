@@ -9,3 +9,4 @@ export * from './reset-password';
 export * from './not-found';
 export * from './forbidden';
 export * from './server-error';
+export * from './waiting';

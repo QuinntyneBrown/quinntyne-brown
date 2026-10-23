@@ -38,7 +38,12 @@ public class EditResourceHandler(
             return (resource.IsArchived && access.CanChange(resource, caller) ? Result.Conflict("Restore it before you edit it.") : Result.Forbidden(), null);
         }
 
-        var (fields, errors) = await rules.CheckAsync(command.Fields, titleRequired: true, cancellationToken);
+        if (rules.RefusesVisibility(resource.OrganizationId, command.Fields))
+        {
+            return (Result.Forbidden(), null);
+        }
+
+        var (fields, errors) = await rules.CheckAsync(resource.OrganizationId, command.Fields, titleRequired: true, cancellationToken);
         Uri? link = null;
         if (resource.IsLink && !ResourceLinks.TryParse(command.Url, out link))
         {

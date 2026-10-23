@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   ElementRef,
   OnInit,
@@ -11,12 +12,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
-import {
-  RESOURCE_TYPES,
-  RESOURCES_SERVICE,
-  ROLE_LABELS,
-  SHAREABLE_ROLES,
-} from '@faithtech-community/api';
+import { RESOURCE_TYPES, RESOURCES_SERVICE, ACCESS_SERVICE } from '@faithtech-community/api';
 import {
   CheckboxComponent,
   CheckboxGroupComponent,
@@ -77,12 +73,30 @@ export class ResourceDetailsComponent implements OnInit {
     value: t,
     label: t,
   }));
-  protected readonly roles = SHAREABLE_ROLES.map((r) => ({ value: r, label: ROLE_LABELS[r] }));
+  /** The org the resource is in, for its share roles; the active org when absent. */
+  readonly org = input<string | null>(null);
+
+  private readonly access = inject(ACCESS_SERVICE);
+  private readonly orgAccess = computed(() => {
+    const slug = this.org();
+    return (slug && this.access.orgs().find((o) => o.slug === slug)) || this.access.homeOrg();
+  });
+  /** "Everyone in FaithTech Toronto", the Org-wide choice (ADR 0039). */
+  protected readonly orgName = computed(
+    () => this.orgAccess()?.branding.displayName ?? 'this organization',
+  );
+  /** Only the Portfolio Lead, or a System Admin, publishes to the whole portfolio (L2-148 AC4). */
+  protected readonly mayPublishPortfolioWide = computed(
+    () => this.access.isSystemAdmin() || !!this.orgAccess()?.isPortfolioLead,
+  );
+  protected readonly roles = computed(() =>
+    this.access.shareRoles(this.org()).map((r) => ({ value: r.key, label: r.name })),
+  );
   protected readonly tagSuggestions = signal<TagSuggestion[]>([]);
   protected readonly people = signal<PersonOption[]>([]);
   protected readonly searching = signal(false);
 
-  protected readonly visibility = signal('Global');
+  protected readonly visibility = signal('OrgWide');
   protected readonly titleLength = signal(0);
 
   ngOnInit(): void {
@@ -126,9 +140,7 @@ export class ResourceDetailsComponent implements OnInit {
         members.map((m) => ({
           id: m.id,
           name: m.name,
-          detail: [m.roles.map((r) => ROLE_LABELS[r]).join(', '), m.city]
-            .filter(Boolean)
-            .join(' · '),
+          detail: [m.roles.join(', '), m.city].filter(Boolean).join(' · '),
         })),
       );
     } catch {

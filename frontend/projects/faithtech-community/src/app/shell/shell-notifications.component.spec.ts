@@ -1,7 +1,12 @@
 // Traces to: L2-027
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { NOTIFICATIONS_SERVICE, NotificationDto, NotificationPage } from '@faithtech-community/api';
+import {
+  NOTIFICATIONS_SERVICE,
+  provideStaticAccess,
+  NotificationDto,
+  NotificationPage,
+} from '@faithtech-community/api';
 import { of } from 'rxjs';
 
 import { ShellNotificationsComponent } from './shell-notifications.component';
@@ -46,7 +51,7 @@ async function setup(items: NotificationDto[]) {
     }),
   };
   TestBed.configureTestingModule({
-    providers: [{ provide: NOTIFICATIONS_SERVICE, useValue: service }],
+    providers: [{ provide: NOTIFICATIONS_SERVICE, useValue: service }, provideStaticAccess()],
   });
   const router = TestBed.inject(Router);
   const navigate = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);

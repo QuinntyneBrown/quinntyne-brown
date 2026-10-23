@@ -1,9 +1,10 @@
+import { MockOrganizations, legacyRoleOf, roleKeyOf, roleNameOf } from './mock-organizations';
 import { Route } from '@playwright/test';
 
 import type { MockAccount, MockProfile } from './mock-api';
 import type { MockNotifications } from './mock-notifications';
 
-export type MockNoteVisibility = 'Private' | 'Shared' | 'Global';
+export type MockNoteVisibility = 'Private' | 'Shared' | 'OrgWide' | 'PortfolioWide';
 
 export interface MockSpan {
   text: string;
@@ -52,6 +53,8 @@ export interface NotesContext {
   readonly profiles: Map<string, MockProfile>;
   readonly notifications: MockNotifications;
   readonly now: Date;
+  /** Who may publish Portfolio-wide (ADR 0039). */
+  readonly organizations: MockOrganizations;
 }
 
 const PAGE_SIZE = 25;
@@ -90,7 +93,7 @@ const TYPES = [
 /**
  * NotesEndpoints in the browser (backend/src/QuinntyneBrown.Community.Api/Endpoints/NotesEndpoints.cs, ADR 0025):
  * visibility in every read (Private to the owner and System Admin, Shared to its members and the current holders
- * of its roles, Global to every member), owner-only writes, and a 409 when a save is based on an old version.
+ * of its roles, Org-wide and Portfolio-wide to every member), owner-only writes, and a 409 when a save is based on an old version.
  */
 export class MockNotes {
   readonly pages: MockNote[] = [];
@@ -195,7 +198,8 @@ export class MockNotes {
 
   mayOpen(n: MockNote, caller: MockAccount): boolean {
     return (
-      n.visibility === 'Global' ||
+      n.visibility === 'OrgWide' ||
+      n.visibility === 'PortfolioWide' ||
       n.ownerId === caller.profileId ||
       caller.roles.includes('SystemAdmin') ||
       (n.visibility === 'Shared' && this.sharedWith(n, caller))
@@ -385,10 +389,16 @@ export class MockNotes {
   /** Share (L2-093): the visibility and audience, and a notification for each new recipient. */
   private share(route: Route, n: MockNote, caller: MockAccount, body: Record<string, unknown>) {
     const visibility = body['visibility'] as MockNoteVisibility;
-    if (!['Private', 'Shared', 'Global'].includes(visibility))
+    if (!['Private', 'Shared', 'OrgWide', 'PortfolioWide'].includes(visibility))
       return this.invalid(route, { Visibility: ['Choose who can see it.'] });
+    if (
+      visibility === 'PortfolioWide' &&
+      !this.context.organizations.mayPublishPortfolioWide(caller)
+    )
+      return route.fulfill({ status: 403 });
     const memberIds = visibility === 'Shared' ? ((body['memberIds'] as string[]) ?? []) : [];
-    const roles = visibility === 'Shared' ? ((body['roles'] as string[]) ?? []) : [];
+    const roles =
+      visibility === 'Shared' ? ((body['roles'] as string[]) ?? []).map(legacyRoleOf) : [];
     if (roles.some((r) => !SHAREABLE.includes(r)))
       return this.invalid(route, { Roles: ['Choose roles from the list.'] });
     if (visibility === 'Shared' && memberIds.length === 0 && roles.length === 0)
@@ -430,7 +440,7 @@ export class MockNotes {
         id: a.profileId,
         name: a.name,
         city: this.context.profiles.get(a.profileId)?.homeCity ?? null,
-        roles: [...a.roles].sort(),
+        roles: a.roles.map(roleNameOf).sort(),
       }));
     return this.json(route, 200, people);
   }
@@ -535,6 +545,7 @@ export class MockNotes {
 
   private summary(n: MockNote, caller: MockAccount) {
     return {
+      organization: { id: 'org-toronto', slug: 'faithtech-toronto', name: 'FaithTech Toronto' },
       id: n.id,
       title: n.title,
       icon: n.icon,
@@ -563,7 +574,7 @@ export class MockNotes {
         ? null
         : n.memberIds.includes(caller.profileId)
           ? 'you'
-          : (n.roles.find((r) => caller.roles.includes(r)) ?? null);
+          : (n.roles.filter((r) => caller.roles.includes(r)).map(roleKeyOf)[0] ?? null);
     return {
       ...this.summary(n, caller),
       parentId: n.parentId,
@@ -576,7 +587,8 @@ export class MockNotes {
           city: this.context.profiles.get(id)?.homeCity ?? null,
         })),
         roles: n.roles.map((role) => ({
-          role,
+          role: roleKeyOf(role),
+          name: roleNameOf(role),
           count: [...this.context.accounts.values()].filter((a) => a.roles.includes(role)).length,
         })),
       },

@@ -76,7 +76,7 @@ test.describe('Reports access', () => {
     await shell.moreLink.click();
     await shell.drawerLink('Reports').click();
 
-    await expect(page).toHaveURL('/reports');
+    await expect(page).toHaveURL('/o/faithtech-toronto/reports');
     await expect(reports.heading).toHaveText('Reports');
     await axe.check();
   });

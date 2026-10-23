@@ -31,7 +31,7 @@ public static class ResourceClients
 
     public sealed record AudienceMember(Guid Id, string Name, string? City);
 
-    public sealed record AudienceRole(string Role, int Count);
+    public sealed record AudienceRole(string Role, int Count, string? Name = null);
 
     public sealed record Audience(AudienceMember[] Members, AudienceRole[] Roles);
 
@@ -106,7 +106,7 @@ public static class ResourceClients
 
     public static async Task<Detail> AddFileAsync(
         this CommunityApiFactory factory, ProfileClients.Member owner, Upload? file = null,
-        IDictionary<string, string>? fields = null, IEnumerable<string>? tags = null, Role role = Role.CityLead)
+        IDictionary<string, string>? fields = null, IEnumerable<string>? tags = null, SeededRole role = SeededRole.CityLead)
     {
         var response = await factory.ClientFor(owner, role).UploadAsync(file ?? Deck(), fields, tags);
         response.EnsureSuccessStatusCode();

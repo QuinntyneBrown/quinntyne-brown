@@ -5,4 +5,5 @@ public enum AudienceKind
     Everyone,
     Roles,
     EventRsvps,
+    Portfolio,
 }

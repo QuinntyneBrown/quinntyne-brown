@@ -25,6 +25,15 @@ Each recipient receives an in-app notification and, unless the recipient opted o
 
 A send to a large audience runs in one request; the outbox worker delivers the emails, and a background fan-out job is deferred (ADR 0016).
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- "Communications Lead or System Admin" becomes a holder of `announcements.send` in the target org (the seeded Communications Lead), or its Org Lead, the Portfolio Lead or a System Admin (`L2-151` AC1).
+- `Announcement` carries a required `OrganizationId`. The audience is the org's members, holders of chosen catalogue roles of that org (`RoleDefinitionId` instead of `Role`), or one of the org's events' RSVP list.
+- The Portfolio Lead may choose **Everyone in the portfolio**: every member of every org of the portfolio receives it once, and it is labelled "Portfolio" (`L2-151` AC2). Anyone else choosing it answers `403` (`L2-151` AC3). Cross-org role holders are not members and are not recipients by default.
+- The email opt-out is unchanged.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

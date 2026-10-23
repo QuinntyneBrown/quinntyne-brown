@@ -148,6 +148,15 @@ Missing, to be added to `components` first (design system pages `stat`, `progres
 - **Backend integration tests** (`backend/tests/QuinntyneBrown.Community.Api.Tests/Reports/`, EF Core in-memory with a unique database per fixture and `FakeTimeProvider`): `ReportAccessTests` (Staff and System Admin `200`; each lead role, Volunteer, no role `403` on both routes; anonymous `401`), `ReportFiltersTests` (defaults, city list from verified members and events, `400` for unknown values), `ReportFiguresTests` (one test per definition and exclusion, period edges at `From` and now, All time, private contacts never counted), `ReportChartsTests`, `ReportExportTests` (sections, every cell quoted, guarded cells, file name) and `JoinedAtTests` (sign-up, Google, invite and connect sign-up stamp the join time). `backend/tests/QuinntyneBrown.Community.Infrastructure.Tests/Csv/CsvWriterTests.cs` covers quoting, doubled quotes, line breaks, nulls, empty rows and each guarded character.
 - **Angular unit tests** sit next to `ReportsPage`, `HttpReportsService` and the new components.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `ReportAccess.CanRead` becomes: the caller holds `reports.view` in at least one org where `reports` is on, which includes the Staff and Portfolio cross-org roles, the Org Lead, the Portfolio Lead and System Admin; anyone else answers `403` (`L2-150` AC3). [ADR 0035](../../../adr/0035-cross-org-roles.md) supersedes ADR 0031's "Staff and System Admin" in part.
+- Every aggregate adds `OrganizationId IN scope`, where scope is `access.OrgsWith(Permissions.ReportsView) ∩ ReadScope("reports")`. Members are counted through `OrgMembership` rows of scoped orgs rather than every profile; a person in two scoped orgs is counted once under all orgs.
+- A new `org` query parameter (a slug) narrows the report to one org; a slug outside the scope answers `404` (`L2-150` AC2). `ReportDto` gains `orgs: { id, slug, name }[]` for the filter, which the page shows beside the existing city and period filters. The URL carries `?org=`.
+- The CSV export applies the same scope and filter. Private contacts stay out of every query.
+
 ## Requirements
 
 | L2 ID | Refines (L1) | Requirement |

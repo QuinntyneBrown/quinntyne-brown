@@ -30,9 +30,9 @@ export class PublicShellComponent {
     { initialValue: this.router.url },
   );
 
-  /** /public/events/{id} signs in to /events/{id}. */
+  /** /o/{slug}/events/{id} signs in to the same address, which members see as the event page (L2-149). */
   protected readonly signInHref = computed(() => {
-    const id = /^\/public\/events\/([^/?#]+)/.exec(this.url())?.[1];
-    return id ? `/sign-in?returnUrl=${encodeURIComponent(`/events/${id}`)}` : '/sign-in';
+    const page = /^\/o\/[^/?#]+\/events\/[^/?#]+/.exec(this.url())?.[0];
+    return page ? `/sign-in?returnUrl=${encodeURIComponent(page)}` : '/sign-in';
   });
 }

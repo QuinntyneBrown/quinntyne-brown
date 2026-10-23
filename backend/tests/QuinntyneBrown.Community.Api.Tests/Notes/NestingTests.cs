@@ -49,12 +49,12 @@ public class NestingTests(CommunityApiFactory factory) : IClassFixture<Community
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var client = factory.ClientFor(grace);
-        var playbook = await factory.AddNoteAsync(grace, "Playbook", "Global");
+        var playbook = await factory.AddNoteAsync(grace, "Playbook", "OrgWide");
         await client.CreateNoteAsync("Private child", playbook.Id);
         var open = await client.CreateNoteAsync("Open child", playbook.Id);
         await factory.WithDbAsync(async db =>
         {
-            (await db.NotePages.FindAsync(open.Id))!.SetAudience(Domain.Notes.NoteVisibility.Global, [], []);
+            (await db.NotePages.FindAsync(open.Id))!.SetAudience(Domain.Notes.NoteVisibility.OrgWide, [], []);
             return await db.SaveChangesAsync();
         });
 
@@ -68,7 +68,7 @@ public class NestingTests(CommunityApiFactory factory) : IClassFixture<Community
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var hannah = await factory.AddMemberAsync("Hannah Kim");
-        var theirs = await factory.AddNoteAsync(hannah, "Hannah’s playbook", "Global");
+        var theirs = await factory.AddNoteAsync(hannah, "Hannah’s playbook", "OrgWide");
         var client = factory.ClientFor(grace);
         var mine = await client.CreateNoteAsync("Run sheet");
 
@@ -105,7 +105,7 @@ public class NestingTests(CommunityApiFactory factory) : IClassFixture<Community
     public async Task Someone_who_can_read_a_page_cannot_move_it()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var page = await factory.AddNoteAsync(grace, "Playbook", "Global");
+        var page = await factory.AddNoteAsync(grace, "Playbook", "OrgWide");
         var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"));
 
         var response = await marcus.PutAsJsonAsync($"/api/notes/{page.Id}/parent", new { ParentId = (Guid?)null });

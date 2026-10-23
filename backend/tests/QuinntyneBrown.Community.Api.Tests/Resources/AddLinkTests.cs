@@ -11,14 +11,14 @@ namespace QuinntyneBrown.Community.Api.Tests.Resources;
 public class AddLinkTests(CommunityApiFactory factory) : IClassFixture<CommunityApiFactory>
 {
     private static object Link(string? url, string? title = "Event poster template", string type = "Template") =>
-        new { Url = url, Title = title, Description = "Canva template", Type = type, Tags = new[] { "Events" }, Visibility = "Global" };
+        new { Url = url, Title = title, Description = "Canva template", Type = type, Tags = new[] { "Events" }, Visibility = "OrgWide" };
 
     [Fact]
     public async Task A_lead_adds_an_https_link_and_its_host_is_derived()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsJsonAsync("/api/resources/links", Link("https://www.canva.com/design/DAF123/edit"));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync("/api/resources/links", Link("https://www.canva.com/design/DAF123/edit"));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var link = (await response.Content.ReadFromJsonAsync<Detail>())!;
@@ -38,7 +38,7 @@ public class AddLinkTests(CommunityApiFactory factory) : IClassFixture<Community
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsJsonAsync("/api/resources/links", Link(url));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync("/api/resources/links", Link(url));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Equal("Use a link that starts with https://.", (await response.Content.ReadFromJsonAsync<ValidationProblemDetails>())!.Errors["Url"].Single());
@@ -49,7 +49,7 @@ public class AddLinkTests(CommunityApiFactory factory) : IClassFixture<Community
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsJsonAsync("/api/resources/links", Link("https://canva.com/d/1", title: " ", type: ""));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync("/api/resources/links", Link("https://canva.com/d/1", title: " ", type: ""));
 
         var errors = (await response.Content.ReadFromJsonAsync<ValidationProblemDetails>())!.Errors;
         Assert.Equal(["Title", "Type"], errors.Keys.Order());
@@ -60,7 +60,7 @@ public class AddLinkTests(CommunityApiFactory factory) : IClassFixture<Community
     {
         var volunteer = await factory.AddMemberAsync("Samuel Mensah");
 
-        var response = await factory.ClientFor(volunteer, Role.Volunteer).PostAsJsonAsync("/api/resources/links", Link("https://canva.com/d/1"));
+        var response = await factory.ClientFor(volunteer, SeededRole.Volunteer).PostAsJsonAsync("/api/resources/links", Link("https://canva.com/d/1"));
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
@@ -69,7 +69,7 @@ public class AddLinkTests(CommunityApiFactory factory) : IClassFixture<Community
     public async Task The_owner_changes_the_link_and_it_is_never_fetched()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         var link = (await (await client.PostAsJsonAsync("/api/resources/links", Link("https://canva.com/d/1"))).Content.ReadFromJsonAsync<Detail>())!;
 
         var bad = await client.PutAsJsonAsync($"/api/resources/{link.Id}", new

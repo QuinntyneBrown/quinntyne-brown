@@ -17,8 +17,8 @@ public class ResourceVisibilityTests(CommunityApiFactory factory) : IClassFixtur
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var budget = await factory.AddFileAsync(grace, new Upload("budget.pdf", Pdf), Private);
-        var staff = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), Role.Staff);
-        var lead = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), Role.CityLead);
+        var staff = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), SeededRole.Staff);
+        var lead = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead);
 
         foreach (var other in new[] { staff, lead })
         {
@@ -38,7 +38,7 @@ public class ResourceVisibilityTests(CommunityApiFactory factory) : IClassFixtur
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var budget = await factory.AddFileAsync(grace, new Upload("budget.pdf", Pdf), Private);
         var priya = await factory.AddMemberAsync("Priya Shah");
-        var admin = factory.ClientFor(priya, Role.SystemAdmin);
+        var admin = factory.ClientFor(priya, SeededRole.SystemAdmin);
 
         var page = await admin.GetFromJsonAsync<Detail>($"/api/resources/{budget.Id}");
         var download = await admin.GetAsync($"/api/resources/{budget.Id}/file");
@@ -55,11 +55,11 @@ public class ResourceVisibilityTests(CommunityApiFactory factory) : IClassFixtur
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var deck = await factory.AddFileAsync(grace, Deck());
-        var volunteer = factory.ClientFor(await factory.AddMemberAsync("Samuel Mensah"), Role.Volunteer);
+        var volunteer = factory.ClientFor(await factory.AddMemberAsync("Samuel Mensah"), SeededRole.Volunteer);
 
         var row = (await volunteer.ListResourcesAsync()).Items.Single(r => r.Id == deck.Id);
 
-        Assert.Equal(("Grace Okonkwo", false, "Global", false), (row.OwnerName, row.IsOwn, row.Visibility, row.SharedWithYou));
+        Assert.Equal(("Grace Okonkwo", false, "OrgWide", false), (row.OwnerName, row.IsOwn, row.Visibility, row.SharedWithYou));
         var page = (await volunteer.GetFromJsonAsync<Detail>($"/api/resources/{deck.Id}"))!;
         Assert.False(page.CanEdit || page.CanTransfer);
     }

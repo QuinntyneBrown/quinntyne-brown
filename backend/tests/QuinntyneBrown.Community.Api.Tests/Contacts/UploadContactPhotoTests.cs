@@ -17,7 +17,7 @@ public class UploadContactPhotoTests(CommunityApiFactory factory) : IClassFixtur
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var response = await client.UploadContactPhotoAsync(contact.Id, TestImages.JpegWithExif(3200, 1600), "coffee.jpg", "  Tomás at the coffee morning ");
 
@@ -46,7 +46,7 @@ public class UploadContactPhotoTests(CommunityApiFactory factory) : IClassFixtur
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         var first = await client.AddContactPhotoAsync(contact.Id, "First");
         factory.Time.Advance(TimeSpan.FromMinutes(1));
 
@@ -58,16 +58,16 @@ public class UploadContactPhotoTests(CommunityApiFactory factory) : IClassFixtur
         Assert.Equal("First", reloaded.PhotoAltText);
     }
 
-    public static TheoryData<string, Role[]> Outsiders() => new()
+    public static TheoryData<string, SeededRole[]> Outsiders() => new()
     {
-        { "another lead", [Role.CityLead] },
-        { "Staff", [Role.Staff] },
+        { "another lead", [SeededRole.CityLead] },
+        { "Staff", [SeededRole.Staff] },
         { "a member with no role", [] },
     };
 
     [Theory]
     [MemberData(nameof(Outsiders))]
-    public async Task Anyone_but_the_owner_or_a_system_admin_gets_404_and_nothing_is_stored(string who, Role[] roles)
+    public async Task Anyone_but_the_owner_or_a_system_admin_gets_404_and_nothing_is_stored(string who, SeededRole[] roles)
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
@@ -85,7 +85,7 @@ public class UploadContactPhotoTests(CommunityApiFactory factory) : IClassFixtur
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).UploadContactPhotoAsync(Guid.NewGuid(), TestImages.Jpeg(), "a.jpg", "A photo");
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).UploadContactPhotoAsync(Guid.NewGuid(), TestImages.Jpeg(), "a.jpg", "A photo");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -97,7 +97,7 @@ public class UploadContactPhotoTests(CommunityApiFactory factory) : IClassFixtur
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
         var admin = await factory.AddMemberAsync("Priya Shah");
 
-        var response = await factory.ClientFor(admin, Role.SystemAdmin).UploadContactPhotoAsync(contact.Id, TestImages.Jpeg(), "a.jpg", "A photo");
+        var response = await factory.ClientFor(admin, SeededRole.SystemAdmin).UploadContactPhotoAsync(contact.Id, TestImages.Jpeg(), "a.jpg", "A photo");
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.Contains("contact.photo-added", await AdminActions(contact.Id, admin));
@@ -184,7 +184,7 @@ public class UploadContactPhotoTests(CommunityApiFactory factory) : IClassFixtur
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
-        return (factory.ClientFor(grace, Role.CityLead), contact);
+        return (factory.ClientFor(grace, SeededRole.CityLead), contact);
     }
 
     private Task<List<Domain.Contacts.ContactPhoto>> PhotosOf(Guid contactId) =>

@@ -49,10 +49,10 @@ public class EventAuthoringTests(CommunityApiFactory factory) : IClassFixture<Co
 
     // AC1: Given an Event Lead, City Lead or System Admin, when they create an event with every field, then it is saved.
     [Theory]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Event_manager_creates_an_event_with_every_field(Role role)
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Event_manager_creates_an_event_with_every_field(SeededRole role)
     {
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
 
@@ -75,7 +75,7 @@ public class EventAuthoringTests(CommunityApiFactory factory) : IClassFixture<Co
     {
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(lead, Role.EventLead).PostAsJsonAsync("/api/events",
+        var response = await factory.ClientFor(lead, SeededRole.EventLead).PostAsJsonAsync("/api/events",
             Request(format: "Online", venue: "ignored", onlineLink: "https://meet.example.org/ft", capacity: null));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -132,11 +132,11 @@ public class EventAuthoringTests(CommunityApiFactory factory) : IClassFixture<Co
     // AC3: Given any other role, when it calls the create or edit API, then the response is 403.
     [Theory]
     [InlineData]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.Volunteer)]
-    [InlineData(Role.Attendee)]
-    [InlineData(Role.CreateLead, Role.CommunicationsLead, Role.ProductEngineer)]
-    public async Task Any_other_role_gets_403_for_create_and_edit(params Role[] roles)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.Volunteer)]
+    [InlineData(SeededRole.Attendee)]
+    [InlineData(SeededRole.CreateLead, SeededRole.CommunicationsLead, SeededRole.ProductEngineer)]
+    public async Task Any_other_role_gets_403_for_create_and_edit(params SeededRole[] roles)
     {
         var member = await factory.AddMemberAsync("Leah Thompson");
         var existing = await factory.AddEventAsync("Builders Night", TimeSpan.FromDays(7));
@@ -156,7 +156,7 @@ public class EventAuthoringTests(CommunityApiFactory factory) : IClassFixture<Co
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
         var existing = await factory.AddEventAsync("Builders Night", TimeSpan.FromDays(7));
 
-        var response = await factory.ClientFor(lead, Role.CityLead).PutAsJsonAsync($"/api/events/{existing.Id}",
+        var response = await factory.ClientFor(lead, SeededRole.CityLead).PutAsJsonAsync($"/api/events/{existing.Id}",
             Request(title: "Builders Night (new venue)", venue: "Trinity Community Centre", capacity: null));
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -170,7 +170,7 @@ public class EventAuthoringTests(CommunityApiFactory factory) : IClassFixture<Co
     {
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
         var existing = await factory.AddEventAsync("Builders Night", TimeSpan.FromDays(7));
-        var client = factory.ClientFor(lead, Role.EventLead);
+        var client = factory.ClientFor(lead, SeededRole.EventLead);
 
         var unknown = await client.PutAsJsonAsync($"/api/events/{Guid.NewGuid()}", Request());
         var invalid = await client.PutAsJsonAsync($"/api/events/{existing.Id}", Request(venue: null));
@@ -187,7 +187,7 @@ public class EventAuthoringTests(CommunityApiFactory factory) : IClassFixture<Co
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
         var existing = await factory.AddEventAsync("Builders Night", TimeSpan.FromDays(7), cancelledBecause: "Venue flooded.");
 
-        var response = await factory.ClientFor(lead, Role.EventLead).PutAsJsonAsync($"/api/events/{existing.Id}", Request());
+        var response = await factory.ClientFor(lead, SeededRole.EventLead).PutAsJsonAsync($"/api/events/{existing.Id}", Request());
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
@@ -200,7 +200,7 @@ public class EventAuthoringTests(CommunityApiFactory factory) : IClassFixture<Co
         var existing = await factory.AddEventAsync("Builders Night", TimeSpan.FromDays(7), rsvps: 2);
         var notified = existing.Rsvps.Select(r => r.ProfileId!.Value).ToHashSet();
 
-        var response = await factory.ClientFor(lead, Role.EventLead).PutAsJsonAsync($"/api/events/{existing.Id}",
+        var response = await factory.ClientFor(lead, SeededRole.EventLead).PutAsJsonAsync($"/api/events/{existing.Id}",
             Request(title: "Builders Night", venue: "Trinity Community Centre"));
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -221,7 +221,7 @@ public class EventAuthoringTests(CommunityApiFactory factory) : IClassFixture<Co
         var admin = await factory.AddMemberAsync("Priya Shah");
         var existing = await factory.AddEventAsync("Builders Night", TimeSpan.FromDays(7));
 
-        var response = await factory.ClientFor(admin, Role.SystemAdmin).PutAsJsonAsync($"/api/events/{existing.Id}",
+        var response = await factory.ClientFor(admin, SeededRole.SystemAdmin).PutAsJsonAsync($"/api/events/{existing.Id}",
             Request(title: "Builders Night (moved)"));
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -233,7 +233,7 @@ public class EventAuthoringTests(CommunityApiFactory factory) : IClassFixture<Co
     private async Task<Dictionary<string, string[]>> PostInvalidAsync(object request)
     {
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
-        var response = await factory.ClientFor(lead, Role.EventLead).PostAsJsonAsync("/api/events", request);
+        var response = await factory.ClientFor(lead, SeededRole.EventLead).PostAsJsonAsync("/api/events", request);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<JsonElement>();
         return problem.GetProperty("errors").Deserialize<Dictionary<string, string[]>>()!;

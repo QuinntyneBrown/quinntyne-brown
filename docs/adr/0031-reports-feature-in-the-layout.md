@@ -1,6 +1,6 @@
 # 0031. Reports feature added to the layout
 
-- Status: Accepted
+- Status: Accepted; superseded in part by ADR 0035 (Reports for holders of `reports.view` in the orgs they cover)
 - Date: 2026-10-22
 - Requirements: L1-024, L2-123 to L2-129, L2-045 AC4 and AC5
 - Design: `docs/detailed-designs/reports/reports-dashboard`

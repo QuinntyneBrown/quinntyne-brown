@@ -25,7 +25,7 @@ public class PartnerTimelineTests(CommunityApiFactory factory) : IClassFixture<C
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var lead = await factory.CreatePartnerAsync(grace, "Maple Street Church");
         var funnel = await factory.CreatePartnerAsync(grace, "Lantern Foundation", "InFunnel");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var added = Assert.Single((await client.ActivitiesAsync(lead.Id)).Items);
         Assert.Equal(
@@ -39,7 +39,7 @@ public class PartnerTimelineTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var partner = await factory.CreatePartnerAsync(grace, "Kestrel Labs");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         factory.Time.Advance(TimeSpan.FromMinutes(1));
 
         await client.PostAsJsonAsync($"/api/partners/{partner.Id}/stage", new { To = "InFunnel", Note = "Proposal sent." });
@@ -62,7 +62,7 @@ public class PartnerTimelineTests(CommunityApiFactory factory) : IClassFixture<C
             ("afternoon, logged later", day, new TimeOnly(14, 0), 5),
             ("the day before", day.AddDays(-1), new TimeOnly(23, 0), 0));
 
-        var page = await factory.ClientFor(grace, Role.CityLead).ActivitiesAsync(partner.Id, "?kind=Note");
+        var page = await factory.ClientFor(grace, SeededRole.CityLead).ActivitiesAsync(partner.Id, "?kind=Note");
 
         Assert.Equal(
             ["afternoon, logged later", "afternoon, logged first", "morning", "no time", "the day before"],
@@ -78,7 +78,7 @@ public class PartnerTimelineTests(CommunityApiFactory factory) : IClassFixture<C
     public async Task A_kind_filter_lists_only_that_kind_and_stage_includes_added(string kind, string[] expected)
     {
         var (grace, partner) = await PartnerAsync();
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         foreach (var logged in new[] { "Call", "Email", "Meeting", "Note" })
         {
             await client.LogActivityAsync(partner.Id, NewActivity(logged, occurredOn: DateOnly.FromDateTime(Now).ToString("yyyy-MM-dd")));
@@ -101,7 +101,7 @@ public class PartnerTimelineTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var (grace, partner) = await PartnerAsync();
 
-        var response = await factory.ClientFor(grace, Role.CityLead).GetAsync($"/api/partners/{partner.Id}/activities{query}");
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).GetAsync($"/api/partners/{partner.Id}/activities{query}");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -114,7 +114,7 @@ public class PartnerTimelineTests(CommunityApiFactory factory) : IClassFixture<C
         // 120 notes, many on the same date and time, so paging must use the log time and id too.
         await SeedAsync(partner.Id, grace.ProfileId,
             [.. Enumerable.Range(0, 120).Select(i => ($"note {i}", day.AddDays(-(i / 40)), i % 3 == 0 ? (TimeOnly?)null : new TimeOnly(10, 0), i % 2))]);
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var first = await client.ActivitiesAsync(partner.Id, "?kind=Note");
         var second = await client.ActivitiesAsync(partner.Id, $"?kind=Note&before={first.Before}");
@@ -133,7 +133,7 @@ public class PartnerTimelineTests(CommunityApiFactory factory) : IClassFixture<C
     public async Task The_partner_and_its_card_show_the_latest_next_step_and_the_last_activity()
     {
         var (grace, partner) = await PartnerAsync();
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         var today = DateOnly.FromDateTime(Now);
         Assert.Equal((today, (string?)null), ((await client.GetFromJsonAsync<Partner>($"/api/partners/{partner.Id}"))!.LastActivityOn, (await client.GetFromJsonAsync<Partner>($"/api/partners/{partner.Id}"))!.NextStep));
 
@@ -152,7 +152,7 @@ public class PartnerTimelineTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var (grace, partner) = await PartnerAsync();
 
-        var read = (await factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), Role.Staff).GetFromJsonAsync<Partner>($"/api/partners/{partner.Id}"))!;
+        var read = (await factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), SeededRole.Staff).GetFromJsonAsync<Partner>($"/api/partners/{partner.Id}"))!;
 
         Assert.False(read.CanLogActivity);
     }

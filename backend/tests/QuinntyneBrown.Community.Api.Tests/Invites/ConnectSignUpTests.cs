@@ -27,7 +27,7 @@ public class ConnectSignUpTests(CommunityApiFactory factory) : IClassFixture<Com
         var (user, profile) = await AccountAsync(email);
         Assert.False(user.EmailConfirmed);
         Assert.Equal("Tomás Ortega", profile.Name);
-        Assert.Empty(profile.Roles);
+        Assert.Empty(await factory.WithDbAsync(db => SeededRoles.OfAsync(db, profile.Id)));
         Assert.Single(factory.Emails.SentTo(email));
         Assert.Empty(await ContactsOfAsync(grace));
         Assert.Empty(await NotificationsForAsync(grace));
@@ -53,7 +53,7 @@ public class ConnectSignUpTests(CommunityApiFactory factory) : IClassFixture<Com
         var message = Assert.Single(await factory.QueuedEmailsToAsync(await factory.EmailOfAsync(grace)));
         Assert.Equal("Tomás Ortega connected with you", message.Subject);
         Assert.Contains($"{CommunityApiFactory.WebAppOrigin}/contacts/{contact.Id}", message.Body);
-        Assert.Empty((await factory.WithDbAsync(db => db.Profiles.AsNoTracking().SingleAsync(p => p.Id == profile.Id))).Roles);
+        Assert.Empty(await factory.WithDbAsync(db => SeededRoles.OfAsync(db, profile.Id)));
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class ConnectSignUpTests(CommunityApiFactory factory) : IClassFixture<Com
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var email = $"{Guid.NewGuid():N}@example.org";
         var existing = await factory.CreateContactAsync(grace, "Tomás from Builders Night", email.ToUpperInvariant(), notes: "Wants to mentor.");
-        await factory.ClientFor(grace, Role.CityLead).PostAsync($"/api/contacts/{existing.Id}/archive", null);
+        await factory.ClientFor(grace, SeededRole.CityLead).PostAsync($"/api/contacts/{existing.Id}/archive", null);
         var token = await factory.ConnectTokenOfAsync(grace);
 
         await factory.VerifyAsync(await factory.SignUpThroughAsync(token, email));
@@ -101,12 +101,12 @@ public class ConnectSignUpTests(CommunityApiFactory factory) : IClassFixture<Com
         await factory.VerifyAsync(await factory.SignUpThroughAsync(token, email));
         var contact = Assert.Single(await ContactsOfAsync(grace));
 
-        var estherClient = factory.ClientFor(esther, Role.CityLead);
+        var estherClient = factory.ClientFor(esther, SeededRole.CityLead);
         Assert.DoesNotContain(await estherClient.ListContactsAsync(), c => c.Id == contact.Id);
         Assert.Equal(HttpStatusCode.NotFound, (await estherClient.GetAsync($"/api/contacts/{contact.Id}")).StatusCode);
-        Assert.Equal(HttpStatusCode.OK, (await factory.ClientFor(grace, Role.CityLead).GetAsync($"/api/contacts/{contact.Id}")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await factory.ClientFor(grace, SeededRole.CityLead).GetAsync($"/api/contacts/{contact.Id}")).StatusCode);
         var priya = await factory.AddMemberAsync("Priya Shah");
-        Assert.Equal(HttpStatusCode.OK, (await factory.ClientFor(priya, Role.SystemAdmin).GetAsync($"/api/contacts/{contact.Id}")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await factory.ClientFor(priya, SeededRole.SystemAdmin).GetAsync($"/api/contacts/{contact.Id}")).StatusCode);
         Assert.True(await factory.WithDbAsync(db => db.AuditEntries.AnyAsync(e => e.TargetId == contact.Id.ToString() && e.Action == "contact.viewed")));
     }
 
@@ -132,7 +132,7 @@ public class ConnectSignUpTests(CommunityApiFactory factory) : IClassFixture<Com
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var old = await factory.ConnectTokenOfAsync(grace);
-        await factory.ClientFor(grace, Role.CityLead).PostAsync("/api/connect/link", null);
+        await factory.ClientFor(grace, SeededRole.CityLead).PostAsync("/api/connect/link", null);
         var email = $"{Guid.NewGuid():N}@example.org";
 
         var replaced = await factory.CreateClient().PostAsJsonAsync("/api/connect/sign-up",

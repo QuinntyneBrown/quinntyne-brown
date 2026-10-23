@@ -9,7 +9,7 @@ public class EventTests
     internal static readonly Guid Creator = Guid.NewGuid();
 
     internal static Event NewEvent(int? capacity = null) =>
-        new("Builders night", "Ship something.", EventType.BuildersNight, Start, Start.AddHours(3), "Toronto",
+        new(Guid.NewGuid(), "Builders night", "Ship something.", EventType.BuildersNight, Start, Start.AddHours(3), "Toronto",
             EventFormat.InPerson, "The Hub", null, capacity, EventVisibility.Public, Creator);
 
     [Fact]
@@ -26,28 +26,28 @@ public class EventTests
     [Fact]
     public void An_event_needs_a_title()
     {
-        Assert.Throws<ArgumentException>(() => new Event(" ", "", EventType.Gathering, Start, Start.AddHours(1), "Toronto",
+        Assert.Throws<ArgumentException>(() => new Event(Guid.NewGuid(), " ", "", EventType.Gathering, Start, Start.AddHours(1), "Toronto",
             EventFormat.Online, null, "https://meet.example.org", null, EventVisibility.MembersOnly, Creator));
     }
 
     [Fact]
     public void An_event_cannot_end_before_it_starts()
     {
-        Assert.Throws<ArgumentException>(() => new Event("Panel", "", EventType.Panel, Start, Start.AddMinutes(-1), "Toronto",
+        Assert.Throws<ArgumentException>(() => new Event(Guid.NewGuid(), "Panel", "", EventType.Panel, Start, Start.AddMinutes(-1), "Toronto",
             EventFormat.Online, null, "https://meet.example.org", null, EventVisibility.MembersOnly, Creator));
     }
 
     [Fact]
     public void An_in_person_event_needs_a_venue()
     {
-        Assert.Throws<ArgumentException>(() => new Event("Panel", "", EventType.Panel, Start, Start.AddHours(1), "Toronto",
+        Assert.Throws<ArgumentException>(() => new Event(Guid.NewGuid(), "Panel", "", EventType.Panel, Start, Start.AddHours(1), "Toronto",
             EventFormat.InPerson, " ", null, null, EventVisibility.MembersOnly, Creator));
     }
 
     [Fact]
     public void An_online_event_needs_a_link()
     {
-        Assert.Throws<ArgumentException>(() => new Event("Panel", "", EventType.Panel, Start, Start.AddHours(1), "Toronto",
+        Assert.Throws<ArgumentException>(() => new Event(Guid.NewGuid(), "Panel", "", EventType.Panel, Start, Start.AddHours(1), "Toronto",
             EventFormat.Online, "The Hub", null, null, EventVisibility.MembersOnly, Creator));
     }
 

@@ -43,6 +43,15 @@ The slice runs from the email field on the contact form to the `Contacts` and `C
 - `backend/tests/QuinntyneBrown.Community.Api.Tests/Contacts/FindDuplicateContactTests.cs` — own active and archived matches, case and whitespace differences, `excludeId`, another lead's contact with the same email answering `204` (`L2-116` AC5), a System Admin never matched against another lead's contact (AC6), and `401` and `403` (AC8).
 - `e2e/tests/contacts/possible-duplicate.spec.ts` with page object additions in `e2e/pages/contact-form.page.ts` — the warning on blur with Open {name} (AC2), "Save as a new contact" (AC3), no warning for no match or another lead's contact (AC4, AC5), the edit form excluding itself, a failed or slow check not blocking save (AC7), and an axe check of the warning state.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Contact` and `PendingConnection` carry a required `OrganizationId`; notes and photos belong to the contact. Contacts are created in the active org and require `contacts.private` there (the four FaithTech leads, or a tier).
+- Private contacts and their notes stay visible only to their owner and to System Admin, audited. The Portfolio Lead, Org Lead and cross-org roles never see them, by id, list or search (`L2-148` AC6). This check is explicit in `ContactAccess` and does not go through `CallerAccess.Has`.
+- Lists are scoped to the owner's contacts in the active org, or in every covered org under "All orgs", with org labels; the `contacts` feature switched off answers `404` ([feature flags](../../organizations/feature-flags/README.md)).
+- Duplicate detection compares the caller's contacts within the same org only.
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirement. It refines a level-1 (L1) requirement, cited by identifier.

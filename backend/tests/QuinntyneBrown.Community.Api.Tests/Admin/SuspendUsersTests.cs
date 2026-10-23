@@ -22,7 +22,7 @@ public class SuspendUsersTests(CommunityApiFactory factory) : IClassFixture<Comm
         var tokens = await _flow.SignInAndGetTokensAsync(email);
         var profileId = await ProfileOfAsync(email);
 
-        var response = await factory.ClientFor(priya, Role.SystemAdmin)
+        var response = await factory.ClientFor(priya, SeededRole.SystemAdmin)
             .PostAsJsonAsync($"/api/admin/users/{profileId}/suspension", new { Reason = "  Repeated spam event listings.  " });
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -46,7 +46,7 @@ public class SuspendUsersTests(CommunityApiFactory factory) : IClassFixture<Comm
         var priya = await factory.AddMemberAsync("Priya Shah");
         var email = await _flow.CreateAccountAsync();
         var profileId = await ProfileOfAsync(email);
-        var admin = factory.ClientFor(priya, Role.SystemAdmin);
+        var admin = factory.ClientFor(priya, SeededRole.SystemAdmin);
         await admin.PostAsJsonAsync($"/api/admin/users/{profileId}/suspension", new { Reason = "Misuse" });
 
         var response = await admin.DeleteAsync($"/api/admin/users/{profileId}/suspension");
@@ -58,9 +58,9 @@ public class SuspendUsersTests(CommunityApiFactory factory) : IClassFixture<Comm
 
     [Theory]
     [InlineData]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.CityLead)]
-    public async Task Any_other_role_gets_403(params Role[] roles)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.CityLead)]
+    public async Task Any_other_role_gets_403(params SeededRole[] roles)
     {
         var caller = await factory.AddMemberAsync("Grace Okonkwo");
         var leah = await factory.AddMemberAsync("Leah Thompson");
@@ -83,7 +83,7 @@ public class SuspendUsersTests(CommunityApiFactory factory) : IClassFixture<Comm
         var leah = await factory.AddMemberAsync("Leah Thompson");
         var value = reason is int length ? new string('r', length) : (string)reason;
 
-        var response = await factory.ClientFor(priya, Role.SystemAdmin)
+        var response = await factory.ClientFor(priya, SeededRole.SystemAdmin)
             .PostAsJsonAsync($"/api/admin/users/{leah.ProfileId}/suspension", new { Reason = value });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -96,7 +96,7 @@ public class SuspendUsersTests(CommunityApiFactory factory) : IClassFixture<Comm
     {
         var priya = await factory.AddMemberAsync("Priya Shah");
         var leah = await factory.AddMemberAsync("Leah Thompson");
-        var admin = factory.ClientFor(priya, Role.SystemAdmin);
+        var admin = factory.ClientFor(priya, SeededRole.SystemAdmin);
 
         var self = await admin.PostAsJsonAsync($"/api/admin/users/{priya.ProfileId}/suspension", new { Reason = "Test" });
         var notSuspended = await admin.DeleteAsync($"/api/admin/users/{leah.ProfileId}/suspension");

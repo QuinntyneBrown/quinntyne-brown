@@ -8,6 +8,7 @@ import { EnvironmentProviders, Provider, makeEnvironmentProviders } from '@angul
 
 import { API_BASE_URL, AUTH_CONFIG, AuthConfig, defaultAuthConfig } from './config';
 import { authInterceptor } from './auth';
+import { ACCESS_SERVICE, HttpAccessService, orgInterceptor } from './access';
 import { httpErrorInterceptor } from './errors';
 import { AUTH_SERVICE, HttpAuthService } from './auth';
 import {
@@ -17,6 +18,12 @@ import {
   HttpPeopleService,
 } from './profiles';
 import { CONTACTS_SERVICE, HttpContactsService } from './contacts';
+import {
+  HttpOrganizationsService,
+  HttpPortfolioService,
+  ORGANIZATIONS_SERVICE,
+  PORTFOLIO_SERVICE,
+} from './organizations';
 import { PARTNERS_SERVICE, HttpPartnersService } from './partners';
 import { TEAM_SERVICE, HttpTeamService } from './team';
 import { ACTIVITY_SERVICE, HttpActivityService } from './activity';
@@ -60,6 +67,7 @@ export function provideApi(baseUrl: string, auth: Partial<AuthConfig> = {}): Env
       useFactory: () => ({ ...defaultAuthConfig(window.location.origin), ...auth }),
     },
     { provide: AUTH_SERVICE, useClass: HttpAuthService },
+    { provide: ACCESS_SERVICE, useClass: HttpAccessService },
     { provide: PROFILES_SERVICE, useClass: HttpProfilesService },
     { provide: PEOPLE_SERVICE, useClass: HttpPeopleService },
     { provide: CONTACTS_SERVICE, useClass: HttpContactsService },
@@ -79,11 +87,13 @@ export function provideApi(baseUrl: string, auth: Partial<AuthConfig> = {}): Env
     { provide: ADMIN_USERS_SERVICE, useClass: HttpAdminUsersService },
     { provide: AUDIT_LOG_SERVICE, useClass: HttpAuditLogService },
     { provide: ROLES_SERVICE, useClass: HttpRolesService },
+    { provide: ORGANIZATIONS_SERVICE, useClass: HttpOrganizationsService },
+    { provide: PORTFOLIO_SERVICE, useClass: HttpPortfolioService },
     { provide: AGILE_SERVICE, useClass: HttpAgileService },
     { provide: AGILE_LIVE_SERVICE, useClass: SignalRAgileLiveService },
   ];
   return makeEnvironmentProviders([
-    provideHttpClient(withInterceptors([authInterceptor, httpErrorInterceptor])),
+    provideHttpClient(withInterceptors([orgInterceptor, authInterceptor, httpErrorInterceptor])),
     ...providers,
   ]);
 }

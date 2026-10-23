@@ -1,6 +1,6 @@
 # 0021. Connect links: a City Lead's reusable QR code
 
-- Status: Accepted
+- Status: Accepted; superseded in part by ADR 0041 (connect links belong to one org and make the person a member)
 - Date: 2026-10-22
 - Requirements: L2-080, L2-081, L2-082, L2-083
 - Design: `docs/detailed-designs/invites/connect-by-qr-code`

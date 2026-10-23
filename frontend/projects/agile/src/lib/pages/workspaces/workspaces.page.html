@@ -53,6 +53,9 @@
                 [meta]="meta(workspace)"
               >
                 <ft-icon-tile leading name="workspaces" />
+                @if (allOrgs() && workspace.organization; as org) {
+                  <ft-org-label meta [name]="org.name" />
+                }
                 @if (workspace.isOwner) {
                   <ft-badge trailing variant="info">Owner</ft-badge>
                 }

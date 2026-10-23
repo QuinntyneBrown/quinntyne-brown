@@ -1,0 +1,33 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Org-owned data and org context
+Container_Boundary(web, "Web app") {
+  Component(shell, "AppShellComponent + org routes", "faithtech-community", "/o/:orgSlug/... children; legacy path redirect guard")
+  Component(guard, "orgGuard / legacyOrgRedirect", "faithtech-community guards", "Validates slug against access; resolves old slugs")
+  Component(sw, "ft-org-switcher", "components", "CDK menu of covered orgs and All orgs")
+  Component(accsvc, "ACCESS_SERVICE / HttpAccessService", "api", "Loads /api/me/access; can(), feature(), active() signals")
+  Component(intc, "orgHeaderInterceptor", "api", "Adds X-Org: active slug or all")
+}
+Container_Boundary(api, "Community API") {
+  Component(mw, "CurrentAccessMiddleware", "Api", "CallerAccess and ActiveOrg for the request")
+  Component(ep, "Feature endpoints", "Minimal API", "Routes unchanged; org is context")
+  Component(scope, "OrgScope", "Application/Organizations", "ReadScope, CreateTarget from CallerAccess and ActiveOrg")
+  Component(vis, "ProfileVisibility", "Application/Organizations", "WhereVisibleTo(access) predicate")
+  Component(h, "Feature handlers and *Access", "Application", "Explicit WHERE OrganizationId IN scope")
+  Component(meep, "MeEndpoints / OrgsEndpoints", "Api", "GET /api/me/access, GET /api/orgs/resolve/{slug}")
+  ComponentDb(db, "CommunityDbContext", "EF Core", "OrganizationId on every aggregate root")
+}
+Rel(shell, guard, "Guards routes with")
+Rel(shell, sw, "Renders")
+Rel(guard, accsvc, "Reads covered orgs")
+Rel(sw, accsvc, "Lists orgs; switches active org")
+Rel(intc, accsvc, "Reads active slug")
+Rel(intc, ep, "X-Org header", "JSON/HTTPS")
+Rel(accsvc, meep, "GET /api/me/access", "JSON/HTTPS")
+Rel(mw, ep, "Admits request with CallerAccess")
+Rel(ep, h, "Dispatches to")
+Rel(h, scope, "Asks scope for feature")
+Rel(h, vis, "Filters profiles with")
+Rel(h, db, "Scoped SQL")
+@enduml

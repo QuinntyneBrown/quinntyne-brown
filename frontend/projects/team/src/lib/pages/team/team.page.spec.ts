@@ -1,14 +1,12 @@
 // Traces to: L2-019
 import { TestBed } from '@angular/core/testing';
 import {
-  AUTH_SERVICE,
-  Role,
   TEAM_SERVICE,
+  provideStaticAccess,
   TeamListDto,
   TeamMemberDto,
 } from '@faithtech-community/api';
 import { Observable, of, throwError } from 'rxjs';
-import { signal } from '@angular/core';
 
 import { TeamPage } from './team.page';
 
@@ -18,7 +16,7 @@ function member(overrides: Partial<TeamMemberDto>): TeamMemberDto {
     name: 'Grace Okonkwo',
     homeCity: 'Toronto',
     photoUrl: 'https://photos.example/grace.jpg',
-    roles: ['CityLead'],
+    roles: ['City Lead'],
     ...overrides,
   };
 }
@@ -28,7 +26,7 @@ const samuel = member({
   profileId: 'p2',
   name: 'Samuel Mensah',
   photoUrl: null,
-  roles: ['CreateLead', 'ProductEngineer'],
+  roles: ['Create Lead', 'Product Engineer'],
 });
 const everyone: TeamListDto = {
   members: [grace, samuel],
@@ -40,14 +38,11 @@ const none: TeamListDto = { members: [], cities: [], next: null, totalCount: 0 }
 
 async function setup(
   list: (filters?: unknown, after?: string | null) => Observable<TeamListDto>,
-  roles: Role[] = ['CityLead'],
+  permissions: string[] = ['invites.send'],
 ) {
   const service = { list: vi.fn(list) };
   TestBed.configureTestingModule({
-    providers: [
-      { provide: TEAM_SERVICE, useValue: service },
-      { provide: AUTH_SERVICE, useValue: { roles: signal(roles) } },
-    ],
+    providers: [{ provide: TEAM_SERVICE, useValue: service }, provideStaticAccess({ permissions })],
   });
   const fixture = TestBed.createComponent(TeamPage);
   const settle = async () => {
@@ -98,7 +93,7 @@ describe('TeamPage', () => {
   });
 
   it('hides Invite someone from members who are not leads', async () => {
-    const { link } = await setup(() => of(everyone), ['Volunteer']);
+    const { link } = await setup(() => of(everyone), ['team.member']);
 
     expect(link('Invite someone')).toBeUndefined();
   });

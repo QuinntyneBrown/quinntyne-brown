@@ -10,7 +10,7 @@ const page: NotePageSummary = {
   ownerId: 'p1',
   ownerName: 'Grace Okonkwo',
   isOwn: false,
-  visibility: 'Global',
+  visibility: 'OrgWide',
   sharedWithYou: false,
   updatedAt: '2026-10-20T12:00:00Z',
   updatedByName: 'Grace Okonkwo',
@@ -31,7 +31,7 @@ describe('note format', () => {
     );
   });
 
-  it('badges visibility from the viewer’s side and nothing for Global', () => {
+  it('badges visibility from the viewer’s side and nothing for Org-wide', () => {
     expect(badgeOf(page)).toBeNull();
     expect(badgeOf({ ...page, visibility: 'Private' })?.text).toBe('Private');
     expect(badgeOf({ ...page, visibility: 'Shared' })?.text).toBe('Shared');

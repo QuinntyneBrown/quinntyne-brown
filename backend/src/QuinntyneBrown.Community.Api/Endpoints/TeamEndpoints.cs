@@ -21,6 +21,11 @@ public static class TeamEndpoints
                 filter = Enum.Parse<TeamRoleFilter>(role, ignoreCase: true);
             }
 
+            if (handler.Unavailable)
+            {
+                return Results.NotFound();
+            }
+
             return await handler.HandleAsync(new ListTeamQuery(filter, city, after, pageSize), cancellationToken) is { } page
                 ? Results.Ok(page)
                 : Results.ValidationProblem(new Dictionary<string, string[]> { ["after"] = ["That page link is out of date. Reload the list."] });

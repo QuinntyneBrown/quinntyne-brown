@@ -5,3 +5,4 @@ export * from './workspace-frame';
 export * from './workspace-settings';
 export * from './workspaces';
 export * from './planning-poker';
+export * from './my-work';

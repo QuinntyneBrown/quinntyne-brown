@@ -1,0 +1,31 @@
+<ft-dialog
+  [heading]="'Edit ' + org.displayName"
+  description="Old links keep working: the previous slug redirects to the new one."
+  [busy]="busy()"
+  (closed)="ref.close()"
+>
+  <form [formGroup]="form" (submit)="$event.preventDefault(); save()">
+    <ft-stack>
+      @if (failed()) {
+        <ft-alert status="danger" heading="Organization not saved">
+          We couldn’t reach Quinntyne Brown. Nothing was changed — try again.
+        </ft-alert>
+      }
+      <ft-form-field required label="Name" [error]="errors()['name'] ?? ''">
+        <ft-text-field formControlName="name" initialFocus [readonly]="busy()" />
+      </ft-form-field>
+      <ft-form-field
+        required
+        label="Slug"
+        help="Lower-case letters, numbers and hyphens, 3 to 40 characters; “all” is reserved."
+        [error]="errors()['slug'] ?? ''"
+      >
+        <ft-text-field formControlName="slug" [readonly]="busy()" />
+      </ft-form-field>
+    </ft-stack>
+  </form>
+  <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+  <ft-button ftDialogFooter variant="primary" [loading]="busy()" (click)="save()">
+    Save changes
+  </ft-button>
+</ft-dialog>

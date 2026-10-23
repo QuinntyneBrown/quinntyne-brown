@@ -33,7 +33,7 @@ public class GlobalSearchTests(CommunityApiFactory factory) : IClassFixture<Comm
         var mine = await factory.CreateContactAsync(grace, $"Tomás {word}");
         await factory.CreateContactAsync(marcus, $"Abby {word}");
 
-        var results = await SearchAsync(factory.ClientFor(grace, Role.CityLead), word);
+        var results = await SearchAsync(factory.ClientFor(grace, SeededRole.CityLead), word);
 
         var contacts = Assert.Single(results.Groups, g => g.Kind == "Contact");
         var item = Assert.Single(contacts.Items);
@@ -48,7 +48,7 @@ public class GlobalSearchTests(CommunityApiFactory factory) : IClassFixture<Comm
         var priya = await factory.AddMemberAsync("Priya Shah");
         await factory.CreateContactAsync(grace, $"Tomás {word}");
 
-        var results = await SearchAsync(factory.ClientFor(priya, Role.SystemAdmin), word);
+        var results = await SearchAsync(factory.ClientFor(priya, SeededRole.SystemAdmin), word);
 
         Assert.DoesNotContain(results.Groups, g => g.Kind == "Contact");
     }
@@ -59,7 +59,7 @@ public class GlobalSearchTests(CommunityApiFactory factory) : IClassFixture<Comm
         var word = Word();
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, $"Tomás {word}");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         await client.PostAsync($"/api/contacts/{contact.Id}/archive", null);
 
         var results = await SearchAsync(client, word);
@@ -68,13 +68,13 @@ public class GlobalSearchTests(CommunityApiFactory factory) : IClassFixture<Comm
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CreateLead)]
-    [InlineData(Role.CommunicationsLead)]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Leads_staff_and_system_admins_find_partners(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CreateLead)]
+    [InlineData(SeededRole.CommunicationsLead)]
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Leads_staff_and_system_admins_find_partners(SeededRole role)
     {
         var word = Word();
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
@@ -88,10 +88,10 @@ public class GlobalSearchTests(CommunityApiFactory factory) : IClassFixture<Comm
     }
 
     [Theory]
-    [InlineData(Role.Volunteer)]
-    [InlineData(Role.ProductEngineer)]
-    [InlineData(Role.Attendee)]
-    public async Task Other_members_never_see_partners(Role role)
+    [InlineData(SeededRole.Volunteer)]
+    [InlineData(SeededRole.ProductEngineer)]
+    [InlineData(SeededRole.Attendee)]
+    public async Task Other_members_never_see_partners(SeededRole role)
     {
         var word = Word();
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
@@ -109,7 +109,7 @@ public class GlobalSearchTests(CommunityApiFactory factory) : IClassFixture<Comm
         var word = Word();
         var cast = await factory.AddCastAsync();
         var story = await factory.AddStoryAsync(cast.WorkspaceId, $"{word} problem briefs for teams");
-        var outsiderLead = await factory.AddWithRolesAsync("Esther Nakamura", Role.CityLead);
+        var outsiderLead = await factory.AddWithRolesAsync("Esther Nakamura", SeededRole.CityLead);
 
         foreach (var client in new[] { factory.OwnerClient(cast), factory.MemberClient(cast), factory.StaffClient(cast), factory.AdminClient(cast) })
         {
@@ -119,7 +119,7 @@ public class GlobalSearchTests(CommunityApiFactory factory) : IClassFixture<Comm
         }
 
         Assert.DoesNotContain((await SearchAsync(factory.OutsiderClient(cast), word)).Groups, g => g.Kind == "WorkItem");
-        Assert.DoesNotContain((await SearchAsync(factory.ClientFor(outsiderLead, Role.CityLead), word)).Groups, g => g.Kind == "WorkItem");
+        Assert.DoesNotContain((await SearchAsync(factory.ClientFor(outsiderLead, SeededRole.CityLead), word)).Groups, g => g.Kind == "WorkItem");
     }
 
     [Fact]
@@ -149,7 +149,7 @@ public class GlobalSearchTests(CommunityApiFactory factory) : IClassFixture<Comm
         var ruth = await factory.AddMemberAsync($"Ruth {word}", p =>
         {
             p.Update(p.Name, "Toronto", "Led the intake team.");
-            p.AddRole(Role.Volunteer, Guid.Empty, DateTime.UtcNow);
+            p.AddRole(SeededRole.Volunteer, Guid.Empty, DateTime.UtcNow);
         });
         var ev = await factory.AddEventAsync($"Hackathon: Tech for {word}", TimeSpan.FromDays(20));
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
@@ -157,7 +157,7 @@ public class GlobalSearchTests(CommunityApiFactory factory) : IClassFixture<Comm
         await factory.CreatePartnerAsync(grace, $"Lantern {word}");
         var jonah = await factory.AddMemberAsync("Jonah Bell");
 
-        var results = await SearchAsync(factory.ClientFor(jonah, Role.ProductEngineer), word);
+        var results = await SearchAsync(factory.ClientFor(jonah, SeededRole.ProductEngineer), word);
 
         Assert.Equal(["Person", "Event"], results.Groups.Select(g => g.Kind));
         var person = Assert.Single(results.Groups[0].Items);

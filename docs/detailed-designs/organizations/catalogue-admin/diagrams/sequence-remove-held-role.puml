@@ -1,0 +1,43 @@
+@startuml
+title UML sequence behaviour — Remove a catalogue role
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Portfolio Lead" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "OrgTypePage" as page
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "OrgTypesEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "CatalogueHandlers" as h
+  participant "IAuditLog" as audit
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Remove "Create Lead"
+page -> ep : DELETE /api/org-types/{typeId}/roles/{roleId}
+ep -> h : DeleteRoleAsync
+h -> db : OrgRoleAssignments for role (+ profile, org)
+alt someone holds it
+  h --> page : 409 { holders: [{ profileId, name, org }] } (L2-137 #3)
+  page --> actor : Lists holders to move first
+else nobody holds it
+  h -> db : Remove role; strip it from other roles' CanGrant
+  h -> audit : catalogue.roleRemoved (before)
+  h --> page : 204
+end
+@enduml

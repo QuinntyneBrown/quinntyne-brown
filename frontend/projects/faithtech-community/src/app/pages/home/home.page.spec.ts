@@ -8,7 +8,8 @@ import {
   EventSummaryDto,
   PARTNERS_SERVICE,
   PartnerBoardDto,
-  Role,
+  StaticOrg,
+  provideStaticAccess,
 } from '@faithtech-community/api';
 import { of, throwError } from 'rxjs';
 
@@ -40,7 +41,15 @@ const board: PartnerBoardDto = {
   ],
 };
 
-async function setup(roles: Role[], events = [event('a'), event('b')]) {
+const CITY_LEAD: StaticOrg = {
+  roles: ['City Lead'],
+  permissions: ['events.manage', 'contacts.private', 'partners.read', 'partners.write'],
+};
+const STAFF: StaticOrg = { roles: ['Staff'], permissions: ['partners.read', 'reports.view'] };
+const VOLUNTEER: StaticOrg = { roles: ['Volunteer'], permissions: ['workspaces.join'] };
+const MEMBER: StaticOrg = { roles: [], permissions: ['notes.create'] };
+
+async function setup(caller: StaticOrg, events = [event('a'), event('b')]) {
   const services = {
     events: { listEvents: vi.fn(() => of({ events, cities: [] })) },
     partners: { getBoard: vi.fn(() => of(board)) },
@@ -50,11 +59,9 @@ async function setup(roles: Role[], events = [event('a'), event('b')]) {
     providers: [
       {
         provide: AUTH_SERVICE,
-        useValue: {
-          roles: signal(roles),
-          currentUser: signal({ name: 'Grace Okonkwo', roles, profileId: 'p1' }),
-        },
+        useValue: { currentUser: signal({ name: 'Grace Okonkwo', profileId: 'p1' }) },
       },
+      provideStaticAccess(caller),
       { provide: EVENTS_SERVICE, useValue: services.events },
       { provide: PARTNERS_SERVICE, useValue: services.partners },
       { provide: ACTIVITY_SERVICE, useValue: services.activity },
@@ -71,7 +78,7 @@ const text = (el: HTMLElement) => el.textContent?.replace(/\s+/g, ' ') ?? '';
 
 describe('HomePage', () => {
   it('shows a lead the quick actions and the pipeline counts', async () => {
-    const { el } = await setup(['CityLead']);
+    const { el } = await setup(CITY_LEAD);
 
     expect(text(el)).toContain('New event');
     expect(text(el)).toContain('Add contact');
@@ -89,7 +96,7 @@ describe('HomePage', () => {
   });
 
   it('greets a member with no role and never asks for events or partners', async () => {
-    const { el, services } = await setup([]);
+    const { el, services } = await setup(MEMBER);
 
     expect(el.querySelector('h1')?.textContent).toBe('Welcome, Grace');
     expect(text(el)).toContain('Finish your profile');
@@ -99,7 +106,7 @@ describe('HomePage', () => {
   });
 
   it('shows Staff the banner and no write actions', async () => {
-    const { el } = await setup(['Staff']);
+    const { el } = await setup(STAFF);
 
     expect(text(el)).toContain('You’re viewing as Staff');
     expect(text(el)).not.toContain('New event');
@@ -108,10 +115,13 @@ describe('HomePage', () => {
   });
 
   it('leaves cancelled events out of Coming up and counts the rest', async () => {
-    const { el } = await setup(
-      ['Volunteer'],
-      [event('a'), event('b', { isCancelled: true }), event('c'), event('d'), event('e')],
-    );
+    const { el } = await setup(VOLUNTEER, [
+      event('a'),
+      event('b', { isCancelled: true }),
+      event('c'),
+      event('d'),
+      event('e'),
+    ]);
 
     expect(el.querySelectorAll('ft-event-card')).toHaveLength(3);
     expect(text(el)).toContain('4 events coming up');
@@ -122,7 +132,7 @@ describe('HomePage', () => {
     TestBed.overrideProvider(EVENTS_SERVICE, {
       useValue: { listEvents: () => throwError(() => new Error('offline')) },
     });
-    const { el } = await setup(['CityLead']);
+    const { el } = await setup(CITY_LEAD);
 
     expect(text(el)).toContain('We couldn’t load your home page');
     expect(el.querySelector('ft-event-card')).toBeNull();

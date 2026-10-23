@@ -21,7 +21,7 @@ test.describe('Sign in with GitHub from the marketing page', () => {
 
     await marketing.signInWithGitHub.click();
 
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
     expect(api.accounts.get('leah@example.org')).toMatchObject({
       name: 'Leah Thompson',
       verified: true,
@@ -44,7 +44,7 @@ test.describe('Sign in with GitHub from the marketing page', () => {
 
     await marketing.signInWithGitHub.click();
 
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
     expect(api.accounts.get('leah@example.org')?.name).toBe('leah-builds');
   });
 
@@ -64,7 +64,7 @@ test.describe('Sign in with GitHub from the marketing page', () => {
 
     await marketing.signInWithGitHub.click();
 
-    await expect(page).toHaveURL('http://localhost:4200/events');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto/events');
     expect(api.accounts.size).toBe(1);
   });
 
@@ -80,7 +80,7 @@ test.describe('Sign in with GitHub from the marketing page', () => {
 
     await marketing.signUpWithGitHub.click();
 
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
     expect(api.callsTo('GET', '/api/account/github/start')).toHaveLength(1);
   });
 
@@ -151,7 +151,7 @@ test.describe('Sign in with GitHub from the marketing page', () => {
 
     await marketing.open();
     await marketing.signInWithGitHub.click();
-    await expect(page).toHaveURL('http://localhost:4200/');
+    await expect(page).toHaveURL('http://localhost:4200/o/faithtech-toronto');
 
     expect([...hosts].sort()).toEqual(['github.com', 'localhost:4200', 'localhost:4300']);
   });

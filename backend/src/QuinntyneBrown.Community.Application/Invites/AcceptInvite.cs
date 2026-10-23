@@ -6,6 +6,7 @@ using QuinntyneBrown.Community.Application.Profiles;
 using QuinntyneBrown.Community.Domain.Identity;
 using QuinntyneBrown.Community.Domain.Invites;
 using QuinntyneBrown.Community.Domain.Notifications;
+using QuinntyneBrown.Community.Domain.Organizations;
 using QuinntyneBrown.Community.Domain.Profiles;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
@@ -14,7 +15,9 @@ using Microsoft.EntityFrameworkCore;
 namespace QuinntyneBrown.Community.Application.Invites;
 
 /// <summary>What the invite link shows before anyone signs in (ADR 0006).</summary>
-public record InviteLookupDto(string Status, string Email, string InviterName, string? InviterCity, string? PreassignedRole, bool HasAccount);
+public record InviteLookupDto(
+    string Status, string Email, string InviterName, string? InviterCity, string? PreassignedRole, bool HasAccount,
+    string? PreassignedRoleName = null, string? OrganizationName = null);
 
 /// <summary>Accepts an invite: with a name and password as a new account, or without them as the signed-in account.</summary>
 /// <summary>The body of <c>POST /api/invites/lookup</c>: the invite link's token, kept out of the URL.</summary>
@@ -60,13 +63,19 @@ public class AcceptInviteHandler(
 
         var inviter = await db.Profiles.AsNoTracking().Where(p => p.Id == invite.InvitedBy)
             .Select(p => new { p.Name, p.HomeCity }).SingleOrDefaultAsync(cancellationToken);
+        var role = invite.PreassignedRoleId is { } roleId
+            ? await db.RoleDefinitions.AsNoTracking().SingleOrDefaultAsync(r => r.Id == roleId, cancellationToken)
+            : null;
+        var org = await db.Organizations.AsNoTracking().Where(o => o.Id == invite.OrganizationId).Select(o => o.DisplayName ?? o.Name).SingleOrDefaultAsync(cancellationToken);
         return new InviteLookupDto(
             invite.Status(time.GetUtcNow()).ToString(),
             invite.Email,
             inviter?.Name ?? "A FaithTech lead",
             inviter?.HomeCity,
-            invite.PreassignedRole?.ToString(),
-            await users.FindByEmailAsync(invite.Email) is not null);
+            role?.Key,
+            await users.FindByEmailAsync(invite.Email) is not null,
+            role?.Name,
+            org);
     }
 
     public async Task<Result> AcceptAsync(AcceptInviteCommand command, CancellationToken cancellationToken = default)
@@ -106,7 +115,7 @@ public class AcceptInviteHandler(
             db.Profiles.Add(profile);
             // The invite reached this address, so the email counts as verified (L2-011 AC1).
             var user = new CommunityUser { UserName = invite.Email, Email = invite.Email, EmailConfirmed = true, ProfileId = profile.Id };
-            Grant(invite, profile, now);
+            await GrantAsync(invite, profile, now, cancellationToken);
             var created = await users.CreateAsync(user, command.Password!);
             if (!created.Succeeded)
             {
@@ -122,7 +131,7 @@ public class AcceptInviteHandler(
             }
 
             profile = await db.Profiles.SingleAsync(p => p.Id == user.ProfileId, cancellationToken);
-            Grant(invite, profile, now);
+            await GrantAsync(invite, profile, now, cancellationToken);
         }
 
         await db.SaveChangesAsync(cancellationToken);
@@ -135,20 +144,30 @@ public class AcceptInviteHandler(
         return Result.Ok();
     }
 
-    // Grants the pre-assigned role, audited with the inviter as actor, marks the invite used and tells the inviter.
-    private void Grant(Invite invite, Profile profile, DateTimeOffset now)
+    // Makes the person a member of the invite's org (ADR 0041), grants the pre-assigned role audited with the inviter as
+    // actor, marks the invite used and tells the inviter.
+    private async Task GrantAsync(Invite invite, Profile profile, DateTimeOffset now, CancellationToken cancellationToken)
     {
-        if (invite.PreassignedRole is { } role && !profile.HasRole(role))
+        var org = invite.OrganizationId;
+        if (!await db.OrgMemberships.AnyAsync(m => m.OrganizationId == org && m.ProfileId == profile.Id, cancellationToken))
         {
-            var before = profile.Roles.Select(r => r.Role).Order().Select(r => r.ToString()).ToArray();
-            profile.AddRole(role, invite.InvitedBy, now.UtcDateTime);
-            var after = profile.Roles.Select(r => r.Role).Order().Select(r => r.ToString()).ToArray();
-            audit.Record(invite.InvitedBy, "role.granted", "Profile", profile.Id.ToString(), new { Roles = before }, new { Roles = after });
+            db.OrgMemberships.Add(new OrgMembership(org, profile.Id, JoinedVia.Invite, now.UtcDateTime));
+        }
+
+        if (invite.PreassignedRoleId is { } roleId
+            && await db.RoleDefinitions.AsNoTracking().SingleOrDefaultAsync(r => r.Id == roleId, cancellationToken) is { } role
+            && !await db.OrgRoleAssignments.AnyAsync(a => a.OrganizationId == org && a.ProfileId == profile.Id && a.RoleDefinitionId == roleId, cancellationToken))
+        {
+            var before = await db.OrgRoleAssignments.Where(a => a.OrganizationId == org && a.ProfileId == profile.Id)
+                .Join(db.RoleDefinitions, a => a.RoleDefinitionId, r => r.Id, (a, r) => r.Key).ToListAsync(cancellationToken);
+            db.OrgRoleAssignments.Add(new OrgRoleAssignment(org, profile.Id, roleId, invite.InvitedBy, now.UtcDateTime));
+            audit.Record(invite.InvitedBy, "role.granted", "Profile", profile.Id.ToString(),
+                new { Roles = before.Order().ToArray() }, new { Roles = before.Append(role.Key).Order().ToArray() }, org);
         }
 
         invite.MarkAccepted(profile.Id, now);
         db.Notifications.Add(new Notification(
-            invite.InvitedBy, NotificationKind.InviteAccepted, $"{profile.Name} accepted your invite", $"/people/{profile.Id}", now));
+            invite.InvitedBy, NotificationKind.InviteAccepted, $"{profile.Name} accepted your invite", $"/people/{profile.Id}", now, organizationId: org));
     }
 
     private Task<Invite?> FindAsync(string token, CancellationToken cancellationToken, bool tracked = false)

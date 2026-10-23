@@ -1,0 +1,8 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Seed the hierarchy
+Person(op, "Operator", "Runs Cli reset, seed and grant-admin")
+System(ftc, "QuinntyneBrown.Community", "Home base for the people Quinntyne Brown builds with: orgs, profiles, events, resources, notes and Agile workspaces")
+Rel(op, ftc, "Resets and seeds the database of")
+@enduml

@@ -7,3 +7,4 @@ export * from './http-params';
 export * from './paging';
 export * from './problem-details';
 export * from './role';
+export * from './org-label';

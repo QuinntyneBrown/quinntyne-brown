@@ -27,7 +27,8 @@ export interface ReassignOwnerData {
 }
 
 /**
- * System Admin gives a workspace to another City Lead after its owner lost the role (L2-037 AC2), matching
+ * The org's Org Lead, the Portfolio Lead or a System Admin gives a workspace a new owner after its
+ * owner can no longer create workspaces in its org (L2-146 AC4), matching
  * docs/mocks/dialogs/reassign-owner. The change is audited. Closes with the new owner's name.
  */
 @Component({
@@ -58,8 +59,8 @@ export class ReassignOwnerDialog implements OnInit {
   protected readonly failed = signal(false);
 
   protected readonly description =
-    `${this.data.workspace.ownerName} no longer holds the City Lead role, and a workspace owner must be a ` +
-    'City Lead. This is recorded in the audit log.';
+    `${this.data.workspace.ownerName} can no longer own workspaces in this organization. Choose someone ` +
+    'who can create workspaces here, or an Org Lead. This is recorded in the audit log.';
 
   async ngOnInit(): Promise<void> {
     try {
@@ -86,7 +87,8 @@ export class ReassignOwnerDialog implements OnInit {
     } catch (error) {
       if (error instanceof HttpErrorResponse && error.status === 400) {
         this.ownerError.set(
-          problemDetails(error)?.errors?.['OwnerId']?.[0] ?? 'Choose a City Lead.',
+          problemDetails(error)?.errors?.['OwnerId']?.[0] ??
+            'Choose someone who can create workspaces in this organization.',
         );
         this.errorFocus().focusFirstError();
       } else {

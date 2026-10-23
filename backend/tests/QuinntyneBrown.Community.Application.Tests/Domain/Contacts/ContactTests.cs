@@ -8,7 +8,7 @@ public class ContactTests
     private static readonly DateTime Now = new(2026, 10, 21, 12, 0, 0, DateTimeKind.Utc);
     private static readonly Guid Owner = Guid.NewGuid();
 
-    private static Contact NewContact() => new(Owner, "Grace Hopper", "grace@example.org", "555-0100", "Navy", "Arlington", Now);
+    private static Contact NewContact() => new(Guid.NewGuid(), Owner, "Grace Hopper", "grace@example.org", "555-0100", "Navy", "Arlington", Now);
 
     [Fact]
     public void A_contact_belongs_to_the_lead_who_created_it()
@@ -26,7 +26,7 @@ public class ContactTests
     [Fact]
     public void A_contact_needs_a_name()
     {
-        Assert.Throws<ArgumentException>(() => new Contact(Owner, " ", null, null, null, null, Now));
+        Assert.Throws<ArgumentException>(() => new Contact(Guid.NewGuid(), Owner, " ", null, null, null, null, Now));
     }
 
     [Fact]

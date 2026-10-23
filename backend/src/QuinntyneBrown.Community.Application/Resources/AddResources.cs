@@ -1,5 +1,6 @@
 using QuinntyneBrown.Community.Application.Common;
-using QuinntyneBrown.Community.Domain.Profiles;
+using QuinntyneBrown.Community.Application.Organizations;
+using QuinntyneBrown.Community.Domain.Organizations;
 using QuinntyneBrown.Community.Domain.Resources;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -22,11 +23,13 @@ public class AddResourcesHandler(
     ResourceFileStore files,
     ResourceViews views,
     ShareNotifier share,
+    ResourceOwners owners,
     TimeProvider time)
 {
     public async Task<(Result Result, IReadOnlyList<ResourceDto>? Added)> HandleAsync(AddResourcesCommand command, CancellationToken cancellationToken = default)
     {
-        if (await ContributorAsync(cancellationToken) is { } refusal)
+        var (refusal, orgId) = await ContributorAsync(cancellationToken);
+        if (refusal is not null)
         {
             return (refusal, null);
         }
@@ -60,14 +63,19 @@ public class AddResourcesHandler(
             return (ResourceResults.Invalid(new() { ["Files"] = [.. refused] }), null);
         }
 
-        var (fields, errors) = await rules.CheckAsync(command.Fields, titleRequired: false, cancellationToken);
+        if (rules.RefusesVisibility(orgId, command.Fields))
+        {
+            return (Result.Forbidden(), null);
+        }
+
+        var (fields, errors) = await rules.CheckAsync(orgId, command.Fields, titleRequired: false, cancellationToken);
         if (fields is null)
         {
             return (ResourceResults.Invalid(errors), null);
         }
 
         var caller = await access.CallerAsync(cancellationToken);
-        var ownerRole = await OwnerRoleAsync(caller, cancellationToken);
+        var ownerRole = await OwnerRoleAsync(caller, orgId, cancellationToken);
         var now = time.GetUtcNow();
         var single = command.Files.Count == 1;
         var added = new List<Resource>();
@@ -77,7 +85,7 @@ public class AddResourcesHandler(
             var file = await files.StoreAsync(id, upload, cancellationToken);
             var title = single && fields.Title is not null ? fields.Title : TitleFrom(upload.FileName);
             var type = single && fields.Type is { } chosen ? chosen : ResourceFileTypes.GuessType(upload.FileName);
-            var resource = Resource.ForFile(id, title, fields.Description, type, caller, file, now);
+            var resource = Resource.ForFile(orgId, id, title, fields.Description, type, caller, file, now);
             resource.SetOwner(caller, ownerRole);
             resource.SetTags(fields.Tags);
             resource.SetAudience(fields.Audience);
@@ -96,24 +104,25 @@ public class AddResourcesHandler(
         return (Result.Ok(), dtos);
     }
 
-    /// <summary>Refuses a caller who may not add resources or whose email is not verified (L2-057 AC2, AC3).</summary>
-    public async Task<Result?> ContributorAsync(CancellationToken cancellationToken)
+    /// <summary>
+    /// The org a new resource goes to, or why the caller may not add one there: no <c>resources.create</c>, or an
+    /// unverified email (L2-057 AC2, AC3).
+    /// </summary>
+    public async Task<(Result? Refusal, Guid OrgId)> ContributorAsync(CancellationToken cancellationToken)
     {
-        if (!access.CanContribute)
+        var target = access.CreateTarget();
+        if (!target.Allowed)
         {
-            return Result.Forbidden();
+            return (target.Refusal, Guid.Empty);
         }
 
         var caller = await access.CallerAsync(cancellationToken);
         var verified = await db.Users.Where(u => u.ProfileId == caller).Select(u => u.EmailConfirmed).SingleOrDefaultAsync(cancellationToken);
-        return verified ? null : Result.Forbidden("Verify your email before adding resources.");
+        return verified ? (null, target.OrgId) : (Result.Forbidden("Verify your email before adding resources."), Guid.Empty);
     }
 
-    public async Task<Role?> OwnerRoleAsync(Guid profileId, CancellationToken cancellationToken)
-    {
-        var roles = await db.Profiles.Where(p => p.Id == profileId).SelectMany(p => p.Roles.Select(r => r.Role)).ToListAsync(cancellationToken);
-        return ResourceAccess.ContributorRoles.Where(roles.Contains).Select(r => (Role?)r).FirstOrDefault();
-    }
+    public Task<string?> OwnerRoleAsync(Guid profileId, Guid orgId, CancellationToken cancellationToken) =>
+        owners.OwnerRoleAsync(profileId, orgId, cancellationToken);
 
     private static string TitleFrom(string fileName)
     {
@@ -137,12 +146,18 @@ public class AddLinkHandler(
 {
     public async Task<(Result Result, ResourceDto? Added)> HandleAsync(AddLinkCommand command, CancellationToken cancellationToken = default)
     {
-        if (await contributors.ContributorAsync(cancellationToken) is { } refusal)
+        var (refusal, orgId) = await contributors.ContributorAsync(cancellationToken);
+        if (refusal is not null)
         {
             return (refusal, null);
         }
 
-        var (fields, errors) = await rules.CheckAsync(command.Fields, titleRequired: true, cancellationToken);
+        if (rules.RefusesVisibility(orgId, command.Fields))
+        {
+            return (Result.Forbidden(), null);
+        }
+
+        var (fields, errors) = await rules.CheckAsync(orgId, command.Fields, titleRequired: true, cancellationToken);
         if (!ResourceLinks.TryParse(command.Url, out var link))
         {
             errors["Url"] = [ResourceLinks.Message];
@@ -154,8 +169,8 @@ public class AddLinkHandler(
         }
 
         var caller = await access.CallerAsync(cancellationToken);
-        var resource = Resource.ForLink(fields.Title!, fields.Description, fields.Type!.Value, caller, link!, time.GetUtcNow());
-        resource.SetOwner(caller, await contributors.OwnerRoleAsync(caller, cancellationToken));
+        var resource = Resource.ForLink(orgId, fields.Title!, fields.Description, fields.Type!.Value, caller, link!, time.GetUtcNow());
+        resource.SetOwner(caller, await contributors.OwnerRoleAsync(caller, orgId, cancellationToken));
         resource.SetTags(fields.Tags);
         resource.SetAudience(fields.Audience);
         db.Resources.Add(resource);

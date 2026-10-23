@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Role } from '../shared';
+import { RoleRef } from '../shared';
 
 export interface PhotoDto {
   id: string;
@@ -22,7 +22,9 @@ export interface ProfileDto {
   bio: string | null;
   featuredPhoto: PhotoDto | null;
   photos: PhotoDto[];
-  roles: Role[];
+  roles: RoleRef[];
+  /** An agent profile (ADR 0036). */
+  isAgent?: boolean;
   /** The caller owns this profile. */
   isOwn: boolean;
   /** The caller may change it: the owner, or a System Admin. */

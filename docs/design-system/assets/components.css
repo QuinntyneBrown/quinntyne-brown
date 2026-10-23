@@ -1276,3 +1276,121 @@ a.page-link:hover, a.page-link[data-state="hover"] { background: var(--color-acc
 .drop-indicator .block--preview { top: var(--space-1); left: var(--space-8); }
 .block-editor__more-menu { position: fixed; inset: calc(var(--layout-topbar-height) + var(--space-16)) var(--layout-margin) auto auto; margin: 0; transform-origin: top right; }
 .dialog__footer-start { margin-right: auto; }
+
+/* ==========================================================================
+   Organizations (L1-025; ADRs 0033 to 0041). Org switcher, org mark and label,
+   Agent badge, permission checklist, role tree, scope picker, colour field with
+   contrast check, token reveal and the public page's org band. The org accent
+   is read only through --color-org-accent and --color-org-accent-foreground,
+   always as a fill behind its own foreground.
+   ========================================================================== */
+
+/* Org mark: the org's logo, or its initials on the accent fill. Decorative next to a visible name. */
+.org-mark { --org-mark-size: var(--size-avatar-sm); flex: none; display: inline-grid; place-items: center; width: var(--org-mark-size); height: var(--org-mark-size); border-radius: var(--radius-md); overflow: hidden; background: var(--color-org-accent); color: var(--color-org-accent-foreground); font: var(--text-label); font-size: var(--font-size-xs); line-height: 1; }
+.org-mark img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.org-mark--md { --org-mark-size: var(--size-avatar-md); font-size: var(--font-size-sm); }
+.org-mark--lg { --org-mark-size: var(--size-avatar-lg); font-size: var(--font-size-md); border-radius: var(--radius-lg); }
+.org-mark--all { background: var(--color-bg-subtle); color: var(--color-fg-default); }
+
+/* Topbar with an org switcher: the portfolio name gives way to the switcher below 1536px. */
+.topbar__brand-name { display: none; }
+@media (min-width: 96rem) { .topbar__brand-name { display: inline; } }
+.topbar:not(:has(.org-switcher)) .topbar__brand-name { display: none; }
+@media (min-width: 30rem) { .topbar:not(:has(.org-switcher)) .topbar__brand-name { display: inline; } }
+
+/* Org switcher (ft-org-switcher): a menu button in the top bar; hidden for people who cover one org. */
+.org-switcher { --org-switcher-name-max: 10rem; position: relative; flex: 0 1 auto; min-width: 0; display: flex; }
+.org-switcher__button { display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0; max-width: 100%; min-height: var(--target-comfortable); padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1); border: var(--border-width-hairline) solid var(--color-border-default); border-radius: var(--radius-full); background: var(--color-bg-surface); color: var(--color-fg-default); font: var(--text-label); cursor: pointer; }
+.org-switcher__button:hover, .org-switcher__button[data-state="hover"] { background: var(--color-bg-subtle); border-color: var(--color-border-strong); }
+.org-switcher__button:focus-visible, .org-switcher__button[data-state="focus"] { outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset); }
+.org-switcher__button[aria-expanded="true"] { background: var(--color-accent-subtle); border-color: var(--color-accent); }
+.org-switcher__button .org-mark { border-radius: var(--radius-full); }
+.org-switcher__name { display: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: var(--org-switcher-name-max); }
+@media (min-width: 64rem) { .org-switcher__name { display: block; } }
+.org-switcher__chevron { flex: none; width: var(--size-icon-sm); height: var(--size-icon-sm); color: var(--color-fg-muted); transition: rotate var(--duration-fast) var(--ease-standard); }
+.org-switcher__button[aria-expanded="true"] .org-switcher__chevron { rotate: 180deg; }
+.org-switcher__menu { position: fixed; inset: calc(var(--space-2) + var(--layout-topbar-height)) auto auto var(--layout-margin); width: min(22rem, calc(100vw - 2 * var(--layout-margin))); min-width: 0; margin: var(--space-1) 0 0; color: var(--color-fg-default); }
+.org-switcher__menu.menu--static { position: fixed; inset: calc(var(--space-2) + var(--layout-topbar-height)) auto auto var(--layout-margin); }
+.org-switcher__option { min-height: var(--target-comfortable); padding-block: var(--space-1); }
+.org-switcher__option-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.org-switcher__option-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.org-switcher__option-type { font: var(--text-caption); color: var(--color-fg-muted); }
+.org-switcher__check { flex: none; width: var(--size-icon-sm); height: var(--size-icon-sm); color: var(--color-fg-accent); visibility: hidden; }
+.org-switcher__option[aria-checked="true"] { background: var(--color-accent-subtle); }
+.org-switcher__option[aria-checked="true"] .org-switcher__check { visibility: visible; }
+.org-switcher__option[aria-checked="true"]:hover, .org-switcher__option[aria-checked="true"][data-state="hover"] { background: var(--color-accent-subtle-hover); }
+
+/* Branded shell: the active org's accent band under the top bar (decorative; the switcher names the org). */
+.org-strip { height: var(--space-1); width: calc(min(var(--layout-container-max), 100%) - 2 * var(--layout-margin) - 2 * var(--space-8)); margin: 0 auto; border-radius: 0 0 var(--radius-sm) var(--radius-sm); background: var(--color-org-accent); }
+
+/* Org label (ft-org-label): which org a row, result or notice belongs to under "All orgs". */
+.org-label { display: inline-flex; align-items: center; gap: var(--space-1); max-width: 100%; min-height: var(--space-6); padding: 0 var(--space-2); border-radius: var(--radius-full); background: var(--color-bg-subtle); color: var(--color-fg-muted); font: var(--text-caption); white-space: nowrap; vertical-align: middle; }
+.org-label__dot { flex: none; width: var(--space-2); height: var(--space-2); border-radius: var(--radius-full); background: var(--color-org-accent); box-shadow: 0 0 0 var(--border-width-hairline) var(--color-border-strong); }
+.org-label__name { overflow: hidden; text-overflow: ellipsis; }
+.org-label--portfolio { background: var(--color-accent-subtle); color: var(--color-fg-accent); }
+.org-label--portfolio .org-label__dot { background: currentColor; box-shadow: none; }
+
+/* Agent badge (ft-badge variant="agent"): a profile of kind Agent. Icon plus the word, never colour alone. */
+.badge--agent { background: var(--color-info-bg); color: var(--color-fg-default); text-transform: none; letter-spacing: normal; font: var(--text-label); font-size: var(--font-size-xs); }
+.badge--agent::before { display: none; }
+.badge--agent .icon { width: var(--size-icon-sm); height: var(--size-icon-sm); color: var(--color-info-icon); }
+
+/* Permission checklist (ft-permission-checklist): permission codes grouped by feature. */
+.permission-checklist { display: grid; gap: var(--space-4); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 64rem) { .permission-checklist { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.permission-checklist__group { margin: 0; padding: var(--space-3) var(--space-4) var(--space-4); border: var(--border-width-hairline) solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-bg-surface); display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.permission-checklist__legend { display: flex; justify-content: space-between; gap: var(--space-2); width: 100%; padding: 0; font: var(--text-label); }
+.permission-checklist__count { font: var(--text-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.permission-checklist__item .choice__text small code { font: var(--text-code); font-size: var(--font-size-xs); color: var(--color-fg-muted); }
+.permission-checklist__hidden { grid-column: 1 / -1; margin: 0; font: var(--text-body-sm); color: var(--color-fg-muted); }
+.permission-checklist--readonly .choice { cursor: default; }
+
+/* Role tree (ft-role-tree): catalogue roles in order; the parent is an indent only and grants nothing. */
+.role-tree { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+.role-tree__item { display: flex; align-items: center; gap: var(--space-2); padding-inline-start: calc(var(--role-depth, 0) * var(--space-6)); }
+.role-tree__item--child { --role-depth: 1; }
+.role-tree__item--grandchild { --role-depth: 2; }
+.role-tree__select { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-0-5); min-height: var(--target-comfortable); padding: var(--space-2) var(--space-3); border: var(--border-width-hairline) solid transparent; border-radius: var(--radius-md); background: none; color: var(--color-fg-default); text-align: left; font: var(--text-label); cursor: pointer; }
+.role-tree__select:hover, .role-tree__select[data-state="hover"] { background: var(--color-bg-subtle); }
+.role-tree__select:focus-visible, .role-tree__select[data-state="focus"] { outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: 0; }
+.role-tree__select[aria-current="true"] { background: var(--color-accent-subtle); border-color: var(--color-accent); color: var(--color-fg-accent); }
+.role-tree__meta { font: var(--text-caption); color: var(--color-fg-muted); }
+.role-tree__item--child .role-tree__select { border-inline-start: var(--border-width-thick) solid var(--color-border-default); border-start-start-radius: 0; border-end-start-radius: 0; }
+.role-tree__item--moved .role-tree__select { box-shadow: 0 0 0 var(--focus-ring-width) var(--color-focus-ring); }
+.role-tree__moves { display: flex; gap: var(--space-0-5); }
+.role-tree__builtin { list-style: none; margin: 0 0 var(--space-3); padding: 0 0 var(--space-3); border-bottom: var(--border-width-hairline) solid var(--color-border-default); display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+/* Scope picker (ft-scope-picker): whole portfolio, every org of a type, or chosen orgs. */
+.scope-picker { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+.scope-picker__option { border: var(--border-width-hairline) solid var(--color-border-default); border-radius: var(--radius-md); padding: var(--space-2) var(--space-3); }
+.scope-picker__option:has(input:checked), .scope-picker__option[data-state="selected"] { border-color: var(--color-accent); background: var(--color-accent-subtle); }
+.scope-picker__detail { padding: var(--space-2) 0 var(--space-1) calc(var(--size-icon-md) + var(--space-3)); display: flex; flex-direction: column; gap: var(--space-2); }
+.scope-picker__summary { margin: 0; font: var(--text-body-sm); color: var(--color-fg-muted); }
+
+/* Colour field with contrast check (ft-colour-field). */
+.colour-field__row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.colour-field__swatch { appearance: none; flex: none; width: var(--control-height-md); height: var(--control-height-md); padding: var(--space-1); border: var(--border-width-hairline) solid var(--color-border-strong); border-radius: var(--radius-md); background: var(--color-bg-surface); cursor: pointer; }
+.colour-field__swatch:focus-visible, .colour-field__swatch[data-state="focus"] { outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset); }
+.colour-field__hex { width: 9rem; font-family: var(--font-family-mono); text-transform: uppercase; }
+.colour-field__preview { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--control-height-md); padding: 0 var(--space-4); border-radius: var(--radius-md); background: var(--color-org-accent); color: var(--color-org-accent-foreground); font: var(--text-label); }
+.colour-field__ratio { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font: var(--text-body-sm); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.colour-field__ratio strong { color: var(--color-fg-default); }
+
+/* Token reveal (ft-token-reveal): a new agent token, shown once. */
+.token-reveal { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border: var(--border-width-hairline) solid var(--color-warning-border); border-radius: var(--radius-md); background: var(--color-warning-bg); color: var(--color-fg-default); }
+.token-reveal__title { display: flex; gap: var(--space-2); align-items: center; font: var(--text-label); }
+.token-reveal__title .icon { color: var(--color-warning-icon); }
+.token-reveal .copy-field .input { background: var(--color-bg-surface); }
+.token-reveal--hidden { border-color: var(--color-border-default); background: var(--color-bg-surface-sunken); }
+
+/* Public event page: the org band (display name and logo on the org accent). */
+.org-band { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--layout-margin); background: var(--color-org-accent); color: var(--color-org-accent-foreground); font: var(--text-label); }
+.org-band a { color: inherit; }
+.org-band .org-mark { background: var(--color-bg-surface); color: var(--color-fg-default); }
+/* Single-org header: the org's mark and name as plain text, no switcher (L2-144 AC2). */
+.org-switcher__current { display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0; font: var(--text-label); color: var(--color-fg-default); }
+.org-switcher__current .org-mark { border-radius: var(--radius-full); }
+.org-switcher__menu .menu__header .text-caption { white-space: normal; }
+/* With the switcher in the bar, the nav gives up room first and scrolls sideways inside the capsule, as ft-top-bar does. */
+.topbar:has(.org-switcher) .topbar__nav { min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.topbar:has(.org-switcher) .topbar__brand { flex: none; }

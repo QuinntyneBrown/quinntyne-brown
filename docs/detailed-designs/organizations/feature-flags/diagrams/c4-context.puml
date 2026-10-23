@@ -1,0 +1,10 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Feature flags per Org Type
+Person(pl, "Portfolio Lead", "Switches features per Org Type")
+Person(mem, "Member of an org", "Sees only enabled sections")
+System(ftc, "QuinntyneBrown.Community", "Home base for the people Quinntyne Brown builds with: orgs, profiles, events, resources, notes and Agile workspaces")
+Rel(pl, ftc, "Switches features of an Org Type in")
+Rel(mem, ftc, "Uses enabled features of its org in")
+@enduml

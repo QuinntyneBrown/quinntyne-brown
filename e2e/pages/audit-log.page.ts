@@ -28,6 +28,12 @@ export class AuditLogPage {
     await this.page.goto('/admin/audit-log');
   }
 
+  /** The table's column headers, in order. */
+  async columns(): Promise<string[]> {
+    const headers = this.page.getByRole('table', { name: 'Audit log' }).getByRole('columnheader');
+    return (await headers.allInnerTexts()).map((t) => t.trim());
+  }
+
   noResults(category: string): Locator {
     return this.page.getByRole('heading', { name: `No ${category} in the last 90 days` });
   }

@@ -7,6 +7,7 @@ public class Event
     private Event() { }
 
     public Event(
+        Guid organizationId,
         string title,
         string description,
         EventType type,
@@ -21,11 +22,15 @@ public class Event
         Guid createdById)
     {
         Id = Guid.NewGuid();
+        OrganizationId = organizationId;
         CreatedById = createdById;
         Apply(title, description, type, startsAt, endsAt, city, format, venue, onlineLink, capacity, visibility);
     }
 
     public Guid Id { get; private set; }
+
+    /// <summary>The org that owns this record (ADR 0034).</summary>
+    public Guid OrganizationId { get; private set; }
 
     public string Title { get; private set; } = string.Empty;
 

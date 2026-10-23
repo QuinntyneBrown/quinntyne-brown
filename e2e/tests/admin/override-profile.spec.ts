@@ -39,7 +39,7 @@ test.describe('System Admin profile override', () => {
     await expect(profile.editProfile).toHaveAttribute('href', `/people/${samuel.profileId}/edit`);
     await profile.editProfile.click();
 
-    await expect(page).toHaveURL(`/people/${samuel.profileId}/edit`);
+    await expect(page).toHaveURL(`/o/faithtech-toronto/people/${samuel.profileId}/edit`);
     await expect(edit.title).toHaveText('Edit Samuel Mensah’s profile');
     await expect(edit.adminNote).toBeVisible();
     await expect(edit.breadcrumb.getByRole('link', { name: 'Samuel Mensah' })).toHaveAttribute(

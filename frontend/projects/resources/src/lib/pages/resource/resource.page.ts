@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RESOURCES_SERVICE, ResourceDto } from '@faithtech-community/api';
+import { ACCESS_SERVICE, RESOURCES_SERVICE, ResourceDto } from '@faithtech-community/api';
 import {
   AvatarComponent,
   BannerComponent,
@@ -32,7 +32,7 @@ import {
   EditResourceData,
   TransferOwnershipDialog,
 } from '../../dialogs';
-import { fileOrHost, roleLabel, saveBlob, typeIcon, visibilityLine } from '../../resource-format';
+import { fileOrHost, saveBlob, typeIcon, visibilityLine } from '../../resource-format';
 import { ThumbnailCache } from '../../thumbnail-cache';
 
 type State = 'loading' | 'loaded' | 'missing' | 'error';
@@ -67,6 +67,7 @@ type State = 'loading' | 'loaded' | 'missing' | 'error';
 })
 export class ResourcePage {
   private readonly resources = inject(RESOURCES_SERVICE);
+  private readonly access = inject(ACCESS_SERVICE);
   private readonly dialogs = inject(DialogService);
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
@@ -80,7 +81,6 @@ export class ResourcePage {
   protected readonly typeIcon = typeIcon;
   protected readonly fileOrHost = fileOrHost;
   protected readonly visibilityLine = visibilityLine;
-  protected readonly roleLabel = roleLabel;
   protected readonly formatDay = formatDay;
   protected readonly colorFor = avatarColorFor;
 
@@ -100,7 +100,9 @@ export class ResourcePage {
     const r = this.resource()!;
     if (!r.sharedVia) return null;
     const who =
-      r.sharedVia === 'you' ? 'you' : `everyone who has the ${roleLabel(r.sharedVia)} role`;
+      r.sharedVia === 'you'
+        ? 'you'
+        : `everyone who has the ${this.access.roleName(r.sharedVia, r.organization?.slug)} role`;
     return `${r.ownerName} shared this with ${who}. You can open and download it, but not share it on.`;
   });
 

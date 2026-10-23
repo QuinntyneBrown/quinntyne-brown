@@ -49,6 +49,11 @@
           @for (a of items(); track a.id) {
             <ft-list-item [label]="a.subject" [meta]="meta(a)" [description]="a.body">
               <ft-icon-tile leading name="announcements" />
+              @if (a.audienceKind === 'Portfolio') {
+                <ft-org-label meta name="Portfolio" [portfolio]="true" />
+              } @else if (allOrgs() && a.organization; as org) {
+                <ft-org-label meta [name]="org.name" />
+              }
             </ft-list-item>
           }
         </ft-list>

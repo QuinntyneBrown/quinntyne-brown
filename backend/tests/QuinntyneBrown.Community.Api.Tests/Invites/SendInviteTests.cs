@@ -17,14 +17,14 @@ public class SendInviteTests(CommunityApiFactory factory) : IClassFixture<Commun
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var email = $"{Guid.NewGuid():N}@example.org";
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsJsonAsync("/api/invites",
-            new { Email = email, PreassignedRole = "ProductEngineer", Note = "Loved your demo at Builders Night!" });
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync("/api/invites",
+            new { Email = email, PreassignedRole = "product-engineer", Note = "Loved your demo at Builders Night!" });
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var dto = (await response.Content.ReadFromJsonAsync<InviteDto>())!;
-        Assert.Equal(("Pending", "ProductEngineer", "Grace Okonkwo"), (dto.Status, dto.PreassignedRole, dto.InvitedByName));
+        Assert.Equal(("Pending", "product-engineer", "Grace Okonkwo"), (dto.Status, dto.PreassignedRole, dto.InvitedByName));
         var message = Assert.Single(await factory.QueuedEmailsToAsync(email));
-        Assert.Contains("Grace Okonkwo invited you to join Quinntyne Brown as a Product Engineer", message.Body);
+        Assert.Contains("Grace Okonkwo invited you to join FaithTech Toronto on Quinntyne Brown as a Product Engineer", message.Body);
         Assert.Contains("Loved your demo at Builders Night!", message.Body);
         Assert.Contains($"{CommunityApiFactory.WebAppOrigin}/accept-invite/", message.Body);
         var token = InviteClients.TokenFrom(message.Body);
@@ -35,12 +35,25 @@ public class SendInviteTests(CommunityApiFactory factory) : IClassFixture<Commun
         Assert.Equal(grace.ProfileId, invite.InvitedBy);
     }
 
+    // Traces to: L2-141
     [Theory]
-    [InlineData(Role.CityLead, "Staff")]
-    [InlineData(Role.CityLead, "CityLead")]
-    [InlineData(Role.CityLead, "SystemAdmin")]
-    [InlineData(Role.EventLead, "Volunteer")]
-    public async Task Only_roles_the_inviter_may_grant_can_be_preassigned(Role inviterRole, string role)
+    [InlineData(SeededRole.CityLead, "staff")]
+    [InlineData(SeededRole.CityLead, "system-admin")]
+    [InlineData(SeededRole.CityLead, "org-lead")]
+    public async Task Only_catalogue_roles_of_the_org_can_be_preassigned(SeededRole inviterRole, string role)
+    {
+        var lead = await factory.AddMemberAsync("Marcus Lee");
+
+        var response = await factory.ClientFor(lead, inviterRole).PostAsJsonAsync("/api/invites",
+            new { Email = "nate@example.org", PreassignedRole = role });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(SeededRole.CityLead, "city-lead")]
+    [InlineData(SeededRole.EventLead, "volunteer")]
+    public async Task Only_roles_the_inviter_may_grant_can_be_preassigned(SeededRole inviterRole, string role)
     {
         var lead = await factory.AddMemberAsync("Marcus Lee");
 
@@ -52,11 +65,11 @@ public class SendInviteTests(CommunityApiFactory factory) : IClassFixture<Commun
     }
 
     [Theory]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CreateLead)]
-    [InlineData(Role.CommunicationsLead)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Any_lead_or_system_admin_may_invite_without_a_role(Role role)
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CreateLead)]
+    [InlineData(SeededRole.CommunicationsLead)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Any_lead_or_system_admin_may_invite_without_a_role(SeededRole role)
     {
         var lead = await factory.AddMemberAsync("Hannah Kim");
 
@@ -67,10 +80,10 @@ public class SendInviteTests(CommunityApiFactory factory) : IClassFixture<Commun
 
     [Theory]
     [InlineData]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.Volunteer)]
-    [InlineData(Role.ProductEngineer)]
-    public async Task Anyone_without_a_lead_role_or_system_admin_gets_403(params Role[] roles)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.Volunteer)]
+    [InlineData(SeededRole.ProductEngineer)]
+    public async Task Anyone_without_a_lead_role_or_system_admin_gets_403(params SeededRole[] roles)
     {
         var member = await factory.AddMemberAsync("Jonah Bell");
 
@@ -87,7 +100,7 @@ public class SendInviteTests(CommunityApiFactory factory) : IClassFixture<Commun
         var lead = await factory.AddMemberAsync("Marcus Lee");
         await factory.SetEmailConfirmedAsync(lead, false);
 
-        var response = await factory.ClientFor(lead, Role.EventLead).PostAsJsonAsync("/api/invites", new { Email = "nate@example.org" });
+        var response = await factory.ClientFor(lead, SeededRole.EventLead).PostAsJsonAsync("/api/invites", new { Email = "nate@example.org" });
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.Equal("Verify your email before sending invites.", (await response.Content.ReadFromJsonAsync<ProblemDetails>())!.Detail);
@@ -100,7 +113,7 @@ public class SendInviteTests(CommunityApiFactory factory) : IClassFixture<Commun
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsJsonAsync("/api/invites", new { Email = email });
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync("/api/invites", new { Email = email });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Equal([message], (await response.Content.ReadFromJsonAsync<ValidationProblemDetails>())!.Errors[field]);
@@ -115,7 +128,7 @@ public class SendInviteTests(CommunityApiFactory factory) : IClassFixture<Commun
             await factory.AddInviteAsync(grace, $"bulk{i}@example.org", age: TimeSpan.FromHours(23));
         }
 
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         var limited = await client.PostAsJsonAsync("/api/invites", new { Email = "one-more@example.org" });
 
         Assert.Equal(HttpStatusCode.TooManyRequests, limited.StatusCode);
@@ -131,16 +144,16 @@ public class SendInviteTests(CommunityApiFactory factory) : IClassFixture<Commun
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var marcus = await factory.AddMemberAsync("Marcus Lee");
-        var (pending, _) = await factory.AddInviteAsync(grace, "nate@example.org", Role.ProductEngineer, TimeSpan.FromDays(1));
-        var (expired, _) = await factory.AddInviteAsync(marcus, "felix@example.org", Role.Attendee, TimeSpan.FromDays(20));
-        var (accepted, _) = await factory.AddInviteAsync(marcus, "ruth@example.org", Role.Volunteer, TimeSpan.FromDays(3));
+        var (pending, _) = await factory.AddInviteAsync(grace, "nate@example.org", SeededRole.ProductEngineer, TimeSpan.FromDays(1));
+        var (expired, _) = await factory.AddInviteAsync(marcus, "felix@example.org", SeededRole.Attendee, TimeSpan.FromDays(20));
+        var (accepted, _) = await factory.AddInviteAsync(marcus, "ruth@example.org", SeededRole.Volunteer, TimeSpan.FromDays(3));
         await factory.WithDbAsync(async db =>
         {
             (await db.Invites.SingleAsync(i => i.Id == accepted.Id)).MarkAccepted(Guid.NewGuid(), factory.Time.GetUtcNow());
             return await db.SaveChangesAsync();
         });
 
-        var invites = (await factory.ClientFor(marcus, Role.EventLead).GetFromJsonAsync<InvitePage>("/api/invites?pageSize=100"))!.Items;
+        var invites = (await factory.ClientFor(marcus, SeededRole.EventLead).GetFromJsonAsync<InvitePage>("/api/invites?pageSize=100"))!.Items;
 
         var byId = invites.ToDictionary(i => i.Id);
         Assert.Equal("Pending", byId[pending.Id].Status);
@@ -155,14 +168,14 @@ public class SendInviteTests(CommunityApiFactory factory) : IClassFixture<Commun
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var email = $"{Guid.NewGuid():N}@example.org";
-        var (expired, oldToken) = await factory.AddInviteAsync(grace, email, Role.Attendee, TimeSpan.FromDays(15));
+        var (expired, oldToken) = await factory.AddInviteAsync(grace, email, SeededRole.Attendee, TimeSpan.FromDays(15));
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsync($"/api/invites/{expired.Id}/resend", null);
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsync($"/api/invites/{expired.Id}/resend", null);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var dto = (await response.Content.ReadFromJsonAsync<InviteDto>())!;
         Assert.NotEqual(expired.Id, dto.Id);
-        Assert.Equal(("Pending", "Attendee", email), (dto.Status, dto.PreassignedRole, dto.Email));
+        Assert.Equal(("Pending", "attendee", email), (dto.Status, dto.PreassignedRole, dto.Email));
         var token = InviteClients.TokenFrom(Assert.Single(await factory.QueuedEmailsToAsync(email)).Body);
         Assert.NotEqual(oldToken, token);
         var renewed = await factory.LoadInviteAsync(dto.Id);
@@ -175,7 +188,7 @@ public class SendInviteTests(CommunityApiFactory factory) : IClassFixture<Commun
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var (pending, _) = await factory.AddInviteAsync(grace, "nate@example.org");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsync($"/api/invites/{pending.Id}/resend", null);
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsync($"/api/invites/{pending.Id}/resend", null);
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
@@ -185,7 +198,7 @@ public class SendInviteTests(CommunityApiFactory factory) : IClassFixture<Commun
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var (pending, _) = await factory.AddInviteAsync(grace, "nate@example.org");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var revoke = await client.PostAsync($"/api/invites/{pending.Id}/revoke", null);
         var again = await client.PostAsync($"/api/invites/{pending.Id}/revoke", null);

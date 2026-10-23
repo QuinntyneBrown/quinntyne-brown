@@ -20,9 +20,9 @@ public class AdminAuditTests(CommunityApiFactory factory) : IClassFixture<Commun
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var secret = await factory.AddNoteAsync(grace, "Partner meeting notes");
-        var open = await factory.AddNoteAsync(grace, "Playbook", "Global");
+        var open = await factory.AddNoteAsync(grace, "Playbook", "OrgWide");
         var priya = await factory.AddMemberAsync("Priya Shah");
-        var admin = factory.ClientFor(priya, Role.SystemAdmin);
+        var admin = factory.ClientFor(priya, SeededRole.SystemAdmin);
 
         var read = (await admin.GetFromJsonAsync<Detail>($"/api/notes/{secret.Id}"))!;
         await admin.GetAsync($"/api/notes/{open.Id}");
@@ -36,10 +36,10 @@ public class AdminAuditTests(CommunityApiFactory factory) : IClassFixture<Commun
     public async Task Every_change_a_System_Admin_makes_to_someone_elses_page_is_audited()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var page = await factory.AddNoteAsync(grace, "Run sheet", "Global");
-        var parent = await factory.AddNoteAsync(grace, "Playbook", "Global");
+        var page = await factory.AddNoteAsync(grace, "Run sheet", "OrgWide");
+        var parent = await factory.AddNoteAsync(grace, "Playbook", "OrgWide");
         var priya = await factory.AddMemberAsync("Priya Shah");
-        var admin = factory.ClientFor(priya, Role.SystemAdmin);
+        var admin = factory.ClientFor(priya, SeededRole.SystemAdmin);
 
         (await admin.SaveNoteAsync(page, [Paragraph("Fixed the address")])).EnsureSuccessStatusCode();
         (await admin.PutAsJsonAsync($"/api/notes/{page.Id}/visibility", new { Visibility = "Private" })).EnsureSuccessStatusCode();
@@ -58,7 +58,7 @@ public class AdminAuditTests(CommunityApiFactory factory) : IClassFixture<Commun
     public async Task Members_acting_on_their_own_pages_are_not_audited()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(grace, Role.SystemAdmin);
+        var client = factory.ClientFor(grace, SeededRole.SystemAdmin);
         var page = await client.CreateNoteAsync("My notes");
 
         (await client.SaveNoteAsync(page, [Paragraph("Hello")])).EnsureSuccessStatusCode();
@@ -71,8 +71,8 @@ public class AdminAuditTests(CommunityApiFactory factory) : IClassFixture<Commun
     public async Task A_lead_cannot_change_another_members_page()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var page = await factory.AddNoteAsync(grace, "Playbook", "Global");
-        var lead = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), Role.CityLead, Role.EventLead, Role.CommunicationsLead);
+        var page = await factory.AddNoteAsync(grace, "Playbook", "OrgWide");
+        var lead = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead, SeededRole.EventLead, SeededRole.CommunicationsLead);
 
         Assert.Equal(HttpStatusCode.Forbidden, (await lead.SaveNoteAsync(page, [Paragraph("Mine")])).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await lead.PutAsJsonAsync($"/api/notes/{page.Id}/visibility", new { Visibility = "Private" })).StatusCode);

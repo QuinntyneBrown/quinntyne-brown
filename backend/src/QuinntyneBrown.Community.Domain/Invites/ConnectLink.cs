@@ -8,14 +8,18 @@ public class ConnectLink
 {
     private ConnectLink() { }
 
-    public ConnectLink(Guid ownerId, string tokenHash, string protectedToken, DateTimeOffset issuedAt)
+    public ConnectLink(Guid organizationId, Guid ownerId, string tokenHash, string protectedToken, DateTimeOffset issuedAt)
     {
         Id = Guid.NewGuid();
+        OrganizationId = organizationId;
         OwnerId = ownerId;
         Replace(tokenHash, protectedToken, issuedAt);
     }
 
     public Guid Id { get; private set; }
+
+    /// <summary>The org that owns this record (ADR 0034).</summary>
+    public Guid OrganizationId { get; private set; }
 
     public Guid OwnerId { get; private set; }
 

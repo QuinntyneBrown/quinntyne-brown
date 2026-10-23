@@ -8,14 +8,15 @@ public class Invite
 
     private Invite() { }
 
-    public Invite(string email, string tokenHash, Role? preassignedRole, Guid invitedBy, DateTimeOffset createdAt, string? note = null)
+    public Invite(Guid organizationId, string email, string tokenHash, Guid? preassignedRoleId, Guid invitedBy, DateTimeOffset createdAt, string? note = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(email);
         ArgumentException.ThrowIfNullOrWhiteSpace(tokenHash);
         Id = Guid.NewGuid();
+        OrganizationId = organizationId;
         Email = email;
         TokenHash = tokenHash;
-        PreassignedRole = preassignedRole;
+        PreassignedRoleId = preassignedRoleId;
         InvitedBy = invitedBy;
         CreatedAt = createdAt;
         ExpiresAt = createdAt + Lifetime;
@@ -24,11 +25,15 @@ public class Invite
 
     public Guid Id { get; private set; }
 
+    /// <summary>The org that owns this record (ADR 0034).</summary>
+    public Guid OrganizationId { get; private set; }
+
     public string Email { get; private set; } = string.Empty;
 
     public string TokenHash { get; private set; } = string.Empty;
 
-    public Role? PreassignedRole { get; private set; }
+    /// <summary>A catalogue role of the invite's org, granted on acceptance (ADR 0041).</summary>
+    public Guid? PreassignedRoleId { get; private set; }
 
     public Guid InvitedBy { get; private set; }
 

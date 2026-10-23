@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import {
   ANNOUNCEMENTS_SERVICE,
-  AUTH_SERVICE,
+  ACCESS_SERVICE,
+  ALL_ORGS,
+  Permission,
   AnnouncementDto,
-  ROLE_LABELS,
-  Role,
 } from '@faithtech-community/api';
 import {
   ButtonComponent,
@@ -17,12 +17,11 @@ import {
   ListSkeletonComponent,
   PageHeaderComponent,
   formatDay,
+  OrgLabelComponent,
 } from '@faithtech-community/components';
 import { firstValueFrom } from 'rxjs';
 
 type State = 'loading' | 'loaded' | 'error';
-
-const SENDERS: Role[] = ['CommunicationsLead', 'SystemAdmin'];
 
 /**
  * The announcements sent to the member, newest first (L2-030, mock `pages/announcements`). Communications
@@ -31,6 +30,7 @@ const SENDERS: Role[] = ['CommunicationsLead', 'SystemAdmin'];
 @Component({
   selector: 'ft-announcements-page',
   imports: [
+    OrgLabelComponent,
     ButtonComponent,
     CardComponent,
     EmptyStateComponent,
@@ -47,13 +47,15 @@ const SENDERS: Role[] = ['CommunicationsLead', 'SystemAdmin'];
 })
 export class AnnouncementsPage {
   private readonly service = inject(ANNOUNCEMENTS_SERVICE);
-  private readonly roles = inject(AUTH_SERVICE).roles;
+  private readonly access = inject(ACCESS_SERVICE);
 
   protected readonly state = signal<State>('loading');
   protected readonly items = signal<AnnouncementDto[]>([]);
   protected readonly hasMore = signal(false);
   protected readonly loadingMore = signal(false);
-  protected readonly canSend = computed(() => this.roles().some((r) => SENDERS.includes(r)));
+  protected readonly canSend = computed(() => this.access.can(Permission.AnnouncementsSend));
+  /** Rows are labelled with their org under "All orgs" (L2-151 AC4). */
+  protected readonly allOrgs = computed(() => this.access.activeSlug() === ALL_ORGS);
   private page = 1;
 
   constructor() {
@@ -98,8 +100,9 @@ export class AnnouncementsPage {
 /** "Everyone", "Product Engineers, Volunteers" or "RSVPs: Toronto Builders Night". */
 function audience(a: AnnouncementDto): string {
   if (a.audienceKind === 'EventRsvps') return `RSVPs: ${a.eventTitle ?? 'an event'}`;
+  if (a.audienceKind === 'Portfolio') return 'Everyone in the portfolio';
   if (a.audienceKind === 'Roles') {
-    return a.roles.map((r) => (r === 'Staff' ? 'Staff' : `${ROLE_LABELS[r]}s`)).join(', ');
+    return a.roles.map((r) => (r === 'Staff' ? r : `${r}s`)).join(', ');
   }
   return 'Everyone';
 }

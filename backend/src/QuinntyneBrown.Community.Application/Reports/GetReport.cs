@@ -7,8 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Reports;
 
-/// <summary>The filters from <c>?city=&amp;period=</c>; empty means All cities and Last 30 days.</summary>
-public record GetReportQuery(string? City, string? Period);
+/// <summary>
+/// The filters from <c>?city=&amp;period=&amp;organization=</c>; empty means All cities, Last 30 days and every org the
+/// caller reports on.
+/// </summary>
+public record GetReportQuery(string? City, string? Period, Guid? Organization = null);
 
 /// <summary>
 /// Computes the report (L2-123 to L2-127) from the definitions in ADR 0030. Every figure is a database aggregate:
@@ -24,11 +27,26 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
     public const int MaxMonths = 12;
     public static readonly TimeSpan UpcomingHorizon = TimeSpan.FromDays(30);
 
+    // The orgs this report covers: where the caller holds reports.view in the request's scope (L2-150).
+    private List<Guid> _scope = [];
+
     public async Task<(Result Result, ReportDto? Report)> HandleAsync(GetReportQuery query, CancellationToken cancellationToken = default)
     {
         if (!access.CanRead)
         {
             return (Result.Forbidden(), null);
+        }
+
+        _scope = [.. access.Scope];
+        if (query.Organization is { } org)
+        {
+            // An org filter outside the caller's reports is not found (L2-150 AC2).
+            if (!_scope.Contains(org))
+            {
+                return (Result.NotFound(), null);
+            }
+
+            _scope = [org];
         }
 
         if (ReportPeriod.Resolve(query.Period, time) is not { } window)
@@ -44,7 +62,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
         }
 
         var members = Members();
-        var events = db.Events.AsNoTracking();
+        var events = db.Events.AsNoTracking().Where(e => _scope.Contains(e.OrganizationId));
         if (city is not null)
         {
             members = members.Where(p => p.HomeCity == city);
@@ -66,6 +84,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
             window.From,
             window.To,
             cities,
+            access.Organizations,
             membersFigure.Value == 0 && eventRows.Count == 0,
             new ReportFiguresDto(membersFigure, eventsHeld, rsvps, partners, announcements),
             membersByCity,
@@ -78,7 +97,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
     private IQueryable<Profile> Members() =>
         from p in db.Profiles.AsNoTracking()
         join u in db.Users on p.Id equals u.ProfileId
-        where u.EmailConfirmed && !p.IsSuspended
+        where u.EmailConfirmed && !p.IsSuspended && db.OrgMemberships.Any(m => m.ProfileId == p.Id && _scope.Contains(m.OrganizationId))
         select p;
 
     /// <summary>The non-blank home cities of members and every event's city, ordinal-ignore-case sorted.</summary>
@@ -86,7 +105,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
     {
         var homeCities = await Members().Where(p => p.HomeCity != null && p.HomeCity.Trim() != string.Empty)
             .Select(p => p.HomeCity!).Distinct().ToListAsync(cancellationToken);
-        var eventCities = await db.Events.Where(e => e.City.Trim() != string.Empty)
+        var eventCities = await db.Events.Where(e => _scope.Contains(e.OrganizationId) && e.City.Trim() != string.Empty)
             .Select(e => e.City).Distinct().ToListAsync(cancellationToken);
         return homeCities.Union(eventCities, StringComparer.Ordinal).Order(StringComparer.OrdinalIgnoreCase).ToList();
     }
@@ -126,7 +145,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
     private async Task<List<PartnerPipelineRowDto>> PartnerPipelineAsync(string? city, List<string> cities, CancellationToken cancellationToken)
     {
         var groups = await (
-                from p in db.Partners.AsNoTracking()
+                from p in db.Partners.AsNoTracking().Where(x => _scope.Contains(x.OrganizationId))
                 where p.ArchivedAtUtc == null
                 join o in db.Profiles on p.OwnerId equals (Guid?)o.Id into owners
                 from o in owners.DefaultIfEmpty()
@@ -162,7 +181,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
     /// <summary>Announcements sent in the window; one city means the sender's home city.</summary>
     private Task<int> AnnouncementsAsync(string? city, ReportWindow window, CancellationToken cancellationToken)
     {
-        var announcements = db.Announcements.AsNoTracking().Where(a => a.SentAt <= window.To);
+        var announcements = db.Announcements.AsNoTracking().Where(a => _scope.Contains(a.OrganizationId) && a.SentAt <= window.To);
         if (window.From is { } from)
         {
             announcements = announcements.Where(a => a.SentAt >= from);

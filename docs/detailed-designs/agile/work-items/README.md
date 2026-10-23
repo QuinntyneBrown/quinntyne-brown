@@ -38,6 +38,16 @@ This feature owns the work item model, the work item dialog (create and edit), t
 - **`WorkItemKind`** — enumeration `Initiative`, `Epic`, `Story`, `Task`; `WorkItemHierarchy.CanParent(parent, child)` encodes the allowed links.
 - **`WorkItemStatus`** — enumeration `ToDo`, `InProgress`, `Done`. Initiatives and epics use the same status values as stories.
 
+### Organization hierarchy
+
+The organization hierarchy changes this design as follows; the rules are in [hierarchy and permissions](../../organizations/hierarchy-and-permissions/README.md) and [org-owned data and context](../../organizations/org-owned-data-and-context/README.md), and the binding decisions in [ADR 0033](../../../adr/0033-permission-codes-and-role-catalogues.md) and [ADR 0034](../../../adr/0034-org-owned-data-and-the-access-resolver.md). Where this section and the text above differ, this section applies. Requests for records outside the caller's coverage, or in an org whose type has the feature off, answer `404` ([feature flags](../../organizations/feature-flags/README.md)).
+
+- `Workspace` carries a required `OrganizationId`; work items, sprints, comments, poker sessions and members belong to the workspace's org. A workspace outside the caller's coverage, or in an org with `agile` off, answers `404`.
+- `WorkspaceAccessPolicy` classifies with `CallerAccess` for the workspace's org: **Admin** is the org's Org Lead, the Portfolio Lead or a System Admin; the read-only level (formerly **Staff**) is any holder of `workspaces.readAll` there, such as the Staff and Portfolio cross-org roles; Owner, Member and Outsider are unchanged (`L2-146` AC5). The "Read-only for Staff" alert reads "Read-only".
+- Actions by an Admin who is not the owner are overrides and stay audited.
+- Assignee pickers offer the workspace's members only, cross-org members included, filtered by profile visibility. Agents may be assigned work like people ([agents](../../organizations/agents/README.md)).
+- My work under "All orgs" lists items assigned to the caller in every covered org, labelled by org (`L2-145` AC3).
+
 ## Requirements
 
 The feature realizes the following level-2 (L2) requirements. Each L2 requirement refines a level-1 (L1) requirement, cited by identifier.

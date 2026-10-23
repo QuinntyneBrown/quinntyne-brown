@@ -25,7 +25,7 @@ public class EmailUnitOfWorkTests(CommunityApiFactory factory) : IClassFixture<C
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var email = $"{Guid.NewGuid():N}@example.org";
 
-        var response = await ClientFor(grace, Role.CityLead).PostAsJsonAsync("/api/invites", new { Email = email });
+        var response = await ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync("/api/invites", new { Email = email });
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.True(await factory.WithDbAsync(db => db.Invites.AnyAsync(i => i.Email == email)));
@@ -39,7 +39,7 @@ public class EmailUnitOfWorkTests(CommunityApiFactory factory) : IClassFixture<C
         var email = $"{Guid.NewGuid():N}@example.org";
         factory.SaveFailures.FailNext(QueuesEmail);
 
-        var response = await ClientFor(grace, Role.CityLead).PostAsJsonAsync("/api/invites", new { Email = email });
+        var response = await ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync("/api/invites", new { Email = email });
 
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         Assert.False(await factory.WithDbAsync(db => db.Invites.AnyAsync(i => i.Email == email)));
@@ -53,10 +53,10 @@ public class EmailUnitOfWorkTests(CommunityApiFactory factory) : IClassFixture<C
         var ruth = await factory.AddMemberAsync("Ruth Alvarez");
         factory.SaveFailures.FailNext(QueuesEmail);
 
-        var response = await ClientFor(grace, Role.CityLead).PostAsJsonAsync($"/api/profiles/{ruth.ProfileId}/roles", new { Role = "Volunteer" });
+        var response = await ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync($"/api/profiles/{ruth.ProfileId}/roles", new { Role = "volunteer" });
 
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
-        Assert.False(await factory.WithDbAsync(db => db.Profiles.AnyAsync(p => p.Id == ruth.ProfileId && p.Roles.Any())));
+        Assert.False(await factory.WithDbAsync(db => db.OrgRoleAssignments.AnyAsync(a => a.ProfileId == ruth.ProfileId)));
         Assert.False(await factory.WithDbAsync(db => db.Notifications.AnyAsync(n => n.RecipientId == ruth.ProfileId)));
         Assert.Empty(await QueuedForAsync(await EventClients.EmailOfAsync(factory, ruth)));
     }
@@ -99,7 +99,7 @@ public class EmailUnitOfWorkTests(CommunityApiFactory factory) : IClassFixture<C
         var lead = await factory.AddMemberAsync("Esther Nakamura");
         factory.SaveFailures.FailNext(QueuesEmail);
 
-        var response = await ClientFor(lead, Role.EventLead)
+        var response = await ClientFor(lead, SeededRole.EventLead)
             .PostAsJsonAsync($"/api/events/{existing.Id}/cancel", new { Reason = "Our venue fell through." });
 
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
@@ -112,10 +112,10 @@ public class EmailUnitOfWorkTests(CommunityApiFactory factory) : IClassFixture<C
     public async Task A_workspace_member_whose_email_cannot_be_queued_is_not_added_either()
     {
         var cast = await factory.AddCastAsync();
-        var marcus = await factory.AddWithRolesAsync("Marcus Chen", Role.Volunteer);
+        var marcus = await factory.AddWithRolesAsync("Marcus Chen", SeededRole.Volunteer);
         factory.SaveFailures.FailNext(QueuesEmail);
 
-        var response = await ClientFor(cast.Owner, Role.CityLead)
+        var response = await ClientFor(cast.Owner, SeededRole.CityLead)
             .PostAsJsonAsync($"/api/workspaces/{cast.WorkspaceId}/members", new { ProfileIds = new[] { marcus.ProfileId } });
 
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
@@ -124,7 +124,7 @@ public class EmailUnitOfWorkTests(CommunityApiFactory factory) : IClassFixture<C
         Assert.Empty(await QueuedForAsync(await EventClients.EmailOfAsync(factory, marcus)));
     }
 
-    private HttpClient ClientFor(ProfileClients.Member member, params Role[] roles) => factory.ClientFor(member, roles);
+    private HttpClient ClientFor(ProfileClients.Member member, params SeededRole[] roles) => factory.ClientFor(member, roles);
 
     private Task<List<OutboxMessage>> QueuedForAsync(string address) =>
         factory.WithDbAsync(db => db.OutboxMessages.Where(m => m.To == address).ToListAsync());

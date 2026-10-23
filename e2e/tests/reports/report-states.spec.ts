@@ -41,7 +41,7 @@ test.describe('Report states', () => {
     await expect(reports.empty).toHaveText('Nothing to report for Calgary in the last 30 days');
     await axe.check();
     await reports.emptyAction('Last 90 days').click();
-    await expect(page).toHaveURL('/reports?city=Calgary&period=last-90-days');
+    await expect(page).toHaveURL('/o/faithtech-toronto/reports?city=Calgary&period=last-90-days');
     await expect(reports.figure('Events held')).toContainText('1');
   });
 
@@ -61,13 +61,13 @@ test.describe('Report states', () => {
     await reports.open('?city=Toronto&period=this-year');
 
     await expect(reports.error).toBeVisible();
-    await expect(page).toHaveURL('/reports?city=Toronto&period=this-year');
+    await expect(page).toHaveURL('/o/faithtech-toronto/reports?city=Toronto&period=this-year');
     await axe.check();
 
     fail = false;
     await reports.tryAgain.click();
     await expect(reports.subtitle).toContainText('Toronto · This year');
     await expect(reports.figure('Members')).toContainText('3');
-    await expect(page).toHaveURL('/reports?city=Toronto&period=this-year');
+    await expect(page).toHaveURL('/o/faithtech-toronto/reports?city=Toronto&period=this-year');
   });
 });

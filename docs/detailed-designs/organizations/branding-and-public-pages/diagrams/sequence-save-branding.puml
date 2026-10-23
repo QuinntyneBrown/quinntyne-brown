@@ -1,0 +1,48 @@
+@startuml
+title UML sequence behaviour — Save org branding
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Org Lead" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "OrgBrandingPage" as page
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "OrganizationBrandingEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "SaveBrandingHandler" as h
+  participant "AccentContrast" as con
+  participant "IAuditLog" as audit
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> page : Display name, accent #rrggbb
+page -> ep : PUT /api/organizations/{id}/branding
+ep -> h : HandleAsync
+alt not Org Lead of org, Portfolio Lead or System Admin
+  h --> page : 403 (404 outside coverage) (L2-156 #5)
+else
+  h -> con : Foreground(accent): white or #111111, whichever contrasts more
+  h -> con : Ratio(accent, foreground)
+  alt ratio < 4.5
+    h --> page : 400 accent "This colour doesn't have enough contrast..." + ratio (L2-149 #5)
+  else
+    h -> db : Organization.SetBranding
+    h -> audit : organization.branding (when Portfolio Lead or System Admin)
+    h --> page : 200 BrandingDto { accent, accentForeground, contrastRatio } (L2-149 #4)
+  end
+end
+@enduml

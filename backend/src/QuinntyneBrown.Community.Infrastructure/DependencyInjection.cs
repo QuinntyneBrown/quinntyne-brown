@@ -63,6 +63,7 @@ public static class DependencyInjection
             .AddTokenProvider<PasswordResetTokenProvider<CommunityUser>>(PasswordResetTokenProvider<CommunityUser>.Name);
         services.AddDataProtection();
         services.AddSingleton<IPassphraseHasher, Pbkdf2PassphraseHasher>();
+        services.AddSingleton<Application.Organizations.IAgentTokenFactory, Organizations.AgentTokenFactory>();
         services.AddSingleton<IUnlockTokens, HmacUnlockTokens>();
         services.TryAddSingleton(TimeProvider.System);
 

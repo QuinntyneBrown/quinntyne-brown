@@ -1,5 +1,7 @@
 using QuinntyneBrown.Community.Application.Common;
+using QuinntyneBrown.Community.Application.Organizations;
 using QuinntyneBrown.Community.Domain.Events;
+using QuinntyneBrown.Community.Domain.Organizations;
 using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Events;
@@ -28,18 +30,28 @@ public record EventSummaryDto(
     string? Venue,
     string Visibility,
     int RsvpCount,
-    bool IsCancelled);
+    bool IsCancelled,
+    OrgLabel? Organization = null);
 
 /// <summary>The matching events, and every city that has an event whatever the filters.</summary>
 public record EventListDto(IReadOnlyList<EventSummaryDto> Events, IReadOnlyList<string> Cities);
 
-/// <summary>Lists events for signed-in members (L2-021). Upcoming means not yet ended, soonest first; past is newest first.</summary>
-public class ListEventsHandler(IApplicationDbContext db, TimeProvider time)
+/// <summary>
+/// Lists the events of the orgs in the request's scope (L2-021, L2-139). Upcoming means not yet ended, soonest first;
+/// past is newest first. Null (404) when <c>X-Org</c> names an org the caller does not cover or without events.
+/// </summary>
+public class ListEventsHandler(IApplicationDbContext db, ICurrentUser current, TimeProvider time)
 {
-    public async Task<EventListDto> HandleAsync(ListEventsQuery query, CancellationToken cancellationToken = default)
+    public async Task<EventListDto?> HandleAsync(ListEventsQuery query, CancellationToken cancellationToken = default)
     {
+        if (current.Access.ActiveOrgUnavailable(Features.Events))
+        {
+            return null;
+        }
+
         var now = time.GetUtcNow();
-        var events = db.Events.AsNoTracking();
+        var scope = current.Access.ReadScope(Features.Events);
+        var events = db.Events.AsNoTracking().Where(e => scope.Contains(e.OrganizationId));
         events = query.Filter switch
         {
             EventListFilter.Past => events.Where(e => e.EndsAt <= now),
@@ -59,14 +71,14 @@ public class ListEventsHandler(IApplicationDbContext db, TimeProvider time)
             : events.OrderBy(e => e.StartsAt);
         // Enums leave the database as values and become names here, so the query stays translatable.
         var rows = await events
-            .Select(e => new { e.Id, e.Title, e.Type, e.StartsAt, e.EndsAt, e.City, e.Format, e.Venue, e.Visibility, Rsvps = e.Rsvps.Count(r => !r.IsWalkIn), e.IsCancelled })
+            .Select(e => new { e.Id, e.Title, e.Type, e.StartsAt, e.EndsAt, e.City, e.Format, e.Venue, e.Visibility, Rsvps = e.Rsvps.Count(r => !r.IsWalkIn), e.IsCancelled, e.OrganizationId })
             .ToListAsync(cancellationToken);
 
-        var cities = await db.Events.AsNoTracking().Select(e => e.City).Distinct().ToListAsync(cancellationToken);
+        var cities = await db.Events.AsNoTracking().Where(e => scope.Contains(e.OrganizationId)).Select(e => e.City).Distinct().ToListAsync(cancellationToken);
         return new EventListDto(
             [.. rows.Select(e => new EventSummaryDto(
                 e.Id, e.Title, e.Type.ToString(), e.StartsAt, e.EndsAt, e.City, e.Format.ToString(), e.Venue,
-                e.Visibility.ToString(), e.Rsvps, e.IsCancelled))],
+                e.Visibility.ToString(), e.Rsvps, e.IsCancelled, OrgLabel.Of(current.Access.Orgs, e.OrganizationId)))],
             [.. cities
                 .Select(c => c.Trim())
                 .Where(c => c.Length > 0)

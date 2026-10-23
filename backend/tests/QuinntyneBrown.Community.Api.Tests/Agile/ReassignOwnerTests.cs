@@ -18,14 +18,16 @@ public class ReassignOwnerTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task Given_an_owner_who_loses_city_lead_when_the_role_is_removed_then_each_system_admin_is_notified()
     {
         var cast = await factory.AddCastAsync();
+        // The org's Org Lead hears about it (L2-146 AC4).
+        var orgLead = await factory.AddWithRolesAsync("Olivia Grant", SeededRole.OrgLead);
 
-        var response = await factory.AdminClient(cast).DeleteAsync($"/api/profiles/{cast.Owner.ProfileId}/roles/CityLead");
+        var response = await factory.AdminClient(cast).DeleteAsync($"/api/profiles/{cast.Owner.ProfileId}/roles/city-lead");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var notification = await factory.WithDbAsync(db => db.Notifications
-            .SingleAsync(n => n.RecipientId == cast.Admin.ProfileId && n.Kind == NotificationKind.WorkspaceOwnerLostCityLead));
+            .SingleAsync(n => n.RecipientId == orgLead.ProfileId && n.Kind == NotificationKind.WorkspaceOwnerLostCityLead));
         Assert.Equal(
-            ("Grace Okonkwo no longer holds the City Lead role but owns Toronto team", $"/workspaces/{cast.WorkspaceId}/settings"),
+            ("Grace Okonkwo can no longer own workspaces but owns Toronto team", $"/workspaces/{cast.WorkspaceId}/settings"),
             (notification.Title, notification.LinkPath));
         var workspace = await factory.AdminClient(cast).GetFromJsonAsync<Workspace>($"/api/workspaces/{cast.WorkspaceId}");
         Assert.True(workspace!.NeedsNewOwner);
@@ -37,7 +39,7 @@ public class ReassignOwnerTests(CommunityApiFactory factory) : IClassFixture<Com
         var cast = await factory.AddCastAsync();
         await factory.OwnerClient(cast).PostAsync($"/api/workspaces/{cast.WorkspaceId}/archive", null);
 
-        await factory.AdminClient(cast).DeleteAsync($"/api/profiles/{cast.Owner.ProfileId}/roles/CityLead");
+        await factory.AdminClient(cast).DeleteAsync($"/api/profiles/{cast.Owner.ProfileId}/roles/city-lead");
 
         var archived = (await factory.AdminClient(cast).GetFromJsonAsync<WorkspacesTests.Summary[]>("/api/workspaces"))!.Single(w => w.Id == cast.WorkspaceId);
         Assert.Equal((true, false), (archived.IsArchived, archived.NeedsNewOwner));
@@ -53,8 +55,8 @@ public class ReassignOwnerTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task Given_a_workspace_needing_an_owner_when_a_system_admin_reassigns_it_to_a_city_lead_then_the_former_owner_stays_a_member_and_it_is_audited()
     {
         var cast = await factory.AddCastAsync();
-        var joel = await factory.AddWithRolesAsync("Joel Mbeki", Role.CityLead);
-        await factory.AdminClient(cast).DeleteAsync($"/api/profiles/{cast.Owner.ProfileId}/roles/CityLead");
+        var joel = await factory.AddWithRolesAsync("Joel Mbeki", SeededRole.CityLead);
+        await factory.AdminClient(cast).DeleteAsync($"/api/profiles/{cast.Owner.ProfileId}/roles/city-lead");
 
         var response = await factory.AdminClient(cast).PutAsJsonAsync($"/api/workspaces/{cast.WorkspaceId}/owner", new { OwnerId = joel.ProfileId });
 
@@ -65,7 +67,7 @@ public class ReassignOwnerTests(CommunityApiFactory factory) : IClassFixture<Com
         var entry = await factory.WithDbAsync(db => db.AuditEntries.SingleAsync(a => a.TargetId == cast.WorkspaceId.ToString()));
         Assert.Equal("workspace.owner.reassigned", entry.Action);
         Assert.Contains(joel.ProfileId.ToString(), entry.AfterJson);
-        var asJoel = await factory.ClientFor(joel, Role.CityLead).GetFromJsonAsync<OwnerView>($"/api/workspaces/{cast.WorkspaceId}");
+        var asJoel = await factory.ClientFor(joel, SeededRole.CityLead).GetFromJsonAsync<OwnerView>($"/api/workspaces/{cast.WorkspaceId}");
         Assert.Equal(("Owner", false), (asJoel!.Access, asJoel.NeedsNewOwner));
     }
 
@@ -77,7 +79,7 @@ public class ReassignOwnerTests(CommunityApiFactory factory) : IClassFixture<Com
         var response = await factory.AdminClient(cast).PutAsJsonAsync($"/api/workspaces/{cast.WorkspaceId}/owner", new { OwnerId = cast.Member.ProfileId });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains("Choose a City Lead.", await response.Content.ReadAsStringAsync());
+        Assert.Contains("Choose someone who can create workspaces in this organization.", await response.Content.ReadAsStringAsync());
         Assert.Equal(cast.Owner.ProfileId, (await factory.LoadWorkspaceAsync(cast.WorkspaceId)).OwnerId);
     }
 
@@ -100,7 +102,7 @@ public class ReassignOwnerTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task Given_anyone_but_a_system_admin_when_they_reassign_the_owner_then_refused(string who, HttpStatusCode expected)
     {
         var cast = await factory.AddCastAsync();
-        var joel = await factory.AddWithRolesAsync("Joel Mbeki", Role.CityLead);
+        var joel = await factory.AddWithRolesAsync("Joel Mbeki", SeededRole.CityLead);
         var client = who switch
         {
             "owner" => factory.OwnerClient(cast),
@@ -119,7 +121,7 @@ public class ReassignOwnerTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task Given_a_system_admin_when_they_list_owner_candidates_then_only_city_leads_but_the_current_owner_are_offered()
     {
         var cast = await factory.AddCastAsync();
-        var joel = await factory.AddWithRolesAsync("Joel Mbeki", Role.CityLead);
+        var joel = await factory.AddWithRolesAsync("Joel Mbeki", SeededRole.CityLead);
 
         var candidates = await factory.AdminClient(cast).GetFromJsonAsync<AgileCandidate[]>($"/api/workspaces/{cast.WorkspaceId}/owner-candidates");
 

@@ -1,3 +1,4 @@
+import { MockOrganizations, TORONTO, roleNameOf } from './mock-organizations';
 import { Route, WebSocketRoute } from '@playwright/test';
 
 import type { MockAccount, MockProfile } from './mock-api';
@@ -12,6 +13,8 @@ export interface MockWorkspace {
   ownerId: string;
   memberIds: string[];
   isArchived: boolean;
+  /** The org the workspace belongs to (L2-146); FaithTech Toronto unless given. */
+  orgSlug: string;
 }
 
 export interface MockSprint {
@@ -122,6 +125,10 @@ export class MockAgile {
     private readonly unrecognised: string[],
     /** Who the hub connection belongs to: the account signed in when it opens. */
     private readonly signedIn: () => MockAccount | null,
+    /** The orgs and what each caller covers, for X-Org and org labels (ADR 0034). */
+    private readonly organizations: () => MockOrganizations,
+    /** Every account, for who may own a workspace in its org. */
+    private readonly accounts: () => MockAccount[] = () => [],
   ) {}
 
   /** POST /hubs/agile/negotiate: offer WebSockets only, as the SignalR client asks. */
@@ -246,6 +253,7 @@ export class MockAgile {
       method: 'Scrum',
       memberIds: [],
       isArchived: false,
+      orgSlug: TORONTO,
       ...workspace,
     };
     this.workspaces.push(full);
@@ -300,7 +308,8 @@ export class MockAgile {
     return (
       path.startsWith('/api/workspaces') ||
       path.startsWith('/api/items') ||
-      path.startsWith('/api/poker-sessions')
+      path.startsWith('/api/poker-sessions') ||
+      path === '/api/work/mine'
     );
   }
 
@@ -314,6 +323,7 @@ export class MockAgile {
     const itemRoute = /^\/api\/items\/([^/]+)(\/.*)?$/.exec(path);
     if (itemRoute) return this.itemRequest(request, itemRoute[1], itemRoute[2] ?? '');
 
+    if (method === 'GET' && path === '/api/work/mine') return this.myWork(request);
     if (path === '/api/workspaces') {
       if (method === 'GET') return this.list(request);
       if (method === 'POST') return this.create(request);
@@ -409,20 +419,24 @@ export class MockAgile {
         if (!manage) return route.fulfill({ status: 403 });
         return route.fulfill({ status: 200, json: this.archivedItems(workspace) });
       case 'GET /owner-candidates':
-        if (!caller.roles.includes('SystemAdmin')) return route.fulfill({ status: 403 });
+        if (!this.administers(workspace, caller)) return route.fulfill({ status: 403 });
         return route.fulfill({
           status: 200,
           json: [...this.profiles.values()]
-            .filter((p) => p.id !== workspace.ownerId && p.roles.includes('CityLead'))
+            .filter((p) => p.id !== workspace.ownerId && this.canOwn(workspace, p.id))
             .sort((a, b) => a.name.localeCompare(b.name))
-            .map((p) => ({ profileId: p.id, name: p.name, roles: p.roles })),
+            .map((p) => ({ profileId: p.id, name: p.name, roles: p.roles.map(roleNameOf) })),
         });
       case 'PUT /owner': {
-        if (!caller.roles.includes('SystemAdmin')) return route.fulfill({ status: 403 });
+        if (!this.administers(workspace, caller)) return route.fulfill({ status: 403 });
         const ownerId = request.body['ownerId'] as string | null;
         if (!ownerId) return invalid(route, 'OwnerId', 'Choose who will own this workspace.');
-        if (!this.profiles.get(ownerId)?.roles.includes('CityLead'))
-          return invalid(route, 'OwnerId', 'Choose a City Lead.');
+        if (!this.canOwn(workspace, ownerId))
+          return invalid(
+            route,
+            'OwnerId',
+            'Choose someone who can create workspaces in this organization.',
+          );
         workspace.memberIds = [
           ...workspace.memberIds.filter((id) => id !== ownerId),
           workspace.ownerId,
@@ -994,17 +1008,86 @@ export class MockAgile {
     return this.profiles.get(profileId)?.name ?? 'A former member';
   }
 
+  /** The workspace's org's Org Lead, the Portfolio Lead or a System Admin: "Admin" (L2-146 AC5). */
+  private administers(workspace: MockWorkspace, caller: MockAccount): boolean {
+    if (caller.roles.includes('SystemAdmin')) return true;
+    const covered = this.organizations()
+      .covered(caller)
+      .find((c) => c.org.slug === workspace.orgSlug);
+    return !!covered && (covered.isOrgLead || covered.isPortfolioLead);
+  }
+
+  /** Who may own a workspace of the org: holders of workspaces.create there, or its Org Leads. */
+  private canOwn(workspace: MockWorkspace, profileId: string): boolean {
+    const account = this.accounts().find((a) => a.profileId === profileId);
+    if (!account) return false;
+    const covered = this.organizations()
+      .covered(account)
+      .find((c) => c.org.slug === workspace.orgSlug && c.isMember);
+    return !!covered && (covered.isOrgLead || covered.permissions.has('workspaces.create'));
+  }
+
   access(workspace: MockWorkspace, caller: MockAccount): MockAccess {
     if (workspace.ownerId === caller.profileId) return 'Owner';
-    if (caller.roles.includes('SystemAdmin')) return 'Admin';
+    if (this.administers(workspace, caller)) return 'Admin';
     if (workspace.memberIds.includes(caller.profileId)) return 'Member';
     if (caller.roles.includes('Staff')) return 'Staff';
     return 'Outsider';
   }
 
+  /** The orgs a list covers: the one in X-Org, or every covered org without one or under "All orgs". */
+  private inScope(route: Route, caller: MockAccount): (w: MockWorkspace) => boolean {
+    const header = route.request().headers()['x-org'];
+    const covered = this.organizations()
+      .covered(caller)
+      .filter((c) => c.org.features.includes('agile'))
+      .map((c) => c.org.slug);
+    return (w) =>
+      covered.includes(w.orgSlug) && (!header || header === 'all' || header === w.orgSlug);
+  }
+
+  /** GET /api/work/mine: open items assigned to the caller in workspaces they can read (MyWorkHandler). */
+  private myWork({ route, caller }: AgileRequest) {
+    const inScope = this.inScope(route, caller!);
+    const all = caller!.roles.some((r) => r === 'Staff' || r === 'SystemAdmin');
+    const rows = this.items
+      .filter((i) => i.assigneeId === caller!.profileId && !i.isArchived)
+      .map((i) => ({ item: i, workspace: this.workspaces.find((w) => w.id === i.workspaceId)! }))
+      .filter(
+        ({ workspace }) =>
+          !workspace.isArchived &&
+          inScope(workspace) &&
+          (all || this.access(workspace, caller!) !== 'Outsider'),
+      )
+      .sort(
+        (a, b) =>
+          Number(a.item.isDone) - Number(b.item.isDone) ||
+          a.workspace.name.localeCompare(b.workspace.name) ||
+          a.item.title.localeCompare(b.item.title),
+      )
+      .map(({ item, workspace }) => ({
+        id: item.id,
+        title: item.title,
+        kind: item.kind,
+        status: item.status,
+        workspaceId: workspace.id,
+        workspaceName: workspace.name,
+        organization: this.label(workspace),
+      }));
+    return route.fulfill({ status: 200, json: rows });
+  }
+
+  /** The workspace's org as lists label it (OrgLabel). */
+  private label(workspace: MockWorkspace) {
+    const org = this.organizations().bySlug(workspace.orgSlug);
+    return org ? { id: org.id, slug: org.slug, name: org.displayName ?? org.name } : null;
+  }
+
   private list({ route, caller }: AgileRequest) {
     const all = caller!.roles.some((r) => r === 'Staff' || r === 'SystemAdmin');
+    const inScope = this.inScope(route, caller!);
     const visible = this.workspaces
+      .filter(inScope)
       .filter((w) =>
         w.isArchived
           ? w.ownerId === caller!.profileId || caller!.roles.includes('SystemAdmin')
@@ -1045,7 +1128,8 @@ export class MockAgile {
         null,
       memberCount: new Set([workspace.ownerId, ...workspace.memberIds]).size,
       isArchived: workspace.isArchived,
-      needsNewOwner: !owner?.roles.some((r) => r === 'CityLead' || r === 'SystemAdmin'),
+      organization: this.label(workspace),
+      needsNewOwner: !this.canOwn(workspace, workspace.ownerId),
     };
   }
 
@@ -1059,7 +1143,7 @@ export class MockAgile {
       .map((id) => ({
         profileId: id,
         name: this.profiles.get(id)?.name ?? 'A former member',
-        roles: this.profiles.get(id)?.roles ?? [],
+        roles: (this.profiles.get(id)?.roles ?? []).map(roleNameOf),
         isOwner: id === workspace.ownerId,
         assignedStories: this.assigned(workspace, id, false),
         assignedTasks: this.assigned(workspace, id, true),
@@ -1086,7 +1170,7 @@ export class MockAgile {
     return [...this.profiles.values()]
       .filter((p) => !excluded.includes(p.id) && this.onTeam(p.id))
       .sort((a, b) => a.name.localeCompare(b.name))
-      .map((p) => ({ profileId: p.id, name: p.name, roles: p.roles }));
+      .map((p) => ({ profileId: p.id, name: p.name, roles: p.roles.map(roleNameOf) }));
   }
 
   private onTeam(profileId: string): boolean {

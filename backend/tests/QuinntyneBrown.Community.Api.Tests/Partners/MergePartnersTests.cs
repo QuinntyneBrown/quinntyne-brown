@@ -32,7 +32,7 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
 
     private async Task<Partner> AddAsync(ProfileClients.Member lead, object body)
     {
-        var response = await factory.ClientFor(lead, Role.CityLead).PostAsJsonAsync("/api/partners", body);
+        var response = await factory.ClientFor(lead, SeededRole.CityLead).PostAsJsonAsync("/api/partners", body);
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<Partner>())!;
     }
@@ -43,7 +43,7 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
         var u = Unique();
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var esther = await factory.AddMemberAsync("Esther Nakamura");
-        factory.ClientFor(esther, Role.CityLead);
+        factory.ClientFor(esther, SeededRole.CityLead);
         var kept = await AddAsync(grace, new
         {
             Name = $"Kestrel {u} Labs",
@@ -72,12 +72,12 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.CreateLead)]
-    [InlineData(Role.CommunicationsLead)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Each_lead_role_and_a_system_admin_may_merge(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.CreateLead)]
+    [InlineData(SeededRole.CommunicationsLead)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Each_lead_role_and_a_system_admin_may_merge(SeededRole role)
     {
         var (_, _, kept, other) = await PairAsync();
         var caller = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), role);
@@ -93,7 +93,7 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     {
         var (grace, esther, kept, other) = await PairAsync();
 
-        var response = await factory.ClientFor(grace, Role.CityLead).MergeAsync(
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).MergeAsync(
             kept.Id, MergeBody(kept, other, new { Phone = "other", Owner = "other", ContactName = "keep", Name = "keep" }));
 
         var merged = (await response.Content.ReadFromJsonAsync<Partner>())!;
@@ -109,13 +109,13 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task Both_timelines_and_stage_histories_end_on_the_kept_record_with_a_merged_entry()
     {
         var (grace, esther, kept, other) = await PairAsync();
-        var lead = factory.ClientFor(esther, Role.CityLead);
+        var lead = factory.ClientFor(esther, SeededRole.CityLead);
         (await lead.LogActivityAsync(other.Id, NewActivity(summary: "Called about hosting.", occurredOn: Today))).EnsureSuccessStatusCode();
         (await lead.PostAsJsonAsync($"/api/partners/{other.Id}/stage", new { To = "InFunnel", Note = "Proposal sent." })).EnsureSuccessStatusCode();
         other = await lead.GetPartnerAsync(other.Id);
         factory.Time.Advance(TimeSpan.FromMinutes(1));
 
-        var response = await factory.ClientFor(grace, Role.CityLead).MergeAsync(kept.Id, MergeBody(kept, other));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).MergeAsync(kept.Id, MergeBody(kept, other));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var timeline = (await lead.ActivitiesAsync(kept.Id)).Items;
@@ -138,7 +138,7 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     {
         var (grace, _, kept, other) = await PairAsync();
 
-        var response = await factory.ClientFor(grace, Role.CityLead).MergeAsync(kept.Id, MergeBody(kept, other, new { Stage = "other" }));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).MergeAsync(kept.Id, MergeBody(kept, other, new { Stage = "other" }));
 
         Assert.Equal("Lead", (await response.Content.ReadFromJsonAsync<Partner>())!.Stage);
         var merged = (await factory.ClientFor(grace).ActivitiesAsync(kept.Id)).Items[0];
@@ -150,7 +150,7 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task The_other_record_is_archived_and_left_off_the_board_search_and_duplicate_checks()
     {
         var (grace, _, kept, other) = await PairAsync();
-        var lead = factory.ClientFor(grace, Role.CityLead);
+        var lead = factory.ClientFor(grace, SeededRole.CityLead);
         Assert.Single((await lead.DuplicatesAsync(kept.Id)).Matches);
 
         await lead.MergeAsync(kept.Id, MergeBody(kept, other));
@@ -177,9 +177,9 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task A_system_admin_sees_restore_on_an_archived_partner()
     {
         var (grace, _, kept, other) = await PairAsync();
-        await factory.ClientFor(grace, Role.CityLead).MergeAsync(kept.Id, MergeBody(kept, other));
+        await factory.ClientFor(grace, SeededRole.CityLead).MergeAsync(kept.Id, MergeBody(kept, other));
 
-        var admin = factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), Role.SystemAdmin);
+        var admin = factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), SeededRole.SystemAdmin);
 
         Assert.True((await admin.GetPartnerAsync(other.Id)).CanRestore);
         Assert.False((await admin.GetPartnerAsync(kept.Id)).CanRestore);
@@ -189,7 +189,7 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task An_archived_partner_refuses_edits_moves_and_logged_activities()
     {
         var (grace, _, kept, other) = await PairAsync();
-        var lead = factory.ClientFor(grace, Role.CityLead);
+        var lead = factory.ClientFor(grace, SeededRole.CityLead);
         await lead.MergeAsync(kept.Id, MergeBody(kept, other));
 
         var edit = await lead.PutAsJsonAsync($"/api/partners/{other.Id}", NewPartner("Renamed"));
@@ -211,7 +211,7 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task A_record_that_changed_since_the_dialog_opened_answers_409_and_nothing_changes(bool keptChanged)
     {
         var (grace, _, kept, other) = await PairAsync();
-        var lead = factory.ClientFor(grace, Role.CityLead);
+        var lead = factory.ClientFor(grace, SeededRole.CityLead);
         var changed = keptChanged ? kept : other;
         (await lead.PostAsJsonAsync($"/api/partners/{changed.Id}/stage", new { To = "Confirmed" })).EnsureSuccessStatusCode();
 
@@ -229,7 +229,7 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task Joined_notes_over_2000_characters_answer_400()
     {
         var (grace, _, kept, other) = await PairAsync();
-        var lead = factory.ClientFor(grace, Role.CityLead);
+        var lead = factory.ClientFor(grace, SeededRole.CityLead);
         var long1 = new string('a', 1200);
         (await lead.PutAsJsonAsync($"/api/partners/{kept.Id}", new { kept.Name, kept.Website, Notes = long1 })).EnsureSuccessStatusCode();
         (await lead.PutAsJsonAsync($"/api/partners/{other.Id}", new { other.Name, other.Website, Notes = long1 })).EnsureSuccessStatusCode();
@@ -251,7 +251,7 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     {
         var (grace, _, kept, other) = await PairAsync();
 
-        var response = await factory.ClientFor(grace, Role.CityLead).MergeAsync(kept.Id, MergeBody(kept, other, new { Name = "both" }));
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).MergeAsync(kept.Id, MergeBody(kept, other, new { Name = "both" }));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -260,7 +260,7 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task Merging_a_partner_into_itself_is_400_an_unknown_one_404_and_an_archived_one_409()
     {
         var (grace, _, kept, other) = await PairAsync();
-        var lead = factory.ClientFor(grace, Role.CityLead);
+        var lead = factory.ClientFor(grace, SeededRole.CityLead);
 
         var self = await lead.MergeAsync(kept.Id, MergeBody(kept, kept));
         var unknown = await lead.MergeAsync(Guid.NewGuid(), MergeBody(kept, other));
@@ -277,8 +277,8 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     public async Task Staff_and_other_members_get_403_anonymous_401_and_nothing_changes()
     {
         var (grace, _, kept, other) = await PairAsync();
-        var staff = factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), Role.Staff);
-        var volunteer = factory.ClientFor(await factory.AddMemberAsync("Ruth Alvarez"), Role.Volunteer);
+        var staff = factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), SeededRole.Staff);
+        var volunteer = factory.ClientFor(await factory.AddMemberAsync("Ruth Alvarez"), SeededRole.Volunteer);
 
         var byStaff = await staff.MergeAsync(kept.Id, MergeBody(kept, other));
         var byVolunteer = await volunteer.MergeAsync(kept.Id, MergeBody(kept, other));
@@ -291,9 +291,9 @@ public class MergePartnersTests(CommunityApiFactory factory) : IClassFixture<Com
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Every_merge_is_audited_with_both_partners_and_the_choices(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Every_merge_is_audited_with_both_partners_and_the_choices(SeededRole role)
     {
         var (_, _, kept, other) = await PairAsync();
         var marcus = await factory.AddMemberAsync("Marcus Lee");

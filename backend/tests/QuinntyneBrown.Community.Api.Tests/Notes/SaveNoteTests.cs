@@ -47,9 +47,9 @@ public class SaveNoteTests(CommunityApiFactory factory) : IClassFixture<Communit
     public async Task Someone_who_can_read_the_page_but_does_not_own_it_cannot_save_it()
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var page = await factory.AddNoteAsync(grace, "Toronto city team playbook", "Global");
-        var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), Role.CityLead);
-        var esther = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), Role.Staff);
+        var page = await factory.AddNoteAsync(grace, "Toronto city team playbook", "OrgWide");
+        var marcus = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead);
+        var esther = factory.ClientFor(await factory.AddMemberAsync("Esther Nakamura"), SeededRole.Staff);
 
         var read = (await marcus.GetFromJsonAsync<Detail>($"/api/notes/{page.Id}"))!;
 

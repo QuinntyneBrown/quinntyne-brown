@@ -9,7 +9,7 @@ async function setup() {
   const ref = { close: vi.fn() };
   const agile = {
     listMemberCandidates: vi.fn(() =>
-      of([{ profileId: 'p3', name: 'Marcus Lee', roles: ['EventLead' as const] }]),
+      of([{ profileId: 'p3', name: 'Marcus Lee', roles: ['Event Lead'] }]),
     ),
     addMembers: vi.fn(() => of(undefined)),
   };

@@ -13,7 +13,7 @@ public class WalkInTests(CommunityApiFactory factory) : IClassFixture<CommunityA
 {
     private static readonly TimeSpan Soon = TimeSpan.FromHours(2);
 
-    private async Task<HttpClient> LeadAsync(Role role = Role.EventLead) =>
+    private async Task<HttpClient> LeadAsync(SeededRole role = SeededRole.EventLead) =>
         factory.ClientFor(await factory.AddMemberAsync("Grace Okonkwo"), role);
 
     private static Task<HttpResponseMessage> AddWalkInAsync(HttpClient client, Guid eventId, object body) =>
@@ -49,7 +49,7 @@ public class WalkInTests(CommunityApiFactory factory) : IClassFixture<CommunityA
     {
         var e = await factory.AddEventAsync("Toronto Builders Night", Soon);
 
-        var response = await AddWalkInAsync(await LeadAsync(Role.CommunicationsLead), e.Id, new { name = "Mira Chen", checkInNow = false });
+        var response = await AddWalkInAsync(await LeadAsync(SeededRole.CommunicationsLead), e.Id, new { name = "Mira Chen", checkInNow = false });
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var attendee = (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("attendee");
@@ -127,7 +127,7 @@ public class WalkInTests(CommunityApiFactory factory) : IClassFixture<CommunityA
     {
         var e = await factory.AddEventAsync("Toronto Builders Night", -TimeSpan.FromMinutes(30), capacity: 1, rsvps: 1,
             visibility: EventVisibility.Public);
-        var client = await LeadAsync(Role.CityLead);
+        var client = await LeadAsync(SeededRole.CityLead);
 
         var response = await AddWalkInAsync(client, e.Id, new { name = "Mira Chen" });
 
@@ -175,9 +175,9 @@ public class WalkInTests(CommunityApiFactory factory) : IClassFixture<CommunityA
 
     // L2-120 AC8: Given Staff, when a walk-in is submitted, then the response is 403; other members get 403 too.
     [Theory]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.Attendee)]
-    public async Task Staff_and_members_cannot_add_walk_ins(Role role)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.Attendee)]
+    public async Task Staff_and_members_cannot_add_walk_ins(SeededRole role)
     {
         var e = await factory.AddEventAsync("Toronto Builders Night", Soon);
 
@@ -202,7 +202,7 @@ public class WalkInTests(CommunityApiFactory factory) : IClassFixture<CommunityA
     {
         var e = await factory.AddEventAsync("Toronto Builders Night", Soon, guests: [("Abby Brooks", "abby@example.org")]);
         var lead = await factory.AddMemberAsync("Grace Okonkwo");
-        var client = factory.ClientFor(lead, Role.EventLead);
+        var client = factory.ClientFor(lead, SeededRole.EventLead);
         await AddWalkInAsync(client, e.Id, new { name = "Mira Chen" });
 
         var response = await client.PostAsJsonAsync($"/api/events/{e.Id}/cancel", new { reason = "The venue flooded." });
@@ -238,7 +238,7 @@ public class WalkInTests(CommunityApiFactory factory) : IClassFixture<CommunityA
         var e = await factory.AddEventAsync("Toronto Builders Night", Soon);
         var priya = await factory.AddMemberAsync("Priya Shah");
 
-        await AddWalkInAsync(factory.ClientFor(priya, Role.SystemAdmin), e.Id, new { name = "Mira Chen" });
+        await AddWalkInAsync(factory.ClientFor(priya, SeededRole.SystemAdmin), e.Id, new { name = "Mira Chen" });
 
         var entry = await factory.WithDbAsync(db => db.AuditEntries.AsNoTracking().SingleAsync(a => a.TargetId == e.Id.ToString()));
         Assert.Equal(("event.walk_in_added", "Event", priya.ProfileId), (entry.Action, entry.TargetType, entry.ActorId));

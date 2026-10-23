@@ -55,6 +55,14 @@ describe('NoticeListComponent', () => {
     expect(link().getAttribute('href')).toBe('/workspaces/w1/items/i1');
   });
 
+  it('labels a notice with its org when one is given', () => {
+    const { fixture, cmp, rows } = setup();
+    cmp.notices.set([{ ...NOTICES[0], org: 'Shelfie' }, NOTICES[1]]);
+    fixture.detectChanges();
+    expect(rows()[0].querySelector('ft-org-label')?.textContent?.trim()).toBe('Shelfie');
+    expect(rows()[1].querySelector('ft-org-label')).toBeNull();
+  });
+
   it('says Unread in words and tints unread rows', () => {
     const { rows } = setup();
     expect(rows()[0].textContent).toContain('Today, 9:30 am · Unread');

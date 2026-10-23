@@ -18,7 +18,7 @@ public class MembershipTests(CommunityApiFactory factory) : IClassFixture<Commun
     public async Task Given_the_owner_when_they_add_team_members_then_they_join_and_each_is_notified_in_app_and_by_email()
     {
         var cast = await factory.AddCastAsync();
-        var marcus = await factory.AddWithRolesAsync("Marcus Lee", Role.EventLead);
+        var marcus = await factory.AddWithRolesAsync("Marcus Lee", SeededRole.EventLead);
 
         var response = await factory.OwnerClient(cast).PostAsJsonAsync(
             $"/api/workspaces/{cast.WorkspaceId}/members", new { ProfileIds = new[] { marcus.ProfileId } });
@@ -31,9 +31,9 @@ public class MembershipTests(CommunityApiFactory factory) : IClassFixture<Commun
     }
 
     [Theory]
-    [InlineData(Role.Attendee)]
-    [InlineData(Role.Staff)]
-    public async Task Given_a_profile_without_a_lead_or_volunteer_role_when_the_owner_adds_it_then_400(Role role)
+    [InlineData(SeededRole.Attendee)]
+    [InlineData(SeededRole.Staff)]
+    public async Task Given_a_profile_without_a_lead_or_volunteer_role_when_the_owner_adds_it_then_400(SeededRole role)
     {
         var cast = await factory.AddCastAsync();
         var jonah = await factory.AddWithRolesAsync("Jonah Bell", role);
@@ -63,7 +63,7 @@ public class MembershipTests(CommunityApiFactory factory) : IClassFixture<Commun
     public async Task Given_anyone_but_the_owner_or_admin_when_they_manage_members_or_settings_then_refused(string who, HttpStatusCode expected)
     {
         var cast = await factory.AddCastAsync();
-        var marcus = await factory.AddWithRolesAsync("Marcus Lee", Role.EventLead);
+        var marcus = await factory.AddWithRolesAsync("Marcus Lee", SeededRole.EventLead);
         var client = who switch
         {
             "member" => factory.MemberClient(cast),
@@ -85,7 +85,7 @@ public class MembershipTests(CommunityApiFactory factory) : IClassFixture<Commun
     public async Task Given_a_suspended_volunteer_when_the_owner_adds_them_then_400_and_they_do_not_join()
     {
         var cast = await factory.AddCastAsync();
-        var jonah = await factory.AddWithRolesAsync("Jonah Bell", Role.Volunteer);
+        var jonah = await factory.AddWithRolesAsync("Jonah Bell", SeededRole.Volunteer);
         await factory.WithDbAsync(async db =>
         {
             (await db.Profiles.SingleAsync(p => p.Id == jonah.ProfileId)).Suspend("Spam", DateTime.UtcNow);
@@ -103,7 +103,7 @@ public class MembershipTests(CommunityApiFactory factory) : IClassFixture<Commun
     public async Task Given_a_system_admin_when_they_add_and_remove_members_then_it_succeeds_and_each_action_is_audited()
     {
         var cast = await factory.AddCastAsync();
-        var marcus = await factory.AddWithRolesAsync("Marcus Lee", Role.EventLead);
+        var marcus = await factory.AddWithRolesAsync("Marcus Lee", SeededRole.EventLead);
         var admin = factory.AdminClient(cast);
 
         var add = await admin.PostAsJsonAsync($"/api/workspaces/{cast.WorkspaceId}/members", new { ProfileIds = new[] { marcus.ProfileId } });
@@ -118,10 +118,10 @@ public class MembershipTests(CommunityApiFactory factory) : IClassFixture<Commun
     [Fact]
     public async Task Given_a_system_admin_who_belongs_to_the_workspace_when_they_rename_it_then_it_succeeds_and_is_audited()
     {
-        var owner = await factory.AddWithRolesAsync("Grace Okonkwo", Role.CityLead);
-        var priya = await factory.AddWithRolesAsync("Priya Shah", Role.SystemAdmin, Role.Volunteer);
+        var owner = await factory.AddWithRolesAsync("Grace Okonkwo", SeededRole.CityLead);
+        var priya = await factory.AddWithRolesAsync("Priya Shah", SeededRole.SystemAdmin, SeededRole.Volunteer);
         var workspaceId = await factory.AddWorkspaceAsync(owner, "Toronto team", WorkspaceMethod.Scrum, priya);
-        var admin = factory.ClientFor(priya, Role.SystemAdmin, Role.Volunteer);
+        var admin = factory.ClientFor(priya, SeededRole.SystemAdmin, SeededRole.Volunteer);
 
         var response = await admin.PutAsJsonAsync($"/api/workspaces/{workspaceId}", new { Name = "Toronto builders" });
 
@@ -136,7 +136,7 @@ public class MembershipTests(CommunityApiFactory factory) : IClassFixture<Commun
     public async Task Given_the_owner_acting_in_their_own_workspace_then_nothing_is_audited()
     {
         var cast = await factory.AddCastAsync();
-        var marcus = await factory.AddWithRolesAsync("Marcus Lee", Role.EventLead);
+        var marcus = await factory.AddWithRolesAsync("Marcus Lee", SeededRole.EventLead);
 
         await factory.OwnerClient(cast).PostAsJsonAsync($"/api/workspaces/{cast.WorkspaceId}/members", new { ProfileIds = new[] { marcus.ProfileId } });
 
@@ -186,8 +186,8 @@ public class MembershipTests(CommunityApiFactory factory) : IClassFixture<Commun
     public async Task Given_the_owner_when_they_list_candidates_then_only_team_members_who_have_not_joined_are_offered()
     {
         var cast = await factory.AddCastAsync();
-        var marcus = await factory.AddWithRolesAsync("Marcus Lee", Role.EventLead, Role.ProductEngineer);
-        var jonah = await factory.AddWithRolesAsync("Jonah Bell", Role.Attendee);
+        var marcus = await factory.AddWithRolesAsync("Marcus Lee", SeededRole.EventLead, SeededRole.ProductEngineer);
+        var jonah = await factory.AddWithRolesAsync("Jonah Bell", SeededRole.Attendee);
 
         var candidates = (await factory.OwnerClient(cast).GetFromJsonAsync<Candidate[]>($"/api/workspaces/{cast.WorkspaceId}/candidates"))!;
 
@@ -196,20 +196,20 @@ public class MembershipTests(CommunityApiFactory factory) : IClassFixture<Commun
         Assert.DoesNotContain(jonah.ProfileId, ids);
         Assert.DoesNotContain(cast.Member.ProfileId, ids);
         Assert.DoesNotContain(cast.Owner.ProfileId, ids);
-        Assert.Equal(["EventLead", "ProductEngineer"], candidates.Single(c => c.ProfileId == marcus.ProfileId).Roles);
+        Assert.Equal(["Event Lead", "Product Engineer"], candidates.Single(c => c.ProfileId == marcus.ProfileId).Roles);
     }
 
     [Fact]
     public async Task Given_a_city_lead_creating_a_workspace_when_they_list_candidates_then_every_team_member_but_themselves_is_offered()
     {
-        var grace = await factory.AddWithRolesAsync("Grace Okonkwo", Role.CityLead);
-        var ruth = await factory.AddWithRolesAsync("Ruth Alvarez", Role.Volunteer);
+        var grace = await factory.AddWithRolesAsync("Grace Okonkwo", SeededRole.CityLead);
+        var ruth = await factory.AddWithRolesAsync("Ruth Alvarez", SeededRole.Volunteer);
 
-        var candidates = (await factory.ClientFor(grace, Role.CityLead).GetFromJsonAsync<Candidate[]>("/api/workspaces/candidates"))!;
+        var candidates = (await factory.ClientFor(grace, SeededRole.CityLead).GetFromJsonAsync<Candidate[]>("/api/workspaces/candidates"))!;
 
         Assert.Contains(candidates, c => c.ProfileId == ruth.ProfileId);
         Assert.DoesNotContain(candidates, c => c.ProfileId == grace.ProfileId);
-        Assert.Equal(HttpStatusCode.Forbidden, (await factory.ClientFor(ruth, Role.Volunteer).GetAsync("/api/workspaces/candidates")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await factory.ClientFor(ruth, SeededRole.Volunteer).GetAsync("/api/workspaces/candidates")).StatusCode);
     }
 
     [Fact]

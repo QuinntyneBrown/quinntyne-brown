@@ -7,7 +7,7 @@ import { ResourcesPage } from '../../pages/resources.page';
 const pdf = (name: string) => ({ name, buffer: Buffer.from('%PDF-1.7 test') });
 
 test.describe('Add resources', () => {
-  test('a lead uploads one file: title from its name, type from its extension, Global by default', async ({
+  test('a lead uploads one file: title from its name, type from its extension, Org-wide by default', async ({
     page,
     api,
     axe,
@@ -23,7 +23,7 @@ test.describe('Add resources', () => {
     const dialog = new AddResourceDialog(page);
     await dialog.opened();
     await expect(dialog.dialog).toContainText('Up to 20 files, 100 MB each.');
-    await expect(dialog.visibility('Global')).toBeChecked();
+    await expect(dialog.visibility('OrgWide')).toBeChecked();
     await expect(dialog.submit('Add resource')).toBeDisabled();
     await axe.check();
 
@@ -39,11 +39,11 @@ test.describe('Add resources', () => {
 
     await expect(dialog.dialog).toBeHidden();
     await expect(resources.toast).toContainText('City launch deck added');
-    await expect(resources.toast).toContainText('Every signed-in member can find it now.');
+    await expect(resources.toast).toContainText('Everyone in the organization can find it now.');
     await expect(resources.item('City launch deck')).toContainText('Deck · PPTX · 1 KB · you');
     expect(api.resources.resources[0]).toMatchObject({
       tags: ['launch'],
-      visibility: 'Global',
+      visibility: 'OrgWide',
       fileName: 'city-launch-deck.pptx',
     });
   });

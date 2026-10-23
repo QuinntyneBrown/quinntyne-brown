@@ -22,17 +22,17 @@ public class PlanningPokerLiveTests(CommunityApiFactory factory) : IClassFixture
         var cast = await factory.AddCastAsync();
         var story = await factory.AddStoryAsync(cast.WorkspaceId, "Kiosk");
         await using var live = Live();
-        var member = Client(live, cast.Member, Role.Volunteer);
+        var member = Client(live, cast.Member, SeededRole.Volunteer);
         var started = await member.PostAsJsonAsync(
             $"/api/workspaces/{cast.WorkspaceId}/poker-sessions", new { StoryIds = new[] { story }, InvitedIds = new[] { cast.Owner.ProfileId } });
         var session = (await started.Content.ReadFromJsonAsync<Session>())!;
-        var watcher = BoardTests.Connect(live, cast.Staff, Role.Staff);
+        var watcher = BoardTests.Connect(live, cast.Staff, SeededRole.Staff);
         var changed = new TaskCompletionSource<Guid>();
         watcher.On<Guid>("PokerChanged", id => changed.TrySetResult(id));
         await watcher.StartAsync();
         await watcher.InvokeAsync("WatchPokerSession", session.Id);
 
-        await Client(live, cast.Owner, Role.CityLead).PutAsJsonAsync($"/api/poker-sessions/{session.Id}/vote", new { Value = "5" });
+        await Client(live, cast.Owner, SeededRole.CityLead).PutAsJsonAsync($"/api/poker-sessions/{session.Id}/vote", new { Value = "5" });
 
         Assert.Equal(session.Id, await changed.Task.WaitAsync(TimeSpan.FromSeconds(2)));
         await watcher.DisposeAsync();
@@ -44,10 +44,10 @@ public class PlanningPokerLiveTests(CommunityApiFactory factory) : IClassFixture
         var cast = await factory.AddCastAsync();
         var story = await factory.AddStoryAsync(cast.WorkspaceId, "Kiosk");
         await using var live = Live();
-        var started = await Client(live, cast.Member, Role.Volunteer).PostAsJsonAsync(
+        var started = await Client(live, cast.Member, SeededRole.Volunteer).PostAsJsonAsync(
             $"/api/workspaces/{cast.WorkspaceId}/poker-sessions", new { StoryIds = new[] { story }, InvitedIds = Array.Empty<Guid>() });
         var session = (await started.Content.ReadFromJsonAsync<Session>())!;
-        var outsider = BoardTests.Connect(live, cast.Outsider, Role.Volunteer);
+        var outsider = BoardTests.Connect(live, cast.Outsider, SeededRole.Volunteer);
         await outsider.StartAsync();
 
         await Assert.ThrowsAsync<HubException>(() => outsider.InvokeAsync("WatchPokerSession", session.Id));
@@ -62,7 +62,7 @@ public class PlanningPokerLiveTests(CommunityApiFactory factory) : IClassFixture
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, null))
             .ConfigureTestServices(s => s.AddScoped<IPokerBroadcaster, SignalRAgileNotifier>()));
 
-    private static HttpClient Client(Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory<Program> server, ProfileClients.Member member, Role role)
+    private static HttpClient Client(Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory<Program> server, ProfileClients.Member member, SeededRole role)
     {
         var client = server.CreateClient();
         client.DefaultRequestHeaders.Add(TestAuthHandler.Header, $"{member.UserId};{role}");

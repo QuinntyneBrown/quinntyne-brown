@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { AvatarColor, AvatarComponent } from '../avatar/avatar.component';
 import { LinkComponent } from '../link/link.component';
+import { OrgLabelComponent } from '../org-label/org-label.component';
 
 export interface Notice {
   id: string;
@@ -15,6 +16,8 @@ export interface Notice {
   /** Time, for example "Today, 11:42 am". "Unread" is appended for unread notices. */
   meta: string;
   unread: boolean;
+  /** The org the activity happened in, for people who cover several (L2-152 AC1). */
+  org?: string;
 }
 
 /**
@@ -23,7 +26,7 @@ export interface Notice {
  */
 @Component({
   selector: 'ft-notice-list',
-  imports: [AvatarComponent, LinkComponent],
+  imports: [AvatarComponent, LinkComponent, OrgLabelComponent],
   templateUrl: './notice-list.component.html',
   styleUrl: './notice-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

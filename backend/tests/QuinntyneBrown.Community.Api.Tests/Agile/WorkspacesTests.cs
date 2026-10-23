@@ -21,9 +21,9 @@ public class WorkspacesTests(CommunityApiFactory factory) : IClassFixture<Commun
     [InlineData("Kanban")]
     public async Task Given_a_city_lead_when_they_create_a_workspace_then_they_own_it(string method)
     {
-        var grace = await factory.AddWithRolesAsync("Grace Okonkwo", Role.CityLead);
+        var grace = await factory.AddWithRolesAsync("Grace Okonkwo", SeededRole.CityLead);
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsJsonAsync("/api/workspaces", new { Name = "  Hackathon ops ", Method = method });
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync("/api/workspaces", new { Name = "  Hackathon ops ", Method = method });
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var created = (await response.Content.ReadFromJsonAsync<Detail>())!;
@@ -35,8 +35,8 @@ public class WorkspacesTests(CommunityApiFactory factory) : IClassFixture<Commun
     [Fact]
     public async Task Given_a_city_lead_when_they_create_a_second_workspace_then_they_own_both()
     {
-        var grace = await factory.AddWithRolesAsync("Grace Okonkwo", Role.CityLead);
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var grace = await factory.AddWithRolesAsync("Grace Okonkwo", SeededRole.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         await client.PostAsJsonAsync("/api/workspaces", new { Name = "Toronto team", Method = "Scrum" });
         await client.PostAsJsonAsync("/api/workspaces", new { Name = "Hackathon ops", Method = "Kanban" });
@@ -49,11 +49,11 @@ public class WorkspacesTests(CommunityApiFactory factory) : IClassFixture<Commun
     [Fact]
     public async Task Given_members_chosen_at_creation_when_the_workspace_is_created_then_each_joins_and_is_notified()
     {
-        var grace = await factory.AddWithRolesAsync("Grace Okonkwo", Role.CityLead);
-        var marcus = await factory.AddWithRolesAsync("Marcus Lee", Role.EventLead);
-        var ruth = await factory.AddWithRolesAsync("Ruth Alvarez", Role.Volunteer);
+        var grace = await factory.AddWithRolesAsync("Grace Okonkwo", SeededRole.CityLead);
+        var marcus = await factory.AddWithRolesAsync("Marcus Lee", SeededRole.EventLead);
+        var ruth = await factory.AddWithRolesAsync("Ruth Alvarez", SeededRole.Volunteer);
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsJsonAsync(
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync(
             "/api/workspaces", new { Name = "Hackathon ops", Method = "Kanban", MemberIds = new[] { marcus.ProfileId, ruth.ProfileId } });
 
         var created = (await response.Content.ReadFromJsonAsync<Detail>())!;
@@ -69,14 +69,14 @@ public class WorkspacesTests(CommunityApiFactory factory) : IClassFixture<Commun
     }
 
     [Theory]
-    [InlineData(Role.Attendee)]
-    [InlineData(Role.ProductEngineer)]
-    public async Task Given_a_profile_without_a_lead_or_volunteer_role_when_chosen_at_creation_then_400_and_nothing_is_saved(Role role)
+    [InlineData(SeededRole.Attendee)]
+    [InlineData(SeededRole.ProductEngineer)]
+    public async Task Given_a_profile_without_a_lead_or_volunteer_role_when_chosen_at_creation_then_400_and_nothing_is_saved(SeededRole role)
     {
-        var grace = await factory.AddWithRolesAsync("Grace Okonkwo", Role.CityLead);
+        var grace = await factory.AddWithRolesAsync("Grace Okonkwo", SeededRole.CityLead);
         var jonah = await factory.AddWithRolesAsync("Jonah Bell", role);
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsJsonAsync(
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync(
             "/api/workspaces", new { Name = "Not saved", Method = "Scrum", MemberIds = new[] { jonah.ProfileId } });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -88,19 +88,19 @@ public class WorkspacesTests(CommunityApiFactory factory) : IClassFixture<Commun
     [InlineData("Ops", "Waterfall", "Method")]
     public async Task Given_an_empty_name_or_an_unknown_method_when_creating_then_400_per_field(string name, string method, string field)
     {
-        var grace = await factory.AddWithRolesAsync("Grace Okonkwo", Role.CityLead);
+        var grace = await factory.AddWithRolesAsync("Grace Okonkwo", SeededRole.CityLead);
 
-        var response = await factory.ClientFor(grace, Role.CityLead).PostAsJsonAsync("/api/workspaces", new { Name = name, Method = method });
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).PostAsJsonAsync("/api/workspaces", new { Name = name, Method = method });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.Contains($"\"{field}\"", await response.Content.ReadAsStringAsync());
     }
 
     [Theory]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.EventLead)]
-    [InlineData(Role.Volunteer)]
-    public async Task Given_anyone_but_a_city_lead_or_system_admin_when_they_create_a_workspace_then_403(Role role)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.EventLead)]
+    [InlineData(SeededRole.Volunteer)]
+    public async Task Given_anyone_but_a_city_lead_or_system_admin_when_they_create_a_workspace_then_403(SeededRole role)
     {
         var someone = await factory.AddWithRolesAsync("Marcus Lee", role);
 
@@ -127,7 +127,7 @@ public class WorkspacesTests(CommunityApiFactory factory) : IClassFixture<Commun
     {
         var cast = await factory.AddCastAsync();
         await factory.AddSprintAsync(cast.WorkspaceId, "Sprint 7");
-        var joel = await factory.AddWithRolesAsync("Joel Mbeki", Role.CityLead);
+        var joel = await factory.AddWithRolesAsync("Joel Mbeki", SeededRole.CityLead);
         var joined = await factory.AddWorkspaceAsync(joel, "Hackathon ops", WorkspaceMethod.Kanban, cast.Owner);
         await factory.AddWorkspaceAsync(joel, "Not mine");
 
@@ -138,9 +138,9 @@ public class WorkspacesTests(CommunityApiFactory factory) : IClassFixture<Commun
     }
 
     [Theory]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.SystemAdmin)]
-    public async Task Given_staff_or_system_admin_when_they_list_workspaces_then_every_workspace_is_listed(Role role)
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.SystemAdmin)]
+    public async Task Given_staff_or_system_admin_when_they_list_workspaces_then_every_workspace_is_listed(SeededRole role)
     {
         var cast = await factory.AddCastAsync();
         var reader = await factory.AddWithRolesAsync("Reader", role);

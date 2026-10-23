@@ -9,11 +9,10 @@ import {
   signal,
 } from '@angular/core';
 import {
-  AUTH_SERVICE,
+  ACCESS_SERVICE,
   PROFILES_SERVICE,
   ProfileDto,
   ROLES_SERVICE,
-  ROLE_LABELS,
 } from '@faithtech-community/api';
 import {
   avatarColorFor,
@@ -26,7 +25,13 @@ import {
 } from '@faithtech-community/components';
 import { firstValueFrom } from 'rxjs';
 
-import { RoleMode, addableRoles, openRoleDialog, removableRoles } from '../../role-actions';
+import {
+  RoleMode,
+  addableRoles,
+  openRoleDialog,
+  removableRoles,
+  roleLabel,
+} from '../../role-actions';
 
 type State = 'loading' | 'loaded' | 'not-found' | 'error';
 
@@ -42,8 +47,9 @@ export class ProfilePage {
   private readonly profiles = inject(PROFILES_SERVICE);
   private readonly rolesService = inject(ROLES_SERVICE);
   private readonly dialogs = inject(DialogService);
-  /** Roles the caller may change on anyone's profile (L2-009, ADR 0005). */
-  private readonly callerRoles = inject(AUTH_SERVICE).roles;
+  /** What the caller may grant in the org (L2-136, ADR 0033). */
+  private readonly access = inject(ACCESS_SERVICE);
+  private readonly org = this.access.homeOrg;
 
   /** Route parameter: a profile id, or "me". */
   readonly id = input.required<string>();
@@ -52,7 +58,9 @@ export class ProfilePage {
   protected readonly profile = signal<ProfileDto | null>(null);
 
   protected readonly avatarColor = computed(() => avatarColorFor(this.profile()?.id));
-  protected readonly roles = computed(() => this.profile()?.roles.map((r) => ROLE_LABELS[r]) ?? []);
+  protected readonly roles = computed(
+    () => this.profile()?.roles.map((r) => roleLabel(r, this.org())) ?? [],
+  );
   protected readonly photos = computed<ProfilePhoto[]>(
     () => this.profile()?.photos.map((p) => ({ url: p.url, alt: p.altText })) ?? [],
   );
@@ -60,12 +68,12 @@ export class ProfilePage {
   /** Roles that could be added: assignable and not yet held. */
   protected readonly canAdd = computed(() => {
     const profile = this.profile();
-    return profile ? addableRoles(this.callerRoles(), profile) : [];
+    return profile ? addableRoles(this.access, this.org(), profile) : [];
   });
   /** Held roles the caller may remove. */
   protected readonly canRemove = computed(() => {
     const profile = this.profile();
-    return profile ? removableRoles(this.callerRoles(), profile) : [];
+    return profile ? removableRoles(this.access, this.org(), profile) : [];
   });
 
   constructor() {
@@ -87,8 +95,14 @@ export class ProfilePage {
   private openRoleDialog(mode: RoleMode): void {
     const profile = this.profile();
     if (!profile) return;
-    openRoleDialog(this.dialogs, this.rolesService, this.callerRoles(), profile, mode, (roles) =>
-      this.profile.update((p) => (p ? { ...p, roles } : p)),
+    openRoleDialog(
+      this.dialogs,
+      this.rolesService,
+      this.access,
+      this.org(),
+      profile,
+      mode,
+      (roles) => this.profile.update((p) => (p ? { ...p, roles } : p)),
     );
   }
 

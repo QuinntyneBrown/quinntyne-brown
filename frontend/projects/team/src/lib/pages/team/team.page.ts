@@ -1,13 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
-  AUTH_SERVICE,
-  ROLE_LABELS,
-  Role,
+  ACCESS_SERVICE,
   TEAM_SERVICE,
   TeamMemberDto,
   TeamRoleFilter,
-  isLead,
+  Permission,
 } from '@faithtech-community/api';
 import {
   AlertComponent,
@@ -64,7 +62,7 @@ const ROLE_CHIPS: { label: string; value: TeamRoleFilter | null }[] = [
 })
 export class TeamPage {
   private readonly team = inject(TEAM_SERVICE);
-  private readonly callerRoles = inject(AUTH_SERVICE).roles;
+  private readonly access = inject(ACCESS_SERVICE);
 
   protected readonly roleChips = ROLE_CHIPS;
   protected readonly city = new FormControl('', { nonNullable: true });
@@ -84,7 +82,7 @@ export class TeamPage {
     () => `Showing ${this.members().length} of ${this.total()} members`,
   );
 
-  protected readonly canInvite = computed(() => isLead(this.callerRoles()));
+  protected readonly canInvite = computed(() => this.access.can(Permission.InvitesSend));
   protected readonly cityOptions = computed<SelectOption[]>(() => [
     { value: '', label: 'All cities' },
     ...this.cities().map((c) => ({ value: c, label: c })),
@@ -108,8 +106,8 @@ export class TeamPage {
     void this.load();
   }
 
-  protected labels(roles: Role[]): string[] {
-    return roles.map((r) => ROLE_LABELS[r]);
+  protected labels(roles: string[]): string[] {
+    return roles;
   }
 
   protected chooseRole(value: TeamRoleFilter | null): void {

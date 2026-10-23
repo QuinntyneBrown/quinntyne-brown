@@ -15,7 +15,6 @@ import {
   AUTH_SERVICE,
   INVITES_SERVICE,
   InviteLookupDto,
-  ROLE_LABELS,
   problemDetails,
 } from '@faithtech-community/api';
 import {
@@ -131,8 +130,7 @@ export class AcceptInvitePage {
     this.stale().text(this.invite()?.inviterName ?? 'the lead who invited you'),
   );
   protected readonly roleLabel = computed(() => {
-    const role = this.invite()?.preassignedRole;
-    return role ? ROLE_LABELS[role] : null;
+    return this.invite()?.preassignedRoleName ?? null;
   });
   protected readonly where = computed(() => {
     const city = this.invite()?.inviterCity;

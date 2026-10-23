@@ -2,14 +2,18 @@ using QuinntyneBrown.Community.Application.Common;
 using QuinntyneBrown.Community.Application.Notifications;
 using QuinntyneBrown.Community.Domain.Announcements;
 using QuinntyneBrown.Community.Domain.Notifications;
-using QuinntyneBrown.Community.Domain.Profiles;
+using QuinntyneBrown.Community.Application.Organizations;
+using QuinntyneBrown.Community.Domain.Organizations;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace QuinntyneBrown.Community.Application.Announcements;
 
-/// <summary>Who an announcement goes to: <c>Everyone</c>, <c>Roles</c> (one or more) or one event's <c>EventRsvps</c>.</summary>
+/// <summary>
+/// Who an announcement goes to: <c>Everyone</c> in the org, <c>Roles</c> (one or more catalogue role keys of the org),
+/// one event's <c>EventRsvps</c>, or <c>Portfolio</c>: every member of every org of the portfolio (L2-151).
+/// </summary>
 public record AudienceRequest(string? Kind, IReadOnlyList<string>? Roles = null, Guid? EventId = null);
 
 /// <summary>A new announcement (L2-029). "Also send by email" is on unless turned off.</summary>
@@ -25,8 +29,7 @@ public static class AnnouncementRules
     public const string BodyMessage = "Write a message of at least one sentence.";
     public const string RolesMessage = "Choose at least one role.";
     public const string EventMessage = "Choose an event.";
-
-    public static bool IsRole(string? value) => Enum.TryParse<Role>(value, ignoreCase: false, out _) && !int.TryParse(value, out _);
+    public const string PortfolioMessage = "Only the Portfolio Lead can send to everyone in the portfolio.";
 }
 
 public class AudienceRequestValidator : AbstractValidator<AudienceRequest>
@@ -40,7 +43,7 @@ public class AudienceRequestValidator : AbstractValidator<AudienceRequest>
         {
             RuleFor(x => x.Roles).Cascade(CascadeMode.Stop)
                 .Must(r => r is { Count: > 0 }).WithMessage(AnnouncementRules.RolesMessage)
-                .Must(r => r!.All(AnnouncementRules.IsRole)).WithMessage(AnnouncementRules.RolesMessage);
+                .Must(r => r!.All(k => !string.IsNullOrWhiteSpace(k))).WithMessage(AnnouncementRules.RolesMessage);
         });
         When(x => x.Kind == nameof(AudienceKind.EventRsvps), () =>
             RuleFor(x => x.EventId).NotNull().WithMessage(AnnouncementRules.EventMessage));
@@ -63,48 +66,73 @@ public class SendAnnouncementValidator : AbstractValidator<SendAnnouncementComma
     }
 }
 
-/// <summary>Communications Leads and System Admins send announcements; everyone else gets 403 (L2-029 AC3).</summary>
+/// <summary>
+/// Holders of <c>announcements.send</c> (the Communications Lead, the Org Lead) send announcements to their org; only
+/// the Portfolio Lead sends portfolio-wide; everyone else gets 403 (L2-029 AC3, L2-151).
+/// </summary>
 public class AnnouncementAccess(ICurrentUser current)
 {
-    public bool CanSend => current.HasRole(Role.CommunicationsLead) || current.HasRole(Role.SystemAdmin);
+    public bool CanSend => current.Access.HasAnywhere(Permissions.AnnouncementsSend);
+
+    /// <summary>The org an announcement is sent from.</summary>
+    public CreateTarget Target() => current.Access.TargetFor(Permissions.AnnouncementsSend);
+
+    public bool CanSendPortfolioWide(Guid orgId) => current.Access.IsSystemAdmin || current.Access.IsPortfolioLead(orgId);
 }
 
 /// <summary>
-/// Resolves an audience to the members who receive it: members with an account who are not suspended (ADR 0016).
-/// Guests who RSVP'd have no account, so an RSVP audience counts members only.
+/// Resolves an audience to the members who receive it: members of the org (or of every org of its portfolio) with an
+/// account who are not suspended (ADR 0016). Guests who RSVP'd have no account, so an RSVP audience counts members only.
 /// </summary>
-public class AudienceResolver(IApplicationDbContext db)
+public class AudienceResolver(IApplicationDbContext db, ShareRoles shareRoles)
 {
-    public IQueryable<Guid> RecipientIds(AnnouncementAudience audience)
+    public async Task<List<Guid>> RecipientIdsAsync(AnnouncementAudience audience, Guid orgId, CancellationToken cancellationToken = default)
     {
+        var orgIds = new List<Guid> { orgId };
+        if (audience.Kind == AudienceKind.Portfolio)
+        {
+            var portfolio = await db.Organizations.Where(o => o.Id == orgId).Select(o => o.PortfolioId).SingleAsync(cancellationToken);
+            orgIds = await db.Organizations.Where(o => o.PortfolioId == portfolio && o.ArchivedAtUtc == null).Select(o => o.Id).ToListAsync(cancellationToken);
+        }
+
         var members = from user in db.Users
                       join profile in db.Profiles on user.ProfileId equals profile.Id
-                      where !profile.IsSuspended
+                      where !profile.IsSuspended && db.OrgMemberships.Any(m => m.ProfileId == profile.Id && orgIds.Contains(m.OrganizationId))
                       select profile;
-        var roles = audience.Roles.ToList();
-        return audience.Kind switch
+        switch (audience.Kind)
         {
-            AudienceKind.Everyone => members.Select(p => p.Id),
-            AudienceKind.Roles => members.Where(p => p.Roles.Any(r => roles.Contains(r.Role))).Select(p => p.Id),
-            AudienceKind.EventRsvps => members
-                .Where(p => db.Events.Where(e => e.Id == audience.EventId).SelectMany(e => e.Rsvps).Any(r => r.ProfileId == p.Id))
-                .Select(p => p.Id),
-            _ => throw new ArgumentOutOfRangeException(nameof(audience)),
-        };
+            case AudienceKind.Roles:
+                var holders = await shareRoles.HoldersAsync(orgId, [.. audience.Roles], cancellationToken);
+                members = members.Where(p => holders.Contains(p.Id));
+                break;
+            case AudienceKind.EventRsvps:
+                members = members.Where(p => db.Events.Where(e => e.Id == audience.EventId).SelectMany(e => e.Rsvps).Any(r => r.ProfileId == p.Id));
+                break;
+        }
+
+        return await members.Select(p => p.Id).Distinct().ToListAsync(cancellationToken);
     }
 
-    /// <summary>The domain audience for a validated request, or null when its event does not exist.</summary>
-    public async Task<AnnouncementAudience?> FromRequestAsync(AudienceRequest request, CancellationToken cancellationToken = default)
+    /// <summary>The domain audience for a validated request in the org, or a refusal (unknown event or role).</summary>
+    public async Task<(AnnouncementAudience? Audience, Result? Refusal)> FromRequestAsync(AudienceRequest request, Guid orgId, CancellationToken cancellationToken = default)
     {
         var kind = Enum.Parse<AudienceKind>(request.Kind!);
-        return kind switch
+        switch (kind)
         {
-            AudienceKind.Everyone => AnnouncementAudience.Everyone(),
-            AudienceKind.Roles => AnnouncementAudience.ForRoles([.. request.Roles!.Select(Enum.Parse<Role>).Distinct()]),
-            _ => await db.Events.AnyAsync(e => e.Id == request.EventId, cancellationToken)
-                ? AnnouncementAudience.ForEventRsvps(request.EventId!.Value)
-                : null,
-        };
+            case AudienceKind.Everyone:
+                return (AnnouncementAudience.Everyone(), null);
+            case AudienceKind.Portfolio:
+                return (AnnouncementAudience.Portfolio(), null);
+            case AudienceKind.Roles:
+                var roles = await shareRoles.ResolveAsync(orgId, request.Roles!, cancellationToken);
+                return roles is null
+                    ? (null, Result.Invalid("Audience.Roles", AnnouncementRules.RolesMessage))
+                    : (AnnouncementAudience.ForRoles([.. roles]), null);
+            default:
+                return await db.Events.AnyAsync(e => e.Id == request.EventId && e.OrganizationId == orgId, cancellationToken)
+                    ? (AnnouncementAudience.ForEventRsvps(request.EventId!.Value), null)
+                    : (null, Result.Invalid("Audience.EventId", AnnouncementRules.EventMessage));
+        }
     }
 }
 
@@ -126,36 +154,53 @@ public class SendAnnouncementHandler(
 
     public async Task<(Result Result, int Count)> CountAsync(AudienceRequest request, CancellationToken cancellationToken = default)
     {
-        if (!access.CanSend)
+        var target = access.Target();
+        if (!target.Allowed)
         {
-            return (Result.Forbidden(), 0);
+            return (target.Refusal!, 0);
         }
 
-        var audience = await audiences.FromRequestAsync(request, cancellationToken);
+        if (request.Kind == nameof(AudienceKind.Portfolio) && !access.CanSendPortfolioWide(target.OrgId))
+        {
+            return (Result.Forbidden(AnnouncementRules.PortfolioMessage), 0);
+        }
+
+        var (audience, refusal) = await audiences.FromRequestAsync(request, target.OrgId, cancellationToken);
         return audience is null
-            ? (Result.Invalid("EventId", AnnouncementRules.EventMessage), 0)
-            : (Result.Ok(), await audiences.RecipientIds(audience).CountAsync(cancellationToken));
+            ? (refusal! with { Errors = refusal.Errors?.ToDictionary(e => e.Key.Replace("Audience.", string.Empty), e => e.Value) }, 0)
+            : (Result.Ok(), (await audiences.RecipientIdsAsync(audience, target.OrgId, cancellationToken)).Count);
     }
 
     public async Task<(Result Result, AnnouncementSent? Sent)> SendAsync(SendAnnouncementCommand command, CancellationToken cancellationToken = default)
     {
-        if (!access.CanSend || current.UserId is not { } userId)
+        var target = access.Target();
+        if (!target.Allowed)
+        {
+            return (target.Refusal!, null);
+        }
+
+        if (current.UserId is not { } userId)
         {
             return (Result.Forbidden(), null);
         }
 
-        var audience = await audiences.FromRequestAsync(command.Audience!, cancellationToken);
+        if (command.Audience!.Kind == nameof(AudienceKind.Portfolio) && !access.CanSendPortfolioWide(target.OrgId))
+        {
+            return (Result.Forbidden(AnnouncementRules.PortfolioMessage), null);
+        }
+
+        var (audience, refusal) = await audiences.FromRequestAsync(command.Audience!, target.OrgId, cancellationToken);
         if (audience is null)
         {
-            return (Result.Invalid("Audience.EventId", AnnouncementRules.EventMessage), null);
+            return (refusal!, null);
         }
 
         var sender = await db.Users.Where(u => u.Id == userId).Select(u => u.ProfileId).SingleAsync(cancellationToken);
         var subject = command.Subject!.Trim();
         var body = command.Body!.Trim();
-        var recipients = await audiences.RecipientIds(audience).ToListAsync(cancellationToken);
+        var recipients = await audiences.RecipientIdsAsync(audience, target.OrgId, cancellationToken);
 
-        var announcement = new Announcement(subject, body, audience, sender, time.GetUtcNow(), command.AlsoEmail);
+        var announcement = new Announcement(target.OrgId, subject, body, audience, sender, time.GetUtcNow(), command.AlsoEmail);
         announcement.AddRecipients(recipients);
         db.Announcements.Add(announcement);
         var emails = await publisher.PublishAsync(
@@ -165,7 +210,8 @@ public class SendAnnouncementHandler(
             LinkPath,
             sender,
             command.AlsoEmail ? recipient => new NotificationEmail(subject, EmailBody(body, recipient)) : null,
-            cancellationToken);
+            cancellationToken,
+            target.OrgId);
         await db.SaveChangesAsync(cancellationToken);
         return (Result.Ok(), new AnnouncementSent(announcement.Id, recipients.Count, emails));
     }

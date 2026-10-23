@@ -11,7 +11,7 @@ test.describe('Accept an invite', () => {
     const invite = api.addInvite({
       email: 'ruth.alvarez@example.org',
       invitedBy: grace.profileId,
-      preassignedRole: 'Volunteer',
+      preassignedRole: 'volunteer',
     });
     const accept = new AcceptInvitePage(page);
     await accept.open(invite.token);
@@ -68,7 +68,7 @@ test.describe('Accept an invite', () => {
     const invite = api.addInvite({
       email: 'jonah@example.org',
       invitedBy: grace.profileId,
-      preassignedRole: 'Volunteer',
+      preassignedRole: 'volunteer',
     });
     const accept = new AcceptInvitePage(page);
     await accept.open(invite.token);

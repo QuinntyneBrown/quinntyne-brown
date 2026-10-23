@@ -23,14 +23,14 @@ public class RestorePartnerTests(CommunityApiFactory factory) : IClassFixture<Co
 
     private string Today => DateOnly.FromDateTime(factory.Time.GetUtcNow().UtcDateTime).ToString("yyyy-MM-dd");
 
-    private HttpClient Admin(ProfileClients.Member admin) => factory.ClientFor(admin, Role.SystemAdmin);
+    private HttpClient Admin(ProfileClients.Member admin) => factory.ClientFor(admin, SeededRole.SystemAdmin);
 
     /// <summary>Kestrel Labs (In funnel) with Kestrel Labs Inc. (Lead, one call and one move) merged into it.</summary>
     private async Task<(ProfileClients.Member Grace, Partner Kept, Partner Other)> MergedPairAsync()
     {
         var u = Unique();
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var lead = factory.ClientFor(grace, Role.CityLead);
+        var lead = factory.ClientFor(grace, SeededRole.CityLead);
         var kept = await factory.CreatePartnerAsync(grace, $"Kestrel {u} Labs", "InFunnel");
         var other = await factory.CreatePartnerAsync(grace, $"Kestrel {u} Labs Inc.", "Lead");
         factory.Time.Advance(TimeSpan.FromMinutes(1));
@@ -65,7 +65,7 @@ public class RestorePartnerTests(CommunityApiFactory factory) : IClassFixture<Co
         var restored = (await response.Content.ReadFromJsonAsync<Partner>())!;
         Assert.Equal((other.Id, "Lead", (Archived?)null, false), (restored.Id, restored.Stage, restored.Archived, restored.CanRestore));
         Assert.True(restored.Version > other.Version);
-        var lead = factory.ClientFor(grace, Role.CityLead);
+        var lead = factory.ClientFor(grace, SeededRole.CityLead);
         var own = (await lead.ActivitiesAsync(other.Id)).Items;
         Assert.Equal(("Restored", $"Restored {other.Name} from {kept.Name}", kept.Id), (own[0].Kind, own[0].Text, own[0].RelatedPartnerId));
         Assert.Equal(["Added", "Call", "StageMoved", "StageMoved"], own.Skip(1).Select(a => a.Kind).Order());
@@ -86,10 +86,10 @@ public class RestorePartnerTests(CommunityApiFactory factory) : IClassFixture<Co
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.Staff)]
-    [InlineData(Role.Volunteer)]
-    public async Task Anyone_but_a_system_admin_gets_403_and_nothing_changes(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.Staff)]
+    [InlineData(SeededRole.Volunteer)]
+    public async Task Anyone_but_a_system_admin_gets_403_and_nothing_changes(SeededRole role)
     {
         var (grace, _, other) = await MergedPairAsync();
         var caller = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), role);
@@ -139,7 +139,7 @@ public class RestorePartnerTests(CommunityApiFactory factory) : IClassFixture<Co
     {
         var u = Unique();
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
-        var lead = factory.ClientFor(grace, Role.CityLead);
+        var lead = factory.ClientFor(grace, SeededRole.CityLead);
         var a = await factory.CreatePartnerAsync(grace, $"A {u}");
         var b = await factory.CreatePartnerAsync(grace, $"B {u}");
         var c = await factory.CreatePartnerAsync(grace, $"C {u}");

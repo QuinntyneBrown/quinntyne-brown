@@ -1,0 +1,158 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam class {
+  BorderColor #344054
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+title Class structure — Hierarchy and permissions
+package "Domain/Organizations" {
+  class Portfolio {
+    +Guid Id
+    +string Name
+    +string Slug
+  }
+  class PortfolioLead {
+    +Guid PortfolioId
+    +Guid ProfileId
+  }
+  class OrgType {
+    +Guid Id
+    +Guid PortfolioId
+    +string Key
+    +string Name
+    +IReadOnlySet<string> EnabledFeatures
+    +IReadOnlySet<string> MemberPermissions
+  }
+  class RoleDefinition {
+    +Guid Id
+    +Guid OrgTypeId
+    +string Key
+    +string Name
+    +string Description
+    +Guid? ParentRoleId
+    +int SortOrder
+    +IReadOnlySet<string> Permissions
+    +IReadOnlySet<Guid> CanGrant
+  }
+  class Organization {
+    +Guid Id
+    +Guid PortfolioId
+    +Guid OrgTypeId
+    +string Name
+    +string Slug
+    +string DisplayName
+    +string? LogoBlobName
+    +string? AccentColour
+    +DateTime? ArchivedAt
+  }
+  class OrgMembership {
+    +Guid OrganizationId
+    +Guid ProfileId
+    +bool IsOrgLead
+    +DateTime JoinedAt
+    +JoinedVia JoinedVia
+  }
+  class OrgRoleAssignment {
+    +Guid OrganizationId
+    +Guid ProfileId
+    +Guid RoleDefinitionId
+    +Guid GrantedById
+    +DateTime GrantedAt
+  }
+  class CrossOrgRole {
+    +Guid Id
+    +Guid PortfolioId
+    +string Name
+    +IReadOnlySet<string> Permissions
+    +bool CanJoinWork
+    +ScopeKind ScopeKind
+  }
+  class CrossOrgAssignment {
+    +Guid CrossOrgRoleId
+    +Guid ProfileId
+    +IReadOnlySet<Guid> NarrowedOrgIds
+  }
+  class Permissions <<static>> {
+    +{static} string PeopleView
+    +{static} string RolesGrant
+    +{static} string EventsManage
+    +{static} ...
+    +{static} FeatureOf(code: string): string
+  }
+  class Feature <<static>> {
+    +{static} string Profiles
+    +{static} string Notes
+    +{static} string Events
+    +{static} ...
+    +{static} IsAlwaysOn(feature: string): bool
+  }
+}
+package "Domain/Profiles" {
+  class Profile {
+    +Guid Id
+    +ProfileKind Kind
+    +bool IsSystemAdmin
+  }
+}
+package "Application/Organizations" {
+  class AccessResolver {
+    +ResolveAsync(userId: Guid, credentialId: Guid?): Task<CallerAccess>
+  }
+  class CallerAccess {
+    +Guid? ProfileId
+    +bool IsSystemAdmin
+    +IReadOnlyDictionary<Guid, OrgAccess> Orgs
+    +Covers(org: Guid): bool
+    +Covers(org: Guid, feature: string): bool
+    +Has(org: Guid, code: string): bool
+    +HasByRole(org: Guid, code: string): bool
+    +IsOrgLead(org: Guid): bool
+    +IsPortfolioLead(org: Guid): bool
+    +OrgsWith(code: string): IReadOnlySet<Guid>
+    +ReadScope(feature: string): IReadOnlySet<Guid>
+  }
+  class OrgAccess {
+    +Guid OrgId
+    +string Slug
+    +Guid PortfolioId
+    +bool IsMember
+    +bool IsOrgLead
+    +bool IsPortfolioLead
+    +bool CanJoinWork
+    +IReadOnlySet<string> Features
+    +IReadOnlySet<string> Permissions
+    +IReadOnlySet<string> RolePermissions
+  }
+  class RoleGrantPolicy {
+    +CanGrant(access: CallerAccess, org: Guid, role: RoleDefinition): GrantDecision
+    +CanGrantTier(access: CallerAccess, tier: BuiltInTier, scope: Guid): GrantDecision
+  }
+}
+Portfolio "1" *-- "many" OrgType
+Portfolio "1" *-- "many" Organization
+Portfolio "1" *-- "many" CrossOrgRole
+Portfolio "1" -- "many" PortfolioLead
+OrgType "1" *-- "many" RoleDefinition
+RoleDefinition --> "0..1" RoleDefinition : parent (display only)
+Organization --> OrgType : is of
+Organization "1" *-- "many" OrgMembership
+OrgMembership --> Profile
+OrgRoleAssignment --> RoleDefinition
+OrgRoleAssignment --> OrgMembership : held within
+CrossOrgRole "1" *-- "many" CrossOrgAssignment
+CrossOrgAssignment --> Profile
+AccessResolver ..> Portfolio : reads
+AccessResolver ..> OrgMembership : reads
+AccessResolver ..> OrgRoleAssignment : reads
+AccessResolver ..> CrossOrgAssignment : reads
+AccessResolver ..> Feature : filters by
+AccessResolver --> CallerAccess : builds
+CallerAccess "1" *-- "many" OrgAccess
+RoleGrantPolicy ..> CallerAccess : reads
+RoleDefinition ..> Permissions : codes from
+@enduml

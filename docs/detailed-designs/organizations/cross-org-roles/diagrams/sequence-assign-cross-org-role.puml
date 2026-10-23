@@ -1,0 +1,46 @@
+@startuml
+title UML sequence behaviour — Assign a cross-org role
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+skinparam rectangle {
+  BorderColor #344054
+  FontColor #101828
+}
+skinparam package {
+  BorderColor #667085
+  FontColor #101828
+  BackgroundColor #F9FAFB
+}
+actor "Portfolio Lead" as actor
+box "Frontend — QuinntyneBrown.Community web app" #E0F2FE
+  participant "AssignCrossOrgRoleDialog" as dlg
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "CrossOrgRolesEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application and Domain" #ECFDF3
+  participant "CrossOrgRoleHandlers" as h
+  participant "IAuditLog" as audit
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+actor -> dlg : Person, optional narrowing to some orgs
+dlg -> ep : POST /api/cross-org-roles/{id}/assignments { profileId, narrowedOrgIds }
+ep -> h : AssignAsync
+alt caller is not Portfolio Lead of the role's portfolio nor System Admin
+  h --> dlg : 403 (L2-138 #7)
+else narrowed org outside the role's scope
+  h --> dlg : 400 narrowedOrgIds
+else already assigned
+  h --> dlg : 409
+else
+  h -> db : INSERT CrossOrgAssignment
+  h -> audit : crossOrgRole.assigned (before, after)
+  h -> db : SaveChanges
+  h --> dlg : 201 CrossOrgAssignmentDto
+end
+@enduml

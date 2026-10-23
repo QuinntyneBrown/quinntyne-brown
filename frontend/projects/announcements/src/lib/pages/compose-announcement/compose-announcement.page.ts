@@ -12,15 +12,13 @@ import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   ANNOUNCEMENTS_SERVICE,
-  AUTH_SERVICE,
+  ACCESS_SERVICE,
+  Permission,
   AnnouncementAudience,
   AnnouncementSent,
   AudienceKind,
   EVENTS_SERVICE,
   EventSummaryDto,
-  ROLES,
-  ROLE_LABELS,
-  Role,
 } from '@faithtech-community/api';
 import {
   AlertComponent,
@@ -61,8 +59,6 @@ const SUMMARY: Record<string, string> = {
   [SUBJECT_MESSAGE]: 'Add a subject',
   [BODY_MESSAGE]: 'Write a message',
 };
-const SENDERS: Role[] = ['CommunicationsLead', 'SystemAdmin'];
-
 /**
  * Compose and send an announcement (L2-029, mock `pages/compose-announcement`). The send button shows how
  * many people the chosen audience reaches; Communications Leads and System Admins only (ADR 0016).
@@ -105,7 +101,15 @@ export class ComposeAnnouncementPage {
   private readonly subjectField = viewChild('subjectField', { read: FormFieldComponent });
   private readonly bodyField = viewChild('bodyField', { read: FormFieldComponent });
 
-  protected readonly roles = ROLES.map((role) => ({ role, label: ROLE_LABELS[role] }));
+  private readonly access = inject(ACCESS_SERVICE);
+  /** Only the Portfolio Lead, or a System Admin, sends to the whole portfolio (L2-151 AC2, AC3). */
+  protected readonly mayReachPortfolio =
+    this.access.isSystemAdmin() || !!this.access.homeOrg()?.isPortfolioLead;
+  /** The roles of the active org, and the cross-org roles covering it (ADR 0035). */
+  protected readonly roles = (this.access.homeOrg()?.shareRoles ?? []).map((r) => ({
+    role: r.key,
+    label: r.name,
+  }));
   protected readonly form = inject(NonNullableFormBuilder).group({
     kind: ['Everyone' as AudienceKind],
     roles: [[] as string[]],
@@ -180,11 +184,7 @@ export class ComposeAnnouncementPage {
   });
 
   constructor() {
-    if (
-      !inject(AUTH_SERVICE)
-        .roles()
-        .some((r) => SENDERS.includes(r))
-    ) {
+    if (!this.access.can(Permission.AnnouncementsSend, this.access.homeOrg()?.slug ?? null)) {
       void this.router.navigateByUrl('/forbidden');
       return;
     }
@@ -242,8 +242,9 @@ export class ComposeAnnouncementPage {
 
   private audience(): AnnouncementAudience {
     const value = this.form.getRawValue();
-    if (value.kind === 'Roles') return { kind: 'Roles', roles: value.roles as Role[] };
+    if (value.kind === 'Roles') return { kind: 'Roles', roles: value.roles as string[] };
     if (value.kind === 'EventRsvps') return { kind: 'EventRsvps', eventId: value.eventId };
+    if (value.kind === 'Portfolio') return { kind: 'Portfolio' };
     return { kind: 'Everyone' };
   }
 

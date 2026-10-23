@@ -20,6 +20,14 @@ const event: PublicEventDto = {
   isFull: false,
   isCancelled: false,
   cancellationReason: null,
+  organization: {
+    slug: 'faithtech-toronto',
+    aliases: [],
+    displayName: 'FaithTech Toronto',
+    logoUrl: null,
+    accent: null,
+    accentForeground: null,
+  },
 };
 
 async function setup(

@@ -24,16 +24,16 @@ public class ContactPhotoImageTests(CommunityApiFactory factory) : IClassFixture
         Assert.Equal(factory.Photos.Blobs[key].Content, await response.Content.ReadAsByteArrayAsync());
     }
 
-    public static TheoryData<string, Role[]> Outsiders() => new()
+    public static TheoryData<string, SeededRole[]> Outsiders() => new()
     {
-        { "another lead", [Role.CityLead] },
-        { "Staff", [Role.Staff] },
+        { "another lead", [SeededRole.CityLead] },
+        { "Staff", [SeededRole.Staff] },
         { "a member with no role", [] },
     };
 
     [Theory]
     [MemberData(nameof(Outsiders))]
-    public async Task A_shared_url_does_not_let_anyone_else_fetch_the_image(string who, Role[] roles)
+    public async Task A_shared_url_does_not_let_anyone_else_fetch_the_image(string who, SeededRole[] roles)
     {
         var (owner, contact) = await OwnContact();
         var photo = await owner.AddContactPhotoAsync(contact.Id);
@@ -72,7 +72,7 @@ public class ContactPhotoImageTests(CommunityApiFactory factory) : IClassFixture
         var photo = await owner.AddContactPhotoAsync(contact.Id);
         var admin = await factory.AddMemberAsync("Priya Shah");
 
-        var response = await factory.ClientFor(admin, Role.SystemAdmin).GetAsync(photo.Url);
+        var response = await factory.ClientFor(admin, SeededRole.SystemAdmin).GetAsync(photo.Url);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var actions = await factory.WithDbAsync(db => db.AuditEntries.AsNoTracking()
@@ -84,6 +84,6 @@ public class ContactPhotoImageTests(CommunityApiFactory factory) : IClassFixture
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var contact = await factory.CreateContactAsync(grace, "Tomás Ortega");
-        return (factory.ClientFor(grace, Role.CityLead), contact);
+        return (factory.ClientFor(grace, SeededRole.CityLead), contact);
     }
 }

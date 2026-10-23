@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Org label and mark — QuinntyneBrown.Community design system</title>
+<meta name="description" content="Org label (name pill with the accent dot) and org mark (logo or initials on the org accent).">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/ds.css">
+<style>
+  .demo-org-toronto { --color-org-accent: #0b6e4f; --color-org-accent-foreground: #ffffff; } /* allow-color */
+  .demo-org-shelfie { --color-org-accent: #f2b134; --color-org-accent-foreground: #111111; } /* allow-color */
+  .demo-org-long { --color-org-accent: #5b21b6; --color-org-accent-foreground: #ffffff; } /* allow-color */
+  .demo-org-fail { --color-org-accent: #1f8a70; --color-org-accent-foreground: #111111; } /* allow-color */
+  .ds-main .org-switcher__menu.menu--static { position: static; margin-top: var(--space-2); }
+  .ds-main .org-switcher { flex-direction: column; align-items: flex-start; }
+  .ds-main .org-switcher__name { display: block; }
+</style>
+</head>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="ds-shell">
+  <nav class="ds-nav" aria-label="Design system">
+    <div class="ds-nav__brand"><a href="../index.html">FaithTech DS</a><button class="ds-theme-toggle" type="button" aria-pressed="false">☾ Dark</button></div>
+    <details open><summary>Foundations</summary><ul>
+      <li><a href="../foundations/color.html">Color</a></li>
+      <li><a href="../foundations/typography.html">Typography</a></li>
+      <li><a href="../foundations/spacing.html">Spacing</a></li>
+      <li><a href="../foundations/layout.html">Layout</a></li>
+      <li><a href="../foundations/elevation.html">Elevation</a></li>
+      <li><a href="../foundations/shape.html">Shape</a></li>
+      <li><a href="../foundations/motion.html">Motion</a></li>
+      <li><a href="../foundations/iconography.html">Iconography</a></li>
+      <li><a href="../foundations/theming.html">Theming</a></li>
+      <li><a href="../foundations/responsive.html">Responsive</a></li>
+      <li><a href="../foundations/accessibility.html">Accessibility</a></li>
+      <li><a href="../foundations/content.html">Content</a></li>
+    </ul></details>
+    <details open><summary>Components</summary><ul>
+      <li><a href="../components/button.html">Button</a></li>
+      <li><a href="../components/link.html">Link</a></li>
+      <li><a href="../components/menu.html">Menu</a></li>
+      <li><a href="../components/form-field.html">Form field</a></li>
+      <li><a href="../components/text-field.html">Text field</a></li>
+      <li><a href="../components/copy-field.html">Copy field</a></li>
+      <li><a href="../components/token-reveal.html">Token reveal</a></li>
+      <li><a href="../components/textarea.html">Textarea</a></li>
+      <li><a href="../components/select.html">Select</a></li>
+      <li><a href="../components/radio-group.html">Radio group</a></li><li><a href="../components/checkbox-group.html">Checkbox group</a></li>
+      <li><a href="../components/switch.html">Switch</a></li>
+      <li><a href="../components/colour-field.html">Colour field</a></li>
+      <li><a href="../components/permission-checklist.html">Permission checklist</a></li>
+      <li><a href="../components/scope-picker.html">Scope picker</a></li>
+      <li><a href="../components/form-layout.html">Form layout</a></li>
+      <li><a href="../components/picture-list.html">Picture list</a></li>
+      <li><a href="../components/photo-gallery.html">Photo gallery</a></li>
+      <li><a href="../components/file-dropzone.html">File drop zone</a></li>
+      <li><a href="../components/file-row.html">File row</a></li>
+      <li><a href="../components/tag-input.html">Tag input</a></li>
+      <li><a href="../components/person-picker.html">Person picker</a></li>
+      <li><a href="../components/type-icon.html">Type icon</a></li>
+      <li><a href="../components/sticker-picker.html">Estimate card picker</a></li>
+      <li><a href="../components/emoji-picker.html">Emoji picker</a></li>
+      <li><a href="../components/top-bar.html">Top bar</a></li>
+      <li><a href="../components/org-switcher.html">Org switcher</a></li>
+      <li><a href="../components/tab-bar.html">Tab bar</a></li>
+      <li><a href="../components/tabs.html">Tabs</a></li>
+      <li><a href="../components/breadcrumb.html">Breadcrumb</a></li>
+      <li><a href="../components/skip-link.html">Skip link</a></li>
+      <li><a href="../components/layout.html">Layout primitives</a></li>
+      <li><a href="../components/card.html">Card</a></li>
+      <li><a href="../components/dialog.html">Dialog</a></li>
+      <li><a href="../components/notification-panel.html">Notification panel</a></li>
+      <li><a href="../components/list.html">List</a></li>
+      <li><a href="../components/table.html">Table</a></li>
+      <li><a href="../components/description-list.html">Description list</a></li>
+      <li><a href="../components/feed.html">Activity feed</a></li>
+      <li><a href="../components/tree.html">Backlog tree</a></li>
+      <li><a href="../components/role-tree.html">Role tree</a></li>
+      <li><a href="../components/kanban.html">Kanban board</a></li>
+      <li><a href="../components/event-card.html">Event card</a></li>
+      <li><a href="../components/person-card.html">Person card</a></li>
+      <li><a href="../components/profile-header.html">Profile header</a></li>
+      <li><a href="../components/person-summary.html">Person summary</a></li>
+      <li><a href="../components/search-results.html">Search results</a></li>
+      <li><a href="../components/note.html">Note</a></li>
+      <li><a href="../components/block-editor.html">Block editor</a></li>
+      <li><a href="../components/slash-menu.html">Slash menu</a></li>
+      <li><a href="../components/format-toolbar.html">Formatting toolbar</a></li>
+      <li><a href="../components/save-status.html">Save status</a></li>
+      <li><a href="../components/page-links.html">Page links</a></li>
+      <li><a href="../components/avatar.html">Avatar</a></li>
+      <li><a href="../components/qr-code.html">QR code</a></li>
+      <li><a href="../components/logo-mark.html">Logo mark</a></li>
+      <li><a href="../components/badge.html">Badge</a></li>
+      <li><a href="../components/agent-badge.html">Agent badge</a></li>
+      <li><a href="../components/org-label.html">Org label and mark</a></li>
+      <li><a href="../components/chip.html">Chip</a></li>
+      <li><a href="../components/stat.html">Stat</a></li>
+      <li><a href="../components/sticker.html">Estimate card</a></li>
+      <li><a href="../components/toast.html">Toast</a></li>
+      <li><a href="../components/alert.html">Alert and banner</a></li>
+      <li><a href="../components/inline-message.html">Inline message</a></li>
+      <li><a href="../components/progress.html">Progress</a></li>
+      <li><a href="../components/skeleton.html">Skeleton</a></li>
+      <li><a href="../components/empty-state.html">Empty state</a></li>
+      <li><a href="../components/error-page.html">Error page</a></li>
+      <li><a href="../components/landing-hero.html">Landing hero</a></li>
+      <li><a href="../components/video-player.html">Video player</a></li>
+      <li><a href="../components/auth-forms.html">Sign-in and sign-up forms</a></li>
+      <li><a href="../components/site-footer.html">Site footer</a></li>
+    </ul></details>
+    <details open><summary>Patterns</summary><ul>
+      <li><a href="../patterns/forms.html">Forms</a></li>
+      <li><a href="../patterns/feedback-and-loading.html">Feedback and loading</a></li>
+      <li><a href="../patterns/empty-and-error-states.html">Empty and error states</a></li>
+      <li><a href="../patterns/navigation.html">Navigation and page structure</a></li>
+      <li><a href="../patterns/dialogs-and-overlays.html">Dialogs and overlays</a></li>
+      <li><a href="../patterns/lists-and-tables.html">Lists and tables</a></li>
+      <li><a href="../patterns/notifications.html">Notifications</a></li>
+      <li><a href="../patterns/content-and-tone.html">Content and tone</a></li>
+      <li><a href="../patterns/private-preview-wall.html">Private preview wall</a></li>
+    </ul></details>
+  </nav>
+
+  <main id="main" class="ds-main">
+    <header class="ds-header">
+      <p class="ds-kicker">Component · Data display</p>
+      <h1>Org label and mark</h1>
+      <p class="ds-lead">Which organization something belongs to: a text label for combined lists, and the org’s mark.</p>
+      <div class="ds-meta"><span class="ds-pill ds-pill--ok">WCAG 2.2 AA</span><span class="ds-pill">Status: new</span></div>
+      <ul class="ds-toc"><li><a href="#overview">Overview</a></li><li><a href="#anatomy">Anatomy</a></li><li><a href="#variants">Variants</a></li><li><a href="#sizes">Sizes</a></li><li><a href="#states">States</a></li><li><a href="#responsive">Responsive</a></li><li><a href="#theming">Theming</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#content">Content</a></li><li><a href="#do-dont">Do and don't</a></li><li><a href="#tokens">Tokens</a></li><li><a href="#code">Code</a></li><li><a href="#sources">Sources</a></li></ul>
+    </header>
+
+    <section class="ds-section" id="overview"><h2><a href="#overview">Overview</a></h2>
+<p>An <b>org label</b> says which organization a row, result, notice or announcement belongs to, wherever lists combine orgs (All orgs, search, notifications, the portfolio audit log). The <b>org mark</b> is the org’s logo, or its initials on the org accent; it identifies the org in the switcher, the organizations list and branding previews.</p><div class="ds-themes"><div data-theme="light"><div style="padding: var(--space-4); background: var(--color-bg-surface);"><div class="cluster"><span class="org-label demo-org-toronto"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">FaithTech Toronto</span></span><span class="org-label demo-org-shelfie"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">Shelfie</span></span><span class="org-label org-label--portfolio"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">Portfolio</span></span><span class="org-mark demo-org-toronto" aria-hidden="true">FT</span><span class="org-mark org-mark--md demo-org-shelfie" aria-hidden="true">S</span><span class="org-mark org-mark--lg demo-org-toronto" aria-hidden="true">FT</span></div></div></div><div data-theme="dark"><div style="padding: var(--space-4); background: var(--color-bg-surface);"><div class="cluster"><span class="org-label demo-org-toronto"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">FaithTech Toronto</span></span><span class="org-label demo-org-shelfie"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">Shelfie</span></span><span class="org-label org-label--portfolio"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">Portfolio</span></span><span class="org-mark demo-org-toronto" aria-hidden="true">FT</span><span class="org-mark org-mark--md demo-org-shelfie" aria-hidden="true">S</span><span class="org-mark org-mark--lg demo-org-toronto" aria-hidden="true">FT</span></div></div></div></div>
+    </section>
+    <section class="ds-section" id="anatomy"><h2><a href="#anatomy">Anatomy</a></h2>
+<div class="ds-anatomy"><figure class="ds-anatomy__figure"><div class="cluster"><span class="org-label demo-org-toronto"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">FaithTech Toronto</span></span><span class="org-mark org-mark--md demo-org-toronto" aria-hidden="true">FT</span></div></figure><ol class="ds-anatomy__list"><li><div><b>Label pill</b><small>Caption text on <code>--color-bg-subtle</code>, never wraps; long names end in an ellipsis.</small></div></li><li><div><b>Accent dot</b><small>Decorative 8px dot in the org accent with a hairline ring, so a pale accent still shows. The name, not the colour, identifies the org.</small></div></li><li><div><b>Org mark</b><small>Square with rounded corners (round inside the switcher), the logo image or the initials on the accent pair.</small></div></li></ol></div>
+    </section>
+    <section class="ds-section" id="variants"><h2><a href="#variants">Variants</a></h2>
+<div class="ds-themes"><div data-theme="light"><div style="padding: var(--space-4); background: var(--color-bg-surface);"><div class="cluster"><span class="org-label demo-org-toronto"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">FaithTech Toronto</span></span><span class="org-label org-label--portfolio"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">Portfolio</span></span><span class="org-mark demo-org-toronto" aria-hidden="true">FT</span><span class="org-mark org-mark--md demo-org-toronto" aria-hidden="true">FT</span><span class="org-mark org-mark--all" aria-hidden="true"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5zM3 13l9 5 9-5"/></svg></span></div></div></div><div data-theme="dark"><div style="padding: var(--space-4); background: var(--color-bg-surface);"><div class="cluster"><span class="org-label demo-org-toronto"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">FaithTech Toronto</span></span><span class="org-label org-label--portfolio"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">Portfolio</span></span><span class="org-mark demo-org-toronto" aria-hidden="true">FT</span><span class="org-mark org-mark--md demo-org-toronto" aria-hidden="true">FT</span><span class="org-mark org-mark--all" aria-hidden="true"><svg class="icon icon--sm" aria-hidden="true" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5zM3 13l9 5 9-5"/></svg></span></div></div></div></div><h3>Org band</h3><div class="ds-themes"><div data-theme="light"><div style="padding: var(--space-4); background: var(--color-bg-surface);"><div class="org-band demo-org-toronto"><span class="org-mark org-mark--md" aria-hidden="true">FT</span><span>FaithTech Toronto</span></div></div></div><div data-theme="dark"><div style="padding: var(--space-4); background: var(--color-bg-surface);"><div class="org-band demo-org-toronto"><span class="org-mark org-mark--md" aria-hidden="true">FT</span><span>FaithTech Toronto</span></div></div></div></div><p>The <b>org band</b> (<code>ft-org-band</code>) heads the public event page and the connect page: the org mark on a surface chip and the display name, on the accent pair. It is decorative chrome; the page’s overline and “Hosted by” repeat the org name as text.</p><p><b>Org</b> (default) and <b>Portfolio</b> (for portfolio-wide announcements and items; accent-subtle with the brand accent text). Marks: org initials, logo (an <code>&lt;img&gt;</code> filling the square), and <b>All orgs</b> (the neutral layered icon).</p>
+    </section>
+    <section class="ds-section" id="sizes"><h2><a href="#sizes">Sizes</a></h2>
+<div class="ds-themes"><div data-theme="light"><div style="padding: var(--space-4); background: var(--color-bg-surface);"><div class="cluster"><span class="org-mark demo-org-toronto" aria-hidden="true">FT</span><span class="org-mark org-mark--md demo-org-toronto" aria-hidden="true">FT</span><span class="org-mark org-mark--lg demo-org-toronto" aria-hidden="true">FT</span></div></div></div><div data-theme="dark"><div style="padding: var(--space-4); background: var(--color-bg-surface);"><div class="cluster"><span class="org-mark demo-org-toronto" aria-hidden="true">FT</span><span class="org-mark org-mark--md demo-org-toronto" aria-hidden="true">FT</span><span class="org-mark org-mark--lg demo-org-toronto" aria-hidden="true">FT</span></div></div></div></div><p>Mark: <b>sm</b> 32px (switcher, tables), <b>md</b> 40px (public band, branding preview), <b>lg</b> 56px (logo field). The label has one size: 24px tall, caption text.</p>
+    </section>
+    <section class="ds-section" id="states"><h2><a href="#states">States</a></h2>
+<div class="ds-matrix"><table><thead><tr><th scope="col">Theme</th><th scope="col">Org</th><th scope="col">Pale accent</th><th scope="col">Portfolio</th><th scope="col">Long name</th><th scope="col">Mark, no logo</th><th scope="col">Mark, no branding</th></tr></thead><tbody><tr><th scope="row">Light</th><td data-theme="light"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><span class="org-label demo-org-toronto"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">FaithTech Toronto</span></span></div></td><td data-theme="light"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><span class="org-label demo-org-shelfie"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">Shelfie</span></span></div></td><td data-theme="light"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><span class="org-label org-label--portfolio"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">Portfolio</span></span></div></td><td data-theme="light"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><span style="display: block; max-width: 12rem;"><span class="org-label demo-org-long"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">FaithTech Kitchener-Waterloo and the Golden Horseshoe</span></span></span></div></td><td data-theme="light"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><span class="org-mark demo-org-toronto" aria-hidden="true">FT</span></div></td><td data-theme="light"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><span class="org-mark" aria-hidden="true">FA</span></div></td></tr><tr><th scope="row">Dark</th><td data-theme="dark"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><span class="org-label demo-org-toronto"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">FaithTech Toronto</span></span></div></td><td data-theme="dark"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><span class="org-label demo-org-shelfie"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">Shelfie</span></span></div></td><td data-theme="dark"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><span class="org-label org-label--portfolio"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">Portfolio</span></span></div></td><td data-theme="dark"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><span style="display: block; max-width: 12rem;"><span class="org-label demo-org-long"><span class="org-label__dot" aria-hidden="true"></span><span class="org-label__name">FaithTech Kitchener-Waterloo and the Golden Horseshoe</span></span></span></div></td><td data-theme="dark"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><span class="org-mark demo-org-toronto" aria-hidden="true">FT</span></div></td><td data-theme="dark"><div style="padding: var(--space-3); background: var(--color-bg-surface);"><span class="org-mark" aria-hidden="true">FA</span></div></td></tr></tbody></table></div><p>Labels and marks are not interactive. <b>No branding</b> falls back to the default pair (<code>--color-accent</code> with <code>--color-fg-on-accent</code>).</p>
+    </section>
+    <section class="ds-section" id="responsive"><h2><a href="#responsive">Responsive behaviour</a></h2>
+<p>The label never wraps; in narrow table cells it truncates at the cell width with the full name in <code>title</code>. Marks keep their size at every width.</p>
+    </section>
+    <section class="ds-section" id="theming"><h2><a href="#theming">Theming</a></h2>
+<p>The label’s text and pill follow the theme (<code>--color-fg-muted</code> on <code>--color-bg-subtle</code>, 5.06:1 light, 6.60:1 dark). The dot and mark read the scoped pair set on the element from the org’s branding, so they look the same in both themes.</p>
+    </section>
+    <section class="ds-section" id="accessibility"><h2><a href="#accessibility">Accessibility</a></h2>
+<ul><li>The label is text: screen readers read the org name. The dot is <code>aria-hidden</code>; colour is never the only cue.</li><li>Marks are decorative (<code>aria-hidden</code>) next to a visible name; where a mark stands alone, the surrounding control carries the name.</li><li>Initials on the accent pass 4.5:1 because branding below that is refused (L2-149 AC5).</li></ul>
+    </section>
+    <section class="ds-section" id="content"><h2><a href="#content">Content</a></h2>
+<ul><li>The org’s display name in full; “Portfolio” for portfolio-wide items.</li><li>Initials: up to two letters from the display name (“FT”, “S”).</li></ul>
+    </section>
+    <section class="ds-section" id="do-dont"><h2><a href="#do-dont">Do and don't</a></h2>
+<div class="ds-dodont"><figure class="ds-do"><div class="ds-example__canvas ds-example__canvas--stack"><p>Label every row in a combined list, even when most rows share one org.</p></div><figcaption>Do.</figcaption></figure><figure class="ds-dont"><div class="ds-example__canvas ds-example__canvas--stack"><p>Rely on the accent dot alone to tell orgs apart.</p></div><figcaption>Don’t.</figcaption></figure></div><div class="ds-dodont"><figure class="ds-do"><div class="ds-example__canvas ds-example__canvas--stack"><p>Set the accent through the scoped tokens on the element.</p></div><figcaption>Do.</figcaption></figure><figure class="ds-dont"><div class="ds-example__canvas ds-example__canvas--stack"><p>Write the org’s hex into component styles or use it as text colour on a surface.</p></div><figcaption>Don’t.</figcaption></figure></div>
+    </section>
+    <section class="ds-section" id="tokens"><h2><a href="#tokens">Tokens</a></h2>
+<table class="ds-table"><thead><tr><th scope="col">Token</th><th scope="col">Use</th></tr></thead><tbody><tr><td><code>--color-org-accent</code>, <code>--color-org-accent-foreground</code></td><td>Dot, mark fill and initials (scoped)</td></tr><tr><td><code>--color-bg-subtle</code>, <code>--color-fg-muted</code>, <code>--text-caption</code></td><td>Label pill and text</td></tr><tr><td><code>--color-accent-subtle</code>, <code>--color-fg-accent</code></td><td>Portfolio variant</td></tr><tr><td><code>--size-avatar-sm|md|lg</code>, <code>--radius-md</code>, <code>--radius-lg</code></td><td>Mark sizes and corners</td></tr></tbody></table>
+    </section>
+    <section class="ds-section" id="code"><h2><a href="#code">Code</a></h2>
+<pre><code>&lt;ft-org-label [name]="item.organization.name" [accent]="item.organization.accent" [accentForeground]="item.organization.accentForeground" /&gt;
+&lt;ft-org-label variant="portfolio" name="Portfolio" /&gt;
+&lt;ft-org-mark [name]="org.name" [logoUrl]="org.logoUrl" [accent]="org.accent" [accentForeground]="org.accentForeground" size="sm" /&gt;</code></pre><table class="ds-table"><thead><tr><th scope="col">Input / output</th><th scope="col">Type and default</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td><code>ft-org-label name</code></td><td><code>string, required</code></td><td>The org’s display name.</td></tr><tr><td><code>ft-org-label variant</code></td><td><code>'org' | 'portfolio', 'org'</code></td><td>Portfolio uses the brand accent tint.</td></tr><tr><td><code>ft-org-label accent / accentForeground</code></td><td><code>string | null, null</code></td><td>Sets the scoped pair on the host; null keeps the default pair.</td></tr><tr><td><code>ft-org-mark name</code></td><td><code>string, required</code></td><td>Used for the initials and the image’s empty alt.</td></tr><tr><td><code>ft-org-mark logoUrl</code></td><td><code>string | null, null</code></td><td>Shows the logo instead of initials.</td></tr><tr><td><code>ft-org-mark size</code></td><td><code>'sm' | 'md' | 'lg', 'sm'</code></td><td>32, 40 or 56px.</td></tr><tr><td><code>ft-org-mark all</code></td><td><code>boolean, false</code></td><td>The neutral All orgs mark.</td></tr><tr><td><code>ft-org-band name / logoUrl / accent / accentForeground</code></td><td><code>string, string | null</code></td><td>The public page band; sets the scoped pair on its host.</td></tr><tr><td><code>[ftOrgAccent]</code></td><td><code>{ accent, accentForeground } | null</code></td><td>Directive that sets <code>--color-org-accent</code> and its foreground on any host (the shell header and strip); null leaves the defaults.</td></tr></tbody></table>
+    </section>
+    <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
+<ul><li><a href="../../mocks/pages/people/all-orgs.html">pages/people/all-orgs</a></li><li><a href="../../mocks/pages/resources/all-orgs.html">pages/resources/all-orgs</a></li><li><a href="../../mocks/pages/search/all-orgs.html">pages/search/all-orgs</a></li><li><a href="../../mocks/notifications/bell/org-labels.html">notifications/bell/org-labels</a></li><li><a href="../../mocks/pages/organizations/default.html">pages/organizations/default</a></li><li><a href="../../mocks/pages/organization/branding.html">pages/organization/branding</a></li></ul>
+    </section>
+
+    <footer class="ds-footer"><span>QuinntyneBrown.Community design system · extracted from <a href="../../mocks/index.html">docs/mocks</a> on 2026-10-21 · organizations added 2026-10-23</span><a href="#top">Back to top</a></footer>
+  </main>
+</div>
+<script src="../assets/ds.js"></script>
+</body>
+</html>

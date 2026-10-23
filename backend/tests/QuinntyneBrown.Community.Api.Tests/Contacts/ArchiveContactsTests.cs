@@ -16,7 +16,7 @@ public class ArchiveContactsTests(CommunityApiFactory factory) : IClassFixture<C
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var ben = await factory.CreateContactAsync(grace, "Ben Carter", notes: "Moved to Calgary.");
         await factory.CreateContactAsync(grace, "Abby Brooks");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var response = await client.PostAsync($"/api/contacts/{ben.Id}/archive", null);
 
@@ -32,7 +32,7 @@ public class ArchiveContactsTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var ben = await factory.CreateContactAsync(grace, "Ben Carter", notes: "Moved to Calgary.");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         await client.PostAsync($"/api/contacts/{ben.Id}/archive", null);
 
         var response = await client.PostAsync($"/api/contacts/{ben.Id}/restore", null);
@@ -48,7 +48,7 @@ public class ArchiveContactsTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var ben = await factory.CreateContactAsync(grace, "Ben Carter");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
 
         var restore = await client.PostAsync($"/api/contacts/{ben.Id}/restore", null);
         await client.PostAsync($"/api/contacts/{ben.Id}/archive", null);
@@ -62,7 +62,7 @@ public class ArchiveContactsTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var ben = await factory.CreateContactAsync(grace, "Ben Carter", notes: "Moved to Calgary.");
-        var client = factory.ClientFor(grace, Role.CityLead);
+        var client = factory.ClientFor(grace, SeededRole.CityLead);
         await client.PostAsJsonAsync($"/api/contacts/{ben.Id}/notes", new { Body = "Second note." });
         await client.PostAsync($"/api/contacts/{ben.Id}/archive", null);
 
@@ -79,23 +79,23 @@ public class ArchiveContactsTests(CommunityApiFactory factory) : IClassFixture<C
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var ben = await factory.CreateContactAsync(grace, "Ben Carter");
 
-        var response = await factory.ClientFor(grace, Role.CityLead).DeleteAsync($"/api/contacts/{ben.Id}");
+        var response = await factory.ClientFor(grace, SeededRole.CityLead).DeleteAsync($"/api/contacts/{ben.Id}");
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         Assert.True(await factory.WithDbAsync(db => db.Contacts.AnyAsync(c => c.Id == ben.Id)));
     }
 
     [Theory]
-    [InlineData(Role.CityLead)]
-    [InlineData(Role.Staff)]
-    public async Task Nobody_else_archives_restores_or_deletes_a_contact(Role role)
+    [InlineData(SeededRole.CityLead)]
+    [InlineData(SeededRole.Staff)]
+    public async Task Nobody_else_archives_restores_or_deletes_a_contact(SeededRole role)
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var ben = await factory.CreateContactAsync(grace, "Ben Carter");
         var other = factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), role);
 
         var archive = await other.PostAsync($"/api/contacts/{ben.Id}/archive", null);
-        await factory.ClientFor(grace, Role.CityLead).PostAsync($"/api/contacts/{ben.Id}/archive", null);
+        await factory.ClientFor(grace, SeededRole.CityLead).PostAsync($"/api/contacts/{ben.Id}/archive", null);
         var restore = await other.PostAsync($"/api/contacts/{ben.Id}/restore", null);
         var delete = await other.DeleteAsync($"/api/contacts/{ben.Id}");
 
@@ -110,10 +110,10 @@ public class ArchiveContactsTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var ben = await factory.CreateContactAsync(grace, "Ben Carter");
-        await factory.ClientFor(grace, Role.CityLead).PostAsync($"/api/contacts/{ben.Id}/archive", null);
+        await factory.ClientFor(grace, SeededRole.CityLead).PostAsync($"/api/contacts/{ben.Id}/archive", null);
 
-        var marcus = await factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), Role.CityLead).GetFromJsonAsync<ContactSummary[]>("/api/contacts/archived");
-        var staff = await factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), Role.Staff).GetAsync("/api/contacts/archived");
+        var marcus = await factory.ClientFor(await factory.AddMemberAsync("Marcus Lee"), SeededRole.CityLead).GetFromJsonAsync<ContactSummary[]>("/api/contacts/archived");
+        var staff = await factory.ClientFor(await factory.AddMemberAsync("Daniel Reyes"), SeededRole.Staff).GetAsync("/api/contacts/archived");
 
         Assert.Empty(marcus!);
         Assert.Equal(HttpStatusCode.Forbidden, staff.StatusCode);
@@ -124,7 +124,7 @@ public class ArchiveContactsTests(CommunityApiFactory factory) : IClassFixture<C
     {
         var grace = await factory.AddMemberAsync("Grace Okonkwo");
         var ben = await factory.CreateContactAsync(grace, "Ben Carter");
-        var admin = factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), Role.SystemAdmin);
+        var admin = factory.ClientFor(await factory.AddMemberAsync("Priya Shah"), SeededRole.SystemAdmin);
 
         await admin.PostAsync($"/api/contacts/{ben.Id}/archive", null);
         await admin.PostAsync($"/api/contacts/{ben.Id}/restore", null);

@@ -1,0 +1,11 @@
+@if (logoUrl()) {
+  <span class="org-mark"><img [src]="logoUrl()" alt="" /></span>
+} @else {
+  <span class="org-mark" aria-hidden="true" [attr.data-initials]="initials()"></span>
+}
+<span class="org-band__name"
+  >{{ name() }}
+  @if (caption()) {
+    <span> · {{ caption() }}</span>
+  }
+</span>

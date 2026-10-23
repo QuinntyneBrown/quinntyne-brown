@@ -6,5 +6,9 @@ namespace QuinntyneBrown.Community.Application.Admin;
 /// </summary>
 public interface IAuditLog
 {
-    void Record(Guid actorId, string action, string targetType, string targetId, object? before, object? after);
+    /// <param name="organizationId">The org the action happened in, so its Org Lead can read it (L2-153).</param>
+    /// <param name="portfolioId">The portfolio; filled from the org when omitted.</param>
+    void Record(
+        Guid actorId, string action, string targetType, string targetId, object? before, object? after,
+        Guid? organizationId = null, Guid? portfolioId = null);
 }

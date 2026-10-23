@@ -15,6 +15,8 @@ export interface SearchResultItem {
   startsAt: string | null;
   /** "Private" for a contact, the stage for a partner, "Public" or "Cancelled" for an event. */
   badge: string | null;
+  /** The org the result belongs to, for its label under "All orgs" (L2-152). */
+  organization?: string | null;
 }
 
 export interface SearchResultGroup {

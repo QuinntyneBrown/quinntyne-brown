@@ -1,0 +1,14 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Seed the hierarchy
+Person(op, "Operator", "Deploy pipeline or developer")
+System_Boundary(ftc, "QuinntyneBrown.Community") {
+  Container(cli, "Community Cli", ".NET console", "migrate, reset, seed, grant-admin, demo-data commands")
+  Container(api, "Community API", "ASP.NET Core", "Never applies migrations")
+  ContainerDb(db, "Community database", "PostgreSQL", "Squashed initial schema with hierarchy tables")
+}
+Rel(op, cli, "Runs", "shell")
+Rel(cli, db, "Drops, migrates and seeds", "EF Core")
+Rel(api, db, "Reads and writes", "EF Core")
+@enduml

@@ -15,7 +15,7 @@ test.describe('Notes: archive and restore', () => {
     const sheet = api.notes.add({
       title: 'Builders Night run sheet',
       ownerId: grace.profileId,
-      visibility: 'Global',
+      visibility: 'OrgWide',
     });
     await api.signInAs(grace, `/notes/${sheet.id}`);
     const note = new NotePage(page);
@@ -31,7 +31,7 @@ test.describe('Notes: archive and restore', () => {
     await archive.confirm.click();
 
     const notes = new NotesPage(page);
-    await expect(page).toHaveURL('/notes');
+    await expect(page).toHaveURL('/o/faithtech-toronto/notes');
     await expect(notes.toast).toContainText('Builders Night run sheet archived');
     await expect(notes.item('Builders Night run sheet')).toHaveCount(0);
     expect(sheet.archivedAt).not.toBeNull();
@@ -61,7 +61,7 @@ test.describe('Notes: archive and restore', () => {
     const notes = new NotesPage(page);
     await notes.toast.getByRole('button', { name: 'Undo' }).click();
 
-    await expect(page).toHaveURL(`/notes/${sheet.id}`);
+    await expect(page).toHaveURL(`/o/faithtech-toronto/notes/${sheet.id}`);
     await expect(note.title).toHaveText('Run sheet');
     expect(sheet.archivedAt).toBeNull();
   });

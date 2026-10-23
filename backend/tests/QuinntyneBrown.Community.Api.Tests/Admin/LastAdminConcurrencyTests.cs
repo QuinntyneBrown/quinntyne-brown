@@ -16,19 +16,19 @@ public class LastAdminConcurrencyTests(CommunityApiFactory factory) : IClassFixt
     public async Task Two_overlapping_removals_of_the_last_two_admins_leave_one_admin_and_refuse_the_other()
     {
         await RemoveEveryAdminAsync();
-        var priya = await factory.AddMemberAsync("Priya Shah", p => p.AddRole(Role.SystemAdmin, Guid.Empty, DateTime.UtcNow));
-        var samuel = await factory.AddMemberAsync("Samuel Osei", p => p.AddRole(Role.SystemAdmin, Guid.Empty, DateTime.UtcNow));
-        var asPriya = factory.ClientFor(priya, Role.SystemAdmin);
-        var asSamuel = factory.ClientFor(samuel, Role.SystemAdmin);
+        var priya = await factory.AddMemberAsync("Priya Shah", p => p.AddRole(SeededRole.SystemAdmin, Guid.Empty, DateTime.UtcNow));
+        var samuel = await factory.AddMemberAsync("Samuel Osei", p => p.AddRole(SeededRole.SystemAdmin, Guid.Empty, DateTime.UtcNow));
+        var asPriya = factory.ClientFor(priya, SeededRole.SystemAdmin);
+        var asSamuel = factory.ClientFor(samuel, SeededRole.SystemAdmin);
 
         // Both requests have read what they need before either saves: either their role removals or the
         // System Admin roster that guards those removals.
         factory.SaveGate.HoldUntil(2, db =>
-            db.ChangeTracker.Entries<ProfileRole>().Any(e => e.State == EntityState.Deleted)
+            db.ChangeTracker.Entries<Domain.Profiles.Profile>().Any(e => e.State == EntityState.Modified && !e.Entity.IsSystemAdmin)
             || db.ChangeTracker.Entries<SystemAdminRoster>().Any(e => e.State == EntityState.Modified));
         var responses = await Task.WhenAll(
-            asPriya.DeleteAsync($"/api/profiles/{samuel.ProfileId}/roles/SystemAdmin"),
-            asSamuel.DeleteAsync($"/api/profiles/{priya.ProfileId}/roles/SystemAdmin"));
+            asPriya.DeleteAsync($"/api/profiles/{samuel.ProfileId}/roles/system-admin"),
+            asSamuel.DeleteAsync($"/api/profiles/{priya.ProfileId}/roles/system-admin"));
 
         Assert.Equal(
             [HttpStatusCode.OK, HttpStatusCode.Conflict],
@@ -37,7 +37,7 @@ public class LastAdminConcurrencyTests(CommunityApiFactory factory) : IClassFixt
         Assert.Equal(
             "Someone else changed System Admin roles at the same time. Reload and try again.",
             (await refused.Content.ReadFromJsonAsync<ProblemDetails>())!.Detail);
-        Assert.Equal(1, await factory.WithDbAsync(db => db.Profiles.CountAsync(p => p.Roles.Any(r => r.Role == Role.SystemAdmin))));
+        Assert.Equal(1, await factory.WithDbAsync(db => db.Profiles.CountAsync(p => p.IsSystemAdmin)));
 
         // Only the removal that happened left an audit entry; a System Admin's role changes notify no one,
         // and the refused one added nothing.
@@ -50,9 +50,9 @@ public class LastAdminConcurrencyTests(CommunityApiFactory factory) : IClassFixt
     public async Task The_last_admin_still_gets_the_existing_message()
     {
         await RemoveEveryAdminAsync();
-        var priya = await factory.AddMemberAsync("Priya Shah", p => p.AddRole(Role.SystemAdmin, Guid.Empty, DateTime.UtcNow));
+        var priya = await factory.AddMemberAsync("Priya Shah", p => p.AddRole(SeededRole.SystemAdmin, Guid.Empty, DateTime.UtcNow));
 
-        var response = await factory.ClientFor(priya, Role.SystemAdmin).DeleteAsync($"/api/profiles/{priya.ProfileId}/roles/SystemAdmin");
+        var response = await factory.ClientFor(priya, SeededRole.SystemAdmin).DeleteAsync($"/api/profiles/{priya.ProfileId}/roles/system-admin");
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         Assert.Equal("There must always be at least one System Admin.", (await response.Content.ReadFromJsonAsync<ProblemDetails>())!.Detail);
@@ -61,18 +61,18 @@ public class LastAdminConcurrencyTests(CommunityApiFactory factory) : IClassFixt
     [Fact]
     public async Task A_lease_left_by_a_failed_removal_expires_so_removals_are_not_blocked_for_good()
     {
-        var priya = await factory.AddMemberAsync("Priya Shah", p => p.AddRole(Role.SystemAdmin, Guid.Empty, DateTime.UtcNow));
-        var samuel = await factory.AddMemberAsync("Samuel Osei", p => p.AddRole(Role.SystemAdmin, Guid.Empty, DateTime.UtcNow));
+        var priya = await factory.AddMemberAsync("Priya Shah", p => p.AddRole(SeededRole.SystemAdmin, Guid.Empty, DateTime.UtcNow));
+        var samuel = await factory.AddMemberAsync("Samuel Osei", p => p.AddRole(SeededRole.SystemAdmin, Guid.Empty, DateTime.UtcNow));
         await factory.WithDbAsync(async db =>
         {
             (await db.SystemAdminRosters.SingleAsync()).TryTake(Guid.NewGuid(), factory.Time.GetUtcNow());
             return await db.SaveChangesAsync();
         });
-        var client = factory.ClientFor(priya, Role.SystemAdmin);
+        var client = factory.ClientFor(priya, SeededRole.SystemAdmin);
 
-        var blocked = await client.DeleteAsync($"/api/profiles/{samuel.ProfileId}/roles/SystemAdmin");
+        var blocked = await client.DeleteAsync($"/api/profiles/{samuel.ProfileId}/roles/system-admin");
         factory.Time.Advance(SystemAdminRoster.LeaseLength + TimeSpan.FromSeconds(1));
-        var allowed = await client.DeleteAsync($"/api/profiles/{samuel.ProfileId}/roles/SystemAdmin");
+        var allowed = await client.DeleteAsync($"/api/profiles/{samuel.ProfileId}/roles/system-admin");
 
         Assert.Equal(HttpStatusCode.Conflict, blocked.StatusCode);
         Assert.Equal(HttpStatusCode.OK, allowed.StatusCode);
@@ -80,9 +80,9 @@ public class LastAdminConcurrencyTests(CommunityApiFactory factory) : IClassFixt
 
     private Task<int> RemoveEveryAdminAsync() => factory.WithDbAsync(async db =>
     {
-        foreach (var p in await db.Profiles.Where(p => p.Roles.Any(r => r.Role == Role.SystemAdmin)).ToListAsync())
+        foreach (var p in await db.Profiles.Where(p => p.IsSystemAdmin).ToListAsync())
         {
-            p.RemoveRole(Role.SystemAdmin);
+            p.SetSystemAdmin(false);
         }
 
         return await db.SaveChangesAsync();

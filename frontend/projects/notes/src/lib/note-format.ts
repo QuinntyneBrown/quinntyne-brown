@@ -12,7 +12,7 @@ export function editedLine(page: NotePageSummary): string {
   return `Edited ${formatDay(page.updatedAt)} · ${page.isOwn ? 'you' : page.ownerName}${parent}`;
 }
 
-/** The visibility badge from the viewer's side, nothing for Global (L2-085 AC3). */
+/** The visibility badge from the viewer's side, nothing for Org-wide (L2-085 AC3). */
 export function badgeOf(
   page: NotePageSummary,
 ): { text: string; variant: 'neutral' | 'info' } | null {
@@ -20,5 +20,6 @@ export function badgeOf(
   if (page.visibility === 'Shared') {
     return { text: page.sharedWithYou ? 'Shared with you' : 'Shared', variant: 'info' };
   }
+  if (page.visibility === 'PortfolioWide') return { text: 'Portfolio', variant: 'info' };
   return null;
 }

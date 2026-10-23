@@ -1,13 +1,13 @@
 using System.Text.Json;
 using QuinntyneBrown.Community.Application.Common;
 using QuinntyneBrown.Community.Domain.Admin;
-using QuinntyneBrown.Community.Domain.Profiles;
+using QuinntyneBrown.Community.Application.Organizations;
 using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Admin;
 
 /// <summary>Filters for the audit log (L2-041 AC2). Category is roles, suspensions, contacts or deletions.</summary>
-public record GetAuditEntriesQuery(string? Category = null, Guid? Actor = null, DateTime? From = null, DateTime? To = null, int Page = 1);
+public record GetAuditEntriesQuery(string? Category = null, Guid? Actor = null, DateTime? From = null, DateTime? To = null, int Page = 1, Guid? Organization = null);
 
 public record AuditEntryDto(
     Guid Id,
@@ -20,9 +20,14 @@ public record AuditEntryDto(
     string Summary,
     string? Before,
     string? After,
-    string IpAddress);
+    string IpAddress,
+    OrgLabel? Organization = null,
+    string? Detail = null);
 
-/// <summary>Reads the audit log; System Admin only. Newest first, the last 90 days unless a range is given.</summary>
+/// <summary>
+/// Reads the audit log, scoped to the reader (L2-153): an Org Lead their orgs' entries, the Portfolio Lead their
+/// portfolio's, a System Admin everything. Newest first, the last 90 days unless a range is given.
+/// </summary>
 public class GetAuditEntriesHandler(IApplicationDbContext db, ICurrentUser current, TimeProvider time)
 {
     public const int PageSize = 50;
@@ -31,7 +36,7 @@ public class GetAuditEntriesHandler(IApplicationDbContext db, ICurrentUser curre
 
     public async Task<PagedResult<AuditEntryDto>?> HandleAsync(GetAuditEntriesQuery query, CancellationToken cancellationToken = default)
     {
-        if (!current.HasRole(Role.SystemAdmin))
+        if (!CanRead)
         {
             return null;
         }
@@ -46,7 +51,7 @@ public class GetAuditEntriesHandler(IApplicationDbContext db, ICurrentUser curre
     /// <summary>Every filtered entry, up to <see cref="MaxExportRows"/>, for the CSV export (L2-041 AC5).</summary>
     public async Task<IReadOnlyList<AuditEntryDto>?> HandleAllAsync(GetAuditEntriesQuery query, CancellationToken cancellationToken = default)
     {
-        if (!current.HasRole(Role.SystemAdmin))
+        if (!CanRead)
         {
             return null;
         }
@@ -55,10 +60,25 @@ public class GetAuditEntriesHandler(IApplicationDbContext db, ICurrentUser curre
         return await ToDtosAsync(entries, cancellationToken);
     }
 
+    private bool CanRead => current.Access.IsSystemAdmin || current.Access.LedPortfolios.Count > 0 || current.Access.Orgs.Values.Any(o => o.IsOrgLead);
+
     private IQueryable<AuditEntry> Filter(GetAuditEntriesQuery query)
     {
         var from = query.From ?? time.GetUtcNow().UtcDateTime - DefaultRange;
         var entries = db.AuditEntries.AsNoTracking().Where(e => e.OccurredAtUtc >= from);
+        var access = current.Access;
+        if (!access.IsSystemAdmin)
+        {
+            var portfolios = access.LedPortfolios.ToList();
+            var orgs = access.Orgs.Values.Where(o => o.IsOrgLead).Select(o => o.OrgId).ToList();
+            entries = entries.Where(e => (e.PortfolioId != null && portfolios.Contains(e.PortfolioId.Value))
+                || (e.OrganizationId != null && orgs.Contains(e.OrganizationId.Value)));
+        }
+
+        if (query.Organization is { } org)
+        {
+            entries = entries.Where(e => e.OrganizationId == org);
+        }
         if (query.To is { } to)
         {
             entries = entries.Where(e => e.OccurredAtUtc <= to);
@@ -90,6 +110,11 @@ public class GetAuditEntriesHandler(IApplicationDbContext db, ICurrentUser curre
             .Where(p => profileIds.Contains(p.Id))
             .ToDictionaryAsync(p => p.Id, p => p.Name, cancellationToken);
 
+        var roleNames = (await db.RoleDefinitions.AsNoTracking().Select(r => new { r.Key, r.Name }).ToListAsync(cancellationToken))
+            .Concat(await db.CrossOrgRoles.AsNoTracking().Select(r => new { r.Key, r.Name }).ToListAsync(cancellationToken))
+            .GroupBy(r => r.Key).ToDictionary(g => g.Key, g => g.First().Name);
+        var orgs = await db.Organizations.AsNoTracking().ToDictionaryAsync(o => o.Id, cancellationToken);
+
         // Guid.Empty is the command line, e.g. the first System Admin grant.
         string NameOf(Guid id) => id == Guid.Empty ? "System" : names.GetValueOrDefault(id, "Unknown member");
         string TargetName(AuditEntry e) =>
@@ -97,13 +122,15 @@ public class GetAuditEntriesHandler(IApplicationDbContext db, ICurrentUser curre
 
         return [.. entries.Select(e => new AuditEntryDto(
             e.Id, e.OccurredAtUtc, e.ActorId, NameOf(e.ActorId), e.Action, e.TargetType, e.TargetId,
-            Summarize(e, TargetName(e)), e.BeforeJson, e.AfterJson, e.IpAddress))];
+            Summarize(e, TargetName(e), roleNames), e.BeforeJson, e.AfterJson, e.IpAddress,
+            e.OrganizationId is { } o && orgs.TryGetValue(o, out var org) ? new OrgLabel(org.Id, org.Slug, org.ShownName) : null,
+            e.Detail))];
     }
 
-    private static string Summarize(AuditEntry entry, string target) => entry.Action switch
+    private static string Summarize(AuditEntry entry, string target, IReadOnlyDictionary<string, string> roleNames) => entry.Action switch
     {
-        "role.granted" => $"Granted {ChangedRoles(entry.AfterJson, entry.BeforeJson)} to {target}",
-        "role.removed" => $"Removed {ChangedRoles(entry.BeforeJson, entry.AfterJson)} from {target}",
+        "role.granted" => $"Granted {ChangedRoles(entry.AfterJson, entry.BeforeJson, roleNames)} to {target}",
+        "role.removed" => $"Removed {ChangedRoles(entry.BeforeJson, entry.AfterJson, roleNames)} from {target}",
         "user.suspended" => $"Suspended {target} — reason: {Read(entry.AfterJson, "Reason")}",
         "user.reinstated" => $"Reinstated {target}",
         "profile.updated" => $"Edited the profile of {target}",
@@ -123,10 +150,10 @@ public class GetAuditEntriesHandler(IApplicationDbContext db, ICurrentUser curre
     };
 
     // Roles present in one snapshot and missing from the other, as labels.
-    private static string ChangedRoles(string? withRole, string? withoutRole)
+    private static string ChangedRoles(string? withRole, string? withoutRole, IReadOnlyDictionary<string, string> roleNames)
     {
         var changed = RolesIn(withRole).Except(RolesIn(withoutRole)).ToList();
-        return changed.Count == 0 ? "a role" : string.Join(", ", changed.Select(r => Enum.TryParse<Role>(r, out var role) ? RoleLabels.Of(role) : r));
+        return changed.Count == 0 ? "a role" : string.Join(", ", changed.Select(r => roleNames.GetValueOrDefault(r) ?? RoleKeys.NameOf(r)));
     }
 
     private static IEnumerable<string> RolesIn(string? json)

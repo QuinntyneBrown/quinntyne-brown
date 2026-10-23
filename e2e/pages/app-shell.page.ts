@@ -94,6 +94,11 @@ export class AppShell {
     return this.notificationPanel.getByRole('link', { name: title, exact: true });
   }
 
+  /** The org labels on the open bell panel's notices, shown when the person is in more than one org. */
+  get panelOrgLabels(): Locator {
+    return this.notificationPanel.locator('ft-org-label');
+  }
+
   /** The panel's "Mark all read" and "See all" controls. */
   get panelMarkAllRead(): Locator {
     return this.notificationPanel.getByRole('button', { name: 'Mark all read' });

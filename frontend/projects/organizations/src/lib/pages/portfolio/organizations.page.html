@@ -1,0 +1,78 @@
+<ng-template #orgCell let-org>
+  <strong>{{ org.displayName }}</strong>
+  <br />
+  <span class="muted">/o/{{ org.slug }}</span>
+</ng-template>
+<ng-template #actionCell let-org>
+  <ft-cluster gap="2">
+    @if (org.archivedAt) {
+      <ft-button size="sm" [label]="'Restore ' + org.displayName" (click)="restore(org)">
+        Restore
+      </ft-button>
+    } @else {
+      <ft-button size="sm" [href]="'/o/' + org.slug + '/settings'">
+        Settings<span class="visually-hidden"> for {{ org.displayName }}</span>
+      </ft-button>
+      <ft-button
+        size="sm"
+        variant="ghost"
+        [label]="'Archive ' + org.displayName"
+        (click)="archive(org)"
+      >
+        Archive
+      </ft-button>
+    }
+  </ft-cluster>
+</ng-template>
+
+<ft-portfolio-header current="organizations">
+  @if (context.allowed()) {
+    <ft-button portfolioActions variant="primary" (click)="create()">
+      <ft-icon name="add" /> New organization
+    </ft-button>
+  }
+</ft-portfolio-header>
+@if (context.allowed()) {
+  <ft-tabs label="Organization status">
+    <ft-tab
+      [label]="'Active' + count(false)"
+      [href]="context.base() + '/organizations'"
+      [current]="!showArchived()"
+    />
+    <ft-tab
+      [label]="'Archived' + count(true)"
+      [href]="context.base() + '/organizations?archived=true'"
+      [current]="showArchived()"
+    />
+  </ft-tabs>
+  @switch (state()) {
+    @case ('error') {
+      <ft-empty-state
+        variant="error"
+        heading="We couldn’t load the organizations"
+        text="Check your connection and try again."
+      >
+        <ft-button actions variant="primary" (click)="load()">Try again</ft-button>
+      </ft-empty-state>
+    }
+    @default {
+      @if (state() === 'loaded' && !rows().length) {
+        <ft-empty-state
+          [heading]="showArchived() ? 'No archived organizations' : 'No organizations yet'"
+          [text]="
+            showArchived()
+              ? 'Archived orgs appear here, ready to restore.'
+              : 'Create the first organization of the portfolio.'
+          "
+        />
+      } @else {
+        <ft-table
+          [caption]="'Organizations in the ' + (context.portfolio()?.name ?? '') + ' portfolio'"
+          [columns]="columns()"
+          [rows]="rows()"
+          [loading]="state() === 'loading'"
+        />
+      }
+    }
+  }
+}

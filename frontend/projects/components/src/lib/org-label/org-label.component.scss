@@ -1,0 +1,38 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  max-inline-size: 100%;
+  min-block-size: var(--space-6);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-subtle);
+  color: var(--color-fg-muted);
+  font: var(--text-caption);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.org-label__dot {
+  flex: none;
+  inline-size: var(--space-2);
+  block-size: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-org-accent);
+  box-shadow: 0 0 0 var(--border-width-hairline, 1px) var(--color-border-strong);
+}
+
+.org-label__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:host(.org-label--portfolio) {
+  background: var(--color-accent-subtle);
+  color: var(--color-fg-accent);
+
+  .org-label__dot {
+    background: currentColor;
+    box-shadow: none;
+  }
+}
