@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import {
   ANNOUNCEMENTS_SERVICE,
   ACCESS_SERVICE,
+  ALL_ORGS,
   Permission,
   AnnouncementDto,
 } from '@faithtech-community/api';
@@ -16,6 +17,7 @@ import {
   ListSkeletonComponent,
   PageHeaderComponent,
   formatDay,
+  OrgLabelComponent,
 } from '@faithtech-community/components';
 import { firstValueFrom } from 'rxjs';
 
@@ -28,6 +30,7 @@ type State = 'loading' | 'loaded' | 'error';
 @Component({
   selector: 'ft-announcements-page',
   imports: [
+    OrgLabelComponent,
     ButtonComponent,
     CardComponent,
     EmptyStateComponent,
@@ -51,6 +54,8 @@ export class AnnouncementsPage {
   protected readonly hasMore = signal(false);
   protected readonly loadingMore = signal(false);
   protected readonly canSend = computed(() => this.access.can(Permission.AnnouncementsSend));
+  /** Rows are labelled with their org under "All orgs" (L2-151 AC4). */
+  protected readonly allOrgs = computed(() => this.access.activeSlug() === ALL_ORGS);
   private page = 1;
 
   constructor() {
@@ -95,6 +100,7 @@ export class AnnouncementsPage {
 /** "Everyone", "Product Engineers, Volunteers" or "RSVPs: Toronto Builders Night". */
 function audience(a: AnnouncementDto): string {
   if (a.audienceKind === 'EventRsvps') return `RSVPs: ${a.eventTitle ?? 'an event'}`;
+  if (a.audienceKind === 'Portfolio') return 'Everyone in the portfolio';
   if (a.audienceKind === 'Roles') {
     return a.roles.map((r) => (r === 'Staff' ? r : `${r}s`)).join(', ');
   }

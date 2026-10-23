@@ -7,8 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace QuinntyneBrown.Community.Application.Reports;
 
-/// <summary>The filters from <c>?city=&amp;period=</c>; empty means All cities and Last 30 days.</summary>
-public record GetReportQuery(string? City, string? Period);
+/// <summary>
+/// The filters from <c>?city=&amp;period=&amp;organization=</c>; empty means All cities, Last 30 days and every org the
+/// caller reports on.
+/// </summary>
+public record GetReportQuery(string? City, string? Period, Guid? Organization = null);
 
 /// <summary>
 /// Computes the report (L2-123 to L2-127) from the definitions in ADR 0030. Every figure is a database aggregate:
@@ -35,6 +38,17 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
         }
 
         _scope = [.. access.Scope];
+        if (query.Organization is { } org)
+        {
+            // An org filter outside the caller's reports is not found (L2-150 AC2).
+            if (!_scope.Contains(org))
+            {
+                return (Result.NotFound(), null);
+            }
+
+            _scope = [org];
+        }
+
         if (ReportPeriod.Resolve(query.Period, time) is not { } window)
         {
             return (Result.Invalid("period", "Choose Last 30 days, Last 90 days, This year or All time."), null);
@@ -70,6 +84,7 @@ public class GetReportHandler(IApplicationDbContext db, ReportAccess access, Tim
             window.From,
             window.To,
             cities,
+            access.Organizations,
             membersFigure.Value == 0 && eventRows.Count == 0,
             new ReportFiguresDto(membersFigure, eventsHeld, rsvps, partners, announcements),
             membersByCity,

@@ -14,6 +14,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
+  ACCESS_SERVICE,
   REPORTS_SERVICE,
   ReportDto,
   ReportEventRowDto,
@@ -102,6 +103,7 @@ function describe(period: ReportPeriod): string {
 })
 export class ReportsPage {
   private readonly service = inject(REPORTS_SERVICE);
+  private readonly access = inject(ACCESS_SERVICE);
   private readonly router = inject(Router);
   private readonly breakpoints = inject(BreakpointService);
   private readonly toasts = inject(ToastService);
@@ -109,6 +111,8 @@ export class ReportsPage {
   /** Query parameters. */
   readonly city = input<string | undefined>();
   readonly period = input<string | undefined>();
+  /** An org's slug, to narrow the report to it (L2-150). */
+  readonly org = input<string | undefined>();
 
   protected readonly state = signal<State>('loading');
   protected readonly report = signal<ReportDto | null>(null);
@@ -119,15 +123,27 @@ export class ReportsPage {
   protected readonly periodControl = new FormControl<ReportPeriod>(DEFAULT_PERIOD, {
     nonNullable: true,
   });
+  protected readonly orgControl = new FormControl('', { nonNullable: true });
   protected readonly periods: SelectOption[] = PERIODS;
   /** Figures and charts are one column on phones (L2-126 AC6). */
   protected readonly wide = this.breakpoints.isAtLeast('sm');
   private latest = 0;
 
+  // A primitive, so a refresh of the caller's access (after a 403) doesn't reload the report.
+  private readonly organizationId = computed(
+    () => this.access.orgs().find((o) => o.slug === this.org())?.id ?? null,
+  );
+
   protected readonly filters = computed<ReportFilters>(() => ({
     city: this.city() || null,
     period: (this.period() || DEFAULT_PERIOD) as ReportPeriod,
+    organization: this.organizationId(),
   }));
+
+  /** The org filter, when the report covers several orgs (L2-150 AC1). */
+  protected readonly orgOptions = computed<SelectOption[]>(() =>
+    (this.report()?.organizations ?? []).map((o) => ({ value: o.slug, label: o.name })),
+  );
 
   protected readonly cityOptions = computed<SelectOption[]>(() => {
     const cities = this.report()?.cities ?? [];
@@ -255,6 +271,7 @@ export class ReportsPage {
       const filters = this.filters();
       this.cityControl.setValue(filters.city ?? '');
       this.periodControl.setValue(filters.period);
+      this.orgControl.setValue(this.org() ?? '');
       void this.load(filters);
     });
   }
@@ -262,7 +279,12 @@ export class ReportsPage {
   /** Apply: the URL carries both filters, so the view can be bookmarked (L2-124 AC4). */
   protected apply(): void {
     this.fellBack.set(false);
-    this.go(this.cityControl.value || null, this.periodControl.value);
+    this.go(
+      this.cityControl.value || null,
+      this.periodControl.value,
+      false,
+      this.orgControl.value || null,
+    );
   }
 
   /** Downloads the report shown as CSV; Export CSV stays busy until it is saved (L2-128 AC4). */
@@ -271,7 +293,11 @@ export class ReportsPage {
     if (!r || this.exporting()) return;
     this.exporting.set(true);
     try {
-      const filters: ReportFilters = { city: r.city, period: r.period };
+      const filters: ReportFilters = {
+        city: r.city,
+        period: r.period,
+        organization: this.filters().organization,
+      };
       saveFile(
         await firstValueFrom(this.service.exportCsv(filters)),
         reportFileName(r.city, r.period, r.to),
@@ -300,14 +326,22 @@ export class ReportsPage {
     this.go(this.report()?.city ?? null, period);
   }
 
-  private go(city: string | null, period: ReportPeriod, replaceUrl = false): void {
-    const same = city === this.filters().city && period === this.filters().period;
+  private go(
+    city: string | null,
+    period: ReportPeriod,
+    replaceUrl = false,
+    org: string | null = this.org() ?? null,
+  ): void {
+    const same =
+      city === this.filters().city &&
+      period === this.filters().period &&
+      org === (this.org() ?? null);
     if (same && !replaceUrl) {
       void this.load(this.filters());
       return;
     }
     void this.router.navigate(['/reports'], {
-      queryParams: { city: city ?? '', period },
+      queryParams: { city: city ?? '', period, ...(org ? { org } : {}) },
       replaceUrl,
     });
   }

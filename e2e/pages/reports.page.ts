@@ -6,6 +6,8 @@ export class ReportsPage {
   readonly subtitle: Locator;
   readonly city: Locator;
   readonly period: Locator;
+  /** The Organization filter, shown when the reader covers more than one org (L2-151). */
+  readonly organization: Locator;
   readonly apply: Locator;
   readonly exportCsv: Locator;
   readonly loading: Locator;
@@ -22,6 +24,7 @@ export class ReportsPage {
     this.subtitle = page.locator('ft-page-header').getByText(/ · /).first();
     this.city = page.getByRole('combobox', { name: 'City' });
     this.period = page.getByRole('combobox', { name: 'Period' });
+    this.organization = page.getByRole('combobox', { name: 'Organization' });
     this.apply = page.getByRole('button', { name: 'Apply' });
     this.exportCsv = page.getByRole('button', { name: /^(Export CSV|Exporting…)$/ });
     this.loading = page.getByRole('status', { name: 'Loading reports' });

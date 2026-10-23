@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { PagedResult } from '../shared';
+import { PagedResult, OrgLabel } from '../shared';
 
 /** Audit log categories (L2-041 AC2); each maps onto a set of actions on the server. */
 export type AuditCategory = 'roles' | 'suspensions' | 'contacts' | 'deletions';
@@ -19,6 +19,10 @@ export interface AuditEntry {
   before: string | null;
   after: string | null;
   ipAddress: string;
+  /** The org the action happened in; none for platform actions (L2-153 AC5). */
+  organization?: OrgLabel | null;
+  /** For an agent, the token used and who issued it (ADR 0036). */
+  detail?: string | null;
 }
 
 export interface AuditFilters {

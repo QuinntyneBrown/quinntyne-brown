@@ -1,3 +1,4 @@
+import type { MockOrganizations } from './mock-organizations';
 import { Route } from '@playwright/test';
 
 import type { MockAccount, MockProfile } from './mock-api';
@@ -13,6 +14,8 @@ export interface ReportsContext {
   readonly partners: { readonly partners: MockPartner[] };
   readonly announcements: { readonly announcements: MockAnnouncement[] };
   readonly now: Date;
+  /** The orgs and what each caller covers (ADR 0033). */
+  readonly organizations: MockOrganizations;
 }
 
 export type ReportPeriod = 'last-30-days' | 'last-90-days' | 'this-year' | 'all-time';
@@ -97,10 +100,17 @@ export class MockReports {
     const exporting = url.pathname === '/api/reports/export.csv';
     if (method !== 'GET' || (url.pathname !== '/api/reports' && !exporting)) return false;
     if (!caller) return route.fulfill({ status: 401 });
-    if (!caller.roles.some((r) => r === 'Staff' || r === 'SystemAdmin')) {
-      return route.fulfill({ status: 403 });
-    }
-    const result = this.report(url.searchParams.get('city'), url.searchParams.get('period'));
+    // ReportAccess: the orgs where the caller holds reports.view (L2-150).
+    const orgs = this.context.organizations
+      .covered(caller)
+      .filter((c) => c.permissions.has('reports.view'))
+      .map((c) => ({ id: c.org.id, slug: c.org.slug, name: c.org.displayName ?? c.org.name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    if (!orgs.length) return route.fulfill({ status: 403 });
+    const org = url.searchParams.get('organization');
+    if (org && !orgs.some((o) => o.id === org)) return route.fulfill({ status: 404 });
+    const report = this.report(url.searchParams.get('city'), url.searchParams.get('period'));
+    const result = 'field' in report ? report : { ...report, organizations: orgs };
     if ('field' in result) {
       return route.fulfill({
         status: 400,

@@ -15,4 +15,8 @@ public class ReportAccess(ICurrentUser current)
         [.. current.Access.ReadScope(Features.Reports).Where(org => current.Access.Has(org, Permissions.ReportsView))];
 
     public bool CanRead => Scope.Count > 0;
+
+    /// <summary>The orgs the report may be filtered to, by name (L2-150 AC1).</summary>
+    public IReadOnlyList<Organizations.OrgLabel> Organizations =>
+        [.. Scope.Select(org => Application.Organizations.OrgLabel.Of(current.Access.Orgs, org)).OfType<Organizations.OrgLabel>().OrderBy(o => o.Name)];
 }

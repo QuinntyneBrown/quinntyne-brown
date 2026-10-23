@@ -11,6 +11,8 @@ export interface MockNotification {
   readAt: string | null;
   actorId: string | null;
   actorName: string | null;
+  /** The org the activity happened in (L2-152); none for platform notices. */
+  organization?: { id: string; slug: string; name: string } | null;
 }
 
 const PAGE_SIZE = 50;

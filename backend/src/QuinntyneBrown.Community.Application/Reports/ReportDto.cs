@@ -7,6 +7,7 @@ public record ReportDto(
     DateTimeOffset? From,
     DateTimeOffset To,
     IReadOnlyList<string> Cities,
+    IReadOnlyList<Organizations.OrgLabel> Organizations,
     bool IsEmpty,
     ReportFiguresDto Figures,
     IReadOnlyList<ReportChartRowDto> MembersByCity,

@@ -1,4 +1,4 @@
-import { legacyRoleOf, roleNameOf } from './mock-organizations';
+import { MockOrganizations, legacyRoleOf, roleNameOf } from './mock-organizations';
 import { Route } from '@playwright/test';
 
 import type { MockAccount } from './mock-api';
@@ -23,9 +23,9 @@ export interface AnnouncementsContext {
   readonly events: MockEvents;
   readonly notifications: MockNotifications;
   readonly now: Date;
+  /** The orgs and what each caller covers (ADR 0033). */
+  readonly organizations: MockOrganizations;
 }
-
-const SENDERS = ['CommunicationsLead', 'SystemAdmin'];
 
 /**
  * Plays the announcements endpoints (backend/src/QuinntyneBrown.Community.Api/Endpoints/AnnouncementsEndpoints.cs):
@@ -77,7 +77,11 @@ export class MockAnnouncements {
     if (method === 'GET' && url.pathname === '/api/announcements') {
       return this.list(route, url, caller);
     }
-    const sender = caller.roles.some((r) => SENDERS.includes(r));
+    const sender = this.context.organizations.has(caller, 'announcements.send');
+    // Portfolio-wide is the Portfolio Lead's (or a System Admin's) to send (L2-151 AC3).
+    const audienceKind = (body['audience'] as { kind?: string } | undefined)?.kind ?? body['kind'];
+    if (audienceKind === 'Portfolio' && !this.context.organizations.mayPublishPortfolioWide(caller))
+      return route.fulfill({ status: 403 });
 
     if (method === 'POST' && url.pathname === '/api/announcements/recipient-count') {
       if (!sender) return route.fulfill({ status: 403 });
@@ -152,6 +156,10 @@ export class MockAnnouncements {
       senderName: accounts.find((x) => x.profileId === a.senderId)?.name ?? '',
       audienceKind: a.audience.kind,
       roles: (a.audience.roles ?? []).map(roleNameOf),
+      organization:
+        a.audience.kind === 'Portfolio'
+          ? null
+          : { id: 'org-toronto', slug: 'faithtech-toronto', name: 'FaithTech Toronto' },
       eventTitle:
         this.context.events.events.find((e) => e.id === a.audience.eventId)?.title ?? null,
       recipientCount: a.recipientIds.length,
@@ -173,6 +181,7 @@ export class MockAnnouncements {
       );
       return members.filter((a) => a.roles.some((r) => roles.includes(r)));
     }
+    if (kind === 'Portfolio') return members;
     if (kind === 'EventRsvps') {
       const event = this.context.events.events.find(
         (e) => e.id === audience['eventId' as keyof typeof audience],

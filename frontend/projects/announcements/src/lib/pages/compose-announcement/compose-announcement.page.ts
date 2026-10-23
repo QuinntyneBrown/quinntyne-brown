@@ -102,6 +102,9 @@ export class ComposeAnnouncementPage {
   private readonly bodyField = viewChild('bodyField', { read: FormFieldComponent });
 
   private readonly access = inject(ACCESS_SERVICE);
+  /** Only the Portfolio Lead, or a System Admin, sends to the whole portfolio (L2-151 AC2, AC3). */
+  protected readonly mayReachPortfolio =
+    this.access.isSystemAdmin() || !!this.access.homeOrg()?.isPortfolioLead;
   /** The roles of the active org, and the cross-org roles covering it (ADR 0035). */
   protected readonly roles = (this.access.homeOrg()?.shareRoles ?? []).map((r) => ({
     role: r.key,
@@ -241,6 +244,7 @@ export class ComposeAnnouncementPage {
     const value = this.form.getRawValue();
     if (value.kind === 'Roles') return { kind: 'Roles', roles: value.roles as string[] };
     if (value.kind === 'EventRsvps') return { kind: 'EventRsvps', eventId: value.eventId };
+    if (value.kind === 'Portfolio') return { kind: 'Portfolio' };
     return { kind: 'Everyone' };
   }
 

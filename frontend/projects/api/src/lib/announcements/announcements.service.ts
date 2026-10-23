@@ -1,9 +1,10 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { PagedResult } from '../shared';
+import { OrgLabel, PagedResult } from '../shared';
 
-export type AudienceKind = 'Everyone' | 'Roles' | 'EventRsvps';
+/** `Portfolio` is every member of every org of the portfolio, sent by the Portfolio Lead (L2-151). */
+export type AudienceKind = 'Everyone' | 'Roles' | 'EventRsvps' | 'Portfolio';
 
 /** Everyone, the holders of one or more roles, or one event's RSVP list (L2-029). */
 export interface AnnouncementAudience {
@@ -41,6 +42,8 @@ export interface AnnouncementDto {
   /** The event of an RSVP audience. */
   eventTitle: string | null;
   recipientCount: number;
+  /** The org it was sent in (L2-151 AC4). */
+  organization?: OrgLabel | null;
 }
 
 /** Contract for the announcements API. Pages depend on ANNOUNCEMENTS_SERVICE, never on HttpAnnouncementsService. */

@@ -26,6 +26,11 @@ export class AnnouncementsPage {
     );
   }
 
+  /** The org label on an announcement ("Portfolio" for a portfolio-wide one). */
+  orgLabel(subject: string): Locator {
+    return this.item(subject).locator('ft-org-label');
+  }
+
   item(subject: string): Locator {
     return this.items.filter({ hasText: subject });
   }

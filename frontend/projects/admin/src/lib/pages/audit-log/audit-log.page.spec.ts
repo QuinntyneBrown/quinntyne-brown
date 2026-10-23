@@ -190,14 +190,14 @@ describe('AuditLogPage', () => {
     expect(host.textContent).toContain('Show all actions');
   });
 
-  it('shows skeleton table rows under the When, Who and What headers while loading', async () => {
+  it('shows skeleton table rows under the When, Who, What and Org headers while loading', async () => {
     const { host } = await setup(() => NEVER);
 
     const table = host.querySelector('table')!;
     expect(table.getAttribute('aria-busy')).toBe('true');
     expect(table.querySelector('caption')!.textContent).toBe('Audit log');
     const headers = Array.from(table.querySelectorAll('th')).map((th) => th.textContent!.trim());
-    expect(headers).toEqual(['When', 'Who', 'What']);
+    expect(headers).toEqual(['When', 'Who', 'What', 'Org']);
     expect(table.querySelectorAll('tbody tr ft-skeleton').length).toBeGreaterThan(0);
     expect(host.querySelector('ft-list-skeleton')).toBeNull();
   });

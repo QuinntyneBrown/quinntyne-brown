@@ -40,12 +40,15 @@ public static class ReportClients
     public sealed record EventRow(
         Guid Id, string Title, DateTimeOffset StartsAt, string City, string Status, int? Going, int? CheckedIn, int? CheckedInPercent);
 
+    public sealed record ReportOrg(Guid Id, string Slug, string Name);
+
     public sealed record Report(
         string? City,
         string Period,
         DateTimeOffset? From,
         DateTimeOffset To,
         string[] Cities,
+        ReportOrg[] Organizations,
         bool IsEmpty,
         Figures Figures,
         ChartRow[] MembersByCity,
@@ -121,11 +124,12 @@ public static class ReportClients
         int rsvps = 0,
         int checkedIn = 0,
         int walkIns = 0,
-        bool cancelled = false) =>
+        bool cancelled = false,
+        Guid? organizationId = null) =>
         factory.WithDbAsync(async db =>
         {
             var e = new Event(
-                Infrastructure.Persistence.HierarchySeed.TorontoId, title, $"About {title}.", EventType.Gathering, startsAt, startsAt.AddHours(2), city, EventFormat.InPerson,
+                organizationId ?? Infrastructure.Persistence.HierarchySeed.TorontoId, title, $"About {title}.", EventType.Gathering, startsAt, startsAt.AddHours(2), city, EventFormat.InPerson,
                 "Kestrel Labs", null, null, EventVisibility.MembersOnly, Guid.NewGuid());
             var taken = new List<Rsvp>();
             for (var i = 0; i < rsvps; i++)

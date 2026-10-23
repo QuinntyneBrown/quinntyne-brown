@@ -2,7 +2,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
-import { REPORTS_SERVICE, ReportDto } from '@faithtech-community/api';
+import { REPORTS_SERVICE, provideStaticAccess, ReportDto } from '@faithtech-community/api';
 import { ToastService } from '@faithtech-community/components';
 import { Observable, of, throwError } from 'rxjs';
 
@@ -15,6 +15,7 @@ function report(overrides: Partial<ReportDto> = {}): ReportDto {
     from: '2026-09-21T12:00:00Z',
     to: '2026-10-21T12:00:00Z',
     cities: ['Austin', 'Toronto'],
+    organizations: [],
     isEmpty: false,
     figures: {
       members: { value: 412, newInPeriod: 18 },
@@ -56,6 +57,14 @@ async function setup(
       provideRouter([]),
       { provide: REPORTS_SERVICE, useValue: service },
       { provide: ToastService, useValue: toasts },
+      provideStaticAccess(
+        { permissions: ['reports.view'] },
+        {
+          more: [
+            { slug: 'faithtech-ottawa', name: 'FaithTech Ottawa', permissions: ['reports.view'] },
+          ],
+        },
+      ),
     ],
   });
   const router = TestBed.inject(Router);
@@ -73,10 +82,35 @@ async function setup(
 }
 
 describe('ReportsPage', () => {
+  // Traces to: L2-150 AC1
+  it('offers an org filter when the report covers several orgs and asks for the chosen one', async () => {
+    const labelled = report({
+      organizations: [
+        { id: 'org-faithtech-ottawa', slug: 'faithtech-ottawa', name: 'FaithTech Ottawa' },
+        { id: 'org-faithtech-toronto', slug: 'faithtech-toronto', name: 'FaithTech Toronto' },
+      ],
+    });
+    const { fixture, service, settle, text } = await setup(() => of(labelled));
+    expect(text()).toContain('Organization');
+
+    fixture.componentRef.setInput('org', 'faithtech-ottawa');
+    await settle();
+
+    expect(service.getReport).toHaveBeenLastCalledWith({
+      city: null,
+      period: 'last-30-days',
+      organization: 'org-faithtech-ottawa',
+    });
+  });
+
   it('asks for All cities and the last 30 days when the URL has no filters', async () => {
     const { service } = await setup();
 
-    expect(service.getReport).toHaveBeenCalledWith({ city: null, period: 'last-30-days' });
+    expect(service.getReport).toHaveBeenCalledWith({
+      city: null,
+      period: 'last-30-days',
+      organization: null,
+    });
   });
 
   it('writes the context lines from the numbers', async () => {
@@ -155,7 +189,11 @@ describe('ReportsPage', () => {
     exportButton(fixture.nativeElement).click();
     await settle();
 
-    expect(service.exportCsv).toHaveBeenCalledWith({ city: 'Toronto', period: 'last-30-days' });
+    expect(service.exportCsv).toHaveBeenCalledWith({
+      city: 'Toronto',
+      period: 'last-30-days',
+      organization: null,
+    });
     const link = click.mock.contexts[0] as HTMLAnchorElement;
     expect(link.download).toBe('faithtech-report-toronto-last-30-days-2026-10-21.csv');
     click.mockRestore();
