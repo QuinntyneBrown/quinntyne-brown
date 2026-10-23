@@ -40,3 +40,45 @@ export const Feature = {
 } as const;
 
 export type Feature = (typeof Feature)[keyof typeof Feature];
+
+/** What each feature is, for the features panel (docs/mocks/pages/org-type/features). */
+export const FEATURE_LABELS: Record<Feature, { name: string; description: string }> = {
+  profiles: { name: 'Profiles', description: 'Always on' },
+  notes: { name: 'Docs & notes', description: 'Always on' },
+  contacts: { name: 'Contacts', description: 'Each lead’s private contacts.' },
+  partners: { name: 'Partners', description: 'The shared partner pipeline.' },
+  team: { name: 'Team', description: 'The team page of leads and volunteers.' },
+  events: { name: 'Events', description: 'Events, RSVPs, check-in and public event pages.' },
+  announcements: { name: 'Announcements', description: 'Announcements to the org, with email.' },
+  invites: { name: 'Invites', description: 'Email invites and connect QR codes.' },
+  resources: { name: 'Resources', description: 'Uploaded files and links.' },
+  agile: { name: 'Workspaces', description: 'Agile workspaces, boards and Planning Poker.' },
+  reports: { name: 'Reports', description: 'The read-only Reports page.' },
+};
+
+/** Profiles and Docs & notes cannot be switched off (L2-147 AC4). */
+export const ALWAYS_ON_FEATURES: readonly Feature[] = ['profiles', 'notes'];
+
+/** What each permission code allows, for the catalogue editor (docs/mocks/pages/org-type). */
+export const PERMISSION_LABELS: Record<string, string> = {
+  'people.view': 'See the People page with each person’s roles',
+  'roles.grant': 'Change roles, limited to this role’s “Can grant” list',
+  'notes.create': 'Create note pages',
+  'contacts.private': 'Keep their own private contacts in the org',
+  'partners.read': 'Read the partner pipeline',
+  'partners.write': 'Change the partner pipeline',
+  'team.member': 'Be listed on the Team page',
+  'team.lead': 'Match the Team page’s Leads filter',
+  'events.manage': 'Create, edit and cancel events',
+  'events.rsvpList': 'See who RSVP’d and the check-in page',
+  'events.rsvpListEmails': 'See guest emails and export RSVPs',
+  'events.checkIn': 'Check people in, add walk-ins, export attendance',
+  'announcements.send': 'Send announcements to the org',
+  'invites.send': 'Invite people into the org',
+  'connectLink.own': 'Own a reusable QR code for the org',
+  'resources.create': 'Add resources',
+  'workspaces.create': 'Create and own workspaces',
+  'workspaces.join': 'Be added to the org’s workspaces',
+  'workspaces.readAll': 'Read every workspace of the org',
+  'reports.view': 'Open the Reports page for the org',
+};

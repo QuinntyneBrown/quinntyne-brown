@@ -1,0 +1,31 @@
+<ft-dialog
+  heading="New Org Type"
+  description="A template for organizations: its role catalogue and features. Profiles and Docs & notes are always on."
+  [busy]="busy()"
+  (closed)="ref.close()"
+>
+  <form [formGroup]="form" (submit)="$event.preventDefault(); create()">
+    <ft-stack>
+      @if (failed()) {
+        <ft-alert status="danger" heading="Org Type not created">
+          We couldn’t create it. Check the key isn’t used already, then try again.
+        </ft-alert>
+      }
+      <ft-form-field required label="Name" [error]="errors()['name'] ?? ''">
+        <ft-text-field formControlName="name" initialFocus [readonly]="busy()" />
+      </ft-form-field>
+      <ft-form-field
+        required
+        label="Key"
+        help="Stable and lower-case, such as “faithtech-city”."
+        [error]="errors()['key'] ?? ''"
+      >
+        <ft-text-field formControlName="key" [readonly]="busy()" />
+      </ft-form-field>
+    </ft-stack>
+  </form>
+  <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+  <ft-button ftDialogFooter variant="primary" [loading]="busy()" (click)="create()">
+    Create and add roles
+  </ft-button>
+</ft-dialog>

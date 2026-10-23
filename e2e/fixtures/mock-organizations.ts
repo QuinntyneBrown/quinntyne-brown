@@ -119,7 +119,7 @@ const LEAD = [
   'team.lead',
 ];
 
-interface CatalogueRole {
+export interface CatalogueRole {
   key: string;
   name: string;
   description: string;
@@ -215,7 +215,7 @@ const CATALOGUES: Record<string, CatalogueRole[]> = {
 /** Every member's bundle (ADR 0033). */
 const MEMBER_PERMISSIONS = ['notes.create'];
 
-interface CrossOrgRole {
+export interface CrossOrgRole {
   key: string;
   name: string;
   permissions: string[];
@@ -285,6 +285,9 @@ export interface MockRoleOption {
 }
 
 export class MockOrganizations {
+  /** This test's catalogues and cross-org roles: the Portfolio screens edit them (L2-137). */
+  readonly catalogues: Record<string, CatalogueRole[]> = structuredClone(CATALOGUES);
+  readonly crossOrgRoles: CrossOrgRole[] = structuredClone(CROSS_ORG);
   readonly orgs: MockOrg[] = [
     {
       id: 'org-toronto',
@@ -411,15 +414,19 @@ export class MockOrganizations {
     const memberOf = this.memberships(member);
     const result: CoveredOrg[] = [];
     for (const org of this.orgs) {
-      const catalogue = CATALOGUES[org.typeName] ?? [];
+      // An archived org leaves every switcher (L2-156 AC2).
+      if (org.archived) continue;
+      const catalogue = this.catalogues[org.typeName] ?? [];
       const isMember = memberOf.includes(org.slug);
       const isOrgLead = isMember && (member.orgLead ?? []).includes(org.slug);
       const isPortfolioLead = !!member.portfolioLead;
-      const crossOrg = CROSS_ORG.filter(
-        (r) =>
-          (member.crossOrg ?? []).includes(r.key) ||
-          (r.key === 'staff' && member.roles.includes('Staff')),
-      ).filter((r) => r.typeName === null || r.typeName === org.typeName);
+      const crossOrg = this.crossOrgRoles
+        .filter(
+          (r) =>
+            (member.crossOrg ?? []).includes(r.key) ||
+            (r.key === 'staff' && member.roles.includes('Staff')),
+        )
+        .filter((r) => r.typeName === null || r.typeName === org.typeName);
       if (!isMember && !isSystemAdmin && !isPortfolioLead && crossOrg.length === 0) continue;
 
       const keys = isMember ? this.catalogueKeys(member, org.slug, memberOf) : [];
@@ -489,7 +496,7 @@ export class MockOrganizations {
         });
       }
       for (const key of this.catalogueKeys(member, slug)) {
-        const role = (CATALOGUES[org.typeName] ?? []).find((r) => r.key === key);
+        const role = (this.catalogues[org.typeName] ?? []).find((r) => r.key === key);
         if (role) {
           refs.push({
             key,
@@ -501,7 +508,7 @@ export class MockOrganizations {
         }
       }
     }
-    for (const role of CROSS_ORG) {
+    for (const role of this.crossOrgRoles) {
       if (
         (member.crossOrg ?? []).includes(role.key) ||
         (role.key === 'staff' && member.roles.includes('Staff'))
@@ -525,7 +532,7 @@ export class MockOrganizations {
 
   /** The catalogue roles the caller may grant in the org (RoleGrantPolicy). */
   grantable(member: OrgMember, covered: CoveredOrg): MockRoleOption[] {
-    const catalogue = CATALOGUES[covered.org.typeName] ?? [];
+    const catalogue = this.catalogues[covered.org.typeName] ?? [];
     const tier =
       member.roles.includes('SystemAdmin') || covered.isPortfolioLead || covered.isOrgLead;
     if (tier) return catalogue.map(option);
@@ -540,10 +547,10 @@ export class MockOrganizations {
   /** The roles an item in the org may be shared with: its catalogue and the cross-org roles covering it. */
   shareRoles(covered: CoveredOrg): MockRoleOption[] {
     return [
-      ...(CATALOGUES[covered.org.typeName] ?? []).map(option),
-      ...CROSS_ORG.filter((r) => r.typeName === null || r.typeName === covered.org.typeName).map(
-        (r) => ({ key: r.key, name: r.name, description: null, isCrossOrg: true }),
-      ),
+      ...(this.catalogues[covered.org.typeName] ?? []).map(option),
+      ...this.crossOrgRoles
+        .filter((r) => r.typeName === null || r.typeName === covered.org.typeName)
+        .map((r) => ({ key: r.key, name: r.name, description: null, isCrossOrg: true })),
     ];
   }
 

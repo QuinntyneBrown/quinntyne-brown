@@ -108,6 +108,15 @@ export const SECTIONS: readonly Section[] = [
       access.isSystemAdmin() ||
       access.orgs().some((o) => o.slug === org && (o.isOrgLead || o.isPortfolioLead)),
   },
+  // Org Types, orgs, cross-org roles and agents for the Portfolio Lead and System Admins (L2-156).
+  {
+    label: 'Portfolio',
+    path: 'portfolio',
+    icon: 'layers',
+    secondary: true,
+    opens: (access) =>
+      access.isSystemAdmin() || !!access.access()?.portfolios.some((p) => p.isLead),
+  },
   // Only System Admins see the admin area (L2-040).
   {
     label: 'Admin',

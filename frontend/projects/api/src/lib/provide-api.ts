@@ -18,7 +18,12 @@ import {
   HttpPeopleService,
 } from './profiles';
 import { CONTACTS_SERVICE, HttpContactsService } from './contacts';
-import { HttpOrganizationsService, ORGANIZATIONS_SERVICE } from './organizations';
+import {
+  HttpOrganizationsService,
+  HttpPortfolioService,
+  ORGANIZATIONS_SERVICE,
+  PORTFOLIO_SERVICE,
+} from './organizations';
 import { PARTNERS_SERVICE, HttpPartnersService } from './partners';
 import { TEAM_SERVICE, HttpTeamService } from './team';
 import { ACTIVITY_SERVICE, HttpActivityService } from './activity';
@@ -83,6 +88,7 @@ export function provideApi(baseUrl: string, auth: Partial<AuthConfig> = {}): Env
     { provide: AUDIT_LOG_SERVICE, useClass: HttpAuditLogService },
     { provide: ROLES_SERVICE, useClass: HttpRolesService },
     { provide: ORGANIZATIONS_SERVICE, useClass: HttpOrganizationsService },
+    { provide: PORTFOLIO_SERVICE, useClass: HttpPortfolioService },
     { provide: AGILE_SERVICE, useClass: HttpAgileService },
     { provide: AGILE_LIVE_SERVICE, useClass: SignalRAgileLiveService },
   ];

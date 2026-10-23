@@ -1,0 +1,22 @@
+<ng-template #actionCell let-role>
+  <ft-button size="sm" [label]="'Assign ' + role.name" (click)="assign(role)">Assign</ft-button>
+</ng-template>
+<ft-portfolio-header current="cross-org-roles" />
+@if (context.allowed()) {
+  @if (state() === 'error') {
+    <ft-empty-state
+      variant="error"
+      heading="We couldn’t load the cross-org roles"
+      text="Check your connection and try again."
+    >
+      <ft-button actions variant="primary" (click)="load()">Try again</ft-button>
+    </ft-empty-state>
+  } @else {
+    <ft-table
+      [caption]="'Cross-org roles in the ' + (context.portfolio()?.name ?? '') + ' portfolio'"
+      [columns]="columns()"
+      [rows]="rows()"
+      [loading]="state() === 'loading'"
+    />
+  }
+}

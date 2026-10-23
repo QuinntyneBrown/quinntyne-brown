@@ -15,6 +15,7 @@ import { MockWall } from './mock-wall';
 import { MockResources } from './mock-resources';
 import { MockNotes } from './mock-notes';
 import { MockOrganizations, MockRoleRef, OrgMember } from './mock-organizations';
+import { MockPortfolio } from './mock-portfolio';
 
 export interface MockAccount {
   name: string;
@@ -229,6 +230,12 @@ export class MockApi {
   readonly github = new MockGitHub(this, (account) => (this.session = account));
   /** Orgs, their types, features and catalogues, and what each caller covers (ADR 0033 to 0038). */
   readonly organizations = new MockOrganizations();
+  /** Portfolio administration: Org Types, catalogues, orgs, cross-org roles and agents. */
+  readonly portfolio = new MockPortfolio(
+    () => this.organizations,
+    () => [...this.accounts.values()],
+    () => this.now,
+  );
   /** The private-preview wall on both hosts (ADR 0026); open unless a test calls wall.lock(). */
   readonly wall: MockWall;
 
@@ -479,6 +486,15 @@ export class MockApi {
       return this.roles(route, method, roleRoute[1], roleRoute[2], body, authorization);
     const suspension = /^\/api\/admin\/users\/([^/]+)\/suspension$/.exec(url.pathname);
     if (suspension) return this.suspension(route, method, suspension[1], body, authorization);
+    const portfolio = this.portfolio.handle(
+      route,
+      method,
+      url.pathname,
+      url,
+      body,
+      this.caller(authorization),
+    );
+    if (portfolio) return portfolio;
     const members = /^\/api\/organizations\/([^/]+)\/members(?:\/([^/]+))?(\/org-lead)?$/.exec(
       url.pathname,
     );
@@ -1016,7 +1032,8 @@ export class MockApi {
   private listPeople(route: Route, url: URL, authorization: string | undefined) {
     const caller = this.caller(authorization);
     if (!caller) return route.fulfill({ status: 401 });
-    if (!caller.roles.some((r) => ['CityLead', 'Staff', 'SystemAdmin'].includes(r))) {
+    // people.view in some org: City Leads, Staff, the Portfolio Lead and System Admins (L2-136).
+    if (!this.organizations.covered(caller).some((c) => c.permissions.has('people.view'))) {
       return route.fulfill({ status: 403 });
     }
     const term = (url.searchParams.get('q') ?? '').trim().toLowerCase();

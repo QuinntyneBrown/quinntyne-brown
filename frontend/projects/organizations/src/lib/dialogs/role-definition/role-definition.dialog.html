@@ -1,0 +1,57 @@
+<ft-dialog
+  [heading]="data.role ? 'Edit ' + data.role.name : 'Add a role to ' + data.type.name"
+  description="A role never inherits its parent’s permissions. Changes apply to every org of this type at once."
+  [busy]="busy()"
+  (closed)="ref.close()"
+>
+  <form [formGroup]="form" (submit)="$event.preventDefault(); save()">
+    <ft-stack>
+      @if (failed()) {
+        <ft-alert status="danger" heading="Role not saved">
+          We couldn’t reach Quinntyne Brown. Nothing was changed — try again.
+        </ft-alert>
+      }
+      <ft-form-field required label="Name" [error]="errors()['name'] ?? ''">
+        <ft-text-field formControlName="name" initialFocus [readonly]="busy()" />
+      </ft-form-field>
+      <ft-form-field
+        required
+        label="Key"
+        help="Stable, lower-case, unique in this type. Used in exports and the API."
+        [error]="errors()['key'] ?? ''"
+      >
+        <ft-text-field formControlName="key" [readonly]="busy() || !!data.role" />
+      </ft-form-field>
+      <ft-form-field label="Description" [optional]="true">
+        <ft-text-field formControlName="description" [readonly]="busy()" />
+      </ft-form-field>
+      <ft-form-field
+        label="Shown under"
+        help="For display order only; grants nothing."
+        [error]="errors()['parentRoleId'] ?? ''"
+      >
+        <ft-select formControlName="parentRoleId" [options]="parentOptions" placeholder="None" />
+      </ft-form-field>
+      <ft-permission-checklist formControlName="permissions" [groups]="groups" />
+      @if (errors()['permissions']; as message) {
+        <ft-alert status="danger" heading="Check the permissions">{{ message }}</ft-alert>
+      }
+      @if (grantable.length) {
+        <ft-checkbox-group
+          legend="Can grant"
+          hint="Roles of this type that holders may give others in their org."
+          formControlName="canGrant"
+          [error]="errors()['canGrant'] ?? ''"
+        >
+          @for (role of grantable; track role.id) {
+            <ft-checkbox [value]="role.id">{{ role.name }}</ft-checkbox>
+          }
+        </ft-checkbox-group>
+      }
+    </ft-stack>
+  </form>
+  <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+  <ft-button ftDialogFooter variant="primary" [loading]="busy()" (click)="save()">
+    {{ data.role ? 'Save role' : 'Add role' }}
+  </ft-button>
+</ft-dialog>

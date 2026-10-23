@@ -1,0 +1,64 @@
+<ng-template #nameCell let-agent>
+  <ft-cluster gap="2">
+    <strong>{{ agent.name }}</strong>
+    <ft-badge variant="info">Agent</ft-badge>
+  </ft-cluster>
+</ng-template>
+<ng-template #agentActions let-agent>
+  <ft-button size="sm" [label]="'Issue a token to ' + agent.name" (click)="issue(agent)">
+    Issue a token
+  </ft-button>
+</ng-template>
+<ng-template #tokenActions let-token>
+  @if (token.status === 'Active') {
+    <ft-button size="sm" variant="ghost" [label]="'Revoke ' + token.name" (click)="revoke(token)">
+      Revoke
+    </ft-button>
+  }
+</ng-template>
+<ft-portfolio-header current="agents">
+  @if (context.allowed()) {
+    <ft-button portfolioActions variant="primary" (click)="create()">
+      <ft-icon name="add" /> New agent
+    </ft-button>
+  }
+</ft-portfolio-header>
+@if (context.allowed()) {
+  @switch (state()) {
+    @case ('error') {
+      <ft-empty-state
+        variant="error"
+        heading="We couldn’t load the agents"
+        text="Check your connection and try again."
+      >
+        <ft-button actions variant="primary" (click)="load()">Try again</ft-button>
+      </ft-empty-state>
+    }
+    @default {
+      @if (state() === 'loaded' && !agents().length) {
+        <ft-empty-state
+          heading="No agents yet"
+          text="Agents are AI helpers with their own profile. Create one, give it roles, then issue it a token."
+        />
+      } @else {
+        <ft-stack gap="4">
+          <ft-table
+            caption="Agents"
+            [columns]="agentColumns()"
+            [rows]="agentRows()"
+            [loading]="state() === 'loading'"
+          />
+          @for (agent of agents(); track agent.profileId) {
+            @if (tokens()[agent.profileId]?.length) {
+              <ft-table
+                [caption]="'Tokens of ' + agent.name"
+                [columns]="tokenColumns()"
+                [rows]="tokenRows(agent.profileId)"
+              />
+            }
+          }
+        </ft-stack>
+      }
+    }
+  }
+}

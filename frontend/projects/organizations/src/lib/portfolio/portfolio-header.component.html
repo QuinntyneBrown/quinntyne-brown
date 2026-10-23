@@ -1,0 +1,24 @@
+@if (context.allowed()) {
+  <ft-page-header [title]="title()" [overline]="overline()" [subtitle]="subtitle()">
+    <ng-container ngProjectAs="[ftPageHeaderActions]">
+      <ng-content select="[portfolioActions]" />
+    </ng-container>
+  </ft-page-header>
+  <ft-tabs label="Portfolio sections">
+    @for (tab of sections; track tab.section) {
+      <ft-tab
+        [label]="tab.label"
+        [href]="context.base() + '/' + tab.section"
+        [current]="tab.section === current()"
+      />
+    }
+  </ft-tabs>
+} @else {
+  <h1 class="visually-hidden">Portfolio</h1>
+  <ft-empty-state
+    heading="Only the Portfolio Lead manages the portfolio"
+    text="Ask the Portfolio Lead to change Org Types, organizations, cross-org roles or agents."
+  >
+    <ft-button actions variant="primary" href="/">Back to home</ft-button>
+  </ft-empty-state>
+}

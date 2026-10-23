@@ -1,0 +1,29 @@
+<ft-dialog
+  [heading]="data.heading"
+  [description]="data.description ?? null"
+  [busy]="busy()"
+  (closed)="ref.close()"
+>
+  @if (refusal(); as message) {
+    <ft-alert status="danger" [heading]="data.refusedHeading">
+      {{ message }}
+      @if (holders().length) {
+        <ul>
+          @for (holder of holders(); track holder) {
+            <li>{{ holder }}</li>
+          }
+        </ul>
+      }
+    </ft-alert>
+  }
+  <p>{{ data.text }}</p>
+  <ft-button ftDialogFooter [disabled]="busy()" (click)="ref.close()">Cancel</ft-button>
+  <ft-button
+    ftDialogFooter
+    [variant]="data.danger === false ? 'primary' : 'danger'"
+    [loading]="busy()"
+    (click)="confirm()"
+  >
+    {{ data.confirmLabel }}
+  </ft-button>
+</ft-dialog>

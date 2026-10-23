@@ -1,0 +1,120 @@
+<ft-portfolio-header
+  current="org-types"
+  [heading]="type()?.name ?? 'Org Type'"
+  description="Changes apply to every org of this type at once."
+/>
+@if (context.allowed()) {
+  <ft-tabs label="Org Type sections">
+    <ft-tab label="Roles" [href]="here()" [current]="section() !== 'features'" />
+    <ft-tab label="Features" [href]="here() + '/features'" [current]="section() === 'features'" />
+  </ft-tabs>
+  @switch (state()) {
+    @case ('loading') {
+      <ft-list-skeleton label="Loading the Org Type" />
+    }
+    @case ('error') {
+      <ft-empty-state
+        variant="error"
+        heading="We couldn’t load this Org Type"
+        text="Check your connection and try again."
+      >
+        <ft-button actions variant="primary" (click)="load()">Try again</ft-button>
+      </ft-empty-state>
+    }
+    @default {
+      @if (type(); as t) {
+        @if (section() === 'features') {
+          <ft-card [heading]="'Features for ' + t.name + ' orgs'">
+            <ft-stack gap="3">
+              <p>
+                A feature that’s off leaves the navigation of every {{ t.name }} org, and its pages
+                answer not found. Its data is kept and comes back when you switch it on.
+              </p>
+              @for (feature of alwaysOn; track feature) {
+                <ft-switch [formControl]="on" [description]="labels[feature].description">
+                  {{ labels[feature].name }}
+                </ft-switch>
+              }
+              <form [formGroup]="features" (submit)="$event.preventDefault(); saveFeatures()">
+                <ft-stack gap="3">
+                  @for (feature of switchable; track feature) {
+                    <ft-switch
+                      [formControlName]="feature"
+                      [description]="labels[feature].description"
+                    >
+                      {{ labels[feature].name }}
+                    </ft-switch>
+                  }
+                </ft-stack>
+              </form>
+              <div>
+                <ft-button variant="primary" [loading]="saving()" (click)="saveFeatures()">
+                  Save features
+                </ft-button>
+              </div>
+            </ft-stack>
+          </ft-card>
+        } @else {
+          <ft-card heading="Roles">
+            <ft-stack gap="3">
+              <ft-cluster>
+                <ft-button variant="primary" (click)="addRole(t)"
+                  ><ft-icon name="add" /> Add role</ft-button
+                >
+              </ft-cluster>
+              <p class="muted">
+                Org Lead holds every permission of the type; Member holds
+                {{ t.memberPermissions.join(', ') || 'nothing' }}. Indent shows the parent for
+                display only. A role never inherits its parent’s permissions.
+              </p>
+              <ft-list label="Roles">
+                @for (role of t.roles; track role.id; let first = $first; let last = $last) {
+                  <ft-list-item [label]="role.name" [class.indented]="!!role.parentRoleId">
+                    <span meta>
+                      <code>{{ role.key }}</code>
+                      · {{ role.holderCount }} {{ role.holderCount === 1 ? 'person' : 'people' }} ·
+                      {{ role.permissions.length }} permissions
+                    </span>
+                    <ft-cluster trailing gap="2">
+                      <ft-button
+                        size="sm"
+                        variant="ghost"
+                        [label]="'Move ' + role.name + ' up'"
+                        [disabled]="first"
+                        (click)="move(t, role, -1)"
+                      >
+                        Up
+                      </ft-button>
+                      <ft-button
+                        size="sm"
+                        variant="ghost"
+                        [label]="'Move ' + role.name + ' down'"
+                        [disabled]="last"
+                        (click)="move(t, role, 1)"
+                      >
+                        Down
+                      </ft-button>
+                      <ft-button size="sm" [label]="'Edit ' + role.name" (click)="editRole(t, role)"
+                        >Edit</ft-button
+                      >
+                      <ft-button
+                        size="sm"
+                        variant="ghost"
+                        [label]="'Remove ' + role.name"
+                        (click)="removeRole(t, role)"
+                      >
+                        Remove
+                      </ft-button>
+                    </ft-cluster>
+                  </ft-list-item>
+                } @empty {
+                  <ft-list-item label="No roles yet" meta="Add the first role of this catalogue." />
+                }
+              </ft-list>
+            </ft-stack>
+          </ft-card>
+        }
+      }
+    }
+  }
+}

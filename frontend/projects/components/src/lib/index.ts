@@ -44,6 +44,8 @@ export * from './org-switcher';
 export * from './org-band';
 export * from './org-theme';
 export * from './colour-field';
+export * from './token-reveal';
+export * from './permission-checklist';
 export * from './note';
 export * from './notice-list';
 export * from './page-links';

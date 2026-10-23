@@ -1,0 +1,26 @@
+<fieldset class="checklist">
+  <legend>{{ legend() }}</legend>
+  @for (group of groups(); track group.feature; let i = $index) {
+    <fieldset class="group" [attr.aria-describedby]="uid + '-' + i + '-count'">
+      <legend class="group__legend">
+        {{ group.label }}
+        <span class="group__count" [id]="uid + '-' + i + '-count'">{{ counts()[i] }}</span>
+      </legend>
+      @for (item of group.codes; track item.code) {
+        <label class="choice">
+          <input
+            type="checkbox"
+            [value]="item.code"
+            [checked]="checked(item.code)"
+            [disabled]="disabled()"
+            (change)="toggle(item.code, $event)"
+          />
+          <span class="text">
+            {{ item.label }}
+            <code>{{ item.code }}</code>
+          </span>
+        </label>
+      }
+    </fieldset>
+  }
+</fieldset>

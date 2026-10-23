@@ -92,6 +92,11 @@ const ORG_ROUTES: Routes = [
       import('@faithtech-community/organizations').then((m) => m.ORG_SETTINGS_ROUTES),
   },
   {
+    path: 'portfolio',
+    loadChildren: () =>
+      import('@faithtech-community/organizations').then((m) => m.PORTFOLIO_ROUTES),
+  },
+  {
     path: 'invites',
     canActivate: [featureGuard('invites')],
     loadChildren: () => import('@faithtech-community/invites').then((m) => m.INVITES_ROUTES),
