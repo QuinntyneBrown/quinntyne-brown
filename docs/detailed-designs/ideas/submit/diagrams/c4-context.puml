@@ -1,0 +1,14 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Submit an idea
+Person(visitor, "Visitor", "Not signed in; gives a name and email")
+Person(member, "Member", "Signed in; answers the optional steps that are on")
+Person(admin, "System Admin", "Told about every idea")
+System(ftc, "QuinntyneBrown.Community", "Wizard, validation, storage under the platform intake, notifications")
+System_Ext(smtp, "Email (SMTP/SendGrid)", "Delivers the outbox")
+Rel(visitor, ftc, "Submits an idea", "HTTPS")
+Rel(member, ftc, "Submits an idea", "HTTPS")
+Rel(ftc, admin, "In-app notification IdeaSubmitted")
+Rel(ftc, smtp, "Admin email with the whole idea; submitter confirmation")
+@enduml

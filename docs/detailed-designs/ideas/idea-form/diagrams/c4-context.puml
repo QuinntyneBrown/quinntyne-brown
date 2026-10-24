@@ -1,0 +1,10 @@
+@startuml
+!include <C4/C4_Context>
+LAYOUT_WITH_LEGEND()
+title System Context — Idea form
+Person(admin, "System Admin", "Turns the optional steps on or off")
+Person(member, "Member", "Gets the steps that are on")
+System(ftc, "QuinntyneBrown.Community", "Platform intake and its switches")
+Rel(admin, ftc, "Reads and saves the switches", "HTTPS")
+Rel(member, ftc, "Wizard reads the switches", "HTTPS")
+@enduml

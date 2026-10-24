@@ -141,7 +141,7 @@
   &lt;form class="card wizard-card"&gt;…&lt;/form&gt;
   &lt;aside class="wizard-layout__preview"&gt;…&lt;/aside&gt;
 &lt;/div&gt;</code></pre></details></div>
-      <h3>Three or five steps</h3><p>Signed-out visitors get three steps. Signed-in members also get "Where it stands" and "People" (the <code>*-signed-in</code> mocks), so the rail and "1 of N" label change; nothing else does.</p>
+      <h3>Three to five steps</h3><p>Signed-out visitors always get three steps. Signed-in members also get each optional step the Idea form turns on, in order: "How far along is it?" then "Who do you need?" (the <code>*-signed-in</code> mocks, drawn with both on), so a member has three, four or five steps. The rail, the "N of M" label and the progress bar always count the same steps; nothing else changes.</p>
     </section>
 
     <section class="ds-section" id="sizes"><h2><a href="#sizes">Sizes</a></h2>
@@ -197,7 +197,7 @@
 
     <section class="ds-section" id="sources"><h2><a href="#sources">Sources</a></h2>
       <p>Extracted from these mocks:</p><ul><li><a href="../../mocks/pages/submit-idea/default.html">pages/submit-idea</a> (all states, including <a href="../../mocks/pages/submit-idea/signed-in.html">signed-in</a>)</li></ul>
-      <p>Drift fixed during extraction: the wizard CSS landed in components.css before this page existed; none in the mocks.</p>
+      <p>Drift fixed during extraction: the wizard CSS landed in components.css before this page existed; none in the mocks. Updated 2026-10-24 for the Ideas requirements (L2-171): the optional steps are named as the mocks name them, the step count is three to five, and no new class was needed. Angular: <code>ft-wizard</code>, <code>ft-review-section</code> and <code>ft-preview-card</code> in <code>components</code>.</p>
     </section>
 
     <footer class="ds-footer"><span>QuinntyneBrown.Community design system · extracted from <a href="../../mocks/index.html">docs/mocks</a> on 2026-10-23</span><a href="#top">Back to top</a></footer>

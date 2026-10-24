@@ -1,0 +1,18 @@
+@startuml
+!include <C4/C4_Container>
+LAYOUT_WITH_LEGEND()
+title Containers — Submit an idea
+Person(person, "Visitor or member")
+System_Boundary(ftc, "QuinntyneBrown.Community") {
+  Container(web, "Community app", "Angular", "/ideas/new in PublicShell or AppShell; ideas library; IDEAS_SERVICE")
+  Container(api, "Community API", "ASP.NET Core", "POST /api/ideas (anonymous, idea-submit limit); GET /api/ideas/form")
+  ContainerDb(db, "Community database", "PostgreSQL", "IdeaIntakes, Ideas, Notifications, OutboxMessages")
+  Container(worker, "Outbox worker", "Hosted service", "Sends queued emails")
+}
+System_Ext(smtp, "SMTP/SendGrid")
+Rel(person, web, "Uses", "HTTPS")
+Rel(web, api, "JSON", "HTTPS")
+Rel(api, db, "Reads intake; writes idea, notifications, emails", "EF Core")
+Rel(worker, db, "Reads outbox")
+Rel(worker, smtp, "Sends")
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+title UML sequence behaviour — Plan the steps (L2-171)
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Person" as p
+box "Frontend — community app" #EFF8FF
+  participant "SubmitIdeaPage" as page
+  participant "IDEAS_SERVICE" as svc
+end box
+box "Backend — API" #D1FADF
+  participant "IdeasEndpoints" as ep
+  participant "IdeaFormHandler" as h
+end box
+p -> page : open /ideas/new
+alt not signed in (PublicShell)
+  page -> page : steps = problem, idea, review (3)
+else signed in (AppShell)
+  page -> svc : form()
+  svc -> ep : GET /api/ideas/form
+  ep -> h : GetFormAsync()
+  h --> page : { askStage, askPeople }
+  page -> page : steps = problem, idea,\n[stage if askStage], [people if askPeople], review
+end
+page -> page : rail, "N of M" and progress (N ÷ M) from the same list
+page -> page : focus the step heading
+@enduml

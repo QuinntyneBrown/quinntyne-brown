@@ -1,0 +1,22 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Idea form
+Container_Boundary(web, "Community app") {
+  Component(page, "IdeaFormPage", "ideas library", "/admin/ideas: two ft-switch, Save, saved alert")
+  Component(wizard, "SubmitIdeaPage", "ideas library", "Reads askStage/askPeople")
+  Component(svc, "HttpIdeasService", "api library", "settings(), saveSettings(), form()")
+}
+Container_Boundary(api, "Community API") {
+  Component(ep, "IdeasEndpoints", "Minimal API", "GET/PUT /api/admin/ideas/settings; GET /api/ideas/form")
+  Component(h, "IdeaFormHandler", "Application", "System Admin check (404), audit")
+  Component(audit, "IAuditLog", "Application", "ideas.formChanged")
+}
+ContainerDb(db, "Community database", "PostgreSQL", "IdeaIntakes, AuditEntries")
+Rel(page, svc, "Calls")
+Rel(wizard, svc, "Calls")
+Rel(svc, ep, "JSON over HTTPS")
+Rel(ep, h, "Dispatches")
+Rel(h, audit, "Records")
+Rel(h, db, "Reads and updates IdeaIntake")
+@enduml

@@ -51,6 +51,8 @@ Ordered by value to the user. Effort and completion come from [estimates](estima
 | 44 | Run the portfolio | The Portfolio Lead creates and archives orgs, switches Org Type features and edits role catalogues. | 11 | 90 |
 | 45 | Assign cross-org roles | The Portfolio Lead gives Staff or Portfolio to someone, who then covers the role's orgs. | 5 | 85 |
 | 46 | Give agents scoped tokens | The Portfolio Lead creates agents and issues revocable tokens limited to chosen orgs, shown once. | 6 | 85 |
+| 47 | Submit an app idea | Anyone describes a problem and an idea in a short wizard, signed in or not; System Admin is told and the submitter gets a confirmation. | 9 | 0 |
+| 48 | Choose the idea steps | System Admin turns the optional "How far along is it?" and "Who do you need?" steps on or off. | 2 | 0 |
 
 Journeys 33 to 35 (Resources) are not yet recorded in [`videos/journeys/`](videos/journeys/README.md); record them with `pwsh eng/videos/Record-JourneyVideos.ps1` once the screens are built. The app shell tour needs re-recording too, because the shell gains the Resources nav item.
 

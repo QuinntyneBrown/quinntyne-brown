@@ -44,7 +44,7 @@ quinntyne-brown/
 │   │   │                                        # Profiles/, Contacts/, Partners/, Team/, Events/, Search/,
 │   │   │                                        # Notifications/, Announcements/, Invites/, Admin/,
 │   │   │                                        # Resources/, Notes/, Agile/, PrivatePreview/, Reports/,
-│   │   │                                        # Organizations/, Integrations/)
+│   │   │                                        # Organizations/, Integrations/, Ideas/)
 │   │   ├── QuinntyneBrown.Community.Infrastructure/  # DbContext, EF migrations, Postgres full-text
 │   │   │                                        # search, Azure Blob, email, .ics, CSV, image resizing,
 │   │   │                                        # OpenIddict stores, audit log, seeder, private-preview
@@ -89,8 +89,10 @@ quinntyne-brown/
 │       │                             # and System Admin (filters, figures, charts, tables, CSV export)
 │       ├── organizations/            # Feature library: portfolio, org types, role catalogue editor,
 │       │                             # feature flags, cross-org roles, memberships, org branding, agents
-│       └── integrations/             # Feature library: Applications list, application events page,
-│                                     # register application, rotate secret and revoke dialogs
+│       ├── integrations/             # Feature library: Applications list, application events page,
+│       │                             # register application, rotate secret and revoke dialogs
+│       └── ideas/                    # Feature library: the public Submit an app idea wizard and the
+│                                     # System Admin Idea form (ADR 0043)
 ├── e2e/                              # Playwright suite (Chromium only)
 │   ├── playwright.config.ts
 │   ├── pages/                        # Page objects: one per screen, owning selectors
@@ -118,7 +120,7 @@ quinntyne-brown/
 
 Rules (MUST be followed):
 
-- Every feature uses the same name in `Application/`, `frontend/projects/`, `docs/specs/` and `docs/detailed-designs/`. The Agile workspaces subsystem is named `agile` (`Domain/Agile/`, `Application/Agile/`, `frontend/projects/agile/`, `docs/detailed-designs/agile/`; ADR 0010). Reports is named `reports` (`Application/Reports/`, `frontend/projects/reports/`, `docs/detailed-designs/reports/`, `docs/estimates/reports.md`, `e2e/tests/reports/`; ADR 0031); it reads other features' entities and needs no `Domain/Reports/`. The organization hierarchy is named `organizations` (`Domain/Organizations/`, `Application/Organizations/`, `frontend/projects/organizations/`, `docs/specs/`, `docs/detailed-designs/organizations/`, `docs/estimates/organizations.md`, `e2e/tests/organizations/`; `docs/proposals/organization-hierarchy.md`). The org switcher is a component in `components`. Application integrations (inbound webhooks) are named `integrations` (`Domain/Integrations/`, `Application/Integrations/`, `Infrastructure/Integrations/`, `frontend/projects/integrations/`, `docs/specs/`, `docs/detailed-designs/integrations/` with the publishers' ICD in `icd/`, `docs/estimates/integrations.md`, `e2e/tests/integrations/`; ADR 0042); the entities are `IntegrationApp` and `IntegrationEvent` because `Application` is a namespace, and the UI says "Applications".
+- Every feature uses the same name in `Application/`, `frontend/projects/`, `docs/specs/` and `docs/detailed-designs/`. The Agile workspaces subsystem is named `agile` (`Domain/Agile/`, `Application/Agile/`, `frontend/projects/agile/`, `docs/detailed-designs/agile/`; ADR 0010). Reports is named `reports` (`Application/Reports/`, `frontend/projects/reports/`, `docs/detailed-designs/reports/`, `docs/estimates/reports.md`, `e2e/tests/reports/`; ADR 0031); it reads other features' entities and needs no `Domain/Reports/`. The organization hierarchy is named `organizations` (`Domain/Organizations/`, `Application/Organizations/`, `frontend/projects/organizations/`, `docs/specs/`, `docs/detailed-designs/organizations/`, `docs/estimates/organizations.md`, `e2e/tests/organizations/`; `docs/proposals/organization-hierarchy.md`). The org switcher is a component in `components`. Application integrations (inbound webhooks) are named `integrations` (`Domain/Integrations/`, `Application/Integrations/`, `Infrastructure/Integrations/`, `frontend/projects/integrations/`, `docs/specs/`, `docs/detailed-designs/integrations/` with the publishers' ICD in `icd/`, `docs/estimates/integrations.md`, `e2e/tests/integrations/`; ADR 0042); the entities are `IntegrationApp` and `IntegrationEvent` because `Application` is a namespace, and the UI says "Applications". Ideas (submit an app idea) are named `ideas` (`Domain/Ideas/`, `Application/Ideas/`, `frontend/projects/ideas/`, `docs/specs/`, `docs/detailed-designs/ideas/`, `docs/estimates/ideas.md`, `e2e/tests/ideas/`; ADRs 0043 to 0045); the public wizard and the Idea form live in the community app, never in the marketing application.
 - EF Core migrations live only in `Infrastructure/Persistence/Migrations/` and are applied by the Cli project, never by the API.
 - .NET tests live only under `backend/tests/`. Angular unit tests (`*.spec.ts`) sit next to the code they test. Playwright tests live only in `e2e/`.
 - Each frontend feature is its own library project under `frontend/projects/<feature>/`, exposing its routes, pages and dialogs through its public API (`public-api.ts`). The app lazy-loads it from the shell.
@@ -153,10 +155,10 @@ The organization hierarchy (`docs/proposals/organization-hierarchy.md`) is agree
 - System Admin can override anything; overrides by System Admin, Portfolio Lead and Org Lead on other people's items go to the audit log.
 - People join an org only through that org's invite or connect link, or by being added by its Org Lead or Portfolio Lead. Agents are profiles of kind Agent that sign in with scoped, revocable tokens and hold roles like people.
 - A feature disabled for an Org Type returns 404 in its orgs. Anything outside the caller's coverage returns 404.
-- Public events are the only content anonymous visitors see (shareable page, guest RSVP, `.ics`), addressed by org.
+- Public events are the only content anonymous visitors see (shareable page, guest RSVP, `.ics`), addressed by org. The one other anonymous action is submitting an idea (`POST /api/ideas`, ADR 0044): it writes one idea to the platform intake, returns only that idea and reads nothing else.
 - Every query, search result and endpoint must enforce these permissions on the server. Never rely on the UI to hide data.
 
-v1 features: profiles and photos (max 10, one featured, alt text required), invites (expire after 14 days), connect links (a City Lead's reusable QR code that never expires and can be replaced; not an invite), contacts (soft-delete archive and restore, linked when the person signs up), partner Kanban (Lead -> In Funnel -> Confirmed), team, events (hackathon is an event type), global search, notifications (in-app + email), announcements (with email opt-out), resources (uploads and https links, type and tags, private/shared/global visibility, archive with 30-day purge), docs & notes (block-based pages with formatting, drag-and-drop and keyboard reorder, page links, backlinks and nesting; private/shared/global visibility, default private; archive and restore). Hackathon teams, projects and judging are v2. Do not build them yet.
+v1 features: profiles and photos (max 10, one featured, alt text required), invites (expire after 14 days), connect links (a City Lead's reusable QR code that never expires and can be replaced; not an invite), contacts (soft-delete archive and restore, linked when the person signs up), partner Kanban (Lead -> In Funnel -> Confirmed), team, events (hackathon is an event type), global search, notifications (in-app + email), announcements (with email opt-out), resources (uploads and https links, type and tags, private/shared/global visibility, archive with 30-day purge), docs & notes (block-based pages with formatting, drag-and-drop and keyboard reorder, page links, backlinks and nesting; private/shared/global visibility, default private; archive and restore), ideas (a public wizard to submit an app idea, three steps signed out and up to five signed in as the System Admin's Idea form switches allow; System Admin is notified, the submitter gets a confirmation; no triage screen yet). Hackathon teams, projects and judging are v2. Do not build them yet.
 
 ## Backend architecture
 
@@ -175,7 +177,7 @@ Non-obvious rules:
 - Business rules live in Application handlers and domain services, never in endpoints or controllers.
 - The API does **not** apply EF Core migrations on startup. Run them explicitly with the Cli project.
 - Seed data is idempotent and safe to re-run.
-- Endpoints require authentication by default. Anonymous access, such as public event pages and guest RSVP, must be opted into explicitly per endpoint. The inbound webhook (`POST /api/webhooks/events`) is anonymous and authenticated by its HMAC signature instead (ADR 0042).
+- Endpoints require authentication by default. Anonymous access, such as public event pages and guest RSVP, must be opted into explicitly per endpoint. The inbound webhook (`POST /api/webhooks/events`) is anonymous and authenticated by its HMAC signature instead (ADR 0042). Idea submission (`POST /api/ideas`) is anonymous, validated and rate limited (ADR 0044).
 - Keep request logging outside the exception-handling middleware so handled response statuses are logged correctly.
 - While `PrivatePreview:Enabled` is on (the default; Development turns it off), `PrivatePreviewGateMiddleware` refuses every request without a valid unlock before routing, authentication and static files (ADR 0026). Keep it ahead of them in `Program.cs`. It is a gate in front of the permission rules, never a replacement for them. Its only exemptions are exact method-and-path matches: `GET /health/live` and `POST /api/webhooks/events` (ADR 0042).
 - Keep secrets out of the repo; use configuration and environment variables.
