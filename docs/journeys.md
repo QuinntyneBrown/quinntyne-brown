@@ -51,9 +51,11 @@ Ordered by value to the user. Effort and completion come from [estimates](estima
 | 44 | Run the portfolio | The Portfolio Lead creates and archives orgs, switches Org Type features and edits role catalogues. | 11 | 90 |
 | 45 | Assign cross-org roles | The Portfolio Lead gives Staff or Portfolio to someone, who then covers the role's orgs. | 5 | 85 |
 | 46 | Give agents scoped tokens | The Portfolio Lead creates agents and issues revocable tokens limited to chosen orgs, shown once. | 6 | 85 |
-| 47 | Submit an app idea | Anyone describes a problem and an idea in a short wizard, signed in or not; System Admin is told and the submitter gets a confirmation. | 9 | 0 |
-| 48 | Choose the idea steps | System Admin turns the optional "How far along is it?" and "Who do you need?" steps on or off. | 2 | 0 |
+| 47 | Submit an app idea | Anyone describes a problem and an idea in a short wizard, signed in or not; System Admin is told and the submitter gets a confirmation. | 9 | 95 |
+| 48 | Choose the idea steps | System Admin turns the optional "How far along is it?" and "Who do you need?" steps on or off. | 2 | 100 |
 
 Journeys 33 to 35 (Resources) are not yet recorded in [`videos/journeys/`](videos/journeys/README.md); record them with `pwsh eng/videos/Record-JourneyVideos.ps1` once the screens are built. The app shell tour needs re-recording too, because the shell gains the Resources nav item.
 
 Journeys 41 to 46 (organizations) have Playwright specs in `e2e/tests/organizations/` but no recorded videos yet, and the existing journeys need re-recording because the shell gains the org switcher, org addresses (`/o/{slug}/…`) and the Organization and Portfolio sections. Recording needs `speech.platform.bing.com` for the edge-tts narration; run `pwsh eng/videos/Record-JourneyVideos.ps1` where that host is reachable.
+
+Journeys 47 and 48 (Ideas) have Playwright specs in `e2e/tests/ideas/`, a story in `eng/videos/journeys/submit-an-idea.story.ts` and screenshots; the narrated video is not recorded yet (it needs `speech.platform.bing.com`).
