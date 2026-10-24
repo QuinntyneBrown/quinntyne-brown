@@ -81,6 +81,7 @@ export const ICONS: Readonly<Record<string, string>> = {
   applications:
     "<rect x='3' y='4' width='18' height='16' rx='2'/><path d='M3 9h18M7 13l2 2-2 2M12 17h4'/>",
   revoke: "<circle cx='12' cy='12' r='9'/><path d='m5.7 5.7 12.6 12.6'/>",
+  idea: "<path d='M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z'/>",
 };
 
 export const ICON_NAMES = Object.keys(ICONS);

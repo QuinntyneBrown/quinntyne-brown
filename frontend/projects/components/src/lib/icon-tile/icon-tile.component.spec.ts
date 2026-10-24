@@ -28,3 +28,21 @@ describe('IconTileComponent', () => {
     expect(sm.classList.contains('ft-icon-tile--sm')).toBe(true);
   });
 });
+
+@Component({
+  imports: [IconTileComponent],
+  template: `<ft-icon-tile name="idea" cover="sun" />`,
+})
+class CoverHostComponent {}
+
+// Traces to: L2-174, L2-176 (design system components/wizard.html: preview and success tiles)
+describe('IconTileComponent cover', () => {
+  it('draws the icon on the cover colour', () => {
+    const fixture = TestBed.createComponent(CoverHostComponent);
+    fixture.detectChanges();
+    const tile = (fixture.nativeElement as HTMLElement).querySelector('ft-icon-tile')!;
+
+    expect(tile.classList).toContain('ft-icon-tile--cover');
+    expect(tile.getAttribute('data-cover')).toBe('sun');
+  });
+});

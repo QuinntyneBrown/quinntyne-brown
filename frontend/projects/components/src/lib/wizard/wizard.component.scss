@@ -1,0 +1,196 @@
+:host {
+  display: block;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--layout-gutter);
+  align-items: start;
+  margin-block-start: var(--space-4);
+}
+
+.main {
+  min-inline-size: 0;
+}
+
+.preview {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .layout {
+    grid-template-columns: 13.5rem minmax(0, 1fr);
+  }
+
+  .aside {
+    position: sticky;
+    inset-block-start: calc(var(--layout-topbar-height) + var(--space-4));
+  }
+}
+
+@media (min-width: 80rem) {
+  .layout--preview {
+    grid-template-columns: 13.5rem minmax(0, 1fr) 20rem;
+
+    .preview {
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      inset-block-start: calc(var(--layout-topbar-height) + var(--space-4));
+    }
+  }
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  @media (min-width: 64rem) {
+    display: none;
+  }
+}
+
+.progress__label {
+  margin: 0;
+  font: var(--text-label);
+  color: var(--color-fg-default);
+
+  span {
+    margin-inline-start: var(--space-2);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-fg-muted);
+  }
+}
+
+.progress__track {
+  block-size: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-subtle);
+  overflow: hidden;
+}
+
+.progress__bar {
+  block-size: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+
+.steps {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @media (min-width: 64rem) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  > li {
+    position: relative;
+  }
+
+  // The connector to the next step, accent once this step is done.
+  > li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: calc(var(--size-avatar-sm) / 2 - var(--border-width-thick) / 2);
+    inset-block-start: calc(var(--size-avatar-sm) + var(--space-1));
+    inset-block-end: calc(-1 * var(--space-6) + var(--space-1));
+    inline-size: var(--border-width-thick);
+    border-radius: var(--radius-full);
+    background: var(--color-border-default);
+  }
+
+  > li[data-done]:not(:last-child)::after {
+    background: var(--color-accent);
+  }
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  inline-size: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:disabled,
+  &[aria-current='step'] {
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus-ring);
+    outline-offset: var(--focus-ring-offset);
+  }
+}
+
+.marker {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--size-avatar-sm);
+  block-size: var(--size-avatar-sm);
+  border: var(--border-width-thick) solid var(--color-border-default);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-surface);
+  color: var(--color-fg-muted);
+  font: var(--text-label);
+  font-weight: var(--font-weight-bold);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+
+  ft-icon {
+    --ft-icon-size: var(--size-icon-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.step[aria-current='step'] .marker {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-fg-on-accent);
+}
+
+li[data-done] .marker {
+  border-color: var(--color-accent);
+  color: var(--color-fg-accent);
+}
+
+li[data-done] .step:hover .marker {
+  background: var(--color-accent-subtle);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  padding-block-start: var(--space-1);
+}
+
+.title {
+  font: var(--text-label);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-fg-default);
+}
+
+.step:disabled .title {
+  color: var(--color-fg-muted);
+}
+
+.summary {
+  font: var(--text-caption);
+  color: var(--color-fg-muted);
+}

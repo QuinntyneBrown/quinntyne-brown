@@ -136,3 +136,37 @@ describe('RadioGroupComponent default orientation', () => {
     expect(options!.classList.contains('ft-radio-group__options--inline')).toBe(false);
   });
 });
+
+@Component({
+  imports: [RadioGroupComponent, RadioComponent],
+  template: `<ft-radio-group legend="Who feels this most?" [orientation]="orientation">
+    <ft-radio value="churches">Churches and ministries</ft-radio>
+    <ft-radio value="families">Families</ft-radio>
+  </ft-radio-group>`,
+})
+class TilesHostComponent {
+  orientation: 'tiles' | 'tiles-pair' = 'tiles-pair';
+}
+
+// Traces to: L2-169 AC1 (design system components/radio-group.html, Choice tiles)
+describe('RadioGroupComponent tiles', () => {
+  it('draws each choice as a tile, two across for a pair', () => {
+    const fixture = TestBed.createComponent(TilesHostComponent);
+    fixture.detectChanges();
+    const host: HTMLElement = fixture.nativeElement;
+
+    expect(host.querySelector('.ft-radio-group__options--tiles-pair')).not.toBeNull();
+    expect(host.querySelectorAll('label.choice.choice--tile')).toHaveLength(2);
+  });
+
+  it('keeps one column for plain tiles', () => {
+    const fixture = TestBed.createComponent(TilesHostComponent);
+    fixture.componentInstance.orientation = 'tiles';
+    fixture.detectChanges();
+    const host: HTMLElement = fixture.nativeElement;
+
+    expect(host.querySelector('.ft-radio-group__options--tiles')).not.toBeNull();
+    expect(host.querySelector('.ft-radio-group__options--tiles-pair')).toBeNull();
+    expect(host.querySelectorAll('label.choice--tile')).toHaveLength(2);
+  });
+});

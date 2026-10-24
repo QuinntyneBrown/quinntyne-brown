@@ -73,3 +73,29 @@ describe('ErrorSummaryComponent', () => {
     expect(document.activeElement).toBe(host.querySelector('[role=alert]'));
   });
 });
+
+@Component({
+  imports: [ErrorSummaryComponent],
+  template: `<input id="p" /><ft-error-summary
+      [errors]="errors"
+      noun="problem"
+      action="continue"
+    />`,
+})
+class NounHostComponent {
+  errors: FormError[] = [
+    { message: 'Add a little more detail, at least 30 characters', fieldId: 'p' },
+    { message: 'Choose who feels this problem most', fieldId: 'p2' },
+  ];
+}
+
+// Traces to: L2-169 AC2 (docs/mocks/pages/submit-idea/invalid.html)
+describe('ErrorSummaryComponent noun', () => {
+  it('names the problems with the given noun', () => {
+    const fixture = TestBed.createComponent(NounHostComponent);
+    fixture.detectChanges();
+    const host: HTMLElement = fixture.nativeElement;
+
+    expect(host.querySelector('[role=alert]')!.textContent).toContain('Fix 2 problems to continue');
+  });
+});

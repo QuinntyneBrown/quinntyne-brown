@@ -27,13 +27,15 @@ export class ErrorSummaryComponent {
   readonly errors = input<FormError[]>([]);
   /** Title after the count, e.g. "Fix 3 things to publish". */
   readonly action = input('submit');
+  /** What each error is called in the title: "Fix 2 things", or "Fix 2 problems" (Submit an idea). */
+  readonly noun = input('thing');
   readonly errorSelected = output<FormError>();
 
   private readonly box = viewChild<ElementRef<HTMLElement>>('box');
 
   protected readonly title = computed(() => {
     const n = this.errors().length;
-    return `Fix ${n} ${n === 1 ? 'thing' : 'things'} to ${this.action()}`;
+    return `Fix ${n} ${n === 1 ? this.noun() : `${this.noun()}s`} to ${this.action()}`;
   });
 
   focus(): void {

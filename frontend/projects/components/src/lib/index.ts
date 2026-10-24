@@ -84,3 +84,4 @@ export * from './toast';
 export * from './top-bar';
 export * from './tree';
 export * from './video-player';
+export * from './wizard';

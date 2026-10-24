@@ -8,6 +8,8 @@
   <div
     class="ft-radio-group__options"
     [class.ft-radio-group__options--inline]="orientation() === 'inline'"
+    [class.ft-radio-group__options--tiles]="orientation() === 'tiles'"
+    [class.ft-radio-group__options--tiles-pair]="orientation() === 'tiles-pair'"
   >
     <ng-content />
   </div>

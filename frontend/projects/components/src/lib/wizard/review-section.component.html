@@ -1,0 +1,9 @@
+<section [attr.aria-labelledby]="headingId">
+  <div class="head">
+    <h3 [id]="headingId">{{ heading() }}</h3>
+    <ft-button variant="ghost" size="sm" [label]="editLabel()" (click)="edit.emit()"
+      >Edit</ft-button
+    >
+  </div>
+  <ng-content />
+</section>

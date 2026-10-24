@@ -1,0 +1,14 @@
+<article [attr.aria-label]="label()">
+  <ft-card>
+    <div class="head">
+      <ft-icon-tile [name]="icon()" [cover]="cover()" />
+      <div>
+        <h3 class="title" [class.muted]="!filledTitle()">
+          {{ filledTitle() || placeholderTitle() }}
+        </h3>
+        <p class="caption">{{ caption() }}</p>
+      </div>
+    </div>
+    <p class="text" [class.muted]="!filledText()">{{ filledText() || placeholderText() }}</p>
+  </ft-card>
+</article>

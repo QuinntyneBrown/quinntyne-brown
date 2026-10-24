@@ -25,6 +25,19 @@ fieldset {
   row-gap: var(--space-2);
 }
 
+// Choice tiles: one column, or two across from 640px for a pair.
+.ft-radio-group__options--tiles,
+.ft-radio-group__options--tiles-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 40rem) {
+  .ft-radio-group__options--tiles-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 // Always rendered so its polite live region exists before an error; empty, it cancels the gap.
 .errors {
   margin-block-start: calc(-1 * var(--space-3));
