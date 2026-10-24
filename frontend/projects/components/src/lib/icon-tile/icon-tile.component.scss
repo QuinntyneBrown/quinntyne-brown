@@ -30,3 +30,14 @@ img {
   font-size: var(--font-size-xl);
   line-height: 1;
 }
+
+// An icon on a cover colour, always with the dark on-cover foreground (design system, wizard).
+:host(.ft-icon-tile--cover) {
+  color: var(--color-fg-on-cover);
+}
+
+@each $cover in sage, rose, sky, sun, lilac, mint, peach {
+  :host([data-cover='#{$cover}']) {
+    background: var(--color-cover-#{$cover});
+  }
+}

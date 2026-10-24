@@ -51,3 +51,47 @@ small {
   font: var(--text-body-sm);
   color: var(--color-fg-muted);
 }
+
+// A choice drawn as a bordered tile (design system: Choice tiles).
+.choice--tile {
+  block-size: 100%;
+  box-sizing: border-box;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-surface);
+  border: var(--border-width-hairline) solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+
+  &:hover {
+    background: var(--color-bg-subtle);
+  }
+
+  &:has(input:checked) {
+    background: var(--color-accent-subtle);
+    border-color: var(--color-accent);
+  }
+
+  &:has(input[aria-invalid='true']) {
+    border-color: var(--color-danger-border);
+  }
+
+  &:has(input:focus-visible) {
+    outline: var(--focus-ring-width) solid var(--color-focus-ring);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  input:focus-visible {
+    outline: none;
+  }
+
+  .text {
+    font-weight: var(--font-weight-semibold);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}

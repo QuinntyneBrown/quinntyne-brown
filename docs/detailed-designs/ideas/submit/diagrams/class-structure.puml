@@ -1,0 +1,59 @@
+@startuml
+title Class structure — Submit an idea
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+class IdeaIntake {
+  +Id : Guid
+  +OrganizationId : Guid
+  +AskStage : bool
+  +AskPeople : bool
+}
+class Idea {
+  +Id : Guid
+  +OrganizationId : Guid
+  +AuthorProfileId : Guid?
+  +SubmitterName : string
+  +SubmitterEmail : string
+  +Problem, Audience, Title, Pitch, Solution : string
+  +Stage, Platform, Involvement, Commitment : string?
+  +Topics, Skills : List<string>
+  +Status : IdeaStatus
+  +SubmittedAt : DateTimeOffset
+}
+enum IdeaStatus {
+  New
+}
+class IdeaOptions <<static>> {
+  +Audiences, Stages, Platforms, Topics, Skills, Involvements, Commitments
+  +Label(field, key) : string
+}
+class SubmitIdeaCommand <<record>> {
+  +Problem, Audience, Title, Pitch, Solution
+  +Stage?, Platform?, Topics?, Skills?, Involvement?, Commitment?
+  +Name?, Email?
+}
+class IdeaSteps <<static>> {
+  +For(signedIn, askStage, askPeople) : IdeaStep[]
+}
+class IdeaValidation <<static>> {
+  +Validate(command, steps, needsContact) : errors
+}
+class IdeaEmails <<static>> {
+  +ForAdmin(idea) : NotificationEmail
+  +Confirmation(idea) : EmailMessage
+}
+class SubmitIdeaHandler {
+  +HandleAsync(SubmitIdeaCommand) : (Result, SubmittedIdeaDto?)
+}
+Idea "*" --> "1" IdeaIntake : OrganizationId
+Idea --> IdeaStatus
+SubmitIdeaHandler ..> SubmitIdeaCommand
+SubmitIdeaHandler ..> IdeaSteps
+SubmitIdeaHandler ..> IdeaValidation
+SubmitIdeaHandler ..> IdeaEmails
+SubmitIdeaHandler ..> Idea
+IdeaValidation ..> IdeaOptions
+IdeaEmails ..> IdeaOptions
+@enduml

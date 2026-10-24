@@ -1,0 +1,32 @@
+<ft-breadcrumb>
+  <ft-breadcrumb-item href="/admin/users">Admin</ft-breadcrumb-item>
+  <ft-breadcrumb-item>Idea form</ft-breadcrumb-item>
+</ft-breadcrumb>
+<ft-page-header title="Idea form" />
+<ft-tabs label="Admin sections">
+  <ft-tab label="Users" href="/admin/users" />
+  <ft-tab label="Audit log" href="/admin/audit-log" />
+  <ft-tab label="Idea form" href="/admin/ideas" [current]="true" />
+</ft-tabs>
+<ft-stack class="settings" width="md">
+  <form [formGroup]="form" (ngSubmit)="save()" aria-describedby="steps-hint">
+    <ft-card heading="Optional steps">
+      <ft-stack>
+        @if (saved()) {
+          <ft-alert status="success" heading="Idea form saved" />
+        }
+        <p class="hint" id="steps-hint">
+          Signed-in members answer the steps you turn on. Visitors who aren’t signed in always get
+          the three required steps.
+        </p>
+        <ft-switch formControlName="askStage">Ask “How far along is it?”</ft-switch>
+        <ft-switch formControlName="askPeople">Ask “Who do you need?”</ft-switch>
+        <ft-form-actions>
+          <ft-button type="submit" variant="primary" [loading]="saving()" [disabled]="!loaded()"
+            >Save</ft-button
+          >
+        </ft-form-actions>
+      </ft-stack>
+    </ft-card>
+  </form>
+</ft-stack>

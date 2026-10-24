@@ -1,0 +1,35 @@
+@startuml
+title UML sequence behaviour — Save the Idea form (L2-181)
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Caller" as p
+box "Frontend — community app" #EFF8FF
+  participant "IdeaFormPage" as page
+end box
+box "Backend — API and Application" #D1FADF
+  participant "IdeasEndpoints" as ep
+  participant "IdeaFormHandler" as h
+  participant "IAuditLog" as audit
+end box
+database "Community database" as db
+p -> page : open /admin/ideas
+page -> ep : GET /api/admin/ideas/settings
+ep -> h : GetSettingsAsync()
+alt not System Admin
+  h --> page : 404
+  page -> p : not-found page
+else System Admin
+  h -> db : IdeaIntake
+  h --> page : { askStage: true, askPeople: true }
+  p -> page : toggle a switch, Save
+  page -> ep : PUT /api/admin/ideas/settings
+  ep -> h : SaveSettingsAsync(command)
+  h -> db : SetSteps(...)
+  h -> audit : ideas.formChanged (before, after)
+  h -> db : SaveChanges
+  h --> page : 200 saved settings
+  page -> p : "Idea form saved"
+end
+@enduml

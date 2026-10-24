@@ -1,0 +1,49 @@
+@startuml
+title UML sequence behaviour — Submit an idea (L2-176 to L2-180)
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+actor "Visitor or member" as p
+box "Frontend — community app" #EFF8FF
+  participant "SubmitIdeaPage" as page
+end box
+box "Backend — QuinntyneBrown.Community.Api" #D1FADF
+  participant "Rate limiter (idea-submit)" as rl
+  participant "IdeasEndpoints" as ep
+end box
+box "Backend — QuinntyneBrown.Community.Application" #ECFDF3
+  participant "SubmitIdeaHandler" as h
+  participant "INotificationPublisher" as pub
+end box
+box "Backend — QuinntyneBrown.Community.Infrastructure" #FFF4E5
+  database "Community database" as db
+end box
+p -> page : Submit idea
+page -> page : busy ("Submitting…", Back disabled)
+page -> rl : POST /api/ideas
+alt more than 10 this hour (user or address)
+  rl --> page : 429
+  page -> p : error alert, answers kept, "Try again"
+else within the limit
+  rl -> ep : request (token optional)
+  ep -> h : SubmitIdeaCommand
+  h -> db : load IdeaIntake
+  h -> h : submitter (profile + account email, or body name + email)
+  h -> h : drop fields of steps that are off\nvalidate every field
+  alt invalid
+    h --> page : 400 errors by field
+    page -> p : summary links to step and field
+  else valid
+    h -> db : add Idea (intake org, status New)
+    h -> pub : IdeaSubmitted to each active System Admin\n(in-app + email with the whole idea)
+    h -> db : queue confirmation to the submitter
+    h -> db : SaveChanges (one unit of work)
+    h --> page : 201 { id, title, name, email }
+    page -> p : "Your idea is in" (focus), Submit another idea
+  end
+end
+alt network failure or 5xx
+  page -> p : "Idea not submitted", answers kept
+end
+@enduml

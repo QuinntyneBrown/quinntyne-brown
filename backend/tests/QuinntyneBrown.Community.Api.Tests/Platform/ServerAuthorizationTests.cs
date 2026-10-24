@@ -13,7 +13,7 @@ namespace QuinntyneBrown.Community.Api.Tests.Platform;
 public partial class ServerAuthorizationTests(CommunityApiFactory factory) : IClassFixture<CommunityApiFactory>
 {
     // Endpoints the design marks anonymous (L2-042 AC1), plus the health probes (L2-047), the invite link (L2-011) and
-    // public events with guest RSVP (L2-023) and the connect link lookup and sign-up.
+    // public events with guest RSVP (L2-023), the connect link lookup and sign-up, and idea submission (L2-177, ADR 0044).
     private static readonly string[] AnonymousRoutes =
     [
         "health/live",
@@ -37,6 +37,7 @@ public partial class ServerAuthorizationTests(CommunityApiFactory factory) : ICl
         "api/public/events/{id:guid}/rsvps/cancel",
         "api/public/events/{id:guid}/calendar.ics",
         "api/announcements/unsubscribe",
+        "api/ideas",
     ];
 
     [Fact]

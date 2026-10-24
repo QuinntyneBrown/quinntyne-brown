@@ -2,6 +2,7 @@ using System.Text.Json;
 using QuinntyneBrown.Community.Application.Identity;
 using QuinntyneBrown.Community.Domain.Admin;
 using QuinntyneBrown.Community.Domain.Events;
+using QuinntyneBrown.Community.Domain.Ideas;
 using JoinedVia = QuinntyneBrown.Community.Domain.Organizations.JoinedVia;
 using OrgMembership = QuinntyneBrown.Community.Domain.Organizations.OrgMembership;
 using PortfolioLead = QuinntyneBrown.Community.Domain.Organizations.PortfolioLead;
@@ -104,6 +105,12 @@ public class CommunitySeeder(IOpenIddictApplicationManager applications, Communi
             {
                 db.CrossOrgRoles.Add(role);
             }
+        }
+
+        // The platform intake owns every idea, in the portfolio's root org; an existing row keeps its switches (ADR 0044).
+        if (!await db.IdeaIntakes.AnyAsync(i => i.Id == IdeaIntake.PlatformId, cancellationToken))
+        {
+            db.IdeaIntakes.Add(new IdeaIntake(HierarchySeed.TorontoId));
         }
 
         await db.SaveChangesAsync(cancellationToken);

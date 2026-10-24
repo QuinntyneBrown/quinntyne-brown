@@ -7,8 +7,8 @@
 <meta name="mock:kind" content="page">
 <meta name="mock:screen" content="idea-settings">
 <meta name="mock:state" content="default">
-<meta name="mock:requirements" content="">
-<meta name="description" content="System Admin: turn the optional idea steps on or off.">
+<meta name="mock:requirements" content="L2-171, L2-181">
+<meta name="description" content="System Admin: the optional idea steps, both on until someone turns them off.">
 <link rel="stylesheet" href="../../../design-system/tokens/tokens.css">
 <link rel="stylesheet" href="../../../design-system/assets/components.css">
 <link rel="stylesheet" href="../../assets/mock.css">
@@ -33,10 +33,11 @@
 <main id="main" class="container">
 <nav aria-label="Breadcrumb"><ol class="breadcrumb"><li><a href="../../pages/admin-users/default.html">Admin</a></li><li aria-current="page">Idea form</li></ol></nav>
 <div class="page-header"><div><h1>Idea form</h1></div></div>
-<form class="card stack form-width--md" action="saved.html" method="get" aria-labelledby="steps-h">
+<form class="card stack form-width--md" action="saved.html" method="get" aria-labelledby="steps-h" aria-describedby="steps-hint">
 <h2 class="card__title" id="steps-h">Optional steps</h2>
-<label class="switch"><input type="checkbox" name="stage"><span class="switch__text">Ask “How far along is it?”</span></label>
-<label class="switch"><input type="checkbox" name="people"><span class="switch__text">Ask “Who do you need?”</span></label>
+<p class="text-muted" id="steps-hint">Signed-in members answer the steps you turn on. Visitors who aren’t signed in always get the three required steps.</p>
+<label class="switch"><input type="checkbox" name="stage" checked><span class="switch__text">Ask “How far along is it?”</span></label>
+<label class="switch"><input type="checkbox" name="people" checked><span class="switch__text">Ask “Who do you need?”</span></label>
 <div class="form-actions cluster"><button class="btn btn--primary" type="submit">Save</button></div>
 </form>
 </main>

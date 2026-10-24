@@ -1,0 +1,26 @@
+@startuml
+!include <C4/C4_Component>
+LAYOUT_WITH_LEGEND()
+title Components — Submit an idea
+Container_Boundary(web, "Community app") {
+  Component(page, "SubmitIdeaPage", "ideas library", "Answers, step plan, validation mirror, preview, busy/error/success")
+  Component(wiz, "ft-wizard, ft-review-section, ft-preview-card, ft-radio-group (tiles)", "components library", "Design-system Wizard")
+  Component(svc, "HttpIdeasService", "api library", "IDEAS_SERVICE: form(), submit()")
+}
+Container_Boundary(api, "Community API") {
+  Component(rl, "Rate limiter policy 'idea-submit'", "ASP.NET Core rate limiting", "10 an hour per user or address")
+  Component(ep, "IdeasEndpoints", "Minimal API", "AllowAnonymous POST /api/ideas; 201/400/404/429")
+  Component(h, "SubmitIdeaHandler", "Application", "Submitter, step plan, validation, store, notify, confirm")
+  Component(pub, "INotificationPublisher", "Application", "In-app + email per System Admin")
+  Component(q, "IEmailQueue", "Infrastructure", "Outbox in the same save")
+}
+ContainerDb(db, "Community database", "PostgreSQL")
+Rel(page, wiz, "Composes")
+Rel(page, svc, "Calls")
+Rel(svc, rl, "POST /api/ideas")
+Rel(rl, ep, "Passes to")
+Rel(ep, h, "Dispatches")
+Rel(h, pub, "IdeaSubmitted")
+Rel(h, q, "Confirmation")
+Rel(h, db, "Reads IdeaIntake, inserts Idea")
+@enduml

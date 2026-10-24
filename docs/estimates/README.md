@@ -1,6 +1,6 @@
 # Estimates
 
-- Overall effort: 387 days
+- Overall effort: 398 days
 - Complete: 96%
 - Visual conformance: letter grade (F to A+) of the implemented UI against the HTML mocks and design system (margins, spacing, fonts, borders), from screenshots in `docs/videos/journeys/<journey>/screenshots/`. Subsystem grades are the rounded mean of their designs. The marketing page, Google sign-in and GitHub sign-in have no journey screenshots yet, so they are not graded (n/a).
 
@@ -25,14 +25,16 @@
 | [reports](reports.md) | 7 days | 100% | B |
 | [organizations](organizations.md) | 53 days | 93% | — |
 | [integrations](integrations.md) | 11 days | 98% | — |
+| [ideas](ideas.md) | 11 days | 96% | A- |
 
 ## Roadmap
 
-1. integrations: record the Applications journey video; wrap the Data Protection key ring with Key Vault (ADR 0042)
-2. organizations: cross-org role create and narrow screens, the catalogue's indent and outdent and Member bundle, the Org Lead's Agents and Audit log tabs, and re-recorded journey videos
-3. platform: deploy behind the private-preview wall (the owner's runbook, `platform/private-preview-wall`)
-4. platform and identity: finish the remaining designs
-5. admin, search and agile: finish the remaining designs
-6. marketing page and Google sign-in, and resources: finish the remaining designs
-7. notes: block-editor (the mouse path into the Turn into submenu) and pages-and-list (measure the 500-block read and save latency)
-8. Deferred: notes co-editing, version history, purging archived pages and orphaned-image clean-up
+1. ideas: record the Submit an app idea video; then the follow-up feature to browse and triage ideas
+2. integrations: record the Applications journey video; wrap the Data Protection key ring with Key Vault (ADR 0042)
+3. organizations: cross-org role create and narrow screens, the catalogue's indent and outdent and Member bundle, the Org Lead's Agents and Audit log tabs, and re-recorded journey videos
+4. platform: deploy behind the private-preview wall (the owner's runbook, `platform/private-preview-wall`)
+5. platform and identity: finish the remaining designs
+6. admin, search and agile: finish the remaining designs
+7. marketing page and Google sign-in, and resources: finish the remaining designs
+8. notes: block-editor (the mouse path into the Turn into submenu) and pages-and-list (measure the 500-block read and save latency)
+9. Deferred: notes co-editing, version history, purging archived pages and orphaned-image clean-up

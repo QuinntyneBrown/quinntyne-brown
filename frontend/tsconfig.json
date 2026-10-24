@@ -21,6 +21,7 @@
       "@faithtech-community/agile": ["./projects/agile/src/public-api.ts"],
       "@faithtech-community/reports": ["./projects/reports/src/public-api.ts"],
       "@faithtech-community/integrations": ["./projects/integrations/src/public-api.ts"],
+      "@faithtech-community/ideas": ["./projects/ideas/src/public-api.ts"],
       "@faithtech-community/organizations": ["./projects/organizations/src/public-api.ts"]
     },
     "strict": true,
@@ -96,6 +97,12 @@
     },
     {
       "path": "./projects/integrations/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/ideas/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/ideas/tsconfig.spec.json"
     },
     {
       "path": "./projects/organizations/tsconfig.lib.json"

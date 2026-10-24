@@ -1,0 +1,41 @@
+@startuml
+title Class structure — Idea form
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #344054
+class IdeaIntake {
+  +{static} PlatformId : Guid
+  +Id : Guid
+  +OrganizationId : Guid
+  +AskStage : bool
+  +AskPeople : bool
+  +UpdatedAt : DateTimeOffset?
+  +UpdatedByProfileId : Guid?
+  +SetSteps(askStage, askPeople, by, at)
+}
+class IdeaFormHandler {
+  +GetSettingsAsync() : (Result, IdeaFormSettingsDto?)
+  +SaveSettingsAsync(SaveIdeaFormCommand) : (Result, IdeaFormSettingsDto?)
+  +GetFormAsync() : IdeaFormDto
+}
+class SaveIdeaFormCommand <<record>> {
+  +AskStage : bool?
+  +AskPeople : bool?
+}
+class IdeaFormSettingsDto <<record>> {
+  +AskStage : bool
+  +AskPeople : bool
+  +UpdatedAt : DateTimeOffset?
+}
+class IdeaFormDto <<record>> {
+  +AskStage : bool
+  +AskPeople : bool
+}
+interface IAuditLog
+IdeaFormHandler ..> IdeaIntake
+IdeaFormHandler ..> SaveIdeaFormCommand
+IdeaFormHandler ..> IdeaFormSettingsDto
+IdeaFormHandler ..> IdeaFormDto
+IdeaFormHandler ..> IAuditLog : ideas.formChanged
+@enduml

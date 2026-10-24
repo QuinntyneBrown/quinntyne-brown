@@ -18,4 +18,5 @@ public enum NotificationKind
     ResourceOwnershipTransferred,
     NotePageShared,
     AddedToOrg,
+    IdeaSubmitted,
 }

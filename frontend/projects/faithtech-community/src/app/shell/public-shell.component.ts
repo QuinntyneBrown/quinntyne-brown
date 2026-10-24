@@ -30,9 +30,12 @@ export class PublicShellComponent {
     { initialValue: this.router.url },
   );
 
-  /** /o/{slug}/events/{id} signs in to the same address, which members see as the event page (L2-149). */
+  /**
+   * /o/{slug}/events/{id} signs in to the same address, which members see as the event page (L2-149); so does
+   * /ideas/new, which members see in the app shell (ADR 0043).
+   */
   protected readonly signInHref = computed(() => {
-    const page = /^\/o\/[^/?#]+\/events\/[^/?#]+/.exec(this.url())?.[0];
+    const page = /^(\/o\/[^/?#]+\/events\/[^/?#]+|\/ideas\/new)/.exec(this.url())?.[0];
     return page ? `/sign-in?returnUrl=${encodeURIComponent(page)}` : '/sign-in';
   });
 }

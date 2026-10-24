@@ -94,5 +94,9 @@ public interface IApplicationDbContext
 
     DbSet<Domain.Integrations.IntegrationEvent> IntegrationEvents { get; }
 
+    DbSet<Domain.Ideas.IdeaIntake> IdeaIntakes { get; }
+
+    DbSet<Domain.Ideas.Idea> Ideas { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

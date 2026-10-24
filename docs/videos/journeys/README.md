@@ -142,6 +142,14 @@ mono, 48 kb/s, loudness-normalized). The chapters are embedded in each WebM and 
 `captions.vtt`. The phone and tablet scenes in the app shell tour use a 390 or 768 pixel wide
 viewport, so the rest of the frame is grey.
 
+### Ideas
+
+| Video | Length | Rerun alone |
+|---|---|---|
+| Submit an app idea · [narration](submit-an-idea/narration.md) · [screenshots](submit-an-idea/screenshots) | not yet recorded | `pwsh eng/videos/Record-JourneyVideos.ps1 -Journey submit-an-idea` |
+
+The Submit an app idea story (`eng/videos/journeys/submit-an-idea.story.ts`) and its narration are written; the take needs `pwsh` and `speech.platform.bing.com` for the edge-tts voice, which the environment that built the feature did not have. Its screenshots were captured with `DEMO_SCREENSHOTS`. Per `AGENTS.md`, the recording carries no captions.
+
 ## Voice
 
 One narrator for every video: `en-US-AndrewMultilingualNeural`, synthesized with the free

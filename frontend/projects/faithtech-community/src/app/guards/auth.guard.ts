@@ -26,3 +26,6 @@ export const publicEventMatch: CanMatchFn = async (_route, segments) => {
   const slug = segments[1]?.path;
   return !access.orgs().some((o) => o.slug === slug);
 };
+
+/** Matches only for a visitor who is not signed in, so a page can answer one address in either shell (ADR 0043). */
+export const signedOutMatch: CanMatchFn = () => !inject(AUTH_SERVICE).isAuthenticated();

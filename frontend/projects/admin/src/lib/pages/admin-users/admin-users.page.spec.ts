@@ -223,7 +223,7 @@ describe('AdminUsersPage', () => {
     expect(row('Victor Kane').textContent).toContain('Suspended');
   });
 
-  it('offers only the Admin sections that share this tab row: Users and Audit log', async () => {
+  it('offers the Admin sections that share this tab row: Users, Audit log and Idea form (L2-181)', async () => {
     const { host } = await setup(() => of(page([grace])));
 
     const nav = host.querySelector('nav[aria-label="Admin sections"]')!;
@@ -235,6 +235,7 @@ describe('AdminUsersPage', () => {
     expect(tabs).toEqual([
       ['Users', '/admin/users', 'page'],
       ['Audit log', '/admin/audit-log', null],
+      ['Idea form', '/admin/ideas', null],
     ]);
   });
 

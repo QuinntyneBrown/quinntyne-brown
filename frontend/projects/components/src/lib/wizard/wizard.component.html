@@ -1,0 +1,52 @@
+<div class="layout" [class.layout--preview]="preview()">
+  <div class="aside">
+    <nav [attr.aria-label]="label()">
+      <div class="progress">
+        <p class="progress__label">
+          {{ title() }}<span>{{ position() }} of {{ steps().length }}</span>
+        </p>
+        <div class="progress__track" aria-hidden="true">
+          <div class="progress__bar" [style.inline-size.%]="percent()"></div>
+        </div>
+      </div>
+      <ol class="steps">
+        @for (step of steps(); track $index) {
+          <li [attr.data-done]="$index < current() ? '' : null">
+            <button
+              class="step"
+              type="button"
+              [disabled]="$index > current()"
+              [attr.aria-current]="$index === current() ? 'step' : null"
+              (click)="$index < current() && stepSelect.emit($index)"
+            >
+              <span class="marker">
+                @if ($index < current()) {
+                  <ft-icon name="done" />
+                } @else {
+                  {{ $index + 1 }}
+                }
+              </span>
+              <span class="text">
+                <span class="title"
+                  >{{ step.title }}
+                  @if ($index < current()) {
+                    <span class="visually-hidden"> (done)</span>
+                  }
+                </span>
+                @if (step.summary) {
+                  <span class="summary">{{ step.summary }}</span>
+                }
+              </span>
+            </button>
+          </li>
+        }
+      </ol>
+    </nav>
+  </div>
+  <div class="main">
+    <ng-content />
+  </div>
+  <div class="preview">
+    <ng-content select="[ftWizardPreview]" />
+  </div>
+</div>

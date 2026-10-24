@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  font: var(--text-h3);
+  overflow-wrap: anywhere;
+}
+
+.caption {
+  margin: 0;
+  font: var(--text-caption);
+  color: var(--color-fg-muted);
+}
+
+.text {
+  margin: 0;
+  font: var(--text-body);
+  overflow-wrap: anywhere;
+}
+
+.muted {
+  color: var(--color-fg-muted);
+}

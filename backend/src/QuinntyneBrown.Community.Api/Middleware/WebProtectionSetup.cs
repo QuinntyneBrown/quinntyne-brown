@@ -10,6 +10,7 @@ public static class WebProtectionSetup
     public const string AuthRateLimitPolicy = "auth";
     public const string GuestRsvpRateLimitPolicy = "guest-rsvp";
     public const string WebhookRateLimitPolicy = "webhook";
+    public const string IdeaSubmitRateLimitPolicy = "idea-submit";
 
     public static IServiceCollection AddWebProtections(this IServiceCollection services, IConfiguration configuration)
     {
@@ -60,6 +61,15 @@ public static class WebProtectionSetup
                     source.Length is > 0 and <= 100 ? $"webhook:{source}" : "webhook:",
                     _ => Window(webhookPermitLimit));
             });
+
+            // 10 ideas an hour per signed-in member, or per IP address for visitors (L2-178, ADR 0044).
+            var ideaPermitLimit = configuration.GetValue("RateLimits:IdeaSubmitPerHour", 10);
+            options.AddPolicy(IdeaSubmitRateLimitPolicy, context =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    context.User.FindFirst(OpenIddictConstants.Claims.Subject)?.Value is { } userId
+                        ? $"idea:user:{userId}"
+                        : $"idea:ip:{context.Connection.RemoteIpAddress}",
+                    _ => new FixedWindowRateLimiterOptions { PermitLimit = ideaPermitLimit, Window = TimeSpan.FromHours(1), QueueLimit = 0 }));
 
             // A publisher is told when to retry (ICD); other limited responses are unchanged.
             options.OnRejected = (context, _) =>

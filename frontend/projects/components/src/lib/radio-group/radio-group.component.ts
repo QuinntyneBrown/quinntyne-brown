@@ -1,9 +1,11 @@
 import {
+  ElementRef,
   booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   computed,
   forwardRef,
+  inject,
   input,
   signal,
 } from '@angular/core';
@@ -12,8 +14,11 @@ import { InlineMessageComponent } from '../inline-message/inline-message.compone
 
 let nextId = 0;
 
-/** `stack` (default) puts one choice per line; `inline` lays short choices out in a wrapping row. */
-export type RadioGroupOrientation = 'stack' | 'inline';
+/**
+ * `stack` (default) puts one choice per line; `inline` lays short choices out in a wrapping row; `tiles` draws each
+ * choice as a bordered tile, and `tiles-pair` puts the tiles two across from 640px (design system: Choice tiles).
+ */
+export type RadioGroupOrientation = 'stack' | 'inline' | 'tiles' | 'tiles-pair';
 
 /**
  * One choice from a few visible options: a fieldset with a legend and ft-radio children. Short
@@ -35,6 +40,7 @@ export type RadioGroupOrientation = 'stack' | 'inline';
 })
 export class RadioGroupComponent implements ControlValueAccessor {
   private readonly uid = `ft-radio-group-${nextId++}`;
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly legend = input.required<string>();
   readonly name = input<string | null>(null);
@@ -47,6 +53,8 @@ export class RadioGroupComponent implements ControlValueAccessor {
   readonly disabled = signal(false);
 
   readonly groupName = computed(() => this.name() ?? this.uid);
+  /** True when the choices are drawn as tiles; ft-radio reads it. */
+  readonly tiles = computed(() => this.orientation().startsWith('tiles'));
   protected readonly errorId = `${this.uid}-error`;
 
   private onChange: (value: string) => void = () => undefined;
@@ -73,5 +81,13 @@ export class RadioGroupComponent implements ControlValueAccessor {
 
   touch(): void {
     this.onTouched();
+  }
+
+  /** Moves focus to the checked radio, or the first one, as an error summary link does (L2-169 AC2). */
+  focus(): void {
+    const radios = Array.from(
+      this.host.nativeElement.querySelectorAll<HTMLInputElement>('input[type=radio]'),
+    );
+    (radios.find((r) => r.checked) ?? radios[0])?.focus();
   }
 }

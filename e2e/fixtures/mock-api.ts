@@ -10,6 +10,7 @@ import { MockGitHub } from './mock-github';
 import { MockGoogle } from './mock-google';
 import { MockNotification, MockNotifications } from './mock-notifications';
 import { MockReports } from './mock-reports';
+import { MockIdeas } from './mock-ideas';
 import { MockIntegrations } from './mock-integrations';
 import { MockSearch } from './mock-search';
 import { MockWall } from './mock-wall';
@@ -224,6 +225,8 @@ export class MockApi {
   readonly reports = new MockReports(this);
   /** Applications and their events (ADR 0042): register, rotate, revoke and read; `deliver` adds an event. */
   readonly integrations = new MockIntegrations(this);
+  /** Ideas (ADR 0044): the Idea form switches and submitted ideas. */
+  readonly ideas = new MockIdeas(this);
   /** Docs & notes: pages, blocks, links and visibility (ADR 0023 to 0025). */
   readonly notes = new MockNotes(this);
   /** Global search over the other fakes, with the server's permission rules (L2-026). */
@@ -477,6 +480,8 @@ export class MockApi {
       this.caller(authorization),
     );
     if (integrations) return integrations;
+    const ideas = this.ideas.handle(route, method, url, body, this.caller(authorization));
+    if (ideas) return ideas;
     const notes = this.notes.handle(route, method, url, body, this.caller(authorization));
     if (notes) return notes;
     const search = this.search.handle(route, method, url, this.caller(authorization));
