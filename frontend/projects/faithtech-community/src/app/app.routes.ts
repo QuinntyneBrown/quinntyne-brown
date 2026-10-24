@@ -175,6 +175,11 @@ export const routes: Routes = [
         loadChildren: () =>
           import('@faithtech-community/notifications').then((m) => m.SETTINGS_ROUTES),
       },
+      // The Idea form sits beside Users and Audit log (ADR 0043).
+      {
+        path: 'admin/ideas',
+        loadChildren: () => import('@faithtech-community/ideas').then((m) => m.IDEA_FORM_ROUTES),
+      },
       {
         path: 'admin',
         loadChildren: () => import('@faithtech-community/admin').then((m) => m.ADMIN_ROUTES),

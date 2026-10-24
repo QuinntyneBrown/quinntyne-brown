@@ -18,6 +18,7 @@ using QuinntyneBrown.Community.Infrastructure.Search;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using QuinntyneBrown.Community.Domain.Ideas;
 using QuinntyneBrown.Community.Domain.Integrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -105,6 +106,8 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
     public DbSet<IntegrationApp> IntegrationApps => Set<IntegrationApp>();
 
     public DbSet<IntegrationEvent> IntegrationEvents => Set<IntegrationEvent>();
+
+    public DbSet<IdeaIntake> IdeaIntakes => Set<IdeaIntake>();
 
     /// <summary>The ASP.NET Data Protection key ring, so protected secrets survive restarts (ADR 0042).</summary>
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
@@ -713,6 +716,11 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
             evt.HasIndex(e => new { e.IntegrationAppId, e.EventId }).IsUnique();
             evt.HasIndex(e => new { e.IntegrationAppId, e.ReceivedAt });
             evt.HasIndex(e => e.OrganizationId);
+        });
+
+        builder.Entity<IdeaIntake>(intake =>
+        {
+            intake.Property(i => i.Id).ValueGeneratedNever();
         });
 
         builder.Entity<Event>().HasIndex(e => e.OrganizationId);

@@ -4,6 +4,7 @@ using QuinntyneBrown.Community.Application.Announcements;
 using QuinntyneBrown.Community.Application.Contacts;
 using QuinntyneBrown.Community.Application.Events;
 using QuinntyneBrown.Community.Application.Identity;
+using QuinntyneBrown.Community.Application.Ideas;
 using QuinntyneBrown.Community.Application.Integrations;
 using QuinntyneBrown.Community.Application.Invites;
 using QuinntyneBrown.Community.Application.Notifications;
@@ -61,6 +62,7 @@ public static class DependencyInjection
         services.AddScoped<GetMyAccessHandler>();
         services.AddScoped<IntegrationAppsHandler>();
         services.AddScoped<ReceiveEventHandler>();
+        services.AddScoped<IdeaFormHandler>();
         services.AddScoped<ResolveOrgSlugHandler>();
         services.AddScoped<MyWorkHandler>();
         services.AddScoped<MembersHandler>();

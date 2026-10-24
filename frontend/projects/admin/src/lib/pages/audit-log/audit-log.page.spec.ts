@@ -160,7 +160,7 @@ describe('AuditLogPage', () => {
     expect(cells[2]).toBe('Granted City Lead to Esther Nakamura');
   });
 
-  it('offers only the Admin sections that share this tab row: Users and Audit log', async () => {
+  it('offers the Admin sections that share this tab row: Users, Audit log and Idea form (L2-181)', async () => {
     const { host } = await setup(() => of(page([entry('Granted Staff to Daniel Reyes')])));
 
     const nav = host.querySelector('nav[aria-label="Admin sections"]')!;
@@ -172,6 +172,7 @@ describe('AuditLogPage', () => {
     expect(tabs).toEqual([
       ['Users', '/admin/users', null],
       ['Audit log', '/admin/audit-log', 'page'],
+      ['Idea form', '/admin/ideas', null],
     ]);
   });
 

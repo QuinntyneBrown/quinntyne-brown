@@ -1021,6 +1021,31 @@ namespace QuinntyneBrown.Community.Infrastructure.Persistence.Migrations
                     b.ToTable("Rsvps", (string)null);
                 });
 
+            modelBuilder.Entity("QuinntyneBrown.Community.Domain.Ideas.IdeaIntake", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("AskPeople")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AskStage")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedByProfileId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IdeaIntakes");
+                });
+
             modelBuilder.Entity("QuinntyneBrown.Community.Domain.Integrations.IntegrationApp", b =>
                 {
                     b.Property<Guid>("Id")

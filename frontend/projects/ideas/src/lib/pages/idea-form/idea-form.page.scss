@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+.settings {
+  margin-block-start: var(--space-6);
+}
+
+.hint {
+  margin: 0;
+  font: var(--text-body);
+  color: var(--color-fg-muted);
+}
