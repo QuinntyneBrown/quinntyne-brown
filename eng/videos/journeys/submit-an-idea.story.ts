@@ -42,7 +42,9 @@ test('submit-an-idea', async ({ page, api }) => {
   await show.step('your-idea', async () => {
     await wizard.continue.click();
     await wizard.title.fill('ShiftShare');
-    await wizard.pitch.fill('Shift sign-ups for shelter volunteers that fill gaps before they happen.');
+    await wizard.pitch.fill(
+      'Shift sign-ups for shelter volunteers that fill gaps before they happen.',
+    );
     await wizard.solution.fill(
       'Coordinators post open shifts. Volunteers get a text, tap to claim, and see who else is on.',
     );
