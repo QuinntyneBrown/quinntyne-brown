@@ -1,10 +1,13 @@
 import { Route } from '@playwright/test';
 
 import type { MockAccount } from './mock-api';
+import type { MockNotifications } from './mock-notifications';
 
 /** What the ideas fake reads from the rest of the fake backend. */
 export interface IdeasContext {
   readonly now: Date;
+  readonly accounts: Map<string, MockAccount>;
+  readonly notifications: MockNotifications;
 }
 
 /** An idea as the fake stores it (Idea in backend/src/QuinntyneBrown.Community.Domain/Ideas/Idea.cs). */
@@ -74,6 +77,8 @@ export class MockIdeas {
   updatedAt: string | null = null;
   readonly formChanges: MockIdeaFormChange[] = [];
   readonly submitted: MockIdea[] = [];
+  /** The emails SubmitIdeaHandler queues: one to each active System Admin, then the submitter's confirmation. */
+  readonly emails: { to: string; subject: string }[] = [];
   /** RateLimits:IdeaSubmitPerHour: submissions over it answer 429 (L2-178). */
   limitPerHour = 10;
 
@@ -178,6 +183,21 @@ export class MockIdeas {
       submittedAt: this.context.now.toISOString(),
     };
     this.submitted.push(idea);
+    // Every active System Admin is told in the app and by email; the submitter is confirmed (L2-179, L2-180).
+    for (const admin of [...this.context.accounts.values()].filter(
+      (a) => a.roles.includes('SystemAdmin') && !a.suspended,
+    )) {
+      this.context.notifications.add({
+        recipientId: admin.profileId,
+        kind: 'IdeaSubmitted',
+        title: `New app idea: ${idea.title}`,
+        linkPath: '/admin/ideas',
+        actorId: idea.authorProfileId,
+        actorName: caller?.name ?? null,
+      });
+      this.emails.push({ to: admin.email, subject: `New app idea: ${idea.title}` });
+    }
+    this.emails.push({ to: idea.email, subject: `We got your idea: ${idea.title}` });
     return route.fulfill({
       status: 201,
       json: { id: idea.id, title: idea.title, name: idea.name, email: idea.email },

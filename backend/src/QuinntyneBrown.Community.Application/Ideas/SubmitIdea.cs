@@ -1,5 +1,7 @@
 using QuinntyneBrown.Community.Application.Common;
+using QuinntyneBrown.Community.Application.Notifications;
 using QuinntyneBrown.Community.Domain.Ideas;
+using QuinntyneBrown.Community.Domain.Notifications;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -96,9 +98,11 @@ internal sealed class SubmitIdeaValidator : AbstractValidator<SubmitIdeaCommand>
 /// <summary>
 /// Stores a submitted idea under the platform intake (L2-177, ADR 0044). The endpoint is anonymous: a visitor gives a
 /// name and email, a signed-in member's come from the account and the idea is linked to their profile. Answers to
-/// steps the submitter was not asked are ignored.
+/// steps the submitter was not asked are ignored. Every active System Admin is told in the app and by email, and the
+/// submitter gets a confirmation, in the same save as the idea (L2-179, L2-180, ADR 0045).
 /// </summary>
-public class SubmitIdeaHandler(IApplicationDbContext db, ICurrentUser current, TimeProvider time)
+public class SubmitIdeaHandler(
+    IApplicationDbContext db, ICurrentUser current, INotificationPublisher notifications, IEmailQueue emails, TimeProvider time)
 {
     public async Task<(Result Result, SubmittedIdeaDto? Idea)> HandleAsync(SubmitIdeaCommand command, CancellationToken cancellationToken = default)
     {
@@ -136,6 +140,11 @@ public class SubmitIdeaHandler(IApplicationDbContext db, ICurrentUser current, T
             steps.People ? new IdeaPeople([.. (command.Skills ?? []).Distinct()], command.Involvement, command.Commitment) : null,
             time.GetUtcNow());
         db.Ideas.Add(idea);
+        var admins = await db.Profiles.Where(p => p.IsSystemAdmin && !p.IsSuspended).Select(p => p.Id).ToListAsync(cancellationToken);
+        await notifications.PublishAsync(
+            admins, NotificationKind.IdeaSubmitted, $"New app idea: {idea.Title}", "/admin/ideas", idea.AuthorProfileId,
+            _ => IdeaEmails.ForAdmin(idea), cancellationToken);
+        emails.Enqueue(IdeaEmails.Confirmation(idea));
         await db.SaveChangesAsync(cancellationToken);
         return (Result.Ok(), new SubmittedIdeaDto(idea.Id, idea.Title, idea.SubmitterName, idea.SubmitterEmail));
     }

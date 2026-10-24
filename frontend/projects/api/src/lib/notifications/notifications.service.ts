@@ -17,7 +17,8 @@ export type NotificationKind =
   | 'PlanningPokerInvite'
   | 'Announcement'
   | 'ResourceShared'
-  | 'ResourceOwnershipTransferred';
+  | 'ResourceOwnershipTransferred'
+  | 'IdeaSubmitted';
 
 export interface NotificationDto {
   id: string;
