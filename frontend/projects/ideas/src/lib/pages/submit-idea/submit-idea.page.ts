@@ -7,15 +7,25 @@ import {
   ElementRef,
   inject,
   Injector,
+  OnInit,
   signal,
   viewChild,
   viewChildren,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { IDEAS_SERVICE, problemDetails, SubmittedIdea } from '@faithtech-community/api';
 import {
+  AUTH_SERVICE,
+  IDEAS_SERVICE,
+  problemDetails,
+  SubmitIdeaRequest,
+  SubmittedIdea,
+} from '@faithtech-community/api';
+import {
+  BadgeComponent,
   ButtonComponent,
+  ChipComponent,
+  ChipGroupComponent,
   DescriptionListComponent,
   DescriptionListItemComponent,
   ErrorSummaryComponent,
@@ -37,8 +47,18 @@ import {
 } from '@faithtech-community/components';
 import { firstValueFrom, map } from 'rxjs';
 
-import { AUDIENCES, labelOf, LIMITS } from '../../idea-options';
-import { IDEA_STEPS, IdeaStepKey, planIdeaSteps } from '../../idea-steps';
+import {
+  AUDIENCES,
+  COMMITMENTS,
+  INVOLVEMENTS,
+  labelOf,
+  LIMITS,
+  PLATFORMS,
+  SKILLS,
+  STAGES,
+  TOPICS,
+} from '../../idea-options';
+import { IDEA_STEPS, IdeaStepKey, IdeaSwitches, planIdeaSteps } from '../../idea-steps';
 
 type Field = 'problem' | 'audience' | 'title' | 'pitch' | 'solution' | 'name' | 'email';
 
@@ -79,7 +99,10 @@ const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s.]+$/;
   selector: 'ft-submit-idea-page',
   imports: [
     ReactiveFormsModule,
+    BadgeComponent,
     ButtonComponent,
+    ChipComponent,
+    ChipGroupComponent,
     DescriptionListComponent,
     DescriptionListItemComponent,
     ErrorSummaryComponent,
@@ -102,11 +125,18 @@ const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s.]+$/;
   styleUrl: './submit-idea.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SubmitIdeaPage {
+export class SubmitIdeaPage implements OnInit {
   private readonly ideas = inject(IDEAS_SERVICE);
+  private readonly auth = inject(AUTH_SERVICE);
   private readonly injector = inject(Injector);
 
   protected readonly audiences = AUDIENCES;
+  protected readonly stages = STAGES;
+  protected readonly platforms = PLATFORMS;
+  protected readonly topicOptions = TOPICS;
+  protected readonly skillOptions = SKILLS;
+  protected readonly involvements = INVOLVEMENTS;
+  protected readonly commitments = COMMITMENTS;
   protected readonly limits = LIMITS;
 
   protected readonly form = new FormGroup({
@@ -117,7 +147,23 @@ export class SubmitIdeaPage {
     solution: new FormControl('', { nonNullable: true }),
     name: new FormControl('', { nonNullable: true }),
     email: new FormControl('', { nonNullable: true }),
+    stage: new FormControl<string | null>(null),
+    platform: new FormControl<string | null>(null),
+    involvement: new FormControl<string | null>(null),
+    commitment: new FormControl<string | null>(null),
   });
+  /** The chips' choices, kept beside the form: topics (at most five) and skills. */
+  protected readonly topics = signal<readonly string[]>([]);
+  protected readonly skills = signal<readonly string[]>([]);
+  /** Optional steps passed with Skip, whose answers were cleared (L2-172 AC3, L2-173 AC2). */
+  protected readonly skipped = signal<ReadonlySet<IdeaStepKey>>(new Set());
+
+  /** A signed-in member submits under their account's name and email (L2-175 AC5, L2-177 AC2). */
+  protected readonly signedIn = this.auth.isAuthenticated;
+  protected readonly member = computed(() => this.auth.currentUser());
+  /** The Idea form switches; the wizard shows once they are known, so the step count never jumps. */
+  private readonly switches = signal<IdeaSwitches | null>(null);
+  protected readonly ready = signal(!this.auth.isAuthenticated());
   /** Every answer as a signal, for the preview, Review and errors that follow the answers. */
   protected readonly values = toSignal(
     this.form.valueChanges.pipe(map(() => this.form.getRawValue())),
@@ -126,7 +172,7 @@ export class SubmitIdeaPage {
     },
   );
 
-  protected readonly steps = computed(() => planIdeaSteps(false, null));
+  protected readonly steps = computed(() => planIdeaSteps(this.signedIn(), this.switches()));
   protected readonly wizardSteps = computed(() => this.steps().map((key) => IDEA_STEPS[key]));
   protected readonly index = signal(0);
   protected readonly step = computed(() => this.steps()[this.index()]);
@@ -151,6 +197,18 @@ export class SubmitIdeaPage {
     () => this.submitted()?.name.trim().split(/\s+/)[0] ?? '',
   );
 
+  async ngOnInit(): Promise<void> {
+    if (!this.signedIn()) return;
+    try {
+      this.switches.set(await firstValueFrom(this.ideas.form()));
+    } catch {
+      // Without the switches the member answers the required steps only.
+      this.switches.set(null);
+    } finally {
+      this.ready.set(true);
+    }
+  }
+
   private readonly card = viewChild(WizardCardComponent);
   private readonly successHeading = viewChild<ElementRef<HTMLElement>>('successHeading');
   private readonly fields = viewChildren(FormFieldComponent);
@@ -163,6 +221,43 @@ export class SubmitIdeaPage {
 
   protected audienceLabel(): string {
     return labelOf(AUDIENCES, this.values().audience);
+  }
+
+  protected label(options: typeof STAGES, value: string | null): string {
+    return value ? labelOf(options, value) : 'Not answered';
+  }
+
+  /** True when an optional step was skipped or left empty, so Review says "Skipped". */
+  protected isSkipped(step: 'stage' | 'people'): boolean {
+    const v = this.values();
+    const empty =
+      step === 'stage'
+        ? !v.stage && !v.platform && !this.topics().length
+        : !v.involvement && !v.commitment && !this.skills().length;
+    return this.skipped().has(step) || empty;
+  }
+
+  protected toggle(list: 'topics' | 'skills', value: string, pressed: boolean): void {
+    const target = list === 'topics' ? this.topics : this.skills;
+    target.update((values) => (pressed ? [...values, value] : values.filter((v) => v !== value)));
+  }
+
+  protected topicDisabled(topic: string): boolean {
+    return this.topics().length >= LIMITS.topics && !this.topics().includes(topic);
+  }
+
+  /** Skip an optional step: its answers are cleared and Review shows it as skipped. */
+  protected skip(): void {
+    const step = this.step();
+    if (step === 'stage') {
+      this.form.patchValue({ stage: null, platform: null });
+      this.topics.set([]);
+    } else if (step === 'people') {
+      this.form.patchValue({ involvement: null, commitment: null });
+      this.skills.set([]);
+    }
+    this.skipped.update((set) => new Set(set).add(step));
+    this.goTo(this.index() + 1);
   }
 
   /** Continue, or Submit idea on Review. */
@@ -178,6 +273,11 @@ export class SubmitIdeaPage {
       await this.submit();
       return;
     }
+    this.skipped.update((set) => {
+      const next = new Set(set);
+      next.delete(step);
+      return next;
+    });
     this.goTo(this.index() + 1);
   }
 
@@ -197,6 +297,9 @@ export class SubmitIdeaPage {
   /** Submit another idea: back to the first step with every answer cleared (L2-176 AC5). */
   protected startAgain(): void {
     this.form.reset();
+    this.topics.set([]);
+    this.skills.set([]);
+    this.skipped.set(new Set());
     this.attempted.set(new Set());
     this.serverErrors.set([]);
     this.submitted.set(null);
@@ -209,19 +312,8 @@ export class SubmitIdeaPage {
   }
 
   private async submit(): Promise<void> {
-    const v = this.form.getRawValue();
     try {
-      const idea = await firstValueFrom(
-        this.ideas.submit({
-          problem: v.problem.trim(),
-          audience: v.audience ?? '',
-          title: v.title.trim(),
-          pitch: v.pitch.trim(),
-          solution: v.solution.trim(),
-          name: v.name.trim(),
-          email: v.email.trim(),
-        }),
-      );
+      const idea = await firstValueFrom(this.ideas.submit(this.request()));
       this.submitted.set(idea);
       afterNextRender(() => this.successHeading()?.nativeElement.focus(), {
         injector: this.injector,
@@ -233,6 +325,30 @@ export class SubmitIdeaPage {
           : null;
       if (fields) this.showServerErrors(fields);
     }
+  }
+
+  /** The answers to send: only the steps this person was asked, and a visitor's name and email (L2-177 AC5). */
+  private request(): SubmitIdeaRequest {
+    const v = this.form.getRawValue();
+    const request: SubmitIdeaRequest = {
+      problem: v.problem.trim(),
+      audience: v.audience ?? '',
+      title: v.title.trim(),
+      pitch: v.pitch.trim(),
+      solution: v.solution.trim(),
+    };
+    if (this.steps().includes('stage')) {
+      Object.assign(request, { stage: v.stage, platform: v.platform, topics: [...this.topics()] });
+    }
+    if (this.steps().includes('people')) {
+      Object.assign(request, {
+        skills: [...this.skills()],
+        involvement: v.involvement,
+        commitment: v.commitment,
+      });
+    }
+    if (!this.signedIn()) Object.assign(request, { name: v.name.trim(), email: v.email.trim() });
+    return request;
   }
 
   /** Each server error goes back to its step and field (L2-176 AC3). */
@@ -276,7 +392,7 @@ export class SubmitIdeaPage {
       require('pitch', 'Add a one-line pitch', LIMITS.pitch, 'the pitch');
       require('solution', 'Say how it would work', LIMITS.solution, 'how it would work');
     }
-    if (step === 'review') {
+    if (step === 'review' && !this.signedIn()) {
       require('name', 'Enter your name', LIMITS.name, 'your name');
       const email = v.email.trim();
       if (!EMAIL.test(email) || email.length > LIMITS.email)

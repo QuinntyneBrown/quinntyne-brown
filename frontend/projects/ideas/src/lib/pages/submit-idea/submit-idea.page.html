@@ -12,132 +12,273 @@
   </ft-stack>
 } @else {
   <ft-page-header title="Submit an app idea" />
-  <ft-wizard
-    label="Idea submission steps"
-    [steps]="wizardSteps()"
-    [current]="index()"
-    [preview]="true"
-    (stepSelect)="goTo($event)"
-  >
-    <form [formGroup]="form" (ngSubmit)="next()" novalidate>
-      <ft-wizard-card [heading]="heading()">
-        <ft-error-summary
-          [errors]="summary()"
-          noun="problem"
-          [action]="step() === 'review' ? 'submit' : 'continue'"
-          (errorSelected)="focusError($event)"
-        />
-        @switch (step()) {
-          @case ('problem') {
-            <ft-form-field label="Describe the problem" [error]="error('problem')">
-              <ft-textarea
-                formControlName="problem"
-                [rows]="5"
-                [maxlength]="limits.problem"
-                placeholder="Volunteers coordinate shifts over group texts, so nights go uncovered."
-              />
-            </ft-form-field>
-            <ft-radio-group
-              #audienceGroup
-              legend="Who feels this most?"
-              orientation="tiles-pair"
-              formControlName="audience"
-              [error]="error('audience')"
-            >
-              @for (option of audiences; track option.value) {
-                <ft-radio [value]="option.value">{{ option.label }}</ft-radio>
+  @if (ready()) {
+    <ft-wizard
+      label="Idea submission steps"
+      [steps]="wizardSteps()"
+      [current]="index()"
+      [preview]="true"
+      (stepSelect)="goTo($event)"
+    >
+      <form [formGroup]="form" (ngSubmit)="next()" novalidate>
+        <ft-wizard-card [heading]="heading()">
+          <ft-error-summary
+            [errors]="summary()"
+            noun="problem"
+            [action]="step() === 'review' ? 'submit' : 'continue'"
+            (errorSelected)="focusError($event)"
+          />
+          @switch (step()) {
+            @case ('problem') {
+              <ft-form-field label="Describe the problem" [error]="error('problem')">
+                <ft-textarea
+                  formControlName="problem"
+                  [rows]="5"
+                  [maxlength]="limits.problem"
+                  placeholder="Volunteers coordinate shifts over group texts, so nights go uncovered."
+                />
+              </ft-form-field>
+              <ft-radio-group
+                #audienceGroup
+                legend="Who feels this most?"
+                orientation="tiles-pair"
+                formControlName="audience"
+                [error]="error('audience')"
+              >
+                @for (option of audiences; track option.value) {
+                  <ft-radio [value]="option.value">{{ option.label }}</ft-radio>
+                }
+              </ft-radio-group>
+            }
+            @case ('idea') {
+              <ft-form-field label="Name your idea" [error]="error('title')">
+                <ft-text-field
+                  formControlName="title"
+                  placeholder="ShiftShare"
+                  [maxlength]="limits.title"
+                />
+              </ft-form-field>
+              <ft-form-field label="One-line pitch" [error]="error('pitch')">
+                <ft-text-field
+                  formControlName="pitch"
+                  placeholder="Shift sign-ups that fill gaps before they happen."
+                  [maxlength]="limits.pitch"
+                />
+              </ft-form-field>
+              <ft-form-field label="How would it work?" [error]="error('solution')">
+                <ft-textarea
+                  formControlName="solution"
+                  [rows]="6"
+                  [maxlength]="limits.solution"
+                  placeholder="Coordinators post open shifts. Volunteers tap to claim one."
+                />
+              </ft-form-field>
+            }
+            @case ('stage') {
+              <ft-radio-group legend="Stage" orientation="tiles-pair" formControlName="stage">
+                @for (option of stages; track option.value) {
+                  <ft-radio [value]="option.value">{{ option.label }}</ft-radio>
+                }
+              </ft-radio-group>
+              <ft-radio-group
+                legend="Where would it run?"
+                orientation="tiles-pair"
+                formControlName="platform"
+              >
+                @for (option of platforms; track option.value) {
+                  <ft-radio [value]="option.value">{{ option.label }}</ft-radio>
+                }
+              </ft-radio-group>
+              <div class="chips">
+                <p class="chips__label" aria-hidden="true">
+                  Topics <span class="optional">(optional)</span>
+                </p>
+                <ft-chip-group label="Topics (optional)">
+                  @for (topic of topicOptions; track topic) {
+                    <ft-chip
+                      [pressed]="topics().includes(topic)"
+                      [disabled]="topicDisabled(topic)"
+                      (pressedChange)="toggle('topics', topic, $event)"
+                      >{{ topic }}</ft-chip
+                    >
+                  }
+                </ft-chip-group>
+              </div>
+            }
+            @case ('people') {
+              <div class="chips">
+                <p class="chips__label" aria-hidden="true">Which skills would get this moving?</p>
+                <ft-chip-group label="Which skills would get this moving?">
+                  @for (skill of skillOptions; track skill) {
+                    <ft-chip
+                      [pressed]="skills().includes(skill)"
+                      (pressedChange)="toggle('skills', skill, $event)"
+                      >{{ skill }}</ft-chip
+                    >
+                  }
+                </ft-chip-group>
+              </div>
+              <ft-radio-group
+                legend="How do you want to be involved?"
+                orientation="tiles"
+                formControlName="involvement"
+              >
+                @for (option of involvements; track option.value) {
+                  <ft-radio [value]="option.value">{{ option.label }}</ft-radio>
+                }
+              </ft-radio-group>
+              <ft-radio-group
+                legend="How much time can you give?"
+                orientation="tiles"
+                formControlName="commitment"
+              >
+                @for (option of commitments; track option.value) {
+                  <ft-radio [value]="option.value">{{ option.label }}</ft-radio>
+                }
+              </ft-radio-group>
+            }
+            @case ('review') {
+              <ft-review-sections>
+                <ft-review-section
+                  heading="The problem"
+                  editLabel="Edit the problem"
+                  (edit)="edit('problem')"
+                >
+                  <ft-description-list>
+                    <ft-description-list-item label="Problem" [multiline]="true">{{
+                      values().problem.trim()
+                    }}</ft-description-list-item>
+                    <ft-description-list-item label="Who feels it">{{
+                      audienceLabel()
+                    }}</ft-description-list-item>
+                  </ft-description-list>
+                </ft-review-section>
+                <ft-review-section
+                  heading="Your idea"
+                  editLabel="Edit your idea"
+                  (edit)="edit('idea')"
+                >
+                  <ft-description-list>
+                    <ft-description-list-item label="Name">{{
+                      values().title.trim()
+                    }}</ft-description-list-item>
+                    <ft-description-list-item label="Pitch">{{
+                      values().pitch.trim()
+                    }}</ft-description-list-item>
+                    <ft-description-list-item label="How it works" [multiline]="true">{{
+                      values().solution.trim()
+                    }}</ft-description-list-item>
+                  </ft-description-list>
+                </ft-review-section>
+                @if (steps().includes('stage')) {
+                  <ft-review-section
+                    heading="How far along is it?"
+                    editLabel="Edit how far along it is"
+                    (edit)="edit('stage')"
+                  >
+                    @if (isSkipped('stage')) {
+                      <p class="muted">Skipped</p>
+                    } @else {
+                      <ft-description-list>
+                        <ft-description-list-item label="Stage">{{
+                          label(stages, values().stage)
+                        }}</ft-description-list-item>
+                        <ft-description-list-item label="Where it would run">{{
+                          label(platforms, values().platform)
+                        }}</ft-description-list-item>
+                        <ft-description-list-item label="Topics">
+                          @if (topics().length) {
+                            <ul class="badges">
+                              @for (topic of topics(); track topic) {
+                                <li>
+                                  <ft-badge>{{ topic }}</ft-badge>
+                                </li>
+                              }
+                            </ul>
+                          } @else {
+                            Not answered
+                          }
+                        </ft-description-list-item>
+                      </ft-description-list>
+                    }
+                  </ft-review-section>
+                }
+                @if (steps().includes('people')) {
+                  <ft-review-section
+                    heading="Who do you need?"
+                    editLabel="Edit who you need"
+                    (edit)="edit('people')"
+                  >
+                    @if (isSkipped('people')) {
+                      <p class="muted">Skipped</p>
+                    } @else {
+                      <ft-description-list>
+                        <ft-description-list-item label="Skills">
+                          @if (skills().length) {
+                            <ul class="badges">
+                              @for (skill of skills(); track skill) {
+                                <li>
+                                  <ft-badge>{{ skill }}</ft-badge>
+                                </li>
+                              }
+                            </ul>
+                          } @else {
+                            Not answered
+                          }
+                        </ft-description-list-item>
+                        <ft-description-list-item label="Involvement">{{
+                          label(involvements, values().involvement)
+                        }}</ft-description-list-item>
+                        <ft-description-list-item label="Time">{{
+                          label(commitments, values().commitment)
+                        }}</ft-description-list-item>
+                      </ft-description-list>
+                    }
+                  </ft-review-section>
+                }
+              </ft-review-sections>
+              @if (signedIn()) {
+                <p class="as">
+                  Submitting as <strong>{{ member()?.name }}</strong
+                  >, {{ member()?.email }}
+                </p>
+              } @else {
+                <h3 class="details">Your details</h3>
+                <ft-form-field label="Your name" [error]="error('name')">
+                  <ft-text-field formControlName="name" autocomplete="name" />
+                </ft-form-field>
+                <ft-form-field label="Email" [error]="error('email')">
+                  <ft-text-field type="email" formControlName="email" autocomplete="email" />
+                </ft-form-field>
               }
-            </ft-radio-group>
+            }
           }
-          @case ('idea') {
-            <ft-form-field label="Name your idea" [error]="error('title')">
-              <ft-text-field
-                formControlName="title"
-                placeholder="ShiftShare"
-                [maxlength]="limits.title"
-              />
-            </ft-form-field>
-            <ft-form-field label="One-line pitch" [error]="error('pitch')">
-              <ft-text-field
-                formControlName="pitch"
-                placeholder="Shift sign-ups that fill gaps before they happen."
-                [maxlength]="limits.pitch"
-              />
-            </ft-form-field>
-            <ft-form-field label="How would it work?" [error]="error('solution')">
-              <ft-textarea
-                formControlName="solution"
-                [rows]="6"
-                [maxlength]="limits.solution"
-                placeholder="Coordinators post open shifts. Volunteers tap to claim one."
-              />
-            </ft-form-field>
+          @if (index() > 0) {
+            <ft-button ftWizardBack variant="ghost" (click)="back()">Back</ft-button>
           }
-          @case ('review') {
-            <ft-review-sections>
-              <ft-review-section
-                heading="The problem"
-                editLabel="Edit the problem"
-                (edit)="edit('problem')"
-              >
-                <ft-description-list>
-                  <ft-description-list-item label="Problem" [multiline]="true">{{
-                    values().problem.trim()
-                  }}</ft-description-list-item>
-                  <ft-description-list-item label="Who feels it">{{
-                    audienceLabel()
-                  }}</ft-description-list-item>
-                </ft-description-list>
-              </ft-review-section>
-              <ft-review-section
-                heading="Your idea"
-                editLabel="Edit your idea"
-                (edit)="edit('idea')"
-              >
-                <ft-description-list>
-                  <ft-description-list-item label="Name">{{
-                    values().title.trim()
-                  }}</ft-description-list-item>
-                  <ft-description-list-item label="Pitch">{{
-                    values().pitch.trim()
-                  }}</ft-description-list-item>
-                  <ft-description-list-item label="How it works" [multiline]="true">{{
-                    values().solution.trim()
-                  }}</ft-description-list-item>
-                </ft-description-list>
-              </ft-review-section>
-            </ft-review-sections>
-            <h3 class="details">Your details</h3>
-            <ft-form-field label="Your name" [error]="error('name')">
-              <ft-text-field formControlName="name" autocomplete="name" />
-            </ft-form-field>
-            <ft-form-field label="Email" [error]="error('email')">
-              <ft-text-field type="email" formControlName="email" autocomplete="email" />
-            </ft-form-field>
+          @if (step() === 'stage' || step() === 'people') {
+            <ft-button ftWizardActions variant="ghost" (click)="skip()">Skip</ft-button>
           }
-        }
-        @if (index() > 0) {
-          <ft-button ftWizardBack variant="ghost" (click)="back()">Back</ft-button>
-        }
-        @if (step() === 'review') {
-          <ft-button ftWizardActions type="submit" variant="primary">Submit idea</ft-button>
-        } @else {
-          <ft-button ftWizardActions type="submit" variant="primary"
-            >Continue<ft-icon name="move"
-          /></ft-button>
-        }
-      </ft-wizard-card>
-    </form>
-    <aside ftWizardPreview class="preview" aria-labelledby="preview-heading">
-      <h2 class="preview__heading" id="preview-heading">Preview</h2>
-      <ft-preview-card
-        label="Idea preview"
-        [title]="values().title"
-        caption="You"
-        [text]="values().pitch"
-        placeholderTitle="Untitled idea"
-        placeholderText="Your one-line pitch appears here."
-      />
-    </aside>
-  </ft-wizard>
+          @if (step() === 'review') {
+            <ft-button ftWizardActions type="submit" variant="primary">Submit idea</ft-button>
+          } @else {
+            <ft-button ftWizardActions type="submit" variant="primary"
+              >Continue<ft-icon name="move"
+            /></ft-button>
+          }
+        </ft-wizard-card>
+      </form>
+      <aside ftWizardPreview class="preview" aria-labelledby="preview-heading">
+        <h2 class="preview__heading" id="preview-heading">Preview</h2>
+        <ft-preview-card
+          label="Idea preview"
+          [title]="values().title"
+          [caption]="signedIn() ? (member()?.name ?? '') : 'You'"
+          [text]="values().pitch"
+          placeholderTitle="Untitled idea"
+          placeholderText="Your one-line pitch appears here."
+        />
+      </aside>
+    </ft-wizard>
+  }
 }
