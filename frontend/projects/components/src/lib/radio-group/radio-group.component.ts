@@ -1,9 +1,11 @@
 import {
+  ElementRef,
   booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   computed,
   forwardRef,
+  inject,
   input,
   signal,
 } from '@angular/core';
@@ -38,6 +40,7 @@ export type RadioGroupOrientation = 'stack' | 'inline' | 'tiles' | 'tiles-pair';
 })
 export class RadioGroupComponent implements ControlValueAccessor {
   private readonly uid = `ft-radio-group-${nextId++}`;
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly legend = input.required<string>();
   readonly name = input<string | null>(null);
@@ -78,5 +81,13 @@ export class RadioGroupComponent implements ControlValueAccessor {
 
   touch(): void {
     this.onTouched();
+  }
+
+  /** Moves focus to the checked radio, or the first one, as an error summary link does (L2-169 AC2). */
+  focus(): void {
+    const radios = Array.from(
+      this.host.nativeElement.querySelectorAll<HTMLInputElement>('input[type=radio]'),
+    );
+    (radios.find((r) => r.checked) ?? radios[0])?.focus();
   }
 }

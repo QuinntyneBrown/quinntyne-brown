@@ -1,0 +1,143 @@
+@if (submitted(); as idea) {
+  <ft-stack class="success" width="md">
+    <ft-icon-tile name="done" cover="sage" />
+    <h1 #successHeading tabindex="-1">Your idea is in</h1>
+    <p class="muted">
+      Thanks, {{ firstName() }}. <strong>{{ idea.title }}</strong> was sent. We’ll email you at
+      {{ idea.email }} if we have questions.
+    </p>
+    <div>
+      <ft-button variant="primary" (click)="startAgain()">Submit another idea</ft-button>
+    </div>
+  </ft-stack>
+} @else {
+  <ft-page-header title="Submit an app idea" />
+  <ft-wizard
+    label="Idea submission steps"
+    [steps]="wizardSteps()"
+    [current]="index()"
+    [preview]="true"
+    (stepSelect)="goTo($event)"
+  >
+    <form [formGroup]="form" (ngSubmit)="next()" novalidate>
+      <ft-wizard-card [heading]="heading()">
+        <ft-error-summary
+          [errors]="summary()"
+          noun="problem"
+          [action]="step() === 'review' ? 'submit' : 'continue'"
+          (errorSelected)="focusError($event)"
+        />
+        @switch (step()) {
+          @case ('problem') {
+            <ft-form-field label="Describe the problem" [error]="error('problem')">
+              <ft-textarea
+                formControlName="problem"
+                [rows]="5"
+                [maxlength]="limits.problem"
+                placeholder="Volunteers coordinate shifts over group texts, so nights go uncovered."
+              />
+            </ft-form-field>
+            <ft-radio-group
+              #audienceGroup
+              legend="Who feels this most?"
+              orientation="tiles-pair"
+              formControlName="audience"
+              [error]="error('audience')"
+            >
+              @for (option of audiences; track option.value) {
+                <ft-radio [value]="option.value">{{ option.label }}</ft-radio>
+              }
+            </ft-radio-group>
+          }
+          @case ('idea') {
+            <ft-form-field label="Name your idea" [error]="error('title')">
+              <ft-text-field
+                formControlName="title"
+                placeholder="ShiftShare"
+                [maxlength]="limits.title"
+              />
+            </ft-form-field>
+            <ft-form-field label="One-line pitch" [error]="error('pitch')">
+              <ft-text-field
+                formControlName="pitch"
+                placeholder="Shift sign-ups that fill gaps before they happen."
+                [maxlength]="limits.pitch"
+              />
+            </ft-form-field>
+            <ft-form-field label="How would it work?" [error]="error('solution')">
+              <ft-textarea
+                formControlName="solution"
+                [rows]="6"
+                [maxlength]="limits.solution"
+                placeholder="Coordinators post open shifts. Volunteers tap to claim one."
+              />
+            </ft-form-field>
+          }
+          @case ('review') {
+            <ft-review-sections>
+              <ft-review-section
+                heading="The problem"
+                editLabel="Edit the problem"
+                (edit)="edit('problem')"
+              >
+                <ft-description-list>
+                  <ft-description-list-item label="Problem" [multiline]="true">{{
+                    values().problem.trim()
+                  }}</ft-description-list-item>
+                  <ft-description-list-item label="Who feels it">{{
+                    audienceLabel()
+                  }}</ft-description-list-item>
+                </ft-description-list>
+              </ft-review-section>
+              <ft-review-section
+                heading="Your idea"
+                editLabel="Edit your idea"
+                (edit)="edit('idea')"
+              >
+                <ft-description-list>
+                  <ft-description-list-item label="Name">{{
+                    values().title.trim()
+                  }}</ft-description-list-item>
+                  <ft-description-list-item label="Pitch">{{
+                    values().pitch.trim()
+                  }}</ft-description-list-item>
+                  <ft-description-list-item label="How it works" [multiline]="true">{{
+                    values().solution.trim()
+                  }}</ft-description-list-item>
+                </ft-description-list>
+              </ft-review-section>
+            </ft-review-sections>
+            <h3 class="details">Your details</h3>
+            <ft-form-field label="Your name" [error]="error('name')">
+              <ft-text-field formControlName="name" autocomplete="name" />
+            </ft-form-field>
+            <ft-form-field label="Email" [error]="error('email')">
+              <ft-text-field type="email" formControlName="email" autocomplete="email" />
+            </ft-form-field>
+          }
+        }
+        @if (index() > 0) {
+          <ft-button ftWizardBack variant="ghost" (click)="back()">Back</ft-button>
+        }
+        @if (step() === 'review') {
+          <ft-button ftWizardActions type="submit" variant="primary">Submit idea</ft-button>
+        } @else {
+          <ft-button ftWizardActions type="submit" variant="primary"
+            >Continue<ft-icon name="move"
+          /></ft-button>
+        }
+      </ft-wizard-card>
+    </form>
+    <aside ftWizardPreview class="preview" aria-labelledby="preview-heading">
+      <h2 class="preview__heading" id="preview-heading">Preview</h2>
+      <ft-preview-card
+        label="Idea preview"
+        [title]="values().title"
+        caption="You"
+        [text]="values().pitch"
+        placeholderTitle="Untitled idea"
+        placeholderText="Your one-line pitch appears here."
+      />
+    </aside>
+  </ft-wizard>
+}

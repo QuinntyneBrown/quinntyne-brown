@@ -6,7 +6,7 @@ import { apiTestProviders } from '../shared/api-test-providers';
 import { HttpIdeasService } from './http-ideas.service';
 import { IDEAS_SERVICE } from './ideas.service';
 
-// Traces to: L2-171, L2-181
+// Traces to: L2-171, L2-176, L2-177, L2-181
 describe('HttpIdeasService', () => {
   let service: HttpIdeasService;
   let controller: HttpTestingController;
@@ -17,6 +17,24 @@ describe('HttpIdeasService', () => {
     });
     service = TestBed.inject(IDEAS_SERVICE) as HttpIdeasService;
     controller = TestBed.inject(HttpTestingController);
+  });
+
+  it('submits an idea, leaving refusals and failures to the page', () => {
+    service
+      .submit({ problem: 'p', audience: 'families', title: 't', pitch: 'p', solution: 's' })
+      .subscribe();
+
+    const req = controller.expectOne('/api/ideas');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({
+      problem: 'p',
+      audience: 'families',
+      title: 't',
+      pitch: 'p',
+      solution: 's',
+    });
+    expect(req.request.context.get(HANDLES_SERVER_ERROR)).toBe(true);
+    req.flush({ id: 'idea-1', title: 't', name: 'n', email: 'e' });
   });
 
   it('reads the switches for the wizard', () => {

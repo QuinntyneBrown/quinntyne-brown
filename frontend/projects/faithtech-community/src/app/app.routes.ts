@@ -8,6 +8,7 @@ import {
   orgGuard,
   orgRedirectGuard,
   publicEventMatch,
+  signedOutMatch,
 } from './guards';
 import {
   AuthCallbackPage,
@@ -131,6 +132,13 @@ export const routes: Routes = [
     component: PublicShellComponent,
     loadChildren: () => import('@faithtech-community/events').then((m) => m.PUBLIC_EVENT_ROUTES),
   },
+  // Submit an app idea: the public shell for visitors, the app shell below for members (ADR 0043).
+  {
+    path: 'ideas',
+    component: PublicShellComponent,
+    canMatch: [signedOutMatch],
+    loadChildren: () => import('@faithtech-community/ideas').then((m) => m.IDEAS_ROUTES),
+  },
   {
     path: 'accept-invite',
     loadChildren: () => import('@faithtech-community/invites').then((m) => m.ACCEPT_INVITE_ROUTES),
@@ -174,6 +182,10 @@ export const routes: Routes = [
         path: 'settings',
         loadChildren: () =>
           import('@faithtech-community/notifications').then((m) => m.SETTINGS_ROUTES),
+      },
+      {
+        path: 'ideas',
+        loadChildren: () => import('@faithtech-community/ideas').then((m) => m.IDEAS_ROUTES),
       },
       // The Idea form sits beside Users and Audit log (ADR 0043).
       {

@@ -1,0 +1,10 @@
+<ft-card variant="flush">
+  <div class="body">
+    <h2 #headingEl tabindex="-1">{{ heading() }}</h2>
+    <ng-content />
+  </div>
+  <div class="footer">
+    <div class="start"><ng-content select="[ftWizardBack]" /></div>
+    <div class="end"><ng-content select="[ftWizardActions]" /></div>
+  </div>
+</ft-card>

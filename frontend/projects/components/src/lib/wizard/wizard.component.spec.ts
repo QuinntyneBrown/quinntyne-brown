@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, viewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { PreviewCardComponent } from './preview-card.component';
 import { ReviewSectionComponent, ReviewSectionsComponent } from './review-section.component';
+import { WizardCardComponent } from './wizard-card.component';
 import { WizardComponent, WizardStep } from './wizard.component';
 
 @Component({
@@ -144,5 +145,34 @@ describe('PreviewCardComponent', () => {
     expect(title().classList).not.toContain('muted');
     expect(host.textContent).toContain('Shift sign-ups.');
     expect(host.textContent).toContain('You');
+  });
+});
+
+@Component({
+  imports: [WizardCardComponent],
+  template: `<ft-wizard-card heading="What problem have you noticed?">
+    <p>Fields</p>
+    <button ftWizardBack type="button">Back</button>
+    <button ftWizardActions type="submit">Continue</button>
+  </ft-wizard-card>`,
+})
+class CardHostComponent {
+  readonly card = viewChild.required(WizardCardComponent);
+}
+
+// Traces to: L2-168 AC3
+describe('WizardCardComponent', () => {
+  it('opens with a focusable step heading and puts Back and the actions in the footer', () => {
+    const fixture = TestBed.createComponent(CardHostComponent);
+    document.body.appendChild(fixture.nativeElement);
+    fixture.detectChanges();
+    const host: HTMLElement = fixture.nativeElement;
+    const heading = host.querySelector('h2')!;
+
+    expect(heading.getAttribute('tabindex')).toBe('-1');
+    expect(host.querySelector('.footer .start button')!.textContent).toBe('Back');
+    expect(host.querySelector('.footer .end button')!.textContent).toBe('Continue');
+    fixture.componentInstance.card().focusHeading();
+    expect(document.activeElement).toBe(heading);
   });
 });

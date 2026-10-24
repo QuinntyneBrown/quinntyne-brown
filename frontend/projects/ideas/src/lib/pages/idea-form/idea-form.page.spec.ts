@@ -16,6 +16,7 @@ async function setup(
     of({ ...s, updatedAt: null }),
 ) {
   const service = {
+    submit: vi.fn(),
     form: vi.fn(() => of({ askStage: true, askPeople: true })),
     settings: vi.fn(settings),
     saveSettings: vi.fn(saveSettings),

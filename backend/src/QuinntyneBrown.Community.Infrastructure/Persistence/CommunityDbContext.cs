@@ -109,6 +109,8 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
 
     public DbSet<IdeaIntake> IdeaIntakes => Set<IdeaIntake>();
 
+    public DbSet<Idea> Ideas => Set<Idea>();
+
     /// <summary>The ASP.NET Data Protection key ring, so protected secrets survive restarts (ADR 0042).</summary>
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
@@ -721,6 +723,24 @@ public class CommunityDbContext(DbContextOptions<CommunityDbContext> options)
         builder.Entity<IdeaIntake>(intake =>
         {
             intake.Property(i => i.Id).ValueGeneratedNever();
+        });
+
+        builder.Entity<Idea>(idea =>
+        {
+            idea.Property(i => i.Id).ValueGeneratedNever();
+            idea.Property(i => i.SubmitterName).HasMaxLength(IdeaOptions.NameMaxLength);
+            idea.Property(i => i.SubmitterEmail).HasMaxLength(IdeaOptions.EmailMaxLength);
+            idea.Property(i => i.Problem).HasMaxLength(IdeaOptions.ProblemMaxLength);
+            idea.Property(i => i.Audience).HasMaxLength(IdeaOptions.KeyMaxLength);
+            idea.Property(i => i.Title).HasMaxLength(IdeaOptions.TitleMaxLength);
+            idea.Property(i => i.Pitch).HasMaxLength(IdeaOptions.PitchMaxLength);
+            idea.Property(i => i.Solution).HasMaxLength(IdeaOptions.SolutionMaxLength);
+            idea.Property(i => i.Stage).HasMaxLength(IdeaOptions.KeyMaxLength);
+            idea.Property(i => i.Platform).HasMaxLength(IdeaOptions.KeyMaxLength);
+            idea.Property(i => i.Involvement).HasMaxLength(IdeaOptions.KeyMaxLength);
+            idea.Property(i => i.Commitment).HasMaxLength(IdeaOptions.KeyMaxLength);
+            idea.Property(i => i.Status).HasConversion<string>().HasMaxLength(16);
+            idea.HasIndex(i => new { i.OrganizationId, i.SubmittedAt });
         });
 
         builder.Entity<Event>().HasIndex(e => e.OrganizationId);

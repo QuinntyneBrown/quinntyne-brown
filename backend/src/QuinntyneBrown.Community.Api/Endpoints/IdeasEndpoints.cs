@@ -1,3 +1,4 @@
+using QuinntyneBrown.Community.Api.Middleware;
 using QuinntyneBrown.Community.Application.Ideas;
 
 namespace QuinntyneBrown.Community.Api.Endpoints;
@@ -7,6 +8,15 @@ public static class IdeasEndpoints
 {
     public static IEndpointRouteBuilder MapIdeasEndpoints(this IEndpointRouteBuilder app)
     {
+        // The only anonymous Ideas endpoint: validated by the handler and rate limited (L2-177, L2-178, ADR 0044).
+        app.MapPost("/api/ideas", async (SubmitIdeaCommand command, SubmitIdeaHandler handler, CancellationToken cancellationToken) =>
+            {
+                var (result, idea) = await handler.HandleAsync(command, cancellationToken);
+                return result.ToHttp(() => Results.Created($"/api/ideas/{idea!.Id}", idea));
+            })
+            .AllowAnonymous()
+            .RequireRateLimiting(WebProtectionSetup.IdeaSubmitRateLimitPolicy);
+
         app.MapGet("/api/ideas/form", async (IdeaFormHandler handler, CancellationToken cancellationToken) =>
             Results.Ok(await handler.GetFormAsync(cancellationToken)));
 

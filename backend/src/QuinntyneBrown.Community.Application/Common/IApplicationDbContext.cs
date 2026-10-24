@@ -96,5 +96,7 @@ public interface IApplicationDbContext
 
     DbSet<Domain.Ideas.IdeaIntake> IdeaIntakes { get; }
 
+    DbSet<Domain.Ideas.Idea> Ideas { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

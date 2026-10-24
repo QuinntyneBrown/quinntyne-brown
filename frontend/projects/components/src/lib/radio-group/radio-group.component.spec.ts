@@ -159,6 +159,17 @@ describe('RadioGroupComponent tiles', () => {
     expect(host.querySelectorAll('label.choice.choice--tile')).toHaveLength(2);
   });
 
+  it('focus() moves focus to the first radio when none is checked', () => {
+    const fixture = TestBed.createComponent(TilesHostComponent);
+    document.body.appendChild(fixture.nativeElement);
+    fixture.detectChanges();
+    const host: HTMLElement = fixture.nativeElement;
+
+    fixture.debugElement.children[0].injector.get(RadioGroupComponent).focus();
+
+    expect(document.activeElement).toBe(host.querySelector('input[type=radio]'));
+  });
+
   it('keeps one column for plain tiles', () => {
     const fixture = TestBed.createComponent(TilesHostComponent);
     fixture.componentInstance.orientation = 'tiles';

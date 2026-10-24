@@ -63,6 +63,7 @@ public static class DependencyInjection
         services.AddScoped<IntegrationAppsHandler>();
         services.AddScoped<ReceiveEventHandler>();
         services.AddScoped<IdeaFormHandler>();
+        services.AddScoped<SubmitIdeaHandler>();
         services.AddScoped<ResolveOrgSlugHandler>();
         services.AddScoped<MyWorkHandler>();
         services.AddScoped<MembersHandler>();
