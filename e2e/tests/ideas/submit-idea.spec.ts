@@ -189,3 +189,108 @@ test.describe('Idea delivery', () => {
     await expect(new IdeaFormPage(page).heading).toBeVisible();
   });
 });
+
+test.describe('Submitting', () => {
+  async function toReview(wizard: SubmitIdeaPage) {
+    await wizard.open();
+    await wizard.answerTheProblem();
+    await wizard.answerYourIdea();
+    await wizard.name.fill('Hannah Kim');
+    await wizard.email.fill('hannah.kim@example.org');
+  }
+
+  // L2-176 AC1: busy, Back disabled, a second press sends nothing.
+  test('while submitting the button is busy and Back is disabled', async ({ page, api, axe }) => {
+    const wizard = new SubmitIdeaPage(page);
+    let release: () => void = () => undefined;
+    const held = new Promise<void>((resolve) => (release = resolve));
+    api.on('POST', '/api/ideas', async (route) => {
+      await held;
+      await api.fallback(route);
+    });
+    await toReview(wizard);
+
+    await wizard.submit.click();
+
+    await expect(wizard.submit).toHaveText('Submitting…');
+    await expect(wizard.submit).toHaveAttribute('aria-busy', 'true');
+    await expect(wizard.back).toBeDisabled();
+    await axe.check();
+    await wizard.submit.click({ force: true });
+    release();
+    await expect(wizard.success).toBeVisible();
+    expect(api.callsTo('POST', '/api/ideas')).toHaveLength(1);
+  });
+
+  // L2-176 AC2: a failure keeps every answer and offers Try again.
+  test('a failed submit keeps the answers and Try again sends them', async ({ page, api, axe }) => {
+    const wizard = new SubmitIdeaPage(page);
+    let fail = true;
+    api.on('POST', '/api/ideas', (route) =>
+      fail ? route.fulfill({ status: 503 }) : api.fallback(route),
+    );
+    await toReview(wizard);
+
+    await wizard.submit.click();
+
+    await expect(wizard.failure).toContainText(
+      'We couldn’t reach the server. Your answers are kept. Try again.',
+    );
+    await expect(wizard.reviewSection('Your idea')).toContainText('ShiftShare');
+    await expect(wizard.name).toHaveValue('Hannah Kim');
+    await axe.check();
+    fail = false;
+    await wizard.tryAgain.click();
+    await expect(wizard.success).toBeVisible();
+  });
+
+  // L2-176 AC2: too many ideas in an hour.
+  test('the rate limit says to wait', async ({ page, api }) => {
+    const wizard = new SubmitIdeaPage(page);
+    api.ideas.limitPerHour = 0;
+    await toReview(wizard);
+
+    await wizard.submit.click();
+
+    await expect(wizard.failure).toContainText(
+      'You’ve sent a lot of ideas in a short time. Try again in a little while.',
+    );
+  });
+
+  // L2-176 AC3: a server refusal goes back to the step and field it belongs to.
+  test('a server refusal goes back to its step', async ({ page, api }) => {
+    const wizard = new SubmitIdeaPage(page);
+    api.on('POST', '/api/ideas', (route) =>
+      route.fulfill({
+        status: 400,
+        json: { status: 400, errors: { pitch: ['Use 140 characters or fewer for the pitch'] } },
+      }),
+    );
+    await toReview(wizard);
+
+    await wizard.submit.click();
+
+    await expect(wizard.stepHeading).toHaveText('What would you build?');
+    await expect(wizard.summaryLinks()).toHaveText(['Use 140 characters or fewer for the pitch']);
+  });
+
+  // L2-176 AC5: Submit another idea starts again with nothing filled in.
+  test('Submit another idea starts again', async ({ page }) => {
+    const wizard = new SubmitIdeaPage(page);
+    await toReview(wizard);
+    await wizard.submit.click();
+
+    await wizard.submitAnother.click();
+
+    await expect(wizard.stepHeading).toHaveText('What problem have you noticed?');
+    await expect(wizard.stepHeading).toBeFocused();
+    await expect(wizard.problem).toHaveValue('');
+    await expect(wizard.preview).toContainText('Untitled idea');
+    await wizard.problem.fill('Food banks track donations on paper, so shelves run empty.');
+    await wizard.choice(wizard.audience, 'Families').check();
+    await wizard.continue.click();
+    await wizard.answerYourIdea();
+    await expect(wizard.name).toHaveValue('');
+    await expect(wizard.email).toHaveValue('');
+  });
+});

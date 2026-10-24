@@ -237,6 +237,9 @@
                   </ft-review-section>
                 }
               </ft-review-sections>
+              @if (failure(); as text) {
+                <ft-alert status="danger" heading="Idea not submitted">{{ text }}</ft-alert>
+              }
               @if (signedIn()) {
                 <p class="as">
                   Submitting as <strong>{{ member()?.name }}</strong
@@ -254,13 +257,17 @@
             }
           }
           @if (index() > 0) {
-            <ft-button ftWizardBack variant="ghost" (click)="back()">Back</ft-button>
+            <ft-button ftWizardBack variant="ghost" [disabled]="busy()" (click)="back()"
+              >Back</ft-button
+            >
           }
           @if (step() === 'stage' || step() === 'people') {
             <ft-button ftWizardActions variant="ghost" (click)="skip()">Skip</ft-button>
           }
           @if (step() === 'review') {
-            <ft-button ftWizardActions type="submit" variant="primary">Submit idea</ft-button>
+            <ft-button ftWizardActions type="submit" variant="primary" [loading]="busy()">{{
+              busy() ? 'Submitting…' : failure() ? 'Try again' : 'Submit idea'
+            }}</ft-button>
           } @else {
             <ft-button ftWizardActions type="submit" variant="primary"
               >Continue<ft-icon name="move"

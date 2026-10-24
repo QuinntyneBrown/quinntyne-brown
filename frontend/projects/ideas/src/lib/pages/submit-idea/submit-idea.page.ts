@@ -22,6 +22,7 @@ import {
   SubmittedIdea,
 } from '@faithtech-community/api';
 import {
+  AlertComponent,
   BadgeComponent,
   ButtonComponent,
   ChipComponent,
@@ -99,6 +100,7 @@ const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s.]+$/;
   selector: 'ft-submit-idea-page',
   imports: [
     ReactiveFormsModule,
+    AlertComponent,
     BadgeComponent,
     ButtonComponent,
     ChipComponent,
@@ -182,6 +184,10 @@ export class SubmitIdeaPage implements OnInit {
   private readonly attempted = signal<ReadonlySet<IdeaStepKey>>(new Set());
   private readonly serverErrors = signal<FieldError[]>([]);
   protected readonly submitted = signal<SubmittedIdea | null>(null);
+  /** Submitting: the button is busy and Back is disabled (L2-176 AC1). */
+  protected readonly busy = signal(false);
+  /** Why the last submit failed; every answer is kept (L2-176 AC2). */
+  protected readonly failure = signal<string | null>(null);
 
   protected readonly errors = computed<FieldError[]>(() => {
     const step = this.step();
@@ -262,6 +268,7 @@ export class SubmitIdeaPage implements OnInit {
 
   /** Continue, or Submit idea on Review. */
   protected async next(): Promise<void> {
+    if (this.busy()) return;
     const step = this.step();
     this.serverErrors.update((errors) => errors.filter((e) => STEP_OF[e.field] !== step));
     this.attempted.update((set) => new Set(set).add(step));
@@ -302,6 +309,7 @@ export class SubmitIdeaPage implements OnInit {
     this.skipped.set(new Set());
     this.attempted.set(new Set());
     this.serverErrors.set([]);
+    this.failure.set(null);
     this.submitted.set(null);
     this.goTo(0);
   }
@@ -312,6 +320,8 @@ export class SubmitIdeaPage implements OnInit {
   }
 
   private async submit(): Promise<void> {
+    this.busy.set(true);
+    this.failure.set(null);
     try {
       const idea = await firstValueFrom(this.ideas.submit(this.request()));
       this.submitted.set(idea);
@@ -319,11 +329,16 @@ export class SubmitIdeaPage implements OnInit {
         injector: this.injector,
       });
     } catch (error) {
-      const fields =
-        error instanceof HttpErrorResponse && error.status === 400
-          ? problemDetails(error)?.errors
-          : null;
-      if (fields) this.showServerErrors(fields);
+      const status = error instanceof HttpErrorResponse ? error.status : 0;
+      const fields = status === 400 ? problemDetails(error)?.errors : null;
+      if (fields && this.showServerErrors(fields)) return;
+      this.failure.set(
+        status === 429
+          ? 'You’ve sent a lot of ideas in a short time. Try again in a little while.'
+          : 'We couldn’t reach the server. Your answers are kept. Try again.',
+      );
+    } finally {
+      this.busy.set(false);
     }
   }
 
@@ -352,15 +367,16 @@ export class SubmitIdeaPage implements OnInit {
   }
 
   /** Each server error goes back to its step and field (L2-176 AC3). */
-  private showServerErrors(fields: Record<string, string[]>): void {
+  private showServerErrors(fields: Record<string, string[]>): boolean {
     const errors = Object.entries(fields)
       .filter(([field]) => field in STEP_OF)
       .map(([field, messages]) => ({ field: field as Field, message: messages[0] }));
-    if (!errors.length) return;
+    if (!errors.length) return false;
     this.serverErrors.set(errors);
     const first = Math.min(...errors.map((e) => this.steps().indexOf(STEP_OF[e.field])));
     this.index.set(first);
     this.focusSummary();
+    return true;
   }
 
   private focusSummary(): void {
